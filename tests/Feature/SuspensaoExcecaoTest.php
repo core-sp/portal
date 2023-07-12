@@ -152,7 +152,7 @@ class SuspensaoExcecaoTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
-        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') criou *suspensão* (id: 1)';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') criou período *suspensão do representante no agendamento de salas* (id: 1)';
         $this->assertStringContainsString($txt, $log);
     }
 
@@ -491,7 +491,7 @@ class SuspensaoExcecaoTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
-        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou período *suspensão* (id: 1)';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou período *suspensão do representante no agendamento de salas* (id: 1)';
         $this->assertStringContainsString($txt, $log);
     }
 
@@ -700,7 +700,7 @@ class SuspensaoExcecaoTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
-        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou período *exceção* (id: 1)';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou período *exceção do representante no agendamento de salas* (id: 1)';
         $this->assertStringContainsString($txt, $log);
     }
 
@@ -1590,7 +1590,7 @@ class SuspensaoExcecaoTest extends TestCase
             'data_inicial' => now()->format('Y-m-d'),
             'data_final' => now()->addDays(30)->format('Y-m-d'),
             'justificativa' => json_encode([
-                '[Rotina do Portal] | [Ação - suspensão] - Após verificação dos agendamentos, o agendamento com o protocolo '. $agendamentos[0]->protocolo.
+                '[Rotina Portal - Sala de Reunião] | [Ação - suspensão] - Após verificação dos agendamentos, o agendamento com o protocolo '. $agendamentos[0]->protocolo.
                 ' teve o status atualizado para ' . $agendamentos[0]::STATUS_NAO_COMPARECEU . ' devido ao não envio de justificativa. Então, o CPF / CNPJ '.
                 $agendamentos[0]->representante->cpf_cnpj.' foi suspenso automaticamente por 30 dias a contar do dia ' . now()->format('d/m/Y') . '. Data da justificativa: ' . formataData(now())
             ], JSON_FORCE_OBJECT)
@@ -1604,10 +1604,33 @@ class SuspensaoExcecaoTest extends TestCase
             'data_inicial' => now()->format('Y-m-d'),
             'data_final' => now()->addDays(30)->format('Y-m-d'),
             'justificativa' => json_encode([
-                '[Rotina do Portal] | [Ação - suspensão] - Após verificação dos agendamentos, o agendamento com o protocolo '. $agendamentos[2]->protocolo.
+                '[Rotina Portal - Sala de Reunião] | [Ação - suspensão] - Após verificação dos agendamentos, o agendamento com o protocolo '. $agendamentos[2]->protocolo.
                 ' teve o status atualizado para ' . $agendamentos[2]::STATUS_NAO_COMPARECEU . ' devido ao não envio de justificativa. Então, o CPF / CNPJ '.
                 $agendamentos[2]->representante->cpf_cnpj.' foi suspenso automaticamente por 30 dias a contar do dia ' . now()->format('d/m/Y') . '. Data da justificativa: ' . formataData(now())
             ], JSON_FORCE_OBJECT)
         ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_suspensoes_by_agendamentos_kernel()
+    {
+        $agendamentos = $this->create_agendamentos_rotina();
+
+        $service = resolve('App\Contracts\MediadorServiceInterface');
+        $service->getService('SalaReuniao')->agendados()->executarRotina();
+
+
+        $log = explode(PHP_EOL, tailCustom(storage_path($this->pathLogInterno()), 2));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [Rotina Portal - Sala de Reunião] | [Ação - suspensão] - ';
+        $txt = $inicio . 'Após verificação dos agendamentos, o agendamento com o protocolo '. $agendamentos[0]->protocolo. ' teve o status atualizado para ';
+        $txt .= $agendamentos[0]::STATUS_NAO_COMPARECEU . ' devido ao não envio de justificativa. Então, o CPF / CNPJ '.$agendamentos[0]->representante->cpf_cnpj;
+        $txt .= ' foi suspenso automaticamente por 30 dias a contar do dia ' . now()->format('d/m/Y') . '. Data da justificativa: ' . formataData(now());
+        $this->assertStringContainsString($txt, $log[0]);
+
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [Rotina Portal - Sala de Reunião] | [Ação - suspensão] - ';
+        $txt = $inicio . 'Após verificação dos agendamentos, o agendamento com o protocolo '. $agendamentos[2]->protocolo. ' teve o status atualizado para ';
+        $txt .= $agendamentos[2]::STATUS_NAO_COMPARECEU . ' devido ao não envio de justificativa. Então, o CPF / CNPJ '.$agendamentos[2]->representante->cpf_cnpj;
+        $txt .= ' foi suspenso automaticamente por 30 dias a contar do dia ' . now()->format('d/m/Y') . '. Data da justificativa: ' . formataData(now());
+        $this->assertStringContainsString($txt, $log[1]);
     }
 }

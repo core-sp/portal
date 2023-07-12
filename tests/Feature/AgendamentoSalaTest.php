@@ -2975,30 +2975,68 @@ class AgendamentoSalaTest extends TestCase
             ])
         ]);
 
-        // // manter
-        // $suspenso4 = factory('App\SuspensaoExcecao')->create([
-        //     'cpf_cnpj' => '22233366699',
-        //     'data_final' => null
-        // ])->fresh();
+        /* ANEXOS */
 
-        // // atualizar situação para liberado
-        // $suspenso5 = factory('App\SuspensaoExcecao')->create([
-        //     'cpf_cnpj' => '33366699990',
-        //     'data_inicial_excecao' => now()->format('Y-m-d'),
-        //     'data_final_excecao' => now()->format('Y-m-d'),
-        // ])->fresh();
+        $rep = factory('App\Representante')->create([
+            'cpf_cnpj' => '15489632587'
+        ]);
+        $img = $rep->id . '-' . time() . '.png';
+        $file = UploadedFile::fake()->image($img, 250, 250);
+        $file->storeAs("representantes/agendamento_sala", $img);
 
-        // $representante1 = factory('App\Representante')->create([
-        //     'cpf_cnpj' => '73525258000185'
-        // ]);
+        // excluir anexo
+        $agendamento4 = factory('App\AgendamentoSala')->states('justificado')->create([
+            'anexo' => $img,
+            'idrepresentante' => $rep->id,
+            'updated_at' => now()->subMonth()->toDateTimeString(),
+            'status' => AgendamentoSala::STATUS_JUSTIFICADO,
+        ]);
 
-        // // atualizar relação
-        // $suspenso6 = factory('App\SuspensaoExcecao')->states('excecao')->create([
-        //     'cpf_cnpj' => '73525258000185',
-        // ])->fresh();
+        $rep = factory('App\Representante')->create([
+            'cpf_cnpj' => '87456852369'
+        ]);
+        $pdf = $rep->id . '-' . time() . '.pdf';
+        $file = UploadedFile::fake()->create($pdf, 1000, 'application/pdf');
+        $file->storeAs("representantes/agendamento_sala", $pdf);
+
+        // excluir anexo
+        $agendamento5 = factory('App\AgendamentoSala')->states('justificado')->create([
+            'status' => AgendamentoSala::STATUS_NAO_COMPARECEU,
+            'anexo' => $pdf,
+            'idrepresentante' => $rep->id,
+            'updated_at' => now()->subMonth()->subDays(10)->toDateTimeString()
+        ]);
+
+        $rep = factory('App\Representante')->create([
+            'cpf_cnpj' => '52369874123'
+        ]);
+        $img = $rep->id . '-' . time() . '.jpg';
+        $file = UploadedFile::fake()->image($img);
+        $file->storeAs("representantes/agendamento_sala", $img);
+
+        // manter anexo
+        $agendamento6 = factory('App\AgendamentoSala')->states('justificado')->create([
+            'status' => AgendamentoSala::STATUS_JUSTIFICADO,
+            'anexo' => $img,
+            'idrepresentante' => $rep->id,
+            'updated_at' => now()->subDays(29)->toDateTimeString()
+        ]);
+
+        $rep = factory('App\Representante')->create([
+            'cpf_cnpj' => '87589874445'
+        ]);
+        $img = $rep->id . '-' . time() . '.jpg';
+
+        // não remover anexo para disparo de log
+        $agendamento7 = factory('App\AgendamentoSala')->states('justificado')->create([
+            'status' => AgendamentoSala::STATUS_JUSTIFICADO,
+            'anexo' => $img,
+            'idrepresentante' => $rep->id,
+            'updated_at' => now()->subMonth()->toDateTimeString()
+        ]);
 
         return [
-            $agendamento, $agendamento1, $agendamento2, $agendamento3, /*$suspenso4, $suspenso5, $suspenso6*/
+            $agendamento, $agendamento1, $agendamento2, $agendamento3, $agendamento4, $agendamento5, $agendamento6, $agendamento7
         ];
     }
 
@@ -3035,12 +3073,44 @@ class AgendamentoSalaTest extends TestCase
         ]);
     }
 
-    // /** @test */
-    // public function rotina_agendamentos_remove_anexos_kernel()
-    // {
-    //     $agendamentos = $this->create_agendamentos_rotina();
+    /** @test */
+    public function rotina_agendamentos_remove_anexos_kernel()
+    {
+        $agendamentos = $this->create_agendamentos_rotina();
 
-    //     $service = resolve('App\Contracts\MediadorServiceInterface');
-    //     $service->getService('SalaReuniao')->agendados()->executarRotina(true);
-    // }
+        $service = resolve('App\Contracts\MediadorServiceInterface');
+        $service->getService('SalaReuniao')->agendados()->executarRotina(true);
+
+        Storage::disk('local')->assertMissing('representantes/agendamento_sala/'.$agendamentos[4]->anexo);
+        Storage::disk('local')->assertMissing('representantes/agendamento_sala/'.$agendamentos[5]->anexo);
+        Storage::disk('local')->assertExists('representantes/agendamento_sala/'.$agendamentos[6]->anexo);
+
+        // remover o anexo criado no teste que não deve ser removido na rotina
+        Storage::disk('local')->delete('representantes/agendamento_sala/'.$agendamentos[6]->anexo);
+    }
+
+    /** @test */
+    public function log_is_generated_when_anexo_removed_kernel()
+    {
+        $agendamentos = $this->create_agendamentos_rotina();
+
+        $service = resolve('App\Contracts\MediadorServiceInterface');
+        $service->getService('SalaReuniao')->agendados()->executarRotina(true);
+
+        // remover o anexo criado no teste que não deve ser removido na rotina
+        Storage::disk('local')->delete('representantes/agendamento_sala/'.$agendamentos[6]->anexo);
+
+        $log = explode(PHP_EOL, tailCustom(storage_path($this->pathLogInterno()), 3));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [Rotina Portal - Sala de Reunião] - ';
+        $txt = $inicio . 'Removido anexo do agendamento de sala com ID ' . $agendamentos[4]->id.'.';
+        $this->assertStringContainsString($txt, $log[0]);
+
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [Rotina Portal - Sala de Reunião] - ';
+        $txt = $inicio . 'Removido anexo do agendamento de sala com ID ' . $agendamentos[5]->id.'.';
+        $this->assertStringContainsString($txt, $log[1]);
+
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [Rotina Portal - Sala de Reunião] - ';
+        $txt = $inicio . 'Não foi removido anexo do agendamento de sala com ID ' . $agendamentos[7]->id.'.';
+        $this->assertStringContainsString($txt, $log[2]);
+    }
 }

@@ -318,8 +318,8 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             foreach($agendados as $agendado)
             {
                 $removeu = Storage::disk('local')->delete('representantes/agendamento_sala/'.$agendado->anexo);
-                $removeu ? \Log::channel('interno')->info('[Rotina do Portal] - Removido anexo do agendamento de sala com ID ' . $agendado->id.'.') : 
-                \Log::channel('interno')->info('[Rotina do Portal] - Não foi removido anexo do agendamento de sala com ID ' . $agendado->id.'.');
+                $removeu ? \Log::channel('interno')->info('[Rotina Portal - Sala de Reunião] - Removido anexo do agendamento de sala com ID ' . $agendado->id.'.') : 
+                \Log::channel('interno')->info('[Rotina Portal - Sala de Reunião] - Não foi removido anexo do agendamento de sala com ID ' . $agendado->id.'.');
             }
         }
     }

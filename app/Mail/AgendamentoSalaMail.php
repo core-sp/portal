@@ -89,6 +89,8 @@ class AgendamentoSalaMail extends Mailable
             $this->body .= "<br><strong>Em caso de não comparecimento, deve justifcar a partir de ".onlyDate($agendamento->dia)." até ".$agendamento->getDataLimiteJustificar().", caso contrário será suspenso por 30 dias.</strong><br>";
 
         $this->body .= "<br><strong>Conforme a Resolução Nº 01/2023:</strong><br>";
+        $this->body .= "<strong>5.2</strong> Materiais de escritório ou equipamentos do Core-SP, como impressoras, scanners ou computadores, não estarão disponíveis 
+        aos usuários das salas de reunião.<br>";
         $this->body .= "<strong>6.</strong> Os usuários das salas de reunião deverão respeitar regras básicas de convivência, como, por
         exemplo, manter o silêncio e conservar o local de trabalho limpo e organizado.<br>";
         $this->body .= "<strong>7.</strong> É vedado ao usuário:<br>";

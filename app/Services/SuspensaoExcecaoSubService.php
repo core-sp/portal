@@ -106,7 +106,7 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
 
     public function save($user, $dados, $id = null)
     {
-        $acao = isset($id) ? 'editou período' : 'criou';
+        $acao = isset($id) ? 'editou período' : 'criou período';
         $situacao = 'suspensão';
 
         if(isset($id))
@@ -135,7 +135,7 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
             $id = $user->suspensoes()->create($dados)->id;
         }
 
-        event(new CrudEvent($situacao, $acao, $id));
+        event(new CrudEvent($situacao . ' do representante no agendamento de salas', $acao, $id));
     }
 
     public function buscar($busca, $user)

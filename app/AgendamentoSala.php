@@ -208,7 +208,7 @@ class AgendamentoSala extends Model
             $texto .= ' teve o status atualizado para ' . self::STATUS_NAO_COMPARECEU . ' devido a recusa.';
             $texto .= ' A justificativa do funcionário foi enviada por e-mail para o representante e está no agendamento. Então, o CPF / CNPJ ';
         }else{
-            $texto = '[Rotina do Portal] | [Ação - suspensão] - Após verificação dos agendamentos, o agendamento com o protocolo '. $this->protocolo;
+            $texto = '[Rotina Portal - Sala de Reunião] | [Ação - suspensão] - Após verificação dos agendamentos, o agendamento com o protocolo '. $this->protocolo;
             $texto .= ' teve o status atualizado para ' . self::STATUS_NAO_COMPARECEU . ' devido ao não envio de justificativa. Então, o CPF / CNPJ ';
         }
 

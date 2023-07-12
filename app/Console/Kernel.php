@@ -36,6 +36,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        /*
         // Relatório dos agendados no dia de hoje
         $schedule->call(function() {
             $users = User::select('email','idregional','idperfil')
@@ -137,6 +138,7 @@ class Kernel extends ConsoleKernel
                 }
             }
         })->dailyAt('4:15');
+        */
 
         /** 
          * =======================================================================================================
@@ -151,6 +153,9 @@ class Kernel extends ConsoleKernel
             // Atualizar relacionamento caso o cpf / cnpj se cadastre no portal
             $service = resolve('App\Contracts\MediadorServiceInterface');
             $service->getService('SalaReuniao')->suspensaoExcecao()->executarRotina($service);
+
+            // rotina temporária para o ambiente de testes
+            Representante::whereIn('id', [1,2,3,11])->update(['password' => bcrypt('Dev12345')]);
         })->daily();
 
         $schedule->call(function(){

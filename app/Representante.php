@@ -127,7 +127,7 @@ class Representante extends Authenticable
         ->orderBy('dia', 'ASC')
         ->orderBy('periodo', 'ASC')
         ->orderBy('status', 'ASC')
-        ->paginate(5);
+        ->paginate(4);
     }
 
     public function podeAgendar($mes = null, $ano = null)

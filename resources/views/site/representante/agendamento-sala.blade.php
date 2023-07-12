@@ -30,12 +30,12 @@
         <ul class="nav nav-tabs mt-3">
             @if($salas->isNotEmpty())
             <li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#agendamento">Seus Agendamentos</a>
+                <a class="nav-link {{ $salas->isNotEmpty() ? 'active' : '' }}" data-toggle="tab" href="#agendamento">Seus Agendamentos</a>
             </li>
             @endif
             @if((auth()->guard('representante')->user()->tipoPessoa() != 'PJ') && ($participando->isNotEmpty()))
             <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#participando">Agendamentos como participante</a>
+                <a class="nav-link {{ $salas->isEmpty() && $participando->isNotEmpty() ? 'active' : '' }}" data-toggle="tab" href="#participando">Agendamentos como participante</a>
             </li>
             @endif
         </ul>
@@ -43,7 +43,7 @@
 
         <div class="tab-content">
             @if($salas->isNotEmpty())
-            <div class="tab-pane container active" id="agendamento">
+            <div class="tab-pane container {{ $salas->isNotEmpty() ? 'active' : 'fade' }}" id="agendamento">
                 <div class="list-group w-100 mt-2">
                     @foreach ($salas as $item)
                     <div class="list-group-item light d-block bg-info">
@@ -89,7 +89,7 @@
             @endif
 
             @if((auth()->guard('representante')->user()->tipoPessoa() != 'PJ') && ($participando->isNotEmpty()))
-            <div class="tab-pane container fade" id="participando">
+            <div class="tab-pane container {{ $salas->isEmpty() && $participando->isNotEmpty() ? 'active' : 'fade' }}" id="participando">
                 <div class="list-group w-100 mt-2">
                     @foreach ($participando as $participa)
                     <div class="list-group-item light d-block bg-secondary">
