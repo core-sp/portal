@@ -130,6 +130,7 @@ class Representante extends Authenticable
         ->paginate(4);
     }
 
+    // limite conforme a resolução: no máximo pode agendar 4x por mês
     public function podeAgendar($mes = null, $ano = null)
     {
         $atual = $this->agendamentosSalas()
@@ -149,7 +150,10 @@ class Representante extends Authenticable
             $query->whereMonth('dia', now()->month)
             ->whereYear('dia', now()->year);
         })
-        ->whereNull('status')
+        ->where(function($query){
+            $query->whereNull('status')
+            ->orWhere('status', 'Compareceu');
+        })        
         ->count() < 4;
 
         $seguinte = false;
@@ -161,7 +165,10 @@ class Representante extends Authenticable
             $seguinte = $this->agendamentosSalas()
             ->whereMonth('dia', $mesSeguinte)
             ->whereYear('dia', $anoSeguinte)
-            ->whereNull('status')
+            ->where(function($query){
+                $query->whereNull('status')
+                ->orWhere('status', 'Compareceu');
+            }) 
             ->count() < 4;
 
         return $atual || $seguinte;

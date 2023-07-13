@@ -1672,20 +1672,65 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
-    public function cannot_submit_agendar_sala_after_created_4_by_month()
+    public function cannot_view_agendar_sala_after_created_4_by_month_and_next_month_with_status_null()
     {
-        // Dependendo do dia que o teste é executado, pode dar erro devido a mudança de mês.
-        $dia = Carbon::today()->addMonth()->subDays(15);
-        while($dia->isWeekend())
-            $dia->addDay();
-
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
+
+        $agendas = factory('App\AgendamentoSala', 4)->create();
+
+        $dia = Carbon::parse($agendas->get(0)->dia)->addMonth();
+        while($dia->isWeekend())
+            $dia->addDay();
 
         factory('App\AgendamentoSala', 4)->create([
             'dia' => $dia->format('Y-m-d')
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'agendar']))
+        ->assertRedirect(route('representante.agendar.inserir.view'));
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-times"></i>&nbsp;&nbsp;Já possui o limite de 4 agendamentos confirmados ou com presença a confirmar no mês atual e/ou seguinte.');
+    }
+
+    /** @test */
+    public function cannot_view_agendar_sala_after_created_4_by_month_and_next_month_with_status_compareceu_or_null()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $agendas = factory('App\AgendamentoSala', 4)->create([
+            'status' => AgendamentoSala::STATUS_COMPARECEU
+        ]);
+
+        $dia = Carbon::parse($agendas->get(0)->dia)->addMonth();
+        while($dia->isWeekend())
+            $dia->addDay();
+
+        factory('App\AgendamentoSala', 4)->create([
+            'dia' => $dia->format('Y-m-d'),
+        ]);
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'agendar']))
+        ->assertRedirect(route('representante.agendar.inserir.view'));
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-times"></i>&nbsp;&nbsp;Já possui o limite de 4 agendamentos confirmados ou com presença a confirmar no mês atual e/ou seguinte.');
+    }
+
+    /** @test */
+    public function cannot_submit_agendar_sala_after_created_4_by_month_with_status_null()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        factory('App\AgendamentoSala', 4)->create();
         $agenda = factory('App\AgendamentoSala')->raw();
+
+        $dia = Carbon::parse($agenda['dia'])->addDay();
+        while($dia->isWeekend())
+            $dia->addDay();
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
@@ -1696,7 +1741,62 @@ class AgendamentoSalaTest extends TestCase
         ->assertRedirect(route('representante.agendar.inserir.view'));
 
         $this->get(route('representante.agendar.inserir.view'))
-        ->assertSee('<i class="fas fa-times"></i>&nbsp;&nbsp;Já possui o limite de 4 agendamentos a finalizar no mês atual e/ou seguinte.');
+        ->assertSee('<i class="fas fa-times"></i>&nbsp;&nbsp;Já possui o limite de 4 agendamentos confirmados ou com presença a confirmar no mês atual e/ou seguinte.');
+    }
+
+    /** @test */
+    public function cannot_submit_agendar_sala_after_created_4_by_month_with_status_compareceu()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        factory('App\AgendamentoSala', 4)->create([
+            'status' => AgendamentoSala::STATUS_COMPARECEU
+        ]);
+        $agenda = factory('App\AgendamentoSala')->raw();
+
+        $dia = Carbon::parse($agenda['dia'])->addDay();
+        while($dia->isWeekend())
+            $dia->addDay();
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => $agenda['tipo_sala'],
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'],
+            'dia' => $dia->format('d/m/Y'), 
+            'periodo' => 'tarde',
+        ])
+        ->assertRedirect(route('representante.agendar.inserir.view'));
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-times"></i>&nbsp;&nbsp;Já possui o limite de 4 agendamentos confirmados ou com presença a confirmar no mês atual e/ou seguinte.');
+    }
+
+    /** @test */
+    public function cannot_submit_agendar_sala_after_created_4_by_month_with_status_compareceu_or_null()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        factory('App\AgendamentoSala', 2)->create([
+            'status' => AgendamentoSala::STATUS_COMPARECEU
+        ]);
+        factory('App\AgendamentoSala', 2)->create();
+        $agenda = factory('App\AgendamentoSala')->raw();
+
+        $dia = Carbon::parse($agenda['dia'])->addDay();
+        while($dia->isWeekend())
+            $dia->addDay();
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => $agenda['tipo_sala'],
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'],
+            'dia' => $dia->format('d/m/Y'), 
+            'periodo' => 'tarde',
+        ])
+        ->assertRedirect(route('representante.agendar.inserir.view'));
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-times"></i>&nbsp;&nbsp;Já possui o limite de 4 agendamentos confirmados ou com presença a confirmar no mês atual e/ou seguinte.');
     }
 
     /** @test */

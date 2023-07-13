@@ -67,7 +67,7 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
 
         if(!$user->podeAgendar($mes, $ano))
             return [
-                'message' => '<i class="fas fa-times"></i>&nbsp;&nbsp;Já possui o limite de 4 agendamentos a finalizar no mês atual e/ou seguinte.',
+                'message' => '<i class="fas fa-times"></i>&nbsp;&nbsp;Já possui o limite de 4 agendamentos confirmados ou com presença a confirmar no mês atual e/ou seguinte.',
                 'class' => 'alert-danger'
             ];
     }
