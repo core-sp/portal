@@ -73,6 +73,16 @@ class AgendamentoSala extends Model
         return $protocoloGerado;
     }
 
+    public function temAnexo()
+    {
+    	return isset($this->anexo) && (strpos($this->anexo, '[removido]') === false);
+    }
+
+    public function anexoRemovido()
+    {
+    	return isset($this->anexo) && (strpos($this->anexo, '[removido]') !== false);
+    }
+
     public function isReuniao()
     {
     	return $this->tipo_sala == 'reuniao';

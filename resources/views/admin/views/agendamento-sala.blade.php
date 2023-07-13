@@ -24,12 +24,14 @@
         @if(isset($resultado->justificativa))
             <h4>Justificativa do Representante:</h4>
             <p class="mb-0">{{ $resultado->justificativa }}</p>
-            @if(isset($resultado->anexo))
+            @if($resultado->temAnexo())
             <a href="{{ route('sala.reuniao.agendados.view', ['id' => $resultado->id, 'anexo' => $resultado->anexo]) }}" 
                 class="btn btn-sm btn-info mt-2" 
                 target="_blank">
                 Comprovante
             </a>
+            @elseif($resultado->anexoRemovido())
+                <p>{{ $resultado->anexo }}</p>
             @endif
         @endif
 

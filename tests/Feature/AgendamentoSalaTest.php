@@ -113,6 +113,24 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
+    public function can_view_justificado_with_file()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('justificado_com_anexo')->create();
+
+        $this->get(route('sala.reuniao.agendados.index'))->assertOk();
+
+        $this->get(route('sala.reuniao.agendados.view', $agenda->id))
+        ->assertOk()
+        ->assertSee('<h4>Justificativa do Representante:</h4>')
+        ->assertSee('<p class="mb-0">'.$agenda->justificativa.'</p>')
+        ->assertSee('<a href="'.route('sala.reuniao.agendados.view', ['id' => $agenda->id, 'anexo' => $agenda->anexo]).'"')
+        ->assertSeeText('Comprovante')
+        ->assertSee('<button type="submit" class="btn btn-primary">Não Compareceu Justificado</button>')
+        ->assertSee('<label for="justificativa_admin">Insira o motivo:</label>');
+    }
+
+    /** @test */
     public function can_view_justificado_admin()
     {
         $user = $this->signInAsAdmin();
@@ -3076,14 +3094,35 @@ class AgendamentoSalaTest extends TestCase
     /** @test */
     public function rotina_agendamentos_remove_anexos_kernel()
     {
+        $user = $this->signInAsAdmin();
         $agendamentos = $this->create_agendamentos_rotina();
 
         $service = resolve('App\Contracts\MediadorServiceInterface');
         $service->getService('SalaReuniao')->agendados()->executarRotina(true);
 
         Storage::disk('local')->assertMissing('representantes/agendamento_sala/'.$agendamentos[4]->anexo);
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'id' => $agendamentos[4]->id,
+            'anexo' => $agendamentos[4]->anexo . ' - [removido]'
+        ]);
+        $this->get(route('sala.reuniao.agendados.view', $agendamentos[4]->id))
+        ->assertSeeText($agendamentos[4]->anexo . ' - [removido]');
+
         Storage::disk('local')->assertMissing('representantes/agendamento_sala/'.$agendamentos[5]->anexo);
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'id' => $agendamentos[5]->id,
+            'anexo' => $agendamentos[5]->anexo . ' - [removido]'
+        ]);
+        $this->get(route('sala.reuniao.agendados.view', $agendamentos[5]->id))
+        ->assertSeeText($agendamentos[5]->anexo . ' - [removido]');
+
         Storage::disk('local')->assertExists('representantes/agendamento_sala/'.$agendamentos[6]->anexo);
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'id' => $agendamentos[6]->id,
+            'anexo' => $agendamentos[6]->anexo
+        ]);
+        $this->get(route('sala.reuniao.agendados.view', $agendamentos[6]->id))
+        ->assertSeeText('Comprovante');
 
         // remover o anexo criado no teste que não deve ser removido na rotina
         Storage::disk('local')->delete('representantes/agendamento_sala/'.$agendamentos[6]->anexo);

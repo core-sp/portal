@@ -21,7 +21,8 @@ class AgendamentoController extends Controller
         $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = \Route::is('sala.reuniao.*') ? $this->service->getService('SalaReuniao')->agendados()->listar(auth()->user(), $request, $this->service) : 
+            $filtro = \Route::is('sala.reuniao.agendados.filtro') ? true : null;
+            $dados = \Route::is('sala.reuniao.*') ? $this->service->getService('SalaReuniao')->agendados()->listar(auth()->user(), $filtro, $request, $this->service) : 
             $this->service->getService('Agendamento')->listar($request, $this->service);
             $temFiltro = $dados['temFiltro'];
             $variaveis = $dados['variaveis'];

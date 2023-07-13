@@ -6,6 +6,8 @@ use App\Model;
 use App\AgendamentoSala;
 use Faker\Generator as Faker;
 use Carbon\Carbon;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 $factory->define(AgendamentoSala::class, function (Faker $faker) {
     $amanha = Carbon::tomorrow();
@@ -44,6 +46,14 @@ $factory->state(AgendamentoSala::class, 'justificado', function ($faker) {
     ];
 });
 
+$factory->state(AgendamentoSala::class, 'justificado_com_anexo', function ($faker) {
+    return [
+        'dia' => now()->format('Y-m-d'),
+        'justificativa' => $faker->text(300),
+        'status' => AgendamentoSala::STATUS_ENVIADA,
+    ];
+});
+
 $factory->state(AgendamentoSala::class, 'recusado', function ($faker) {
     return [
         'dia' => now()->format('Y-m-d'),
@@ -52,4 +62,13 @@ $factory->state(AgendamentoSala::class, 'recusado', function ($faker) {
         'justificativa_admin' => $faker->text(200),
         'idusuario' => factory('App\User')
     ];
+});
+
+$factory->afterCreatingState(AgendamentoSala::class, 'justificado_com_anexo', function ($agendamento, $faker) {
+    Storage::fake('local');
+
+    $img = $agendamento->representante->id . '-' . time() . '.png';
+    $file = UploadedFile::fake()->image($img);
+    $file->storeAs("representantes/agendamento_sala", $img);
+    $agendamento->update(['anexo' => $img]);
 });

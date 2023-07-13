@@ -4,7 +4,7 @@ namespace App\Contracts;
 
 interface AgendamentoSalaSubServiceInterface {
 
-    public function listar($user, $request = null, $service = null);
+    public function listar($user, $temFiltro = null, $request = null, $service = null);
 
     public function view($user, $id, $anexo = null);
 

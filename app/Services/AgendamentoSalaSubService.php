@@ -63,8 +63,10 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             'table',
             'table-hover'
         ];
-        $aviso = '<p class="text-primary"><i class="fas fa-info-circle"></i> O sistema irá atualizar o status para "<span class="text-danger font-weight-bold">Não Compareceu</span>" ';
+        $aviso = '<p class="text-primary mb-0"><i class="fas fa-info-circle"></i> O sistema irá atualizar o status para "<span class="text-danger font-weight-bold">'.AgendamentoSala::STATUS_NAO_COMPARECEU.'</span>" ';
         $aviso .= 'após 2 dias do dia do agendamento caso o representante <strong>não compareça e não envie uma justificativa</strong>.</p>';
+        $aviso .= '<p class="text-primary mt-0"><i class="fas fa-info-circle"></i> O sistema irá excluir os comprovantes das justificativas recebidas após 1 mês com status ';
+        $aviso .= '"<span class="text-danger font-weight-bold">'.AgendamentoSala::STATUS_NAO_COMPARECEU.'</span>" ou "<span class="text-secondary font-weight-bold">'.AgendamentoSala::STATUS_JUSTIFICADO.'</span>".</p>';
 
         $tabela = $aviso . montaTabela($headers, $contents, $classes);
         
@@ -117,15 +119,13 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
         }
     }
 
-    private function filtro($request, $service, $user)
+    private function filtro($temFiltro = null, $request, $service, $user)
     {
         $filtro = '';
-        $temFiltro = null;
         $this->variaveis['continuacao_titulo'] = 'em <strong>'.$user->regional->regional.' - '.date('d\/m\/Y').'</strong>';
 
-        if(\Route::is('sala.reuniao.agendados.filtro'))
+        if(isset($temFiltro) && $temFiltro)
         {
-            $temFiltro = true;
             $this->variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
             $this->variaveis['plural'] = 'salas-reunioes/agendados';
         }
@@ -169,7 +169,7 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
         return $temFiltro;
     }
 
-    public function listar($user, $request = null, $service = null)
+    public function listar($user, $temFiltro = null, $request = null, $service = null)
     {
         session(['url' => url()->full()]);
 
@@ -182,7 +182,7 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             return [
                 'resultados' => $resultados, 
                 'tabela' => $this->tabelaCompleta($resultados, $user), 
-                'temFiltro' => $this->filtro($request, $service, $user),
+                'temFiltro' => $this->filtro($temFiltro, $request, $service, $user),
                 'variaveis' => (object) $this->variaveis,
             ];
         }
@@ -318,8 +318,12 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             foreach($agendados as $agendado)
             {
                 $removeu = Storage::disk('local')->delete('representantes/agendamento_sala/'.$agendado->anexo);
-                $removeu ? \Log::channel('interno')->info('[Rotina Portal - Sala de Reunião] - Removido anexo do agendamento de sala com ID ' . $agendado->id.'.') : 
-                \Log::channel('interno')->info('[Rotina Portal - Sala de Reunião] - Não foi removido anexo do agendamento de sala com ID ' . $agendado->id.'.');
+                if($removeu)
+                {
+                    \Log::channel('interno')->info('[Rotina Portal - Sala de Reunião] - Removido anexo do agendamento de sala com ID ' . $agendado->id.'.');
+                    $agendado->update(['anexo' => $agendado->anexo . ' - [removido]']);
+                }else 
+                    \Log::channel('interno')->info('[Rotina Portal - Sala de Reunião] - Não foi removido anexo do agendamento de sala com ID ' . $agendado->id.'.');
             }
         }
     }

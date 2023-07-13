@@ -153,15 +153,6 @@ class Kernel extends ConsoleKernel
             // Atualizar relacionamento caso o cpf / cnpj se cadastre no portal
             $service = resolve('App\Contracts\MediadorServiceInterface');
             $service->getService('SalaReuniao')->suspensaoExcecao()->executarRotina($service);
-
-            // rotina temporária para o ambiente de testes
-            Representante::whereIn('id', [1,2,3,11])->update(['password' => bcrypt('Dev12345')]);
-            \App\Permissao::whereIn('idpermissao', [27,28,29,30,31,32])
-            ->each(function ($item, $key) {
-                $all = explode(',', $item->perfis);
-                if(!in_array('20', $all))
-                    $item->update(['perfis' => '20,' . $item->perfis]);
-            });
         })->daily();
 
         $schedule->call(function(){
@@ -175,6 +166,17 @@ class Kernel extends ConsoleKernel
             $service = resolve('App\Contracts\MediadorServiceInterface');
             $service->getService('SalaReuniao')->agendados()->executarRotina(true);
         })->monthlyOn(1, '2:00');
+
+        // rotina temporária para o ambiente de testes
+        $schedule->call(function(){
+            Representante::whereIn('id', [1,2,3,11])->update(['password' => bcrypt('Dev12345')]);
+            \App\Permissao::whereIn('idpermissao', [27,28,29,30,31,32])
+            ->each(function ($item, $key) {
+                $all = explode(',', $item->perfis);
+                if(!in_array('20', $all))
+                    $item->update(['perfis' => '20,' . $item->perfis]);
+            });
+        })->dailyAt('5:00');
     }
 
     /**
