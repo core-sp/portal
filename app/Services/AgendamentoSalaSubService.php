@@ -112,7 +112,7 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
                 ->when($sala != 'Qualquer', function ($query) use($sala) {
                     $query->where('tipo_sala', $sala);
                 })
-                ->orderBy('dia','DESC')
+                ->orderBy('dia','ASC')
                 ->orderBy('periodo', 'ASC')
                 ->orderBy('id', 'ASC')
                 ->paginate(25);
