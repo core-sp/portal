@@ -144,7 +144,7 @@
         <legend class="w-auto"><small><i class="far fa-check-square text-success"></i> Itens da sala</small></legend>
         <p id="itensShow">
       @if(isset($agendamento))
-        @foreach($agendamento->sala->getItensHtml('reuniao') as $i => $item)
+        @foreach($agendamento->sala->getItensHtml($agendamento->tipo_sala) as $i => $item)
           {!! $i == 0 ? $item : '&nbsp;&nbsp;&nbsp;<strong>|</strong>&nbsp;&nbsp;&nbsp;'.$item !!}
         @endforeach
       @endif

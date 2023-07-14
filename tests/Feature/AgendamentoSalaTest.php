@@ -2003,8 +2003,13 @@ class AgendamentoSalaTest extends TestCase
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->create();
 
+        $itens = array();
+        foreach($agenda->sala->getItensHtml($agenda->tipo_sala) as $i => $item)
+            $i == 0 ? array_push($itens, $item) : array_push($itens, '&nbsp;&nbsp;&nbsp;<strong>|</strong>&nbsp;&nbsp;&nbsp;'.$item);
+
         $this->get(route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $agenda->id]))
         ->assertOk()
+        ->assertSeeInOrder($itens)
         ->assertSeeText('Editar');
 
         $this->put(route('representante.agendar.inserir.put', [
@@ -2122,7 +2127,7 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
-    public function can_to_cancel()
+    public function can_to_cancel_reuniao()
     {
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
@@ -2131,8 +2136,45 @@ class AgendamentoSalaTest extends TestCase
         $this->get(route('representante.agendar.inserir.view'))
         ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]).'" class="btn btn-danger btn-sm link-nostyle mt-2">Cancelar</a>');
 
+        $itens = array();
+        foreach($agenda->sala->getItensHtml($agenda->tipo_sala) as $i => $item)
+            $i == 0 ? array_push($itens, $item) : array_push($itens, '&nbsp;&nbsp;&nbsp;<strong>|</strong>&nbsp;&nbsp;&nbsp;'.$item);
+
         $this->get(route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]))
         ->assertOk()
+        ->assertSeeInOrder($itens)
+        ->assertSee('<button type="submit" class="btn btn-danger">');
+
+        $this->put(route('representante.agendar.inserir.put', [
+            'acao' => 'cancelar',
+            'id' => $agenda->id
+        ]))->assertStatus(302);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento cancelado com sucesso!');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'status' => 'Cancelado'
+        ]);
+    }
+
+    /** @test */
+    public function can_to_cancel_coworking()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->create();
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]).'" class="btn btn-danger btn-sm link-nostyle mt-2">Cancelar</a>');
+
+        $itens = array();
+        foreach($agenda->sala->getItensHtml($agenda->tipo_sala) as $i => $item)
+            $i == 0 ? array_push($itens, $item) : array_push($itens, '&nbsp;&nbsp;&nbsp;<strong>|</strong>&nbsp;&nbsp;&nbsp;'.$item);
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]))
+        ->assertOk()
+        ->assertSeeInOrder($itens)
         ->assertSee('<button type="submit" class="btn btn-danger">');
 
         $this->put(route('representante.agendar.inserir.put', [
@@ -2199,7 +2241,7 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
-    public function can_to_justify()
+    public function can_to_justify_reuniao()
     {
         Mail::fake();
         Storage::fake('local');
@@ -2213,8 +2255,58 @@ class AgendamentoSalaTest extends TestCase
         $this->get(route('representante.agendar.inserir.view'))
         ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $agenda->id]).'" class="btn btn-sm btn-dark link-nostyle mt-2">Justificar</a>');
 
+        $itens = array();
+        foreach($agenda->sala->getItensHtml($agenda->tipo_sala) as $i => $item)
+            $i == 0 ? array_push($itens, $item) : array_push($itens, '&nbsp;&nbsp;&nbsp;<strong>|</strong>&nbsp;&nbsp;&nbsp;'.$item);
+
         $this->get(route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $agenda->id]))
         ->assertOk()
+        ->assertSeeInOrder($itens)
+        ->assertSeeText('Justificar');
+
+        $file = UploadedFile::fake()->image('teste.png', 250, 250);
+        $this->put(route('representante.agendar.inserir.put', [
+            'acao' => 'justificar', 'id' => $agenda->id
+        ]), [
+            'justificativa' => 'dfdfdfdfdfdfdfdfdfdfdfdfdf',
+            'anexo_sala' => $file,
+        ])
+        ->assertStatus(302);
+
+        Mail::assertQueued(AgendamentoSalaMail::class);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento justificado com sucesso! Está em análise do atendente. Foi enviado um e-mail com a sua justificativa.');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'status' => 'Justificativa Enviada'
+        ]);
+
+        Storage::disk('local')->assertExists('representantes/agendamento_sala/'.$agenda->fresh()->anexo);
+    }
+
+    /** @test */
+    public function can_to_justify_coworking()
+    {
+        Mail::fake();
+        Storage::fake('local');
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->create([
+            'dia' => now()->format('Y-m-d')
+        ]);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $agenda->id]).'" class="btn btn-sm btn-dark link-nostyle mt-2">Justificar</a>');
+
+        $itens = array();
+        foreach($agenda->sala->getItensHtml($agenda->tipo_sala) as $i => $item)
+            $i == 0 ? array_push($itens, $item) : array_push($itens, '&nbsp;&nbsp;&nbsp;<strong>|</strong>&nbsp;&nbsp;&nbsp;'.$item);
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $agenda->id]))
+        ->assertOk()
+        ->assertSeeInOrder($itens)
         ->assertSeeText('Justificar');
 
         $file = UploadedFile::fake()->image('teste.png', 250, 250);
