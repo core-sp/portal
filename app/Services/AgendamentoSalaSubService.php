@@ -37,6 +37,7 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             'Tipo de Sala / Dia e Período',
             'Regional',
             'Status',
+            'Atualizado em',
             'Ações'
         ];
         // Opções de conteúdo da tabela
@@ -53,6 +54,7 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
                 $resultado->getTipoSalaHTML().'<br><small><strong>Dia:</strong> '. onlyDate($resultado->dia) .' | <strong>Período:</strong> '.$resultado->getPeriodo(),
                 $resultado->sala->regional->regional,
                 $resultado->getStatusHTML() . $recusado,
+                formataData($resultado->updated_at),
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -82,11 +84,20 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
         if($datemax->lt($datemin))
             $datemax = $datemin;
 
+        $status = 'Qualquer';
+        if($request->filled('status'))
+        {
+            if(in_array($request->status, AgendamentoSala::status()))
+                $status = $request->status;
+            elseif($request->status == 'Sem status')
+                $status = null;
+        }
+
         return [
             'datemin' => $datemin->format('Y-m-d'),
             'datemax' => $datemax->format('Y-m-d'),
             'regional' => $request->filled('regional') && $canFiltroRegional ? $request->regional : $user->idregional,
-            'status' => $request->filled('status') && in_array($request->status, AgendamentoSala::status()) ? $request->status : 'Qualquer',
+            'status' => $status,
             'sala' => $request->filled('sala') && in_array($request->sala, ['reuniao', 'coworking']) ? $request->sala : 'Qualquer'
         ];
     }
@@ -147,7 +158,8 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
         $options = isset($request->status) && ($request->status == 'Qualquer') ? 
         getFiltroOptions('Qualquer', 'Qualquer', true) : getFiltroOptions('Qualquer', 'Qualquer');
 
-        foreach(AgendamentoSala::status() as $s)
+        $allStatus = array_merge(AgendamentoSala::status(), ['Sem status']);
+        foreach($allStatus as $s)
             $options .= isset($request->status) && ($request->status == $s) ? 
             getFiltroOptions($s, $s, true) : getFiltroOptions($s, $s);
 

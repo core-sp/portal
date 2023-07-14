@@ -165,7 +165,7 @@ class Kernel extends ConsoleKernel
         $schedule->call(function(){
             $service = resolve('App\Contracts\MediadorServiceInterface');
             $service->getService('SalaReuniao')->agendados()->executarRotina(true);
-        })->monthlyOn(1, '2:00');
+        })->monthlyOn(15, '2:00');
 
         // rotina temporária para o ambiente de testes
         $schedule->call(function(){

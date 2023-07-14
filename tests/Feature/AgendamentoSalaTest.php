@@ -172,7 +172,8 @@ class AgendamentoSalaTest extends TestCase
         ->assertSee($reuniao->getTipoSalaHTML())
         ->assertSee($coworking->getTipoSalaHTML())
         ->assertSeeText($reuniao->sala->regional->regional)
-        ->assertSeeText($coworking->sala->regional->regional);
+        ->assertSeeText($coworking->sala->regional->regional)
+        ->assertSeeText(formataData($reuniao->updated_at));
     }
 
     /** @test */
@@ -621,6 +622,19 @@ class AgendamentoSalaTest extends TestCase
             ->assertSeeText('RC-AGE-00000005')
             ->assertSeeText('RC-AGE-00000006');
 
+        // Listando todos os agendamentos (qualquer regional, sem status e datas cobrindos todos os agendamentos)
+        $this->get(route('sala.reuniao.agendados.filtro', [
+            'regional' => 'Todas', 
+            'status' => 'Sem status', 
+            'datemin' => date('Y-m-d', strtotime('-1 day')), 
+            'datemax' => date('Y-m-d', strtotime('+1 day'))
+        ]))->assertSeeText('RC-AGE-00000001') 
+            ->assertDontSeeText('RC-AGE-00000002') 
+            ->assertSeeText('RC-AGE-00000003') 
+            ->assertSeeText('RC-AGE-00000004') 
+            ->assertDontSeeText('RC-AGE-00000005')
+            ->assertSeeText('RC-AGE-00000006');
+
         // Listando todos os agendamentos da Sede (qualquer status e datas cobrindos todos os agendamentos)
         $this->get(route('sala.reuniao.agendados.filtro', [
             'regional' => 1, 
@@ -630,6 +644,20 @@ class AgendamentoSalaTest extends TestCase
         ]))
             ->assertSeeText('RC-AGE-00000001') 
             ->assertSeeText('RC-AGE-00000002') 
+            ->assertSeeText('RC-AGE-00000003') 
+            ->assertDontSeeText('RC-AGE-00000004') 
+            ->assertDontSeeText('RC-AGE-00000005')
+            ->assertDontSeeText('RC-AGE-00000006');
+        
+        // Listando todos os agendamentos da Sede (sem status e datas cobrindos todos os agendamentos)
+        $this->get(route('sala.reuniao.agendados.filtro', [
+            'regional' => 1, 
+            'status' => 'Sem status', 
+            'datemin' => date('Y-m-d', strtotime('-1 day')), 
+            'datemax' => date('Y-m-d', strtotime('+1 day'))
+        ]))
+            ->assertSeeText('RC-AGE-00000001') 
+            ->assertDontSeeText('RC-AGE-00000002') 
             ->assertSeeText('RC-AGE-00000003') 
             ->assertDontSeeText('RC-AGE-00000004') 
             ->assertDontSeeText('RC-AGE-00000005')
