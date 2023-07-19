@@ -18,4 +18,6 @@ interface PreRegistroAdminSubServiceInterface {
     public function saveAjaxAdmin($request, $id, User $user);
 
     public function updateStatus($id, User $user, $status);
+
+    public function executarRotina();
 }

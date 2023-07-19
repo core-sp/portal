@@ -20,3 +20,12 @@ $factory->state(UserExterno::class, 'pj', function (Faker $faker) {
         'cpf_cnpj' => '06985713000138'
     ];
 });
+
+$factory->state(UserExterno::class, 'cadastro', function (Faker $faker) {
+    return [
+        'tipo_conta' => 'user_externo',
+        'aceite' => 'on',
+        'password' => 'Teste102030',
+        'password_confirmation' => 'Teste102030'
+    ];
+});

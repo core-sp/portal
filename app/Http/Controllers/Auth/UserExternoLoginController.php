@@ -166,6 +166,7 @@ class UserExternoLoginController extends Controller
         if(!isset($this->tipo) && isset($guard))
             $this->tipo = $this->service->getService('UserExterno')->getDefinicoes($guard);
 
-        return Auth::guard($this->tipo['tipo']);
+        $temp = !isset($this->tipo['tipo']) ? 'user_externo' : $this->tipo['tipo'];
+        return Auth::guard($temp);
     }
 }

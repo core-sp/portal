@@ -293,7 +293,7 @@ Route::middleware(['block_ip'])->group(function () {
       Route::post('/logout', 'Auth\UserExternoLoginController@logout')->name('externo.logout');
       Route::get('/cadastro', 'UserExternoSiteController@cadastroView')->name('externo.cadastro');
       Route::post('/cadastro', 'UserExternoSiteController@cadastro')->name('externo.cadastro.submit');
-      Route::get('/verifica-email/{tipo}/{token}', 'UserExternoSiteController@verificaEmail')->name('externo.verifica-email');
+      Route::get('/verifica-email/{tipo}/{token}', 'UserExternoSiteController@verificaEmail')->where('tipo', 'user_externo|contabil')->name('externo.verifica-email');
       // Reset password routes
       Route::get('/password/reset', 'Auth\UserExternoForgotPasswordController@showLinkRequestForm')->name('externo.password.request');
       Route::post('/password/email', 'Auth\UserExternoForgotPasswordController@sendResetLinkEmail')->name('externo.password.email');

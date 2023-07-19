@@ -5,10 +5,11 @@ namespace App\Services;
 use App\Contracts\PreRegistroAdminSubServiceInterface;
 use App\PreRegistro;
 use App\Anexo;
-use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PreRegistroMail;
 use App\Events\CrudEvent;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface {
 
@@ -82,7 +83,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         ];
     }
 
-    private function filtro($request, MediadorServiceInterface $service, $user)
+    private function filtro($request, $service, $user)
     {
         $filtro = '';
         $temFiltro = null;
@@ -182,7 +183,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         return $preRegistro->anexos->first()->getOpcoesPreRegistro();
     }
 
-    public function listar($request, MediadorServiceInterface $service, $user)
+    public function listar($request, $service, $user)
     {
         $dados = $this->validacaoFiltroAtivo($request, $user);
         $resultados = $this->getResultadosFiltro($dados, $user);
@@ -305,5 +306,33 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
             'message' => '<i class="icon fa fa-check"></i>Pré-registro com a ID: ' . $id . ' foi atualizado para "' . $status . '" com sucesso', 
             'class' => 'alert-success'
         ];
+    }
+
+    public function executarRotina()
+    {
+        $diretorio = Anexo::PATH_PRE_REGISTRO . '/';
+        $prs = PreRegistro::has('anexos')
+        ->with('anexos')
+        ->select('id', 'status', 'created_at', 'updated_at', 'user_externo_id')
+        ->where(function ($query) {
+            $query->whereIn('status', [PreRegistro::STATUS_APROVADO])
+            ->where('updated_at', '<=', Carbon::today()->subWeeks(2)->toDateString());
+        })
+        ->orWhere(function ($query) {
+            $query->whereIn('status', [PreRegistro::STATUS_CRIADO, PreRegistro::STATUS_CORRECAO])
+            ->where('updated_at', '<=', Carbon::today()->subMonths(2)->toDateString());
+        })
+        ->get();
+        if($prs->isNotEmpty())
+        {
+            foreach($prs as $pr)
+            {
+                $totalFiles = $pr->anexos->count();
+                $pr->excluirAnexos();
+                $totalStorage = count(Storage::files($diretorio . $pr->id));
+                $totalBd = $pr->fresh()->anexos->count();
+                \Log::channel('interno')->info('[Rotina Portal] - Pré-Registro - Rotina de exclusão de arquivos do pré-registro: pré-registro com ID '.$pr->id.' possuía '.$totalFiles.' e agora possui '.$totalStorage.' no Storage e '.$totalBd.' no BD.');
+            }
+        }
     }
 }

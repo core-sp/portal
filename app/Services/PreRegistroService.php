@@ -3,12 +3,9 @@
 namespace App\Services;
 
 use App\Contracts\PreRegistroServiceInterface;
-use App\Contracts\PreRegistroAdminSubServiceInterface;
 use App\PreRegistro;
 use App\Anexo;
-use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Storage;
-use App\Repositories\GerentiRepositoryInterface;
 use Carbon\Carbon;
 use App\Events\ExternoEvent;
 use Illuminate\Support\Facades\Mail;
@@ -25,11 +22,6 @@ class PreRegistroService implements PreRegistroServiceInterface {
     const RELATION_PJ = "pessoaJuridica";
     const RELATION_PRE_REGISTRO = "preRegistro";
     const RELATION_RT = "pessoaJuridica.responsavelTecnico";
-
-    public function __construct(PreRegistroAdminSubServiceInterface $admin)
-    {
-        $this->admin = $admin;
-    }
 
     private function getRelacoes()
     {
@@ -146,7 +138,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         return $array;
     }
 
-    private function getRTGerenti(GerentiRepositoryInterface $gerentiRepository, $cpf)
+    private function getRTGerenti($gerentiRepository, $cpf)
     {
         if(!isset($cpf) || (strlen($cpf) != 11))
             return null;
@@ -207,7 +199,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
-    public function verificacao(GerentiRepositoryInterface $gerentiRepository, $externo)
+    public function verificacao($gerentiRepository, $externo)
     {
         if(!isset($externo))
             throw new \Exception('Somente usuário externo pode ser verificado no sistema se consta registro.', 401);
@@ -316,7 +308,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
-    public function getPreRegistro(MediadorServiceInterface $service, $externo)
+    public function getPreRegistro($service, $externo)
     {
         if(!isset($externo))
             throw new \Exception('Somente usuário externo ou contabilidade vinculada a um usuário externo pode solicitar registro.', 401);
@@ -361,7 +353,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
-    public function saveSiteAjax($request, GerentiRepositoryInterface $gerentiRepository, $externo, $contabil = null)
+    public function saveSiteAjax($request, $gerentiRepository, $externo, $contabil = null)
     {
         $preRegistro = $externo->load('preRegistro')->preRegistro;
 
@@ -402,7 +394,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
-    public function saveSite($request, GerentiRepositoryInterface $gerentiRepository, $externo, $contabil = null)
+    public function saveSite($request, $gerentiRepository, $externo, $contabil = null)
     {
         $preRegistro = $externo->load('preRegistro')->preRegistro;
 
@@ -510,6 +502,6 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function admin()
     {
-        return $this->admin;
+        return resolve('App\Contracts\PreRegistroAdminSubServiceInterface');
     }
 }

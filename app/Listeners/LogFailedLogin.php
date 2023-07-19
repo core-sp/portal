@@ -39,8 +39,8 @@ class LogFailedLogin
         {
             if(isset($event->user))
             {
-                $campo = $event->user->getTable() == 'contabil' ? $event->user->cnpj : $event->user->cpf_cnpj;
-                $tipo = $event->user->getTable() == 'contabil' ? 'a Contabilidade' : 'o Usuário Externo';
+                $campo = $event->user->getTable() == 'contabeis' ? $event->user->cnpj : $event->user->cpf_cnpj;
+                $tipo = $event->user->getTable() == 'contabeis' ? 'a Contabilidade' : 'o Usuário Externo';
                 Log::channel('externo')->info($ip . 'Usuário com o cpf/cnpj ' .$campo. ' não conseguiu logar na Área d'.$tipo.'.');
             }
             else
