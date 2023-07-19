@@ -31,6 +31,7 @@ class Licitacao extends Model
     const MOD_PREGAO_ELETRONICO_SRP = 'Pregão Eletrônico SRP';
     const MOD_PREGAO_ELETRONICO_TRADICIONAL = 'Pregão Eletrônico Tradicional';
     const MOD_PREGAO_PRESENCIAL = 'Pregão Presencial';
+    const MOD_DESFAZIMENTO = 'Processo de Desfazimento';
     const MOD_TOMADA_DE_PRECOS = 'Tomada de Preços';
 
     // Situações de licitação
@@ -76,6 +77,7 @@ class Licitacao extends Model
             Licitacao::MOD_PREGAO_ELETRONICO_SRP,
             Licitacao::MOD_PREGAO_ELETRONICO_TRADICIONAL,
             Licitacao::MOD_PREGAO_PRESENCIAL,
+            Licitacao::MOD_DESFAZIMENTO,
             Licitacao::MOD_TOMADA_DE_PRECOS
         ];
     }
