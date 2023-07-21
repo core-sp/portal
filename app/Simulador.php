@@ -70,7 +70,7 @@ class Simulador
                 <li>Comprovante de Residência recente de, no máximo, 03 meses em nome do representante, em caso de comprovante em nome de terceiros, o representante deve anexar uma declaração de próprio punho, informando que reside no endereço do comprovante apresentado, assinar e datar;</li>
                 <li>Comprovante de quitação com o serviço militar, para os profissionais do sexo masculino que tenham até 45 anos (exceto estrangeiro);</li>
                 <li>Prova de estar em dia com as obrigações eleitorais - certidão de quitação eleitoral (site www.tse.jus.br >serviços ao eleitor>certidão de quitação eleitoral); (exceto estrangeiro);</li>
-                <li>Declaração de indicação do responsável técnico assinada por todos os sócios com a concordância do indicado, com reconhecimento de firma; (<a href="https://www.core-sp.org.br/arquivos/2019-07/DECLARA%C3%87%C3%83O%20DE%20RT.pdf" class="vermelho" target="_blank">Termo de indicação de Resp. Técnico</a>)</li>
+                <li>Declaração de indicação do responsável técnico assinada por todos os sócios com a concordância do indicado, com reconhecimento de firma; (<a href="https://www.core-sp.org.br/arquivos/2023-03/4/Indicacao_RT_v_2023.pdf" class="vermelho" target="_blank">Termo de indicação de Resp. Técnico</a>)</li>
                 <li>Cópia da quitação das contribuições devidas ao Sindicato conforme artigo 579 e 608 da CLT e nota técnica da Secretaria de Relações do Trabalho (SRT) nº 202 de 10 de dezembro de 2009. (www.sircesp.com.br); <small><strong>(caráter facultativo)</strong></small></li>
             </ol>' . $this->textoObs();
     }
@@ -94,7 +94,7 @@ class Simulador
                 <li>Comprovante de Residência recente de, no máximo, 03 meses em nome do representante, em caso de comprovante em nome de terceiros, o representante deve anexar uma declaração de próprio punho, informando que reside no endereço do comprovante apresentado, assinar e datar;</li>
                 <li>Comprovante de quitação com o serviço militar, para os profissionais do sexo masculino que tenham até 45 anos (exceto estrangeiro);</li>
                 <li>Prova de estar em dia com as obrigações eleitorais - certidão de quitação eleitoral (site www.tse.jus.br >serviços ao eleitor>certidão de quitação eleitoral); (exceto estrangeiro);</li>
-                <li>Declaração de indicação do responsável técnico assinada por todos os sócios com a concordância do indicado, com reconhecimento de firma; (<a href="https://www.core-sp.org.br/arquivos/2019-07/DECLARA%C3%87%C3%83O%20DE%20RT.pdf" class="vermelho" target="_blank">Termo de indicação de Resp. Técnico</a>)</li>
+                <li>Declaração de indicação do responsável técnico assinada por todos os sócios com a concordância do indicado, com reconhecimento de firma; (<a href="https://www.core-sp.org.br/arquivos/2023-03/4/Indicacao_RT_v_2023.pdf" class="vermelho" target="_blank">Termo de indicação de Resp. Técnico</a>)</li>
                 <li>Cópia da quitação das contribuições devidas ao Sindicato conforme artigo 579 e 608 da CLT e nota técnica da Secretaria de Relações do Trabalho (SRT) nº 202 de 10 de dezembro de 2009. (www.sircesp.com.br); <small><strong>(caráter facultativo)</strong></small></li>
             </ol>' . $this->textoObs();
     }
