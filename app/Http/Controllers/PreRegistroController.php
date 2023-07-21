@@ -13,11 +13,7 @@ class PreRegistroController extends Controller
 
     public function __construct(MediadorServiceInterface $service)
     {
-        // Limitação de requisições por minuto para cada usuário, senão erro 429
-        $qtd = '50';
-        if(config('app.env') == "testing")
-            $qtd = '190';
-        $this->middleware(['auth', 'throttle:' . $qtd . ',1']);
+        $this->middleware(['auth', 'throttle:100,1']);
         $this->service = $service;
     }
 
@@ -26,8 +22,9 @@ class PreRegistroController extends Controller
         // $this->authorize('viewAny', auth()->user());
 
         try{
+            $filtro = \Route::is('preregistro.filtro') ? true : null;
             $user = auth()->user();
-            $dados = $this->service->getService('PreRegistro')->admin()->listar($request, $this->service, $user);
+            $dados = $this->service->getService('PreRegistro')->admin()->listar($request, $this->service, $user, $filtro);
             session(['url_pre_registro' => url()->full()]);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');

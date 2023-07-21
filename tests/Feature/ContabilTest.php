@@ -978,760 +978,677 @@ class ContabilTest extends TestCase
         Notification::hasSent($user_externo, ResetPassword::class);
     }
 
-    // /** @test 
-    //  * 
-    //  * Não pode enviar email para resetar senha se o cpf / cnpj não foi encontrado.
-    // */
-    // public function cannot_send_mail_reset_password_when_not_find_cpfcnpj()
-    // {
-    //     Notification::fake();
+    /** @test */
+    public function cannot_send_mail_reset_password_when_not_find_cpfcnpj()
+    {
+        Notification::fake();
 
-    //     factory('App\Contabil')->create([
-    //         'cpf_cnpj' => '43795442818'
-    //     ]);
-    //     $user_externo = factory('App\Contabil')->raw();
-    //     $this->get(route('externo.password.request'))->assertOk();
-    //     $this->post(route('externo.password.email'), [
-    //         'tipo_conta' => 'contabil',
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj']
-    //     ])->assertSessionHasErrors([
-    //         'cpf_cnpj'
-    //     ]);
+        factory('App\Contabil')->create([
+            'cnpj' => '49931920000112'
+        ]);
+        $user_externo = factory('App\Contabil')->raw();
+        $this->get(route('externo.password.request'))->assertOk();
+        $this->post(route('externo.password.email'), [
+            'tipo_conta' => 'contabil',
+            'cpf_cnpj' => $user_externo['cnpj']
+        ])->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
 
-    //     Notification::assertNothingSent();
-    // }
+        Notification::assertNothingSent();
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode enviar email para resetar senha se o cpf / cnpj está errado.
-    // */
-    // public function cannot_send_mail_reset_password_with_cpfcnpj_wrong()
-    // {
-    //     $user_externo = factory('App\Contabil')->create([
-    //         'cpf_cnpj' => '123456789'
-    //     ]);
-    //     $this->get(route('externo.password.request'))->assertOk();
-    //     $this->post(route('externo.password.email'), [
-    //         'tipo_conta' => 'contabil',
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj']
-    //     ])->assertSessionHasErrors([
-    //         'cpf_cnpj'
-    //     ]);
-    // }
+    /** @test */
+    public function cannot_send_mail_reset_password_with_cpfcnpj_wrong()
+    {
+        $user_externo = factory('App\Contabil')->create([
+            'cnpj' => '49931920000113'
+        ]);
+        $this->get(route('externo.password.request'))->assertOk();
+        $this->post(route('externo.password.email'), [
+            'tipo_conta' => 'contabil',
+            'cpf_cnpj' => $user_externo['cnpj']
+        ])->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Log externo ao alterar a senha em 'Esqueci a senha'.
-    // */
-    // public function log_is_generated_when_send_mail_reset_password()
-    // {
-    //     $user_externo = factory('App\Contabil')->create();
-    //     $this->get(route('externo.password.request'));
-    //     $this->post(route('externo.password.email'), [
-    //         'tipo_conta' => 'contabil',
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj']
-    //     ]);
+    /** @test */
+    public function log_is_generated_when_send_mail_reset_password()
+    {
+        $user_externo = factory('App\Contabil')->create();
+        $this->get(route('externo.password.request'));
+        $this->post(route('externo.password.email'), [
+            'tipo_conta' => 'contabil',
+            'cpf_cnpj' => $user_externo['cnpj']
+        ]);
 
-    //     $log = tailCustom(storage_path($this->pathLogExterno()));
-    //     $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
-    //     $txt = $inicio . 'Usuário com o cpf/cnpj '.$user_externo['cpf_cnpj'].' do tipo de conta "Usuário Externo" solicitou o envio de link para alterar a senha no Login Externo.';
-    //     $this->assertStringContainsString($txt, $log);
-    // }
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Usuário com o cpf/cnpj '.$user_externo['cnpj'].' do tipo de conta "Contabilidade" solicitou o envio de link para alterar a senha no Login Externo.';
+        $this->assertStringContainsString($txt, $log);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode resetar senha se o cpf / cnpj está errado.
-    // */
-    // public function cannot_reset_password_with_cpfcnpj_wrong_after_verificar_email()
-    // {
-    //     $user_externo = factory('App\Contabil')->create([
-    //         'cpf_cnpj' => '123456789'
-    //     ]);
-    //     $token = Password::broker('users_externo')->createToken($user_externo);
-    //     $this->get(route('externo.password.reset', $token))->assertSuccessful();
-    //     $this->post(route('externo.password.update'), [
-    //         'tipo_conta' => 'contabil',
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj'],
-    //         'password' => 'Teste102030', 
-    //         'password_confirmation' => 'Teste102030', 
-    //         'token' => $token
-    //     ])->assertSessionHasErrors([
-    //         'cpf_cnpj'
-    //     ]);
-    // }
+    /** @test */
+    public function cannot_reset_password_with_cpfcnpj_wrong_after_verificar_email()
+    {
+        $user_externo = factory('App\Contabil')->create([
+            'cnpj' => '49931920000113'
+        ]);
+        $token = Password::broker('users_externo')->createToken($user_externo);
+        $this->get(route('externo.password.reset', $token))->assertSuccessful();
+        $this->post(route('externo.password.update'), [
+            'tipo_conta' => 'contabil',
+            'cpf_cnpj' => $user_externo['cnpj'],
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste102030', 
+            'token' => $token
+        ])->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode resetar senha se a senha está errada.
-    // */
-    // public function cannot_reset_password_with_password_wrong_after_verificar_email()
-    // {
-    //     $user_externo = factory('App\Contabil')->create();
-    //     $token = Password::broker('users_externo')->createToken($user_externo);
-    //     $this->get(route('externo.password.reset', $token))->assertSuccessful();
-    //     $this->post(route('externo.password.update'), [
-    //         'tipo_conta' => 'contabil',
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj'],
-    //         'password' => 'teste102030', 
-    //         'password_confirmation' => 'teste102030', 
-    //         'token' => $token
-    //     ])->assertSessionHasErrors([
-    //         'password'
-    //     ]);
-    // }
+    /** @test */
+    public function cannot_reset_password_with_password_wrong_after_verificar_email()
+    {
+        $user_externo = factory('App\Contabil')->create();
+        $token = Password::broker('users_externo')->createToken($user_externo);
+        $this->get(route('externo.password.reset', $token))->assertSuccessful();
+        $this->post(route('externo.password.update'), [
+            'tipo_conta' => 'contabil',
+            'cpf_cnpj' => $user_externo['cnpj'],
+            'password' => 'teste102030', 
+            'password_confirmation' => 'teste102030', 
+            'token' => $token
+        ])->assertSessionHasErrors([
+            'password'
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode resetar senha se a confirmação de senha está errada.
-    // */
-    // public function cannot_reset_password_with_password_confirmation_wrong_after_verificar_email()
-    // {
-    //     $user_externo = factory('App\Contabil')->create();
-    //     $token = Password::broker('users_externo')->createToken($user_externo);
-    //     $this->get(route('externo.password.reset', $token))->assertSuccessful();
-    //     $this->post(route('externo.password.update'), [
-    //         'tipo_conta' => 'contabil',
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj'],
-    //         'password' => 'Teste102030', 
-    //         'password_confirmation' => 'teste102030', 
-    //         'token' => $token
-    //     ])->assertSessionHasErrors([
-    //         'password_confirmation'
-    //     ]);
-    // }
+    /** @test */
+    public function cannot_reset_password_with_password_confirmation_wrong_after_verificar_email()
+    {
+        $user_externo = factory('App\Contabil')->create();
+        $token = Password::broker('users_externo')->createToken($user_externo);
+        $this->get(route('externo.password.reset', $token))->assertSuccessful();
+        $this->post(route('externo.password.update'), [
+            'tipo_conta' => 'contabil',
+            'cpf_cnpj' => $user_externo['cnpj'],
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'teste102030', 
+            'token' => $token
+        ])->assertSessionHasErrors([
+            'password_confirmation'
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode resetar senha se a senha e confirmação de senha estão diferentes.
-    // */
-    // public function cannot_reset_password_with_password_and_confirmation_differents_after_verificar_email()
-    // {
-    //     $user_externo = factory('App\Contabil')->create();
-    //     $token = Password::broker('users_externo')->createToken($user_externo);
-    //     $this->get(route('externo.password.reset', $token))->assertSuccessful();
-    //     $this->post(route('externo.password.update'), [
-    //         'tipo_conta' => 'contabil',
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj'],
-    //         'password' => 'Teste102030', 
-    //         'password_confirmation' => 'Teste10203040', 
-    //         'token' => $token
-    //     ])->assertSessionHasErrors([
-    //         'password_confirmation'
-    //     ]);
-    // }
+    /** @test */
+    public function cannot_reset_password_with_password_and_confirmation_differents_after_verificar_email()
+    {
+        $user_externo = factory('App\Contabil')->create();
+        $token = Password::broker('users_externo')->createToken($user_externo);
+        $this->get(route('externo.password.reset', $token))->assertSuccessful();
+        $this->post(route('externo.password.update'), [
+            'tipo_conta' => 'contabil',
+            'cpf_cnpj' => $user_externo['cnpj'],
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste10203040', 
+            'token' => $token
+        ])->assertSessionHasErrors([
+            'password_confirmation'
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode resetar senha se os campos obrigatórios estão faltando.
-    // */
-    // public function cannot_reset_password_without_mandatory_inputs_after_verificar_email()
-    // {
-    //     $user_externo = factory('App\Contabil')->create();
-    //     $token = Password::broker('users_externo')->createToken($user_externo);
-    //     $this->get(route('externo.password.reset', $token))->assertSuccessful();
-    //     $this->post(route('externo.password.update'), [
-    //         'tipo_conta' => '',
-    //         'cpf_cnpj' => '',
-    //         'password' => '', 
-    //         'password_confirmation' => '', 
-    //         'token' => $token
-    //     ])->assertSessionHasErrors([
-    //         'tipo_conta',
-    //         'cpf_cnpj',
-    //         'password',
-    //         'password_confirmation'
-    //     ]);
-    // }
+    /** @test */
+    public function cannot_reset_password_without_mandatory_inputs_after_verificar_email()
+    {
+        $user_externo = factory('App\Contabil')->create();
+        $token = Password::broker('users_externo')->createToken($user_externo);
+        $this->get(route('externo.password.reset', $token))->assertSuccessful();
+        $this->post(route('externo.password.update'), [
+            'tipo_conta' => '',
+            'cpf_cnpj' => '',
+            'password' => '', 
+            'password_confirmation' => '', 
+            'token' => $token
+        ])->assertSessionHasErrors([
+            'tipo_conta',
+            'cpf_cnpj',
+            'password',
+            'password_confirmation'
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    // */
-    // public function cannot_reset_password_with_wrong_token()
-    // {
-    //     $user_externo = factory('App\Contabil')->create();
-    //     $token = Password::broker('users_externo')->createToken($user_externo);
-    //     $this->get(route('externo.password.reset', $token.'abc'))->assertSuccessful();
-    //     $this->post(route('externo.password.update'), [
-    //         'tipo_conta' => 'contabil',
-    //         'cpf_cnpj' => $user_externo->cpf_cnpj,
-    //         'password' => 'Teste102030', 
-    //         'password_confirmation' => 'Teste102030', 
-    //         'token' => $token.'abc'
-    //     ])->assertSessionHasErrors([
-    //         'cpf_cnpj',
-    //     ]);
-    // }
+    /** @test */
+    public function cannot_reset_password_with_wrong_token()
+    {
+        $user_externo = factory('App\Contabil')->create();
+        $token = Password::broker('users_externo')->createToken($user_externo);
+        $this->get(route('externo.password.reset', $token.'abc'))->assertSuccessful();
+        $this->post(route('externo.password.update'), [
+            'tipo_conta' => 'contabil',
+            'cpf_cnpj' => $user_externo->cnpj,
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste102030', 
+            'token' => $token.'abc'
+        ])->assertSessionHasErrors([
+            'cpf_cnpj',
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    // */
-    // public function cannot_reset_password_with_wrong_tipo()
-    // {
-    //     $user_externo = factory('App\Contabil')->create();
-    //     $token = Password::broker('users_externo')->createToken($user_externo);
-    //     $this->get(route('externo.password.reset', $token.'abc'))->assertSuccessful();
-    //     $this->post(route('externo.password.update'), [
-    //         'tipo_conta' => 'userexterno',
-    //         'cpf_cnpj' => $user_externo->cpf_cnpj,
-    //         'password' => 'Teste102030', 
-    //         'password_confirmation' => 'Teste102030', 
-    //         'token' => $token
-    //     ])->assertSessionHasErrors([
-    //         'tipo_conta',
-    //     ]);
-    // }
+    /** @test */
+    public function cannot_reset_password_with_wrong_tipo()
+    {
+        $user_externo = factory('App\Contabil')->create();
+        $token = Password::broker('users_externo')->createToken($user_externo);
+        $this->get(route('externo.password.reset', $token.'abc'))->assertSuccessful();
+        $this->post(route('externo.password.update'), [
+            'tipo_conta' => 'userexterno',
+            'cpf_cnpj' => $user_externo->cnpj,
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste102030', 
+            'token' => $token
+        ])->assertSessionHasErrors([
+            'tipo_conta',
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Pode resetar senha com tudo certo.
-    // */
-    // public function reset_password_after_verificar_email()
-    // {
-    //     $user_externo = factory('App\Contabil')->create();
-    //     $token = Password::broker('users_externo')->createToken($user_externo);
+    /** @test */
+    public function reset_password_after_verificar_email()
+    {
+        $user_externo = factory('App\Contabil')->create();
+        $token = Password::broker('users_externo')->createToken($user_externo);
 
-    //     $this->get(route('externo.password.reset', $token))->assertSuccessful();
-    //     $this->post(route('externo.password.update'), [
-    //         'tipo_conta' => 'contabil',
-    //         'token' => $token,
-    //         'cpf_cnpj' => $user_externo->cpf_cnpj,
-    //         'password' => 'Teste102030', 
-    //         'password_confirmation' => 'Teste102030', 
-    //     ])->assertRedirect(route('externo.login'));
+        $this->get(route('externo.password.reset', $token))->assertSuccessful();
+        $this->post(route('externo.password.update'), [
+            'tipo_conta' => 'contabil',
+            'token' => $token,
+            'cpf_cnpj' => $user_externo->cnpj,
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste102030', 
+        ])->assertRedirect(route('externo.login'));
 
-    //     $this->get(route('externo.login'))
-    //     ->assertSee('Senha alterada com sucesso. Favor realizar o login novamente com as novas informações.');
-    // }
+        $this->get(route('externo.login'))
+        ->assertSee('Senha alterada com sucesso. Favor realizar o login novamente com as novas informações.');
+    }
 
-    // /** @test 
-    //  * 
-    //  * Log externo ao alterar a senha em 'Esqueci a senha'.
-    // */
-    // public function log_is_generated_when_reset_password()
-    // {
-    //     $user_externo = factory('App\Contabil')->create();
-    //     $token = Password::broker('users_externo')->createToken($user_externo);
+    /** @test */
+    public function log_is_generated_when_reset_password()
+    {
+        $user_externo = factory('App\Contabil')->create();
+        $token = Password::broker('contabeis')->createToken($user_externo);
 
-    //     $this->get(route('externo.password.reset', $token))
-    //     ->assertSee('<label for="password-text" class="m-0 p-0">Força da senha</label>')
-    //     ->assertSee('<div class="progress" id="password-text"></div>')
-    //     ->assertSee('<small><em>Em caso de senha fraca ou média, considere alterá-la para sua segurança.</em></small>')
-    //     ->assertSuccessful();
+        $this->get(route('externo.password.reset', $token))
+        ->assertSee('<label for="password-text" class="m-0 p-0">Força da senha</label>')
+        ->assertSee('<div class="progress" id="password-text"></div>')
+        ->assertSee('<small><em>Em caso de senha fraca ou média, considere alterá-la para sua segurança.</em></small>')
+        ->assertSuccessful();
 
-    //     $this->post(route('externo.password.update'), [
-    //         'tipo_conta' => 'contabil',
-    //         'token' => $token,
-    //         'cpf_cnpj' => $user_externo->cpf_cnpj,
-    //         'password' => 'Teste102030', 
-    //         'password_confirmation' => 'Teste102030', 
-    //     ]);
+        $this->post(route('externo.password.update'), [
+            'tipo_conta' => 'contabil',
+            'token' => $token,
+            'cpf_cnpj' => $user_externo->cnpj,
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste102030', 
+        ]);
 
-    //     $log = tailCustom(storage_path($this->pathLogExterno()));
-    //     $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
-    //     $txt = $inicio . 'Usuário com o cpf/cnpj '.$user_externo['cpf_cnpj'];
-    //     $txt .= ' alterou a senha com sucesso na Área do Usuário Externo através do "Esqueci a senha".';
-    //     $this->assertStringContainsString($txt, $log);
-    // }
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Usuário com o cpf/cnpj '.$user_externo['cnpj'];
+        $txt .= ' alterou a senha com sucesso na Área da Contabilidade através do "Esqueci a senha".';
+        $this->assertStringContainsString($txt, $log);
+    }
 
-    // /** @test */
-    // public function log_is_generated_when_bot_try_login()
-    // {
-    //     $user_externo = factory('App\Contabil')->create();
+    /** @test */
+    public function log_is_generated_when_bot_try_login()
+    {
+        $user_externo = factory('App\Contabil')->create();
 
-    //     $this->get(route('externo.login'))->assertOk();
+        $this->get(route('externo.login'))->assertOk();
 
-    //     $this->post(route('externo.login.submit'), ['cpf_cnpj' => $user_externo['cpf_cnpj'], 'password' => 'teste1020', 'email_system' => '1'])
-    //     ->assertRedirect(route('externo.login'));
+        $this->post(route('externo.login.submit'), [
+            'tipo_conta' => 'contabil',
+            'cpf_cnpj' => $user_externo['cnpj'], 
+            'password' => 'teste1020', 'email_system' => '1'
+        ])
+        ->assertRedirect(route('externo.login'));
 
-    //     $log = tailCustom(storage_path($this->pathLogExterno()));
-    //     $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
-    //     $texto .= 'Possível bot tentou login com cpf/cnpj "' .apenasNumeros($user_externo->cpf_cnpj). '" como Usuário Externo, mas impedido de verificar o usuário no banco de dados.';
-    //     $this->assertStringContainsString($texto, $log);
-    // }
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Possível bot tentou login com cpf/cnpj "' .apenasNumeros($user_externo->cnpj). '" como Contabilidade, mas impedido de verificar o usuário no banco de dados.';
+        $this->assertStringContainsString($texto, $log);
+    }
 
-    // /** @test */
-    // public function same_ip_when_lockout_contabil_by_csrf_token_can_login_on_portal()
-    // {
-    //     $user = factory('App\User')->create([
-    //         'password' => bcrypt('TestePorta1@')
-    //     ]);
-    //     $user_externo = factory('App\Contabil')->create();
+    /** @test */
+    public function same_ip_when_lockout_contabil_by_csrf_token_can_login_on_portal()
+    {
+        $user = factory('App\User')->create([
+            'password' => bcrypt('TestePorta1@')
+        ]);
+        $user_externo = factory('App\Contabil')->create();
 
-    //     $this->get('/')->assertOk();
-    //     $csrf = csrf_token();
+        $this->get('/')->assertOk();
+        $csrf = csrf_token();
 
-    //     for($i = 0; $i < 4; $i++)
-    //     {
-    //         $this->get(route('externo.login'));
-    //         $this->assertEquals($csrf, request()->session()->get('_token'));
-    //         $this->post(route('externo.login.submit'), [
-    //             'tipo_conta' => 'contabil',
-    //             'cpf_cnpj' => $user_externo['cpf_cnpj'], 
-    //             'password' => 'teste1020'
-    //         ]);
-    //         $this->assertEquals($csrf, request()->session()->get('_token'));
-    //     }
+        for($i = 0; $i < 4; $i++)
+        {
+            $this->get(route('externo.login'));
+            $this->assertEquals($csrf, request()->session()->get('_token'));
+            $this->post(route('externo.login.submit'), [
+                'tipo_conta' => 'contabil',
+                'cpf_cnpj' => $user_externo['cnpj'], 
+                'password' => 'teste1020'
+            ]);
+            $this->assertEquals($csrf, request()->session()->get('_token'));
+        }
 
-    //     $this->post('admin/login', [
-    //         'login' => $user->username, 
-    //         'password' => 'TestePorta1'
-    //     ]);
-    //     $this->assertEquals($csrf, request()->session()->get('_token'));
-    //     $this->get('admin/login')
-    //     ->assertSee('Login inválido devido à quantidade de tentativas.');
-    //     $this->assertEquals($csrf, request()->session()->get('_token'));
+        $this->post('admin/login', [
+            'login' => $user->username, 
+            'password' => 'TestePorta1'
+        ]);
+        $this->assertEquals($csrf, request()->session()->get('_token'));
+        $this->get('admin/login')
+        ->assertSee('Login inválido devido à quantidade de tentativas.');
+        $this->assertEquals($csrf, request()->session()->get('_token'));
 
-    //     request()->session()->regenerate();
+        request()->session()->regenerate();
 
-    //     $this->get(route('externo.login'))->assertOk();
-    //     $this->post(route('externo.login.submit'), [
-    //         'tipo_conta' => 'contabil',
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj'], 
-    //         'password' => 'Teste102030'
-    //     ])
-    //     ->assertRedirect(route('externo.dashboard'));
-    // }
+        $this->get(route('externo.login'))->assertOk();
+        $this->post(route('externo.login.submit'), [
+            'tipo_conta' => 'contabil',
+            'cpf_cnpj' => $user_externo['cnpj'], 
+            'password' => 'Teste102030'
+        ])
+        ->assertRedirect(route('externo.dashboard'));
+    }
 
-    // /** @test */
-    // public function cannot_view_form_when_bot_try_login_on_restrict_area()
-    // {
-    //     $user_externo = factory('App\Contabil')->create();
+    /** @test */
+    public function cannot_view_form_when_bot_try_login_on_restrict_area()
+    {
+        $user_externo = factory('App\Contabil')->create();
 
-    //     $this->get(route('externo.login'))->assertOk();
+        $this->get(route('externo.login'))->assertOk();
 
-    //     $this->post(route('externo.login.submit'), [
-    //         'tipo_conta' => 'contabil',
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj'], 
-    //         'password' => 'teste1020', 'email_system' => '1'
-    //     ])
-    //     ->assertRedirect(route('externo.login'));
+        $this->post(route('externo.login.submit'), [
+            'tipo_conta' => 'contabil',
+            'cpf_cnpj' => $user_externo['cnpj'], 
+            'password' => 'teste1020', 'email_system' => '1'
+        ])
+        ->assertRedirect(route('externo.login'));
 
-    //     $this->get(route('externo.login'))
-    //     ->assertDontSee('<label for="login">CPF ou CNPJ</label>')
-    //     ->assertDontSee('<label for="password">Senha</label>')
-    //     ->assertDontSee('<button type="submit" class="btn btn-primary">Entrar</button>');
-    // }
+        $this->get(route('externo.login'))
+        ->assertDontSee('<label for="login">CPF ou CNPJ</label>')
+        ->assertDontSee('<label for="password">Senha</label>')
+        ->assertDontSee('<button type="submit" class="btn btn-primary">Entrar</button>');
+    }
 
-    // /** @test */
-    // public function can_view_strength_bar_password_login_on_restrict_area()
-    // {
-    //     $user_externo = factory('App\Contabil')->create();
+    /** @test */
+    public function can_view_strength_bar_password_login_on_restrict_area()
+    {
+        $user_externo = factory('App\Contabil')->create();
 
-    //     $this->get(route('externo.login'))
-    //     ->assertSee('<label for="password-text" class="m-0 p-0">Força da senha</label>')
-    //     ->assertSee('<div class="progress" id="password-text"></div>')
-    //     ->assertSee('<small><em>Em caso de senha fraca ou média, considere alterá-la para sua segurança.</em></small>')
-    //     ->assertOk();
-    // }
+        $this->get(route('externo.login'))
+        ->assertSee('<label for="password-text" class="m-0 p-0">Força da senha</label>')
+        ->assertSee('<div class="progress" id="password-text"></div>')
+        ->assertSee('<small><em>Em caso de senha fraca ou média, considere alterá-la para sua segurança.</em></small>')
+        ->assertOk();
+    }
 
-    // /** @test 
-    //  * 
-    //  * Pode editar os dados cadastrais.
-    // */
-    // public function can_after_login_update_nome_and_email()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function can_after_login_update_nome_and_email()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->put(route('externo.editar', [
-    //         'nome' => 'Novo nome do Usuário Externo',
-    //         'email' => 'teste@email.com.br'
-    //     ]));
-    //     $this->get(route('externo.editar.view'))
-    //     ->assertSee('Dados alterados com sucesso.');
-    //     $this->assertDatabaseHas('contabeis', [
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj'],
-    //         'nome' => mb_strtoupper('Novo nome do Usuário Externo', 'UTF-8'),
-    //         'email' => 'teste@email.com.br'
-    //     ]);
-    // }
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'nome' => 'Novo nome da Contabilidade',
+            'email' => 'teste@email.com.br'
+        ]));
+        $this->get(route('externo.editar.view'))
+        ->assertSee('Dados alterados com sucesso.');
+        $this->assertDatabaseHas('contabeis', [
+            'cnpj' => $user_externo['cnpj'],
+            'nome' => mb_strtoupper('Novo nome da Contabilidade', 'UTF-8'),
+            'email' => 'teste@email.com.br'
+        ]);
+    }
 
-    // /** @test 
-    // */
-    // public function cannot_after_login_update_email_with_more_than_2_mails_equal()
-    // {
-    //     factory('App\Contabil')->create([
-    //         'cpf_cnpj' => '89878398000177',
-    //         'email' => 'teste@email.com.br'
-    //     ]);
-    //     factory('App\Contabil')->create([
-    //         'cpf_cnpj' => '98040120063',
-    //         'email' => 'teste@email.com.br'
-    //     ]);
+    /** @test */
+    public function cannot_after_login_update_email_with_more_than_2_mails_equal()
+    {
+        factory('App\Contabil')->create([
+            'cnpj' => '89878398000177',
+            'email' => 'teste@email.com.br'
+        ]);
+        factory('App\Contabil')->create([
+            'cnpj' => '49931920000112',
+            'email' => 'teste@email.com.br'
+        ]);
 
-    //     $user_externo = $this->signInAsUserExterno();
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->put(route('externo.editar', [
-    //         'email' => 'teste@email.com.br'
-    //     ]));
-    //     $this->get(route('externo.editar.view'))
-    //     ->assertSee('Este email já alcançou o limite de cadastro, por favor insira outro.');
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'email' => 'teste@email.com.br'
+        ]));
+        $this->get(route('externo.editar.view'))
+        ->assertSee('Este email já alcançou o limite de cadastro, por favor insira outro.');
 
-    //     $this->assertDatabaseHas('contabeis', [
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj'],
-    //         'email' => $user_externo['email']
-    //     ]);
-    // }
+        $this->assertDatabaseHas('contabeis', [
+            'cnpj' => $user_externo['cnpj'],
+            'email' => $user_externo['email']
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Log externo ao alterar os dados cadastrais.
-    // */
-    // public function log_is_generated_when_update_data()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function log_is_generated_when_update_data()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'));
-    //     $this->put(route('externo.editar', [
-    //         'nome' => 'Novo nome do Usuário Externo',
-    //         'email' => 'teste@email.com.br'
-    //     ]));
+        $this->get(route('externo.editar.view'));
+        $this->put(route('externo.editar', [
+            'nome' => 'Novo nome da Contabilidade',
+            'email' => 'teste@email.com.br'
+        ]));
 
-    //     $log = tailCustom(storage_path($this->pathLogExterno()));
-    //     $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
-    //     $txt = $inicio . 'Usuário Externo ' . $user_externo->id . ' ("'. formataCpfCnpj($user_externo->cpf_cnpj) .'")';
-    //     $txt .= ' alterou os dados com sucesso na Área Restrita após logon.';
-    //     $this->assertStringContainsString($txt, $log);
-    // }
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Contabilidade ' . $user_externo->id . ' ("'. formataCpfCnpj($user_externo->cnpj) .'")';
+        $txt .= ' alterou os dados com sucesso na Área Restrita após logon.';
+        $this->assertStringContainsString($txt, $log);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Pode editar o nome.
-    // */
-    // public function can_after_login_update_nome()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function can_after_login_update_nome()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->put(route('externo.editar', [
-    //         'nome' => 'Novo nome do Usuário Externo',
-    //         'email' => $user_externo['email']
-    //     ]));
-    //     $this->assertDatabaseHas('contabeis', [
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj'],
-    //         'nome' => mb_strtoupper('Novo nome do Usuário Externo', 'UTF-8'),
-    //         'email' => $user_externo['email']
-    //     ]);
-    // }
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'nome' => 'Novo nome da Contabilidade',
+            'email' => $user_externo['email']
+        ]));
+        $this->assertDatabaseHas('contabeis', [
+            'cnpj' => $user_externo['cnpj'],
+            'nome' => mb_strtoupper('Novo nome da Contabilidade', 'UTF-8'),
+            'email' => $user_externo['email']
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Pode editar o email.
-    // */
-    // public function can_after_login_update_email()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function can_after_login_update_email()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->put(route('externo.editar', [
-    //         'nome' => $user_externo['nome'],
-    //         'email' => 'teste@teste.com.br'
-    //     ]));
-    //     $this->assertDatabaseHas('contabeis', [
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj'],
-    //         'nome' => $user_externo['nome'],
-    //         'email' => 'teste@teste.com.br'
-    //     ]);
-    // }
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'nome' => $user_externo['nome'],
+            'email' => 'teste@teste.com.br'
+        ]));
+        $this->assertDatabaseHas('contabeis', [
+            'cnpj' => $user_externo['cnpj'],
+            'nome' => $user_externo['nome'],
+            'email' => 'teste@teste.com.br'
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Carrega os dados cadastrais.
-    // */
-    // public function fill_data_with_nome_cpfcnpj_email()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function fill_data_with_nome_cpfcnpj_email()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))
-    //     ->assertSee($user_externo['nome'])
-    //     ->assertSee($user_externo['cpf_cnpj'])
-    //     ->assertSee($user_externo['email']);
-    // }
+        $this->get(route('externo.editar.view'))
+        ->assertSee($user_externo['nome'])
+        ->assertSee($user_externo['cnpj'])
+        ->assertSee($user_externo['email']);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode editar os dados cadastrais sem os inputs obrigatórios.
-    // */
-    // public function cannot_after_login_update_nome_and_email_without_mandatory_inputs()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_after_login_update_nome_and_email_without_mandatory_inputs()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->put(route('externo.editar', [
-    //         'nome' => '',
-    //         'email' => ''
-    //     ]))->assertSessionHasErrors([
-    //         'nome',
-    //         'email'
-    //     ]);
-    //     $this->assertDatabaseHas('contabeis', [
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj'],
-    //         'nome' => $user_externo['nome'],
-    //         'email' => $user_externo['email']
-    //     ]);
-    // }
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'nome' => '',
+            'email' => ''
+        ]))->assertSessionHasErrors([
+            'nome',
+            'email'
+        ]);
+        $this->assertDatabaseHas('contabeis', [
+            'cnpj' => $user_externo['cnpj'],
+            'nome' => $user_externo['nome'],
+            'email' => $user_externo['email']
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode editar o nome vazio.
-    // */
-    // public function cannot_after_login_update_nome_empty()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_after_login_update_nome_empty()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->put(route('externo.editar', [
-    //         'nome' => ''
-    //     ]))->assertSessionHasErrors([
-    //         'nome'
-    //     ]);
-    //     $this->assertDatabaseHas('contabeis', [
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj'],
-    //         'nome' => $user_externo['nome'],
-    //         'email' => $user_externo['email']
-    //     ]);
-    // }
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'nome' => ''
+        ]))->assertSessionHasErrors([
+            'nome'
+        ]);
+        $this->assertDatabaseHas('contabeis', [
+            'cnpj' => $user_externo['cnpj'],
+            'nome' => $user_externo['nome'],
+            'email' => $user_externo['email']
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode editar o email vazio.
-    // */
-    // public function cannot_after_login_update_email_empty()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_after_login_update_email_empty()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->put(route('externo.editar', [
-    //         'email' => ''
-    //     ]))->assertSessionHasErrors([
-    //         'email'
-    //     ]);
-    //     $this->assertDatabaseHas('contabeis', [
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj'],
-    //         'nome' => $user_externo['nome'],
-    //         'email' => $user_externo['email']
-    //     ]);
-    // }
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'email' => ''
+        ]))->assertSessionHasErrors([
+            'email'
+        ]);
+        $this->assertDatabaseHas('contabeis', [
+            'cnpj' => $user_externo['cnpj'],
+            'nome' => $user_externo['nome'],
+            'email' => $user_externo['email']
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode editar o email errado.
-    // */
-    // public function cannot_after_login_update_email_wrong()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_after_login_update_email_wrong()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->put(route('externo.editar', [
-    //         'email' => 'teste.com.br'
-    //     ]))->assertSessionHasErrors([
-    //         'email'
-    //     ]);
-    //     $this->assertDatabaseHas('contabeis', [
-    //         'cpf_cnpj' => $user_externo['cpf_cnpj'],
-    //         'nome' => $user_externo['nome'],
-    //         'email' => $user_externo['email']
-    //     ]);
-    // }
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'email' => 'teste.com.br'
+        ]))->assertSessionHasErrors([
+            'email'
+        ]);
+        $this->assertDatabaseHas('contabeis', [
+            'cnpj' => $user_externo['cnpj'],
+            'nome' => $user_externo['nome'],
+            'email' => $user_externo['email']
+        ]);
+    }
     
-    // /** @test 
-    //  * 
-    //  * Pode editar a senha depois de logar.
-    // */
-    // public function can_after_login_update_password()
-    // {
-    //     Mail::fake();
+    /** @test */
+    public function can_after_login_update_password()
+    {
+        Mail::fake();
 
-    //     $user_externo = $this->signInAsUserExterno();
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->get(route('externo.editar.senha.view'))
-    //     ->assertSee('<label for="password-text" class="m-0 p-0">Força da senha</label>')
-    //     ->assertSee('<div class="progress" id="password-text"></div>')
-    //     ->assertSee('<small><em>Em caso de senha fraca ou média, considere alterá-la para sua segurança.</em></small>')
-    //     ->assertOk();
-    //     $this->put(route('externo.editar', [
-    //         'password_atual' => 'Teste102030',
-    //         'password' => 'Teste10203040',
-    //         'password_confirmation' => 'Teste10203040'
-    //     ]));
-    //     $this->get(route('externo.editar.view'))
-    //     ->assertSee('Dados alterados com sucesso.');
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->get(route('externo.editar.senha.view'))
+        ->assertSee('<label for="password-text" class="m-0 p-0">Força da senha</label>')
+        ->assertSee('<div class="progress" id="password-text"></div>')
+        ->assertSee('<small><em>Em caso de senha fraca ou média, considere alterá-la para sua segurança.</em></small>')
+        ->assertOk();
+        $this->put(route('externo.editar', [
+            'password_atual' => 'Teste102030',
+            'password' => 'Teste10203040',
+            'password_confirmation' => 'Teste10203040'
+        ]));
+        $this->get(route('externo.editar.view'))
+        ->assertSee('Dados alterados com sucesso.');
 
-    //     Mail::assertQueued(CadastroUserExternoMail::class);
-    // }
+        Mail::assertQueued(CadastroUserExternoMail::class);
+    }
 
-    // /** @test */
-    // public function log_is_generated_when_change_password_on_restrict_area()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function log_is_generated_when_change_password_on_restrict_area()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->put(route('externo.editar', [
-    //         'password_atual' => 'Teste102030',
-    //         'password' => 'TestePortal123@#$%&',
-    //         'password_confirmation' => 'TestePortal123@#$%&', 
-    //     ]));
+        $this->put(route('externo.editar', [
+            'password_atual' => 'Teste102030',
+            'password' => 'TestePortal123@#$%&',
+            'password_confirmation' => 'TestePortal123@#$%&', 
+        ]));
 
-    //     $log = tailCustom(storage_path($this->pathLogExterno()));
-    //     $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
-    //     $texto .= 'Usuário Externo ' . $user_externo->id . ' ("'. formataCpfCnpj($user_externo->cpf_cnpj) .'") alterou a senha com sucesso na Área Restrita após logon.';
-    //     $this->assertStringContainsString($texto, $log);
-    // }
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Contabilidade ' . $user_externo->id . ' ("'. formataCpfCnpj($user_externo->cnpj) .'") alterou a senha com sucesso na Área Restrita após logon.';
+        $this->assertStringContainsString($texto, $log);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode editar a senha se a atual foi digitada errada.
-    // */
-    // public function cannot_after_login_update_password_with_password_atual_wrong()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_after_login_update_password_with_password_atual_wrong()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->get(route('externo.editar.senha.view'))->assertOk();
-    //     $this->put(route('externo.editar', [
-    //         'password_atual' => 'Teste10203040',
-    //         'password' => 'Teste10203040',
-    //         'password_confirmation' => 'Teste10203040'
-    //     ]));
-    //     $this->get(route('externo.editar.senha.view'))
-    //     ->assertSee('A senha atual digitada está incorreta!');
-    // }
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->get(route('externo.editar.senha.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'password_atual' => 'Teste10203040',
+            'password' => 'Teste10203040',
+            'password_confirmation' => 'Teste10203040'
+        ]));
+        $this->get(route('externo.editar.senha.view'))
+        ->assertSee('A senha atual digitada está incorreta!');
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode editar a senha se está errada.
-    // */
-    // public function cannot_after_login_update_password_wrong()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_after_login_update_password_wrong()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->get(route('externo.editar.senha.view'))->assertOk();
-    //     $this->put(route('externo.editar', [
-    //         'password_atual' => 'Teste102030',
-    //         'password' => 'teste10203040',
-    //         'password_confirmation' => 'teste10203040'
-    //     ]))->assertSessionHasErrors([
-    //         'password'
-    //     ]);
-    // }
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->get(route('externo.editar.senha.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'password_atual' => 'Teste102030',
+            'password' => 'teste10203040',
+            'password_confirmation' => 'teste10203040'
+        ]))->assertSessionHasErrors([
+            'password'
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode editar a senha se a confirmação de senha está errada.
-    // */
-    // public function cannot_after_login_update_password_confirmation_wrong()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_after_login_update_password_confirmation_wrong()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->get(route('externo.editar.senha.view'))->assertOk();
-    //     $this->put(route('externo.editar', [
-    //         'password_atual' => 'Teste102030',
-    //         'password' => 'Teste10203040',
-    //         'password_confirmation' => 'teste10203040'
-    //     ]))->assertSessionHasErrors([
-    //         'password',
-    //         'password_confirmation'
-    //     ]);
-    // }
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->get(route('externo.editar.senha.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'password_atual' => 'Teste102030',
+            'password' => 'Teste10203040',
+            'password_confirmation' => 'teste10203040'
+        ]))->assertSessionHasErrors([
+            'password',
+            'password_confirmation'
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode editar a senha se a senha e confirmação de senha estão diferentes.
-    // */
-    // public function cannot_after_login_update_password_and_confirmation_differents()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_after_login_update_password_and_confirmation_differents()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->get(route('externo.editar.senha.view'))->assertOk();
-    //     $this->put(route('externo.editar', [
-    //         'password_atual' => 'Teste102030',
-    //         'password' => 'Teste10203040',
-    //         'password_confirmation' => 'Teste1020304050'
-    //     ]))->assertSessionHasErrors([
-    //         'password',
-    //         'password_confirmation'
-    //     ]);
-    // }
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->get(route('externo.editar.senha.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'password_atual' => 'Teste102030',
+            'password' => 'Teste10203040',
+            'password_confirmation' => 'Teste1020304050'
+        ]))->assertSessionHasErrors([
+            'password',
+            'password_confirmation'
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode editar a senha se a senha está vazia.
-    // */
-    // public function cannot_after_login_update_password_empty()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_after_login_update_password_empty()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->get(route('externo.editar.senha.view'))->assertOk();
-    //     $this->put(route('externo.editar', [
-    //         'password_atual' => 'Teste102030',
-    //         'password' => '',
-    //         'password_confirmation' => 'Teste1020304050'
-    //     ]))->assertSessionHasErrors([
-    //         'password'
-    //     ]);
-    // }
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->get(route('externo.editar.senha.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'password_atual' => 'Teste102030',
+            'password' => '',
+            'password_confirmation' => 'Teste1020304050'
+        ]))->assertSessionHasErrors([
+            'password'
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Não pode editar a senha se a confirmação está vazia.
-    // */
-    // public function cannot_after_login_update_confirmation_empty()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_after_login_update_confirmation_empty()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->get(route('externo.editar.senha.view'))->assertOk();
-    //     $this->put(route('externo.editar', [
-    //         'password_atual' => 'Teste102030',
-    //         'password' => 'Teste1020304050',
-    //         'password_confirmation' => ''
-    //     ]))->assertSessionHasErrors([
-    //         'password'
-    //     ]);
-    // }
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->get(route('externo.editar.senha.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'password_atual' => 'Teste102030',
+            'password' => 'Teste1020304050',
+            'password_confirmation' => ''
+        ]))->assertSessionHasErrors([
+            'password'
+        ]);
+    }
 
-    // /** 
-    //  * =======================================================================================================
-    //  * TESTES ABAS DE SERVIÇOS
-    //  * =======================================================================================================
-    //  */
+    /** 
+     * =======================================================================================================
+     * TESTES ABAS DE SERVIÇOS
+     * =======================================================================================================
+     */
 
-    // /** @test 
-    //  * 
-    //  * Pode acessar todas as abas na área restrita do Portal.
-    // */
-    // public function after_login_can_access_tabs_on_restrict()
-    // {
-    //     $user_externo = $this->signInAsUserExterno();
+    /** @test */
+    public function after_login_can_access_tabs_on_restrict()
+    {
+        $user_externo = $this->signInAsUserExterno('contabil');
 
-    //     $this->get(route('externo.dashboard'))->assertOk();
-    //     $this->get(route('externo.editar.view'))->assertOk();
-    //     $this->get(route('externo.editar.senha.view'))->assertOk();
-    //     $this->get(route('externo.preregistro.view'))->assertOk();
-    // }
+        $this->get(route('externo.dashboard'))->assertOk();
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->get(route('externo.editar.senha.view'))->assertOk();
+        $this->get(route('externo.preregistro.view'))->assertOk();
+        $this->get(route('externo.relacao.preregistros'))->assertOk();
+    }
 
-    // /** @test 
-    //  * 
-    //  * Abas da área restrita não são acessíveis sem o login.
-    // */
-    // public function cannot_access_tabs_on_restrict_area_without_login()
-    // {
-    //     $this->get(route('externo.dashboard'))->assertRedirect(route('externo.login'));
-    //     $this->get(route('externo.editar.view'))->assertRedirect(route('externo.login'));
-    //     $this->get(route('externo.editar.senha.view'))->assertRedirect(route('externo.login'));
-    //     $this->get(route('externo.preregistro.view'))->assertRedirect(route('externo.login'));
-    // }
+    /** @test */
+    public function cannot_access_tabs_on_restrict_area_without_login()
+    {
+        $this->get(route('externo.dashboard'))->assertRedirect(route('externo.login'));
+        $this->get(route('externo.editar.view'))->assertRedirect(route('externo.login'));
+        $this->get(route('externo.editar.senha.view'))->assertRedirect(route('externo.login'));
+        $this->get(route('externo.preregistro.view'))->assertRedirect(route('externo.login'));
+        $this->get(route('externo.relacao.preregistros'))->assertRedirect(route('externo.login'));
+    }
 
-    // /** 
-    //  * =======================================================================================================
-    //  * TESTES PRE-REGISTRO CONTABIL
-    //  * =======================================================================================================
-    //  */
+    /** 
+     * =======================================================================================================
+     * TESTES PRE-REGISTRO CONTABIL
+     * =======================================================================================================
+     */
 
     // /** @test */
     // public function view_msg_update()

@@ -49,7 +49,7 @@ $factory->state(PreRegistroCpf::class, 'justificado', function (Faker $faker) {
         $arrayFinal[$campo] = $faker->text(500);
 
     return [
-        'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create([
+        'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create([
             'justificativa' => json_encode($arrayFinal, JSON_FORCE_OBJECT)
         ]),
     ];
@@ -72,29 +72,8 @@ $factory->state(PreRegistroCpf::class, 'campos_editados', function (Faker $faker
 });
 
 $factory->state(PreRegistroCpf::class, 'request', function (Faker $faker) {
-    $contabil = factory('App\Contabil')->states('low')->make([
-        'cnpj' => '35195123000100'
-    ])->attributesToArray();
-    foreach($contabil as $key => $val)
-        $contabil['final'][$key . '_contabil'] = $val;
-
-    $pr = factory('App\PreRegistro')->states('low')->make([
-        'contabil_id' => Contabil::count() + 1
-    ])->attributesToArray();
-    $pr['final'] = $pr;
-    $pr['final']['opcional_celular'] = [opcoes_celular()[0], opcoes_celular()[2]];
-    $pr['final']['tipo_telefone_1'] = tipos_contatos()[0];
-    $pr['final']['telefone_1'] = '(11) 00000-0000';
-    $pr['final']['opcional_celular_1'] = [opcoes_celular()[1], opcoes_celular()[0]];
-    $final = array_merge($pr['final'], $contabil['final']);
-    unset($pr['final']);
-    unset($contabil['final']);
-
-    $pr['opcional_celular'] = opcoes_celular()[0] . ',' . opcoes_celular()[2] . ';' . opcoes_celular()[1] . ',' . opcoes_celular()[0];
-    $pr['tipo_telefone'] = tipos_contatos()[0] . ';' . tipos_contatos()[0];
-    $pr['telefone'] = '(11) 00000-0000;(11) 00000-0000';
-
     return [
+        'pre_registro_id' => factory('App\PreRegistro')->states('low'),
         'nome_social' => $faker->name,
         'estado_civil' => estados_civis()[0],
         'nacionalidade' => nacionalidades()[17],
@@ -102,9 +81,26 @@ $factory->state(PreRegistroCpf::class, 'request', function (Faker $faker) {
         'nome_mae' => $faker->name,
         'nome_pai' => $faker->name,
         'tipo_identidade' => tipos_identidade()[0],
-        'pre_registro_id' => PreRegistro::count() + 1,
-        'preRegistro' => $pr,
-        'contabil' => $contabil,
-        'final' => $final
+        'final' => null
     ];
+});
+
+$factory->afterMakingState(PreRegistroCpf::class, 'request', function ($prCpf, $faker) {
+    factory('App\Anexo')->states('pre_registro')->create();
+    $prCpf->preRegistro->opcional_celular = [opcoes_celular()[0], opcoes_celular()[2]];
+
+    $contabil = array();
+    foreach($prCpf->preRegistro->contabil->attributesToArray() as $key => $val)
+        in_array($key, ['cnpj', 'nome', 'email', 'nome_contato', 'telefone']) ? $contabil[$key . '_contabil'] = $val : null;
+
+    $pf = $prCpf->makeHidden(['id', 'pre_registro_id']);
+
+    $pr = $prCpf->preRegistro->makeHidden(['id', 'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos',
+    'historico_contabil', 'historico_status', 'historico_justificativas', 'campos_espelho', 'campos_editados', 'contabil']);
+
+    $prCpf->final = array_merge($pf->attributesToArray(), $pr->attributesToArray(), $contabil, ['pergunta' => 'Teste']);
+});
+
+$factory->afterCreatingState(PreRegistroCpf::class, 'justificado', function ($prCpf, $faker) {
+    factory('App\Anexo')->states('pre_registro')->create();
 });

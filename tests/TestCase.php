@@ -73,11 +73,12 @@ abstract class TestCase extends BaseTestCase
         return $user;
     }
 
-    protected function signInAsUserExterno($externo = null)
+    protected function signInAsUserExterno($tipo = 'user_externo', $externo = null)
     {
-        $externo = $externo ?: factory('App\UserExterno')->create();
+        $model = $tipo == 'contabil' ? 'App\Contabil' : 'App\UserExterno';
+        $externo = $externo ?: factory($model)->create();
 
-        $this->actingAs($externo, 'user_externo');
+        $this->actingAs($externo, $tipo);
 
         return $externo;
     }

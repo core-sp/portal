@@ -76,9 +76,12 @@ class UserExternoLoginController extends Controller
 
     protected function validateLogin(Request $request)
     {
+        $tipo = $request->input('tipo_conta', 'user_externo');
+        $tipo = $tipo == 'contabil' ? 'Contabilidade' : 'Usuário Externo';
+
         if($request->filled('email_system')){
             $ip = "[IP: " . request()->ip() . "] - ";
-            \Log::channel('externo')->info($ip . 'Possível bot tentou login com cpf/cnpj "' . apenasNumeros($request->cpf_cnpj) . '" como Usuário Externo, mas impedido de verificar o usuário no banco de dados.');
+            \Log::channel('externo')->info($ip . 'Possível bot tentou login com cpf/cnpj "' . apenasNumeros($request->cpf_cnpj) . '" como '.$tipo.', mas impedido de verificar o usuário no banco de dados.');
             throw ValidationException::withMessages([
                 'email_system' => 'error',
             ]);

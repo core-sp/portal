@@ -108,7 +108,7 @@
 <br>
 <h5 class="font-weight-bolder mb-3">Endereço da empresa</h5>
 
-    @if($resultado->pessoaJuridica->mesmoEndereco())
+    @if(isset($resultado->pessoaJuridica) && $resultado->pessoaJuridica->mesmoEndereco())
 
     <p id="checkEndEmpresa">
         <span class="font-weight-bolder">{{ $codigos[2]['checkEndEmpresa'] }} - Mesmo endereço da correspondência </span>

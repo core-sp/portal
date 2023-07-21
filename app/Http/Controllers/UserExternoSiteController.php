@@ -318,7 +318,7 @@ class UserExternoSiteController extends Controller
             auth()->guard('user_externo')->user();
 
             $contabil = auth()->guard('contabil')->user();
-            $preRegistro = $externo->load('preRegistro')->preRegistro;
+            $preRegistro = isset($externo) ? $externo->load('preRegistro')->preRegistro : null;
 
             if(!isset($preRegistro))
                 throw new \Exception('Não autorizado a acessar a solicitação de registro', 401);

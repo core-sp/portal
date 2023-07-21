@@ -355,6 +355,9 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function saveSiteAjax($request, $gerentiRepository, $externo, $contabil = null)
     {
+        if(!isset($externo))
+            throw new \Exception('Não autorizado a acessar a solicitação de registro por falta relacionamento com usuário externo', 401);
+
         $preRegistro = $externo->load('preRegistro')->preRegistro;
 
         if(!isset($preRegistro))
@@ -396,6 +399,9 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function saveSite($request, $gerentiRepository, $externo, $contabil = null)
     {
+        if(!isset($externo))
+            throw new \Exception('Não autorizado a acessar a solicitação de registro por falta relacionamento com usuário externo', 401);
+            
         $preRegistro = $externo->load('preRegistro')->preRegistro;
 
         if(!isset($preRegistro))
@@ -463,6 +469,9 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function excluirAnexo($id, $externo, $contabil = null)
     {
+        if(!isset($externo))
+            throw new \Exception('Não autorizado a acessar a solicitação de registro por falta relacionamento com usuário externo', 401);
+
         $preRegistro = $externo->load('preRegistro')->preRegistro;
 
         if(!isset($preRegistro))

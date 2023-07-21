@@ -4,15 +4,17 @@
 
 use App\PreRegistro;
 use App\UserExterno;
+use App\Contabil;
 use Faker\Generator as Faker;
 
 $factory->define(PreRegistro::class, function (Faker $faker) {
+    $totalSegmentos = count(segmentos()) - 1;
     return [
-        'segmento' => mb_strtoupper(segmentos()[5], 'UTF-8'),
+        'segmento' => mb_strtoupper(segmentos()[$faker->numberBetween(0, $totalSegmentos)], 'UTF-8'),
         'registro_secundario' => null,
         'cep' => '01234-001',
         'logradouro' => 'RUA TESTE DA ESQUINA',
-        'numero' => '29',
+        'numero' => (string) $faker->numberBetween(1, 5000),
         'complemento' => null,
         'bairro' => 'TESTE',
         'cidade' => 'SÃO PAULO',
@@ -21,7 +23,7 @@ $factory->define(PreRegistro::class, function (Faker $faker) {
         'tipo_telefone' => mb_strtoupper(tipos_contatos()[0], 'UTF-8'),
         'opcional_celular' => mb_strtoupper(opcoes_celular()[1], 'UTF-8'),
         'user_externo_id' => UserExterno::count() > 0 ? UserExterno::count() : factory('App\UserExterno'),
-        'contabil_id' => factory('App\Contabil'),
+        'contabil_id' => Contabil::count() > 0 ? Contabil::count() : factory('App\Contabil'),
         'idregional' => factory('App\Regional'),
         'idusuario' => factory('App\User'),
         'status' => PreRegistro::STATUS_CRIADO,
@@ -29,23 +31,31 @@ $factory->define(PreRegistro::class, function (Faker $faker) {
         'confere_anexos' => null,
         'historico_contabil' => json_encode(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT),
         'historico_status' => json_encode([PreRegistro::STATUS_CRIADO . ';' . now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT),
+        'historico_justificativas' => null,
         'campos_espelho' => null,
         'campos_editados' => null,
     ];
 });
 
 $factory->state(PreRegistro::class, 'low', function (Faker $faker) {
+    $totalSegmentos = count(segmentos()) - 1;
     return [
-        'segmento' => segmentos()[5],
+        'segmento' => segmentos()[$faker->numberBetween(0, $totalSegmentos)],
         'tipo_telefone' => tipos_contatos()[0],
         'opcional_celular' => opcoes_celular()[1],
-        'contabil_id' => factory('App\Contabil')->states('low'),
+        'contabil_id' => Contabil::count() > 0 ? Contabil::count() : factory('App\Contabil')->states('low'),
     ];
 });
 
 $factory->state(PreRegistro::class, 'pj', function (Faker $faker) {
     return [
         'user_externo_id' => UserExterno::count() > 0 ? UserExterno::count() : factory('App\UserExterno')->states('pj'),
+    ];
+});
+
+$factory->state(PreRegistro::class, 'sendo_elaborado', function (Faker $faker) {
+    return [
+        'idusuario' => null,
     ];
 });
 
@@ -107,4 +117,27 @@ $factory->state(PreRegistro::class, 'negado', function (Faker $faker) {
             PreRegistro::STATUS_NEGADO . ';' . now()->format('Y-m-d H:i:s')
         ], JSON_FORCE_OBJECT),
     ];
+});
+
+$factory->state(PreRegistro::class, 'campos_ajax', function (Faker $faker) {
+    return [
+        'contabil_id' => null,
+        'tipo_telefone_1' => tipos_contatos()[0],
+        'telefone_1' => '(11) 99999-8888',
+        'opcional_celular_1[]' => opcoes_celular()[1],
+    ];
+});
+
+$factory->afterMakingState(PreRegistro::class, 'campos_ajax', function ($pr, $faker) {
+    $pr->makeHidden([
+        'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos', 'historico_contabil',
+        'historico_status', 'campos_espelho', 'campos_editados', 'historico_justificativas'
+    ]);
+});
+
+$factory->afterCreatingState(PreRegistro::class, 'sendo_elaborado', function ($pr, $faker) {
+    $pr->makeHidden([
+        'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos', 'historico_contabil',
+        'historico_status', 'campos_espelho', 'campos_editados', 'historico_justificativas', 'created_at', 'updated_at', 'id'
+    ]);
 });

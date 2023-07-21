@@ -83,17 +83,13 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         ];
     }
 
-    private function filtro($request, $service, $user)
+    private function filtro($request, $service, $user, $temFiltro = null)
     {
         $filtro = '';
-        $temFiltro = null;
         $this->variaveis['continuacao_titulo'] = 'em <strong>'.$user->regional->regional.'</strong>';
 
-        if(\Route::is('preregistro.filtro'))
-        {
-            $temFiltro = true;
+        if(isset($temFiltro) && $temFiltro)
             $this->variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
-        }
 
         $regionais = $service->getService('Regional')->all()->whereNotIn('idregional', [14])->sortBy('regional');
         $options = !isset($request->regional) ? 
@@ -183,7 +179,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         return $preRegistro->anexos->first()->getOpcoesPreRegistro();
     }
 
-    public function listar($request, $service, $user)
+    public function listar($request, $service, $user, $filtro = null)
     {
         $dados = $this->validacaoFiltroAtivo($request, $user);
         $resultados = $this->getResultadosFiltro($dados, $user);
@@ -192,7 +188,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         return [
             'resultados' => $resultados, 
             'tabela' => $this->tabelaCompleta($resultados), 
-            'temFiltro' => $this->filtro($request, $service, $user),
+            'temFiltro' => $this->filtro($request, $service, $user, $filtro),
             'variaveis' => (object) $this->variaveis,
         ];
     }

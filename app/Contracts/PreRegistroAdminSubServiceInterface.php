@@ -9,7 +9,7 @@ interface PreRegistroAdminSubServiceInterface {
 
     public function getTiposAnexos($idPreRegistro);
 
-    public function listar($request, MediadorServiceInterface $service, User $user);
+    public function listar($request, MediadorServiceInterface $service, User $user, $filtro = null);
 
     public function view($id);
 

@@ -78,7 +78,7 @@
                         id="{{ 'opcional_celular_' . $key }}"
                         class="{{ $classes[4] }} form-check-input {{ $errors->has('opcional_celular') ? 'is-invalid' : '' }}" 
                         value="{{ $tipo }}" 
-                        @if(!empty(old('opcional_celular')))
+                        @if(!empty(old('opcional_celular')) && is_array(old('opcional_celular')))
                         {{ in_array($tipo, old('opcional_celular')) ? 'checked' : '' }}
                         @elseif(isset($resultado->getOpcionalCelular()[0]))
                         {{ in_array(mb_strtoupper($tipo, 'UTF-8'), $resultado->getOpcionalCelular()[0]) ? 'checked' : '' }}
@@ -153,7 +153,7 @@
                         id="{{ 'opcional_celular__' . $key }}"
                         class="{{ $classes[4] }} form-check-input {{ $errors->has('opcional_celular_1') ? 'is-invalid' : '' }}" 
                         value="{{ $tipo }}" 
-                        @if(!empty(old('opcional_celular_1')))
+                        @if(!empty(old('opcional_celular_1')) && is_array(old('opcional_celular_1')))
                         {{ in_array($tipo, old('opcional_celular_1')) == $tipo ? 'checked' : '' }}
                         @elseif(isset($resultado->getOpcionalCelular()[1]))
                         {{ in_array(mb_strtoupper($tipo, 'UTF-8'), $resultado->getOpcionalCelular()[1]) ? 'checked' : '' }}
