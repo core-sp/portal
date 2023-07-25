@@ -17,8 +17,9 @@ $factory->define(Anexo::class, function (Faker $faker) {
 });
 
 $factory->state(Anexo::class, 'pre_registro', function (Faker $faker) {
+    $id = PreRegistro::count() > 0 ? PreRegistro::count() : factory('App\PreRegistro')->create()->id;
     return [
-        'path' => Anexo::PATH_PRE_REGISTRO . '/' . PreRegistro::count() . '/' . (string) \Str::uuid() . '.jpg',
-        'pre_registro_id' => PreRegistro::count()
+        'path' => Anexo::PATH_PRE_REGISTRO . '/' . $id . '/' . (string) \Str::uuid() . '.jpg',
+        'pre_registro_id' => $id
     ];
 });

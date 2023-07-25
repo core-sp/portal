@@ -71,8 +71,14 @@ $factory->state(PreRegistroCnpj::class, 'campos_editados', function (Faker $fake
 });
 
 $factory->state(PreRegistroCnpj::class, 'request', function (Faker $faker) {
+    factory('App\Anexo')->states('pre_registro')->create();
+
     return [
-        'pre_registro_id' => factory('App\PreRegistro')->states('low'),
+        'pre_registro_id' => factory('App\PreRegistro')->states('low')->create([
+            'user_externo_id' => factory('App\UserExterno')->create([
+                'cpf_cnpj' => '12434268000110'
+            ])
+        ]),
         'razao_social' => $faker->company,
         'tipo_empresa' => tipos_empresa()[0],
         'responsavel_tecnico_id' => ResponsavelTecnico::count() > 0 ? ResponsavelTecnico::count() : factory('App\ResponsavelTecnico')->states('low'),
@@ -80,8 +86,30 @@ $factory->state(PreRegistroCnpj::class, 'request', function (Faker $faker) {
     ];
 });
 
-$factory->afterMakingState(PreRegistroCnpj::class, 'request', function ($prCnpj, $faker) {
+$factory->state(PreRegistroCnpj::class, 'request_mesmo_endereco', function (Faker $faker) {
     factory('App\Anexo')->states('pre_registro')->create();
+
+    return [
+        'pre_registro_id' => factory('App\PreRegistro')->states('low')->create([
+            'user_externo_id' => factory('App\UserExterno')->create([
+                'cpf_cnpj' => '12434268000110'
+            ])
+        ]),
+        'razao_social' => $faker->company,
+        'tipo_empresa' => tipos_empresa()[0],
+        'cep' => null,
+        'logradouro' => null,
+        'numero' => null,
+        'complemento' => null,
+        'bairro' => null,
+        'cidade' => null,
+        'uf' => null,
+        'responsavel_tecnico_id' => ResponsavelTecnico::count() > 0 ? ResponsavelTecnico::count() : factory('App\ResponsavelTecnico')->states('low'),
+        'final' => null
+    ];
+});
+
+$factory->afterMakingState(PreRegistroCnpj::class, 'request', function ($prCnpj, $faker) {
     $prCnpj->preRegistro->opcional_celular = [opcoes_celular()[0], opcoes_celular()[2]];
 
     $contabil = array();
@@ -98,11 +126,39 @@ $factory->afterMakingState(PreRegistroCnpj::class, 'request', function ($prCnpj,
     $pj = $prCnpj->makeHidden(['id', 'pre_registro_id', 'historico_rt', 'responsavel_tecnico_id']);
 
     $pr = $prCnpj->preRegistro->makeHidden(['id', 'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos',
-    'historico_contabil', 'historico_status', 'historico_justificativas', 'campos_espelho', 'campos_editados', 'contabil']);
+    'historico_contabil', 'historico_status', 'historico_justificativas', 'campos_espelho', 'campos_editados', 'contabil', 'created_at', 'updated_at']);
 
     $prCnpj->final = array_merge($pj->attributesToArray(), $pr->attributesToArray(), $contabil, $rt, $endereco, ['pergunta' => 'Teste']);
 });
 
-$factory->afterCreatingState(PreRegistroCnpj::class, 'justificado', function ($prCpf, $faker) {
+$factory->afterMakingState(PreRegistroCnpj::class, 'request_mesmo_endereco', function ($prCnpj, $faker) {
+    $prCnpj->preRegistro->opcional_celular = [opcoes_celular()[0], opcoes_celular()[2]];
+
+    $contabil = array();
+    foreach($prCnpj->preRegistro->contabil->attributesToArray() as $key => $val)
+        in_array($key, ['cnpj', 'nome', 'email', 'nome_contato', 'telefone']) ? $contabil[$key . '_contabil'] = $val : null;
+
+    $rt = array();
+    foreach($prCnpj->responsavelTecnico->attributesToArray() as $key1 => $val1)
+        !in_array($key1, ['registro', 'created_at', 'updated_at', 'deleted_at', 'id']) ? $rt[$key1 . '_rt'] = $val1 : null;
+
+    $pj = $prCnpj->makeHidden(['id', 'pre_registro_id', 'historico_rt', 'responsavel_tecnico_id']);
+
+    $pr = $prCnpj->preRegistro->makeHidden(['id', 'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos',
+    'historico_contabil', 'historico_status', 'historico_justificativas', 'campos_espelho', 'campos_editados', 'contabil', 'created_at', 'updated_at']);
+
+    $endereco = ['cep' => $pr->cep, 'logradouro' => $pr->logradouro, 'numero' => $pr->numero, 'complemento' => $pr->complemento, 
+    'bairro' => $pr->bairro, 'cidade' => $pr->cidade, 'uf' => $pr->uf];
+    foreach($endereco as $key1 => $val1)
+        $prCnpj->setAttribute($key1, $val1);
+
+    $prCnpj->final = array_merge($pj->attributesToArray(), $pr->attributesToArray(), $contabil, $rt, ['checkEndEmpresa' => 'on', 'pergunta' => 'Teste']);
+});
+
+$factory->afterCreatingState(PreRegistroCnpj::class, 'justificado', function ($prCnpj, $faker) {
     factory('App\Anexo')->states('pre_registro')->create();
+});
+
+$factory->afterMaking(PreRegistroCnpj::class, function ($prCnpj, $faker) {
+    $prCnpj->makeHidden(['pre_registro_id', 'historico_rt', 'responsavel_tecnico_id']);
 });

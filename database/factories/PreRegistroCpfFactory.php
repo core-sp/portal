@@ -72,8 +72,14 @@ $factory->state(PreRegistroCpf::class, 'campos_editados', function (Faker $faker
 });
 
 $factory->state(PreRegistroCpf::class, 'request', function (Faker $faker) {
+    factory('App\Anexo')->states('pre_registro')->create();
+    
     return [
-        'pre_registro_id' => factory('App\PreRegistro')->states('low'),
+        'pre_registro_id' => factory('App\PreRegistro')->states('low')->create([
+            'user_externo_id' => factory('App\UserExterno')->create([
+                'cpf_cnpj' => '13809835765'
+            ])
+        ]),
         'nome_social' => $faker->name,
         'estado_civil' => estados_civis()[0],
         'nacionalidade' => nacionalidades()[17],
@@ -86,7 +92,6 @@ $factory->state(PreRegistroCpf::class, 'request', function (Faker $faker) {
 });
 
 $factory->afterMakingState(PreRegistroCpf::class, 'request', function ($prCpf, $faker) {
-    factory('App\Anexo')->states('pre_registro')->create();
     $prCpf->preRegistro->opcional_celular = [opcoes_celular()[0], opcoes_celular()[2]];
 
     $contabil = array();
@@ -96,8 +101,8 @@ $factory->afterMakingState(PreRegistroCpf::class, 'request', function ($prCpf, $
     $pf = $prCpf->makeHidden(['id', 'pre_registro_id']);
 
     $pr = $prCpf->preRegistro->makeHidden(['id', 'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos',
-    'historico_contabil', 'historico_status', 'historico_justificativas', 'campos_espelho', 'campos_editados', 'contabil']);
-
+    'historico_contabil', 'historico_status', 'historico_justificativas', 'campos_espelho', 'campos_editados', 'contabil', 'created_at', 'updated_at']);
+    
     $prCpf->final = array_merge($pf->attributesToArray(), $pr->attributesToArray(), $contabil, ['pergunta' => 'Teste']);
 });
 
