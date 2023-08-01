@@ -40,6 +40,8 @@ class RepSalaReuniaoRequest extends FormRequest
             'sala_reuniao_id' => 'required|in:'.$this->salas_ids,
             'dia' => 'required|date_format:d/m/Y|after:'.date('d\/m\/Y').'|before_or_equal:'.Carbon::today()->addMonth()->format('d/m/Y'),
             'periodo' => 'required|in:manha,tarde',
+            'aceite' => 'required|accepted',
+            'ip' => '',
         ];
 
         $justificar = [
@@ -88,6 +90,8 @@ class RepSalaReuniaoRequest extends FormRequest
     
             if((($this->periodo == 'manha') && !isset($this->disponivel['manha'])) || (($this->periodo == 'tarde') && !isset($this->disponivel['tarde'])))
                 $this->merge(['periodo' => '']);
+
+            $this->merge(['ip' => request()->ip()]);
         }
 
         if($this->acao == 'editar'){
@@ -139,8 +143,16 @@ class RepSalaReuniaoRequest extends FormRequest
 
     public function messages()
     {
+        $textoVetados = isset($this->participante_vetado) && (count($this->participante_vetado) == 1) ? 
+        'O seguinte participante já está agendado neste mesmo dia e período:' :
+        'Os seguintes participantes já estão agendados neste mesmo dia e período:';
+
         $participantesVetados = isset($this->participante_vetado) ? 
         '<br><strong>' . implode('<br>', $this->participante_vetado) . '</strong>' : '';
+
+        $textoSuspensos = isset($this->participante_suspenso) && (count($this->participante_suspenso) == 1) ? 
+        'O seguinte participante está suspenso para novos agendamentos:' :
+        'Os seguintes participantes estão suspensos para novos agendamentos:';
 
         $participantesSuspensos = isset($this->participante_suspenso) ? 
         '<br><strong>' . implode('<br>', $this->participante_suspenso) . '</strong>' : '';
@@ -165,8 +177,9 @@ class RepSalaReuniaoRequest extends FormRequest
             'justificativa.max' => 'A justificativa deve ter :max caracteres ou menos',
             'justificativa.min' => 'A justificativa deve ter :min caracteres ou mais',
             'participantes_cpf.*.not_in' => 'Representante logado já é um participante. Não pode ser inserido novamente.',
-            'participante_vetado.size' => 'Os seguintes participantes já estão agendados neste mesmo dia e período:' . $participantesVetados,
-            'participante_suspenso.size' => 'Os seguintes participantes estão suspensos para novos agendamentos:' . $participantesSuspensos,
+            'participante_vetado.size' => $textoVetados . $participantesVetados,
+            'participante_suspenso.size' => $textoSuspensos . $participantesSuspensos,
+            'accepted' => 'Deve concordar com as condições do uso da sala',
         ];
     }
 }

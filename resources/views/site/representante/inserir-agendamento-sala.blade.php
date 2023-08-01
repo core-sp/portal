@@ -287,13 +287,33 @@
 
       </fieldset>
       @endif
+
+      @if(isset($acao) && ($acao == 'agendar'))
+      <div class="form-check mt-3">
+        <input type="checkbox"
+          name="aceite"
+          class="form-check-input {{ $errors->has('aceite') ? 'is-invalid' : '' }}"
+          id="aceite"
+          {{ !empty(old('aceite')) ? 'checked' : '' }}
+          required
+        /> 
+        <label for="termo" class="textoTermo text-justify">
+          Li e concordo com as <a href="{{ route('termo.consentimento.pdf', 'sala-reuniao') }}" target="_blank"><u>condições</u></a> do uso da sala.
+        </label>
+        @if($errors->has('aceite'))
+        <div class="invalid-feedback">
+          {{ $errors->first('aceite') }}
+        </div>
+        @endif
+      </div>
+      @endif
             
       <div class="form-group float-right mt-4">
         <a href="{{ route('representante.agendar.inserir.view') }}" class="btn btn-secondary link-nostyle mr-2">Voltar</a>
         <button type="submit" class="btn btn-{{ $acao == 'cancelar' ? 'danger' : 'primary' }}">
         @switch($acao)
           @case('editar')
-            Editar
+            Salvar
             @break
           @case('cancelar')
             Cancelar

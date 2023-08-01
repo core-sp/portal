@@ -238,41 +238,52 @@ Route::middleware(['block_ip'])->group(function () {
 
     // Salas de Reuniões
     Route::prefix('salas-reunioes')->group(function(){
-      Route::get('/', 'SalaReuniaoController@index')->name('sala.reuniao.index');
-      Route::get('/editar/{id}', 'SalaReuniaoController@edit')->name('sala.reuniao.editar.view');
-      Route::put('/editar/{id}', 'SalaReuniaoController@update')->name('sala.reuniao.editar');
-      Route::get('/regionais-salas-ativas/{tipo}', 'SalaReuniaoController@getRegionaisAtivas')->name('sala.reuniao.regionais.ativas');
-      Route::get('/sala-dias-horas/{tipo}', 'SalaReuniaoController@getDiasHoras')->name('sala.reuniao.dias.horas');
+      Route::name('sala.reuniao.')->group(function () {
+        Route::get('/', 'SalaReuniaoController@index')->name('index');
+        Route::get('/editar/{id}', 'SalaReuniaoController@edit')->name('editar.view');
+        Route::put('/editar/{id}', 'SalaReuniaoController@update')->name('editar');
+        Route::get('/regionais-salas-ativas/{tipo}', 'SalaReuniaoController@getRegionaisAtivas')->name('regionais.ativas');
+        Route::get('/sala-dias-horas/{tipo}', 'SalaReuniaoController@getDiasHoras')->name('dias.horas');
 
-      Route::prefix('agendados')->group(function(){
-        Route::get('/', 'AgendamentoController@index')->name('sala.reuniao.agendados.index');
-        Route::get('/visualizar/{id}/{anexo?}', 'AgendamentoController@view')->name('sala.reuniao.agendados.view');
-        Route::put('/{id}/{acao}', 'AgendamentoController@updateStatus')->where('acao', 'confirma|aceito|recusa')->name('sala.reuniao.agendados.update');
-        Route::get('/filtro', 'AgendamentoController@index')->name('sala.reuniao.agendados.filtro');
-        Route::get('/busca', 'AgendamentoController@busca')->name('sala.reuniao.agendados.busca');
-      });
+        Route::prefix('agendados')->group(function(){
+          Route::name('agendados.')->group(function () {
+            Route::get('/', 'AgendamentoController@index')->name('index');
+            Route::get('/visualizar/{id}/{anexo?}', 'AgendamentoController@view')->name('view');
+            Route::put('/{id}/{acao}', 'AgendamentoController@updateStatus')->where('acao', 'confirma|aceito|recusa')->name('update');
+            Route::get('/filtro', 'AgendamentoController@index')->name('filtro');
+            Route::get('/busca', 'AgendamentoController@busca')->name('busca');
+          });
+        });
 
-      Route::prefix('bloqueios')->group(function(){
-        Route::get('/', 'AgendamentoBloqueioController@index')->name('sala.reuniao.bloqueio.lista');
-        Route::get('/busca', 'AgendamentoBloqueioController@busca')->name('sala.reuniao.bloqueio.busca');
-        Route::get('/criar', 'AgendamentoBloqueioController@create')->name('sala.reuniao.bloqueio.criar');
-        Route::post('/criar', 'AgendamentoBloqueioController@store')->name('sala.reuniao.bloqueio.store');
-        Route::get('/editar/{id}', 'AgendamentoBloqueioController@edit')->name('sala.reuniao.bloqueio.edit');
-        Route::put('/editar/{id}', 'AgendamentoBloqueioController@update')->name('sala.reuniao.bloqueio.update');
-        Route::delete('/apagar/{id}', 'AgendamentoBloqueioController@destroy')->name('sala.reuniao.bloqueio.delete');
-        Route::get('/horarios-ajax', 'AgendamentoBloqueioController@getDadosAjax')->name('sala.reuniao.bloqueio.horariosAjax');
-      });
+        Route::prefix('bloqueios')->group(function(){
+          Route::name('bloqueio.')->group(function () {
+            Route::get('/', 'AgendamentoBloqueioController@index')->name('lista');
+            Route::get('/busca', 'AgendamentoBloqueioController@busca')->name('busca');
+            Route::get('/criar', 'AgendamentoBloqueioController@create')->name('criar');
+            Route::post('/criar', 'AgendamentoBloqueioController@store')->name('store');
+            Route::get('/editar/{id}', 'AgendamentoBloqueioController@edit')->name('edit');
+            Route::put('/editar/{id}', 'AgendamentoBloqueioController@update')->name('update');
+            Route::delete('/apagar/{id}', 'AgendamentoBloqueioController@destroy')->name('delete');
+            Route::get('/horarios-ajax', 'AgendamentoBloqueioController@getDadosAjax')->name('horariosAjax');
+          });
+        });
 
-      Route::prefix('suspensoes-excecoes')->group(function(){
-        Route::get('/', 'SuspensaoExcecaoController@index')->name('sala.reuniao.suspensao.lista');
-        Route::get('/visualizar/{id}/', 'SuspensaoExcecaoController@view')->name('sala.reuniao.suspensao.view');
-        Route::get('/editar/{id}/{situacao}', 'SuspensaoExcecaoController@edit')->where('situacao', 'suspensao|excecao')->name('sala.reuniao.suspensao.edit');
-        Route::put('/editar/{id}/{situacao}', 'SuspensaoExcecaoController@update')->where('situacao', 'suspensao|excecao')->name('sala.reuniao.suspensao.update');
-        Route::get('/criar', 'SuspensaoExcecaoController@create')->name('sala.reuniao.suspensao.criar');
-        Route::post('/criar', 'SuspensaoExcecaoController@store')->name('sala.reuniao.suspensao.store');
-        Route::get('/busca', 'SuspensaoExcecaoController@busca')->name('sala.reuniao.suspensao.busca');
+        Route::prefix('suspensoes-excecoes')->group(function(){
+          Route::name('suspensao.')->group(function () {
+            Route::get('/', 'SuspensaoExcecaoController@index')->name('lista');
+            Route::get('/visualizar/{id}/', 'SuspensaoExcecaoController@view')->name('view');
+            Route::get('/editar/{id}/{situacao}', 'SuspensaoExcecaoController@edit')->where('situacao', 'suspensao|excecao')->name('edit');
+            Route::put('/editar/{id}/{situacao}', 'SuspensaoExcecaoController@update')->where('situacao', 'suspensao|excecao')->name('update');
+            Route::get('/criar', 'SuspensaoExcecaoController@create')->name('criar');
+            Route::post('/criar', 'SuspensaoExcecaoController@store')->name('store');
+            Route::get('/busca', 'SuspensaoExcecaoController@busca')->name('busca');
+          });
+        });
       });
     });
+
+    Route::post('/termo-de-consentimento/upload/{tipo_servico}', 'TermoConsentimentoController@uploadTermo')
+    ->where('tipo_servico', 'sala-reuniao')->name('termo.consentimento.upload')->middleware('auth');
 
   });
 
@@ -365,7 +376,8 @@ Route::middleware(['block_ip'])->group(function () {
     // Página do termo de consentimento com o acesso via email
     Route::get('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimentoView')->name('termo.consentimento.view');
     Route::post('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimento')->name('termo.consentimento.post');
-    Route::get('/termo-consentimento-pdf', 'TermoConsentimentoController@termoConsentimentoPdf')->name('termo.consentimento.pdf');
+    Route::get('/termo-consentimento-pdf/{tipo_servico?}', 'TermoConsentimentoController@termoConsentimentoPdf')
+    ->where('tipo_servico', 'sala-reuniao')->name('termo.consentimento.pdf');
 
     // Páginas (deve ser inserido no final do arquivo de rotas)
     Route::get('{slug}', 'PaginaController@show')->name('paginas.site');

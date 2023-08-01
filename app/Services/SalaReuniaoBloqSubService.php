@@ -14,10 +14,10 @@ class SalaReuniaoBloqSubService implements SalaReuniaoBloqSubServiceInterface {
     public function __construct()
     {
         $this->variaveis = [
-            'singular' => 'bloqueio sala reunião',
-            'singulariza' => 'o bloqueio da sala de reunião',
-            'plural' => 'bloqueios das salas de reuniões',
-            'pluraliza' => 'bloqueios sala reunião',
+            'singular' => 'bloqueio sala reunião / coworking',
+            'singulariza' => 'o bloqueio da sala de reunião / coworking',
+            'plural' => 'bloqueios das salas de reuniões / coworking',
+            'pluraliza' => 'bloqueios sala reunião / coworking',
             'form' => 'sala_reuniao_bloqueio',
             'btn_criar' => '<a href="'.route('sala.reuniao.bloqueio.criar').'" class="btn btn-primary mr-1"><i class="fas fa-plus"></i> Novo Bloqueio</a>',
             'titulo_criar' => 'Criar bloqueio',
@@ -120,12 +120,12 @@ class SalaReuniaoBloqSubService implements SalaReuniaoBloqSubServiceInterface {
         else  
             $id = $user->salasReunioesBloqueios()->create($dados)->id;
 
-        event(new CrudEvent('sala reunião bloqueio', $acao, $id));
+        event(new CrudEvent('sala reunião / coworking bloqueio', $acao, $id));
     }
 
     public function destroy($id)
     {
-        return SalaReuniaoBloqueio::findOrFail($id)->delete() ? event(new CrudEvent('sala reunião bloqueio', 'excluiu', $id)) : null;
+        return SalaReuniaoBloqueio::findOrFail($id)->delete() ? event(new CrudEvent('sala reunião / coworking bloqueio', 'excluiu', $id)) : null;
     }
 
     public function buscar($busca, $user)

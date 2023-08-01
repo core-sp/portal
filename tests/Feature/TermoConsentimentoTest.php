@@ -6,10 +6,39 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class TermoConsentimentoTest extends TestCase
 {
     use RefreshDatabase;
+
+    /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $this->assertGuest();
+                
+        $this->post(route('termo.consentimento.upload', 'sala-reuniao'))->assertRedirect(route('login'));
+    }
+
+    // /** @test */
+    // public function non_authorized_users_cannot_access_links()
+    // {
+    //     $this->signIn();
+    //     $this->assertAuthenticated('web');
+        
+    //     $this->post(route('termo.consentimento.upload', 'sala-reuniao'))->assertForbidden();
+    // }
+
+    /** @test */
+    public function not_found_tipo_servico_post()
+    {
+        $this->signInAsAdmin();
+                
+        $this->post(route('termo.consentimento.upload', 'salas-reuniao'))->assertNotFound();
+        $this->post(route('termo.consentimento.upload', 'salareuniao'))->assertNotFound();
+        $this->post(route('termo.consentimento.upload', 'Sala-Reuniao'))->assertNotFound();
+        $this->post(route('termo.consentimento.upload', 'sala_reuniao'))->assertNotFound();
+    }
 
     /** @test */
     public function can_to_insert_email_on_page_termo()
@@ -67,20 +96,122 @@ class TermoConsentimentoTest extends TestCase
         ->assertSee(route('termo.consentimento.pdf'));
     }
 
-    // /** @test */
-    // public function view_pdf_termo()
-    // {
-    //     $file = UploadedFile::fake()->create('CORE-SP_Termo_de_consentimento.pdf');
+    /** @test */
+    public function show_link_pdf_termo_by_tipo_servico()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        factory('App\SalaReuniao')->create();
 
-    //     $this->get(route('termo.consentimento.pdf'))
-    //     ->assertHeader('content-type', 'application/pdf')
-    // }
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee(route('termo.consentimento.pdf', 'sala-reuniao'));
+    }
 
     /** @test */
-    public function redirect_back_if_not_find_pdf_termo()
+    public function can_upload_termo_sala_reuniao()
+    {
+        Storage::fake('public');
+
+        $this->signInAsAdmin();
+        factory('App\SalaReuniao')->create();
+
+        $this->get(route('sala.reuniao.index'))
+        ->assertSee(route('termo.consentimento.upload', 'sala-reuniao'))
+        ->assertSee('<p class="text-primary mb-1"><i class="fas fa-info-circle"></i>&nbsp;Para atualizar o arquivo das condições para o aceite do representante ao agendar.</p>')
+        ->assertSee('<label for="enviar-file-sala" class="mr-sm-2"><i class="far fa-file-alt"></i>&nbsp;Atualizar arquivo de aceite</label><input type="file" name="file" ');
+
+        $this->post(route('termo.consentimento.upload', 'sala-reuniao'), ['file' => UploadedFile::fake()->create('teste.pdf')])
+        ->assertRedirect(route('sala.reuniao.index'));
+
+        $this->get(route('sala.reuniao.index'))
+        ->assertSee('<i class="icon fa fa-check"></i> Termo foi atualizado com sucesso.');
+
+        Storage::disk('public')->assertExists('termos/sala_reuniao_condicoes.pdf');
+    }
+
+    /** @test */
+    public function log_is_generated_when_upload_termo_sala_reuniao()
+    {
+        Storage::fake('public');
+
+        $user = $this->signInAsAdmin();
+
+        $this->get(route('sala.reuniao.index'))->assertOk();
+        $this->post(route('termo.consentimento.upload', 'sala-reuniao'), ['file' => UploadedFile::fake()->create('teste.pdf')])
+        ->assertRedirect(route('sala.reuniao.index'));
+
+        $log = explode(PHP_EOL, tailCustom(storage_path($this->pathLogInterno()), 2));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') está atualizando *arquivo de termo de consentimento com upload do file: teste.pdf* (id: ---)';
+        $this->assertStringContainsString($txt, $log[0]);
+
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') atualizou *arquivo de termo de consentimento sala_reuniao_condicoes.pdf* (id: ---)';
+        $this->assertStringContainsString($txt, $log[1]);
+    }
+
+    /** @test */
+    public function cannot_upload_termo_sala_reuniao_without_file()
+    {
+        Storage::fake('public');
+
+        $this->signInAsAdmin();
+        factory('App\SalaReuniao')->create();
+
+        $this->post(route('termo.consentimento.upload', 'sala-reuniao'), ['file' => ''])
+        ->assertSessionHasErrors([
+            'file'
+        ]);
+
+        $this->get(route('sala.reuniao.index'))
+        ->assertSee('<i class="fas fa-times"></i> <b>Erro de upload do arquivo:</b> O campo file é obrigatório');
+
+        Storage::disk('public')->assertMissing('termos/sala_reuniao_condicoes.pdf');
+    }
+
+    /** @test */
+    public function cannot_upload_termo_sala_reuniao_with_file_mime_type_invalid()
+    {
+        Storage::fake('public');
+
+        $this->signInAsAdmin();
+        factory('App\SalaReuniao')->create();
+
+        $this->post(route('termo.consentimento.upload', 'sala-reuniao'), ['file' => UploadedFile::fake()->create('teste.png')])
+        ->assertSessionHasErrors([
+            'file'
+        ]);
+
+        $this->get(route('sala.reuniao.index'))
+        ->assertSee('<i class="fas fa-times"></i> <b>Erro de upload do arquivo:</b> Tipo de arquivo não suportado');
+
+        Storage::disk('public')->assertMissing('termos/sala_reuniao_condicoes.pdf');
+    }
+
+    /** @test */
+    public function cannot_upload_termo_sala_reuniao_with_file_more_than_2mb()
+    {
+        Storage::fake('public');
+
+        $this->signInAsAdmin();
+        factory('App\SalaReuniao')->create();
+
+        $this->post(route('termo.consentimento.upload', 'sala-reuniao'), ['file' => UploadedFile::fake()->create('teste.pdf', 2050)])
+        ->assertSessionHasErrors([
+            'file'
+        ]);
+
+        $this->get(route('sala.reuniao.index'))
+        ->assertSee('<i class="fas fa-times"></i> <b>Erro de upload do arquivo:</b> Limite de até 2MB o tamanho do arquivo');
+
+        Storage::disk('public')->assertMissing('termos/sala_reuniao_condicoes.pdf');
+    }
+
+    /** @test */
+    public function view_pdf_termo()
     {
         $this->get(route('termo.consentimento.pdf'))
-        ->assertStatus(302);
+        ->assertHeader('content-type', 'application/pdf');
     }
 
     /** @test */
@@ -93,6 +224,10 @@ class TermoConsentimentoTest extends TestCase
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
+
+        $this->get(route('agendamentosite.formview'))
+        ->assertSee(route('termo.consentimento.pdf'));
+
         $this->post(route('agendamentosite.store'), $agendamento);
 
         $this->assertDatabaseHas('termos_consentimentos', [
@@ -139,6 +274,10 @@ class TermoConsentimentoTest extends TestCase
             'celularNl' => '(11) 99999-9999',
             'termo' => 'on'
         ];
+
+        $this->get(route('site.home'))
+        ->assertSee(route('termo.consentimento.pdf'));
+
         $this->post('/newsletter', $newsletter);
 
         $this->assertDatabaseHas('termos_consentimentos', [
@@ -211,6 +350,9 @@ class TermoConsentimentoTest extends TestCase
         $anunciarVaga['nrVagas'] = $bdoOportunidade['vagasdisponiveis'];
         $anunciarVaga['termo'] = 'on';
 
+        $this->get(route('bdosite.anunciarVagaView'))
+        ->assertSee(route('termo.consentimento.pdf'));
+
         $this->post(route('bdosite.anunciarVaga'), $anunciarVaga);
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
@@ -232,6 +374,9 @@ class TermoConsentimentoTest extends TestCase
             'registrocore' => '',
             'termo' => 'on'
         ];
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertSee(route('termo.consentimento.pdf'));
 
         $this->post(route('cursos.inscricao', $curso->idcurso), $cursoInscrito);
 
@@ -268,6 +413,61 @@ class TermoConsentimentoTest extends TestCase
         $texto .= '*, turma *'.$curso->idcurso.'* e foi criado um novo registro no termo de consentimento, com a id: 1';
 
         $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test */
+    public function created_new_record_when_new_sala_agendamento_portal()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->raw();
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee(route('termo.consentimento.pdf', 'sala-reuniao'));
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => 'coworking',
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'], 
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => $agenda['periodo'],
+            'aceite' => 'on'
+        ]);
+
+        $this->assertDatabaseHas('termos_consentimentos', [
+            'id' => 1,
+            'ip' => request()->ip(),
+            'email' => null,
+            'idrepresentante' => null,
+            'idnewsletter' => null,
+            'idagendamento' => null,
+            'idbdo' => null,
+            'idcursoinscrito' => null,
+            'agendamento_sala_id' => 1
+        ]);
+    }
+
+    /** @test */
+    public function id_termo_in_log_when_new_sala_agendamento_registration_portal()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => 'coworking',
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'], 
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => $agenda['periodo'],
+            'aceite' => 'on'
+        ]);
+
+        $agenda = \App\AgendamentoSala::first();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $string = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $string .= $representante->nome.' (CPF / CNPJ: '.$representante->cpf_cnpj.') *agendou* reserva da sala em *'.$agenda->sala->regional->regional;
+        $string .= '* no dia '.onlyDate($agenda->dia).' para '.$agenda->tipo_sala.', no período ' .$agenda->periodo . ' e foi criado um novo registro no termo de consentimento, com a id: 1';
+        $this->assertStringContainsString($string, $log);
     }
 
     /** @test */

@@ -5,11 +5,18 @@ namespace App\Services;
 use App\TermoConsentimento;
 use App\Contracts\TermoConsentimentoServiceInterface;
 use App\Events\ExternoEvent;
-use Illuminate\Support\Facades\File;
-
-
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use App\Events\CrudEvent;
 
 class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
+
+    private $path_termos_servicos;
+
+    public function __construct()
+    {
+        $this->path_termos_servicos = 'termos';
+    }
 
     public function save($ip, $email)
     {
@@ -33,11 +40,39 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
         }
     }
 
-    public function caminhoFile()
+    public function uploadFile($dados, $tipo_servico)
     {
-        $pdf = 'arquivos/CORE-SP_Termo_de_consentimento.pdf';
+        $tipo_servico = isset($tipo_servico) ? Str::studly(str_replace('-', '_', $tipo_servico)) : $tipo_servico;
 
-        return File::exists($pdf) ? $pdf : null;
+        // if(!perfisPermitidos($tipo_servico . 'Controller', 'edit'))
+        //     throw new \Exception('Não autorizado a realizar upload do termo no serviço ' . $tipo_servico, 403);
+
+        $nome = Str::snake($tipo_servico) . '_condicoes.pdf';
+
+        event(new CrudEvent('arquivo de termo de consentimento com upload do file: ' . $dados['file']->getClientOriginalName(), 'está atualizando', '---'));
+
+        $path = $dados['file']->storeAs($this->path_termos_servicos.'/', $nome, 'public');
+        if(!Storage::disk('public')->exists($path))
+            return [
+                'message' => '<i class="fas fa-times"></i> Arquivo do termo não encontrado',
+                'class' => 'alert-danger'
+            ];
+
+        event(new CrudEvent('arquivo de termo de consentimento ' . $nome, 'atualizou', '---'));
+        return [];
+    }
+
+    public function caminhoFile($tipo_servico = null)
+    {
+        $tipo_servico = isset($tipo_servico) ? Str::studly(str_replace('-', '_', $tipo_servico)) : $tipo_servico;
+
+        if(isset($tipo_servico) && ($tipo_servico == 'SalaReuniao'))
+            return Storage::disk('public')->exists($this->path_termos_servicos.'/'.Str::snake($tipo_servico) . '_condicoes.pdf') ? 
+            Storage::disk('public')->path($this->path_termos_servicos.'/'.Str::snake($tipo_servico) . '_condicoes.pdf') : null;
+
+        if(Storage::disk('public')->exists($this->path_termos_servicos.'/CORE-SP_Termo_de_consentimento.pdf'))
+            return Storage::disk('public')->path($this->path_termos_servicos.'/CORE-SP_Termo_de_consentimento.pdf');
+        return null;
     }
 
     public function download()

@@ -20,12 +20,20 @@ class SalaReuniaoController extends Controller
     {
         // $this->authorize('viewAny', auth()->user());
         try{
-            $dados = $this->service->getService('SalaReuniao')->listar();
+            $dados = $this->service->getService('SalaReuniao')->listar(auth()->user());
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar as salas de reuniões.");
         }
-    
+        
+        $error = session()->get('errors');
+        $message = isset($error) && $error->has('file') ? $error->first('file') : null;
+        if(isset($message))
+        {
+            session()->flash('message', '<i class="fas fa-times"></i> <b>Erro de upload do arquivo:</b> ' . $message);
+            session()->flash('class', 'alert-danger');
+        }
+        
         return view('admin.crud.home', $dados);
     }
 

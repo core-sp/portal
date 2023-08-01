@@ -50,6 +50,11 @@ class AgendamentoSala extends Model
     	return $this->hasOne('App\SuspensaoExcecao', 'agendamento_sala_id');
     }
 
+    public function termos()
+    {
+        return $this->hasMany('App\TermoConsentimento', 'agendamento_sala_id');
+    }
+
     public static function getAgendadoParticipanteByCpf($cpf)
     {
     	return self::where('participantes', 'LIKE', '%"'. apenasNumeros($cpf) .'"%')

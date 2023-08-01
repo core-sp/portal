@@ -8,7 +8,7 @@ interface SalaReuniaoServiceInterface {
 
     public function getItensByTipo($tipo);
 
-    public function listar();
+    public function listar($user);
 
     public function view($id);
 

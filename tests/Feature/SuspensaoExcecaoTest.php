@@ -1179,6 +1179,7 @@ class SuspensaoExcecaoTest extends TestCase
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
             'dia' => Carbon::parse($agenda['dia'])->format('d/m/Y'), 
             'periodo' => 'tarde',
+            'aceite' => 'on'
         ])
         ->assertRedirect(route('representante.agendar.inserir.view'));
 
@@ -1208,10 +1209,72 @@ class SuspensaoExcecaoTest extends TestCase
             'periodo' => $agenda['periodo'],
             'participantes_cpf' => ['569.832.380-10', '862.943.730-85'],
             'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+            'aceite' => 'on'
         ])
         ->assertSessionHasErrors([
             'participante_suspenso'
         ]);
+    }
+
+    /** @test */
+    public function representante_cannot_created_agendamento_with_participante_suspenso_msg_singular()
+    {
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
+        $representante1 = factory('App\Representante')->create([
+            'cpf_cnpj' => '73525258000185'
+        ]);
+
+        $this->actingAs($representante1, 'representante');
+
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => $agenda['tipo_sala'],
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'],
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => $agenda['periodo'],
+            'participantes_cpf' => ['569.832.380-10', '862.943.730-85'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+            'aceite' => 'on'
+        ])
+        ->assertSessionHasErrors([
+            'participante_suspenso'
+        ]);
+
+        $this->assertEquals(session()->get('errors')->first('participante_suspenso'), 
+        'O seguinte participante está suspenso para novos agendamentos:<br><strong>862.943.730-85</strong>');
+    }
+
+    /** @test */
+    public function representante_cannot_created_agendamento_with_participante_suspenso_msg_plural()
+    {
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
+        $suspenso2 = factory('App\SuspensaoExcecao')->create([
+            'cpf_cnpj' => '56983238010'
+        ])->fresh();
+        $representante1 = factory('App\Representante')->create([
+            'cpf_cnpj' => '73525258000185'
+        ]);
+
+        $this->actingAs($representante1, 'representante');
+
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => $agenda['tipo_sala'],
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'],
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => $agenda['periodo'],
+            'participantes_cpf' => ['569.832.380-10', '862.943.730-85'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+            'aceite' => 'on'
+        ])
+        ->assertSessionHasErrors([
+            'participante_suspenso'
+        ]);
+
+        $this->assertEquals(session()->get('errors')->first('participante_suspenso'), 
+        'Os seguintes participantes estão suspensos para novos agendamentos:<br><strong>862.943.730-85<br>569.832.380-10</strong>');
     }
 
     /** @test */
@@ -1271,7 +1334,7 @@ class SuspensaoExcecaoTest extends TestCase
 
         $this->get(route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $agenda->id]))
         ->assertOk()
-        ->assertSeeText('Editar');
+        ->assertSeeText('Salvar');
 
         $this->put(route('representante.agendar.inserir.put', [
             'acao' => 'editar',
@@ -1353,6 +1416,7 @@ class SuspensaoExcecaoTest extends TestCase
             'sala_reuniao_id' => $agenda['sala_reuniao_id'], 
             'dia' => onlyDate($agenda['dia']), 
             'periodo' => $agenda['periodo'],
+            'aceite' => 'on'
         ])->assertStatus(302);
 
         $this->get(route('representante.agendar.inserir.view'))
@@ -1385,6 +1449,7 @@ class SuspensaoExcecaoTest extends TestCase
             'periodo' => $agenda['periodo'],
             'participantes_cpf' => ['569.832.380-10', '862.943.730-85'],
             'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+            'aceite' => 'on'
         ])->assertStatus(302);
 
         $this->get(route('representante.agendar.inserir.view'))
@@ -1411,7 +1476,7 @@ class SuspensaoExcecaoTest extends TestCase
 
         $this->get(route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $agenda->id]))
         ->assertOk()
-        ->assertSeeText('Editar');
+        ->assertSeeText('Salvar');
 
         $this->put(route('representante.agendar.inserir.put', [
             'acao' => 'editar',

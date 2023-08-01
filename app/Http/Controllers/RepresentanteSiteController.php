@@ -571,7 +571,7 @@ class RepresentanteSiteController extends Controller
                 case 'agendar':
                     if(trim($this->gerentiRepository->gerentiStatus($user->ass_id)) != 'Situação: Em dia.')
                         return redirect()->route('representante.agendar.inserir.view')->with([
-                            'message' => '<i class="fas fa-exclamation-triangle"></i>&nbsp;Não pode criar agendamento no momento. Por gentileza, procure o atendimento do Core-SP.',
+                            'message' => '<i class="fas fa-exclamation-triangle"></i>&nbsp;Para liberar o seu agendamento entre em contato com o setor de atendimento da <a href="'.route('regionais.siteGrid').'" target="_blank">seccional</a> de interesse.',
                             'class' => 'alert-warning'
                         ]);
                     $erro = $this->service->getService('SalaReuniao')->site()->verificaPodeAgendar($user, $this->service);
@@ -628,7 +628,7 @@ class RepresentanteSiteController extends Controller
                 case 'agendar':
                     if(trim($this->gerentiRepository->gerentiStatus($user->ass_id)) != 'Situação: Em dia.')
                         return redirect()->route('representante.agendar.inserir.view')->with([
-                            'message' => '<i class="fas fa-exclamation-triangle"></i>&nbsp;Não pode criar agendamento no momento. Por gentileza, procure o atendimento do Core-SP.',
+                            'message' => '<i class="fas fa-exclamation-triangle"></i>&nbsp;Para liberar o seu agendamento entre em contato com o setor de atendimento da <a href="'.route('regionais.siteGrid').'" target="_blank">seccional</a> de interesse.',
                             'class' => 'alert-warning'
                         ]);
                     $dados = $this->service->getService('SalaReuniao')->site()->save($dados, $user, $this->service);

@@ -103,8 +103,12 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
             'protocolo' => $protocolo,
         ]);
 
+        $termo = $agendamento->termos()->create([
+            'ip' => $dados['ip']
+        ]);
+
         $string = $user->nome.' (CPF / CNPJ: '.$user->cpf_cnpj.') *agendou* reserva da sala em *'.$agendamento->sala->regional->regional;
-        $string .= '* no dia '.onlyDate($agendamento->dia).' para '.$agendamento->tipo_sala.', no período ' .$agendamento->periodo;
+        $string .= '* no dia '.onlyDate($agendamento->dia).' para '.$agendamento->tipo_sala.', no período ' .$agendamento->periodo.' e ' .$termo->message();
         event(new ExternoEvent($string));
 
         Mail::to($user->email)->queue(new AgendamentoSalaMail($agendamento));

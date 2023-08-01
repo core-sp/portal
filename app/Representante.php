@@ -147,8 +147,10 @@ class Representante extends Authenticable
             ->whereYear('dia', $ano);
         })
         ->when(!isset($mes) && !isset($ano), function($query){
-            $query->whereMonth('dia', now()->month)
-            ->whereYear('dia', now()->year);
+            // devido poder agendar somente no dia seguinte
+            $diaSeguinte = now()->addDay();
+            $query->whereMonth('dia', $diaSeguinte->month)
+            ->whereYear('dia', $diaSeguinte->year);
         })
         ->where(function($query){
             $query->whereNull('status')

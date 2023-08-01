@@ -448,6 +448,16 @@ $("#logout-interno").click(function(){
 
 // Funcionalidade Sala de Reunião +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+function mesaIgualParticipantesReuniao()
+{
+  var input = $('input[name="participantes_reuniao"]');
+  var com_itens = "Mesa com " + input.val() + " cadeira(s)";
+
+  var adicionado = $('#itens_reuniao option[value^="Mesa com "]');
+  if(adicionado.length > 0)
+    adicionado.val(com_itens).text(com_itens);
+}
+
 $("#itens_reuniao, #itens_coworking").on('dblclick', 'option', function(){
   var texto = this.text;
   var valor = this.value;
@@ -490,6 +500,12 @@ $('button.addItem, button.removeItem').click(function(){
     }
     $(this).remove();
   });
+
+  mesaIgualParticipantesReuniao();
+});
+
+$('#form_salaReuniao input[name="participantes_reuniao"]').change(function(){
+  mesaIgualParticipantesReuniao();
 });
 
 $('#form_salaReuniao button[type="submit"]').click(function(){

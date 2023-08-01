@@ -7,7 +7,7 @@
         <p><i class="fas fa-info-circle text-primary"></i> <em>Somente pode bloquear salas ativas, com participantes maior que zero.</em></p>
         <div class="form-row">
             <div class="col-3">
-                <label for="salaBloqueio">Sala de Reunião</label>
+                <label for="salaBloqueio">Sala de Reunião / Coworking</label>
                 <select 
                     name="sala_reuniao_id" 
                     class="form-control {{ $errors->has('sala_reuniao_id') ? 'is-invalid' : '' }}"

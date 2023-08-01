@@ -113,6 +113,40 @@ class SalaReuniaoTest extends TestCase
     }
 
     /** @test */
+    public function when_add_mesa_change_same_participantes_reuniao()
+    {
+        $this->signInAsAdmin();
+        $sala = factory('App\SalaReuniao')->create();
+        $horarios_r = $sala->getHorariosTarde('reuniao');
+        $horarios_c = $sala->getHorariosManha('coworking');
+                
+        $this->get(route('sala.reuniao.index'))->assertOk();
+        $this->get(route('sala.reuniao.editar.view', $sala->id))->assertOk();
+
+        $dados = $sala->toArray();
+        $dados['participantes_reuniao'] = 2;
+        $dados['manha_horarios_reuniao'] = ['10:00', '11:00', '11:30'];
+        $dados['tarde_horarios_reuniao'] = $horarios_r;
+        $dados['manha_horarios_coworking'] = $horarios_c;
+        $dados['tarde_horarios_coworking'] = ['14:00', '15:00', '15:30'];
+        $dados['itens_reuniao'] = $sala->getItens('reuniao');
+        $dados['itens_coworking'] = $sala->getItens('coworking');
+
+        $this->put(route('sala.reuniao.editar', $sala->id), $dados)
+        ->assertRedirect(route('sala.reuniao.index'));
+
+        $this->assertNotEquals($dados['itens_reuniao'][3], "Mesa com 2 cadeira(s)");
+        $itens = $dados['itens_reuniao'];
+        $itens[3] = "Mesa com 2 cadeira(s)";
+        $this->assertDatabaseHas('salas_reunioes', [
+            'participantes_reuniao' => 2,
+            'horarios_reuniao' => json_encode(['manha' => $dados['manha_horarios_reuniao'], 'tarde' => $horarios_r], JSON_FORCE_OBJECT),
+            'horarios_coworking' => json_encode(['manha' => $horarios_c, 'tarde' => $dados['tarde_horarios_coworking']], JSON_FORCE_OBJECT),
+            'itens_reuniao' => json_encode($itens, JSON_FORCE_OBJECT)
+        ]);
+    }
+
+    /** @test */
     public function log_is_generated_when_sala_is_edited()
     {
         $user = $this->signInAsAdmin();
@@ -135,7 +169,7 @@ class SalaReuniaoTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
-        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *sala de reunião* (id: 1)';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *sala de reunião / coworking* (id: 1)';
         $this->assertStringContainsString($txt, $log);
     }
 
@@ -1200,7 +1234,7 @@ class SalaReuniaoTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
-        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') criou *sala reunião bloqueio* (id: 1)';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') criou *sala reunião / coworking bloqueio* (id: 1)';
         $this->assertStringContainsString($txt, $log);
     }
 
@@ -1467,7 +1501,7 @@ class SalaReuniaoTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
-        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *sala reunião bloqueio* (id: 1)';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *sala reunião / coworking bloqueio* (id: 1)';
         $this->assertStringContainsString($txt, $log);
     }
 
@@ -1619,7 +1653,7 @@ class SalaReuniaoTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
-        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') excluiu *sala reunião bloqueio* (id: 1)';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') excluiu *sala reunião / coworking bloqueio* (id: 1)';
         $this->assertStringContainsString($txt, $log);
     }
 

@@ -16,15 +16,15 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
     public function __construct()
     {
         $this->variaveis = [
-            'singular' => 'sala de reunião',
-            'singulariza' => 'a sala de reunião',
-            'plural' => 'salas de reuniões',
-            'pluraliza' => 'salas de reuniões',
+            'singular' => 'sala de reunião / coworking',
+            'singulariza' => 'a sala de reunião / coworking',
+            'plural' => 'salas de reuniões / coworking',
+            'pluraliza' => 'salas de reuniões / coworking',
             'form' => 'sala_reuniao',
         ];
     }
 
-    private function tabelaCompleta($resultados)
+    private function tabelaCompleta($user, $resultados)
     {
         // Opções de cabeçalho da tabela
         $headers = [
@@ -36,7 +36,7 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
         ];
         // Opções de conteúdo da tabela
         $contents = [];
-        // $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
+        // $userPodeEditar = $user->can('updateOther', auth()->user());
         foreach($resultados as $resultado) {
             $acoes = '';
             // if($userPodeEditar)
@@ -56,7 +56,16 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
             'table',
             'table-hover'
         ];
-        $tabela = montaTabela($headers, $contents, $classes);
+
+        $upload_form = '<p class="text-primary mb-1"><i class="fas fa-info-circle"></i>&nbsp;Para atualizar o arquivo das condições para o aceite do representante ao agendar.</p>';
+        $upload_form .= '<div class="d-inline-flex"><form class="form-inline" action="'. route('termo.consentimento.upload', 'sala-reuniao').'" method="POST" enctype="multipart/form-data">';
+        $upload_form .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+        $upload_form .= '<label for="enviar-file-sala" class="mr-sm-2"><i class="far fa-file-alt"></i>&nbsp;Atualizar arquivo de aceite</label><input type="file" name="file" ';
+        $upload_form .= 'class="form-control pl-0 pb-1 pt-1 mb-2 mr-sm-2" id="enviar-file-sala" accept=".pdf" />';
+        $upload_form .= '<button class="btn btn-sm btn-primary mb-2" type="submit">Enviar</button>';
+        $upload_form .= '<span class="ml-3 mb-2"><a class="btn btn-sm btn-success" href="'. route('termo.consentimento.pdf', 'sala-reuniao') .'" target="_blank">Abrir</a></span></form></div><hr />';
+
+        $tabela = /*$userPodeEditar ? */$upload_form . montaTabela($headers, $contents, $classes)/* : montaTabela($headers, $contents, $classes)*/;
         
         return $tabela;
     }
@@ -80,14 +89,14 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
         }            
     }
 
-    public function listar()
+    public function listar($user)
     {
         $salas = SalaReuniao::with('regional')
         ->get()
         ->sortBy('regional.regional');
 
         return [
-            'tabela' => $this->tabelaCompleta($salas),
+            'tabela' => $this->tabelaCompleta($user, $salas),
             'resultados' => $salas,
             'variaveis' => (object) $this->variaveis
         ];
@@ -106,6 +115,14 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
     public function save($dados, $id, $user)
     {
         $sala = SalaReuniao::findOrFail($id);
+
+        // Item "Mesa..." da reunião adicionada é preenchida com o mesmo valor de participantes reunião.
+        $indice_mesa = array_keys(array_filter($dados['itens_reuniao'], function($v, $k){
+            return strpos($v, 'Mesa com ') !== false;
+        }, ARRAY_FILTER_USE_BOTH));
+        if(count($indice_mesa) > 0)
+            $dados['itens_reuniao'][$indice_mesa[0]] = 'Mesa com ' . $dados['participantes_reuniao'] . ' cadeira(s)';
+
         $itens_reuniao = $sala->getItens('reuniao');
         $participantes['reuniao'] = $sala->participantes_reuniao;
         $itens_coworking = $sala->getItens('coworking');
@@ -135,7 +152,7 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
             event(new CrudEvent('para ' . $gerente->nome . ' (gerente da seccional ' . $sala->regional->regional.') após alteração de itens da sala de reunião', 'envio de e-mail', $id));
         }
         
-        event(new CrudEvent('sala de reunião', 'editou', $id));
+        event(new CrudEvent('sala de reunião / coworking', 'editou', $id));
     }
 
     public function salasAtivas($tipo = null)
