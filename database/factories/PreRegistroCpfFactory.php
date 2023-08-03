@@ -95,8 +95,9 @@ $factory->afterMakingState(PreRegistroCpf::class, 'request', function ($prCpf, $
     $prCpf->preRegistro->opcional_celular = [opcoes_celular()[0], opcoes_celular()[2]];
 
     $contabil = array();
-    foreach($prCpf->preRegistro->contabil->attributesToArray() as $key => $val)
-        in_array($key, ['cnpj', 'nome', 'email', 'nome_contato', 'telefone']) ? $contabil[$key . '_contabil'] = $val : null;
+    if(isset($prCpf->preRegistro->contabil))
+        foreach($prCpf->preRegistro->contabil->attributesToArray() as $key => $val)
+            in_array($key, ['cnpj', 'nome', 'email', 'nome_contato', 'telefone']) ? $contabil[$key . '_contabil'] = $val : null;
 
     $pf = $prCpf->makeHidden(['id', 'pre_registro_id']);
 

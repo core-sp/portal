@@ -2586,360 +2586,360 @@ class PreRegistroCnpjTest extends TestCase
         ]);
     }
 
-    // /** @test */
-    // public function log_is_generated_when_update_status_aprovado()
-    // {
-    //     $admin = $this->signInAsAdmin();
+    /** @test */
+    public function log_is_generated_when_update_status_aprovado()
+    {
+        $admin = $this->signInAsAdmin();
 
-    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
-    //     $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
 
-    //     $arrayAnexos = array();
-    //     foreach($anexo->first()->getObrigatoriosPreRegistro() as $tipo)
-    //         $arrayAnexos[$tipo] = "OK";
+        $arrayAnexos = array();
+        foreach($anexo->first()->getObrigatoriosPreRegistro() as $tipo)
+            $arrayAnexos[$tipo] = "OK";
 
-    //     $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
-    //     $preRegistroCnpj->responsavelTecnico->update(['registro' => '123452000']);
-    //     $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCnpj->responsavelTecnico->update(['registro' => '123452000']);
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
 
-    //     $this->put(route('preregistro.update.status', $preRegistroCnpj->pre_registro_id), ['situacao' => 'aprovar'])
-    //     ->assertRedirect(route('preregistro.index'));
+        $this->put(route('preregistro.update.status', $preRegistroCnpj->pre_registro_id), ['situacao' => 'aprovar'])
+        ->assertRedirect(route('preregistro.index'));
 
-    //     $log = tailCustom(storage_path($this->pathLogInterno()));
-    //     $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
-    //     $txt = $inicio . 'Usuário (usuário 1) atualizou status para ' . PreRegistro::STATUS_APROVADO;
-    //     $txt .= ' *pré-registro* (id: '.$preRegistroCnpj->preRegistro->id.')';
-    //     $this->assertStringContainsString($txt, $log);
-    // }
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Usuário (usuário 1) atualizou status para ' . PreRegistro::STATUS_APROVADO;
+        $txt .= ' *pré-registro* (id: '.$preRegistroCnpj->preRegistro->id.')';
+        $this->assertStringContainsString($txt, $log);
+    }
 
-    // /** @test */
-    // public function cannot_update_status_aprovado_without_confere_anexos()
-    // {
-    //     $admin = $this->signInAsAdmin();
-    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
-    //     $anexo = factory('App\Anexo')->states('pre_registro')->create();
+    /** @test */
+    public function cannot_update_status_aprovado_without_confere_anexos()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
 
-    //     $preRegistroCnpj->responsavelTecnico->update(['registro' => '00012022']);
-    //     $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL]);
+        $preRegistroCnpj->responsavelTecnico->update(['registro' => '00012022']);
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL]);
 
-    //     $this->put(route('preregistro.update.status', $preRegistroCnpj->preRegistro->id), ['situacao' => 'aprovar'])
-    //     ->assertSessionHasErrors('status');
+        $this->put(route('preregistro.update.status', $preRegistroCnpj->preRegistro->id), ['situacao' => 'aprovar'])
+        ->assertSessionHasErrors('status');
 
-    //     $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
-    //     ->assertSeeText('Faltou confirmar a entrega dos anexos');
+        $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
+        ->assertSeeText('Faltou confirmar a entrega dos anexos');
 
-    //     $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_APROVADO);
-    // }
+        $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_APROVADO);
+    }
 
-    // /** @test */
-    // public function cannot_update_status_aprovado_with_justificativa()
-    // {
-    //     $admin = $this->signInAsAdmin();
-    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('justificado')->create();
-    //     $anexo = factory('App\Anexo')->states('pre_registro')->create();
+    /** @test */
+    public function cannot_update_status_aprovado_with_justificativa()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('justificado')->create();
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
 
-    //     $arrayAnexos = array();
-    //     $tipos = $anexo->first()->getOpcoesPreRegistro();
-    //     foreach($tipos as $tipo)
-    //         $arrayAnexos[$tipo] = "OK";
+        $arrayAnexos = array();
+        $tipos = $anexo->first()->getOpcoesPreRegistro();
+        foreach($tipos as $tipo)
+            $arrayAnexos[$tipo] = "OK";
 
-    //     $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
-    //     $preRegistroCnpj->responsavelTecnico->update(['registro' => '00012022']);
-    //     $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCnpj->responsavelTecnico->update(['registro' => '00012022']);
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
 
-    //     $this->put(route('preregistro.update.status', $preRegistroCnpj->preRegistro->id), ['situacao' => 'aprovar'])
-    //     ->assertSessionHasErrors('status');
+        $this->put(route('preregistro.update.status', $preRegistroCnpj->preRegistro->id), ['situacao' => 'aprovar'])
+        ->assertSessionHasErrors('status');
 
-    //     $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
-    //     ->assertSeeText('Possui justificativa(s)');
+        $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
+        ->assertSeeText('Possui justificativa(s)');
 
-    //     $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_APROVADO);
-    // }
+        $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_APROVADO);
+    }
 
-    // /** @test */
-    // public function cannot_update_status_aprovado_without_registro_responsavel_tecnico()
-    // {
-    //     $admin = $this->signInAsAdmin();
-    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
-    //     $anexo = factory('App\Anexo')->states('pre_registro')->create();
+    /** @test */
+    public function cannot_update_status_aprovado_without_registro_responsavel_tecnico()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
 
-    //     $arrayAnexos = array();
-    //     $tipos = $anexo->first()->getOpcoesPreRegistro();
-    //     foreach($tipos as $tipo)
-    //         $arrayAnexos[$tipo] = "OK";
+        $arrayAnexos = array();
+        $tipos = $anexo->first()->getOpcoesPreRegistro();
+        foreach($tipos as $tipo)
+            $arrayAnexos[$tipo] = "OK";
 
-    //     $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
-    //     $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
 
-    //     $this->put(route('preregistro.update.status', $preRegistroCnpj->preRegistro->id), ['situacao' => 'aprovar'])
-    //     ->assertSessionHasErrors('status');
+        $this->put(route('preregistro.update.status', $preRegistroCnpj->preRegistro->id), ['situacao' => 'aprovar'])
+        ->assertSessionHasErrors('status');
 
-    //     $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
-    //     ->assertSeeText('Faltou inserir o registro do Responsável Técnico');
+        $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
+        ->assertSeeText('Faltou inserir o registro do Responsável Técnico');
 
-    //     $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_APROVADO);
-    // }
+        $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_APROVADO);
+    }
 
-    // /** @test */
-    // public function cannot_update_status_aprovado_with_status_different_analise_inicial_or_analise_da_correcao()
-    // {
-    //     $admin = $this->signInAsAdmin();
-    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
-    //     $anexo = factory('App\Anexo')->states('pre_registro')->create();
+    /** @test */
+    public function cannot_update_status_aprovado_with_status_different_analise_inicial_or_analise_da_correcao()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
 
-    //     $arrayAnexos = array();
-    //     $tipos = $anexo->first()->getOpcoesPreRegistro();
-    //     foreach($tipos as $tipo)
-    //         $arrayAnexos[$tipo] = "OK";
+        $arrayAnexos = array();
+        $tipos = $anexo->first()->getOpcoesPreRegistro();
+        foreach($tipos as $tipo)
+            $arrayAnexos[$tipo] = "OK";
 
-    //     $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
-    //     $preRegistroCnpj->responsavelTecnico->update(['registro' => '00012022']);
-    //     $preRegistroCnpj->preRegistro->update(['confere_anexos' => $final]);
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCnpj->responsavelTecnico->update(['registro' => '00012022']);
+        $preRegistroCnpj->preRegistro->update(['confere_anexos' => $final]);
 
-    //     $canUpdate = [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO, PreRegistro::STATUS_APROVADO];
-    //     foreach(PreRegistro::getStatus() as $status)
-    //         if(!in_array($status, $canUpdate))
-    //         {
-    //             $preRegistroCnpj->preRegistro->update(['status' => $status]);
-    //             $this->put(route('preregistro.update.status', $preRegistroCnpj->pre_registro_id), ['situacao' => 'aprovar'])
-    //             ->assertSessionHasErrors('status');
+        $canUpdate = [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO, PreRegistro::STATUS_APROVADO];
+        foreach(PreRegistro::getStatus() as $status)
+            if(!in_array($status, $canUpdate))
+            {
+                $preRegistroCnpj->preRegistro->update(['status' => $status]);
+                $this->put(route('preregistro.update.status', $preRegistroCnpj->pre_registro_id), ['situacao' => 'aprovar'])
+                ->assertSessionHasErrors('status');
 
-    //             $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
-    //             ->assertSeeText('Não possui o status necessário para ser aprovado');
+                $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
+                ->assertSeeText('Não possui o status necessário para ser aprovado');
 
-    //             $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_APROVADO);
-    //         }
-    // }
+                $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_APROVADO);
+            }
+    }
 
-    // /** @test */
-    // public function can_update_status_aprovado_with_status_analise_inicial_or_analise_da_correcao()
-    // {
-    //     $admin = $this->signInAsAdmin();
-    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
-    //     $anexo = factory('App\Anexo')->states('pre_registro')->create();
+    /** @test */
+    public function can_update_status_aprovado_with_status_analise_inicial_or_analise_da_correcao()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
 
-    //     $arrayAnexos = array();
-    //     $tipos = $anexo->first()->getOpcoesPreRegistro();
-    //     foreach($tipos as $tipo)
-    //         $arrayAnexos[$tipo] = "OK";
+        $arrayAnexos = array();
+        $tipos = $anexo->first()->getOpcoesPreRegistro();
+        foreach($tipos as $tipo)
+            $arrayAnexos[$tipo] = "OK";
 
-    //     $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
-    //     $preRegistroCnpj->responsavelTecnico->update(['registro' => '00012022']);
-    //     $preRegistroCnpj->preRegistro->update(['confere_anexos' => $final]);
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCnpj->responsavelTecnico->update(['registro' => '00012022']);
+        $preRegistroCnpj->preRegistro->update(['confere_anexos' => $final]);
 
-    //     $canUpdate = [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO];
-    //     foreach($canUpdate as $status)
-    //     {
-    //         $preRegistroCnpj->preRegistro->update(['status' => $status]);
-    //         $this->put(route('preregistro.update.status', $preRegistroCnpj->pre_registro_id), ['situacao' => 'aprovar'])
-    //         ->assertRedirect(route('preregistro.index'));
+        $canUpdate = [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO];
+        foreach($canUpdate as $status)
+        {
+            $preRegistroCnpj->preRegistro->update(['status' => $status]);
+            $this->put(route('preregistro.update.status', $preRegistroCnpj->pre_registro_id), ['situacao' => 'aprovar'])
+            ->assertRedirect(route('preregistro.index'));
 
-    //         $this->get(route('preregistro.index'))
-    //         ->assertSeeText('Pré-registro com a ID: '.$preRegistroCnpj->pre_registro_id.' foi atualizado para "'.PreRegistro::STATUS_APROVADO.'" com sucesso');
+            $this->get(route('preregistro.index'))
+            ->assertSeeText('Pré-registro com a ID: '.$preRegistroCnpj->pre_registro_id.' foi atualizado para "'.PreRegistro::STATUS_APROVADO.'" com sucesso');
 
-    //         $this->assertEquals(PreRegistro::first()->status, PreRegistro::STATUS_APROVADO);
-    //     }
-    // }
+            $this->assertEquals(PreRegistro::first()->status, PreRegistro::STATUS_APROVADO);
+        }
+    }
 
-    // /** @test */
-    // public function cannot_update_status_with_input_situacao_invalid()
-    // {
-    //     $admin = $this->signInAsAdmin();
+    /** @test */
+    public function cannot_update_status_with_input_situacao_invalid()
+    {
+        $admin = $this->signInAsAdmin();
 
-    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
-    //     $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
 
-    //     $arrayAnexos = array();
-    //     foreach($anexo->first()->getObrigatoriosPreRegistro() as $tipo)
-    //         $arrayAnexos[$tipo] = "OK";
+        $arrayAnexos = array();
+        foreach($anexo->first()->getObrigatoriosPreRegistro() as $tipo)
+            $arrayAnexos[$tipo] = "OK";
 
-    //     $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
-    //     $preRegistroCnpj->responsavelTecnico->update(['registro' => '00012022']);
-    //     $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCnpj->responsavelTecnico->update(['registro' => '00012022']);
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
 
-    //     $this->put(route('preregistro.update.status', $preRegistroCnpj->pre_registro_id), ['situacao' => 'aprova'])
-    //     ->assertSessionHasErrors('situacao');
+        $this->put(route('preregistro.update.status', $preRegistroCnpj->pre_registro_id), ['situacao' => 'aprova'])
+        ->assertSessionHasErrors('situacao');
 
-    //     $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
-    //     ->assertSeeText('Valor do status requisitado inválido');
+        $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
+        ->assertSeeText('Valor do status requisitado inválido');
 
-    //     $this->assertEquals(PreRegistro::first()->status, PreRegistro::STATUS_ANALISE_INICIAL);
-    // }
+        $this->assertEquals(PreRegistro::first()->status, PreRegistro::STATUS_ANALISE_INICIAL);
+    }
 
-    // /** @test */
-    // public function cannot_update_status_without_input_situacao()
-    // {
-    //     $admin = $this->signInAsAdmin();
+    /** @test */
+    public function cannot_update_status_without_input_situacao()
+    {
+        $admin = $this->signInAsAdmin();
 
-    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
-    //     $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
 
-    //     $arrayAnexos = array();
-    //     foreach($anexo->first()->getObrigatoriosPreRegistro() as $tipo)
-    //         $arrayAnexos[$tipo] = "OK";
+        $arrayAnexos = array();
+        foreach($anexo->first()->getObrigatoriosPreRegistro() as $tipo)
+            $arrayAnexos[$tipo] = "OK";
 
-    //     $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
-    //     $preRegistroCnpj->responsavelTecnico->update(['registro' => '00012022']);
-    //     $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCnpj->responsavelTecnico->update(['registro' => '00012022']);
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
 
-    //     $this->put(route('preregistro.update.status', $preRegistroCnpj->pre_registro_id), ['situacao' => null])
-    //     ->assertSessionHasErrors('situacao');
+        $this->put(route('preregistro.update.status', $preRegistroCnpj->pre_registro_id), ['situacao' => null])
+        ->assertSessionHasErrors('situacao');
 
-    //     $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
-    //     ->assertSeeText('Obrigatório o status requisitado');
+        $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
+        ->assertSeeText('Obrigatório o status requisitado');
 
-    //     $this->assertEquals(PreRegistro::first()->status, PreRegistro::STATUS_ANALISE_INICIAL);
-    // }
+        $this->assertEquals(PreRegistro::first()->status, PreRegistro::STATUS_ANALISE_INICIAL);
+    }
 
-    // /** 
-    //  * =======================================================================================================
-    //  * TESTES PRE-REGISTRO-CNPJ - ADMIN
-    //  * =======================================================================================================
-    //  */
+    /** 
+     * =======================================================================================================
+     * TESTES PRE-REGISTRO-CNPJ - ADMIN
+     * =======================================================================================================
+     */
 
-    // /** @test */
-    // public function view_pre_registro_cnpj()
-    // {
-    //     $admin = $this->signInAsAdmin();
+    /** @test */
+    public function view_pre_registro_cnpj()
+    {
+        $admin = $this->signInAsAdmin();
 
-    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
-    //     $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL]);
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL]);
         
-    //     $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
-    //     ->assertSeeText($preRegistroCnpj->razao_social)
-    //     ->assertSeeText($preRegistroCnpj->nire)
-    //     ->assertSeeText($preRegistroCnpj->tipo_empresa)
-    //     ->assertSeeText(onlyDate($preRegistroCnpj->dt_inicio_atividade))
-    //     ->assertSeeText($preRegistroCnpj->inscricao_municipal)
-    //     ->assertSeeText($preRegistroCnpj->inscricao_estadual)
-    //     ->assertSeeText($preRegistroCnpj->capital_social)
-    //     ->assertSeeText($preRegistroCnpj->cep)
-    //     ->assertSeeText($preRegistroCnpj->logradouro)
-    //     ->assertSeeText($preRegistroCnpj->numero)
-    //     ->assertSeeText($preRegistroCnpj->complemento)
-    //     ->assertSeeText($preRegistroCnpj->bairro)
-    //     ->assertSeeText($preRegistroCnpj->cidade)
-    //     ->assertSeeText($preRegistroCnpj->uf);
-    // }
+        $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
+        ->assertSeeText($preRegistroCnpj->razao_social)
+        ->assertSeeText($preRegistroCnpj->nire)
+        ->assertSeeText($preRegistroCnpj->tipo_empresa)
+        ->assertSeeText(onlyDate($preRegistroCnpj->dt_inicio_atividade))
+        ->assertSeeText($preRegistroCnpj->inscricao_municipal)
+        ->assertSeeText($preRegistroCnpj->inscricao_estadual)
+        ->assertSeeText($preRegistroCnpj->capital_social)
+        ->assertSeeText($preRegistroCnpj->cep)
+        ->assertSeeText($preRegistroCnpj->logradouro)
+        ->assertSeeText($preRegistroCnpj->numero)
+        ->assertSeeText($preRegistroCnpj->complemento)
+        ->assertSeeText($preRegistroCnpj->bairro)
+        ->assertSeeText($preRegistroCnpj->cidade)
+        ->assertSeeText($preRegistroCnpj->uf);
+    }
 
-    // /** @test */
-    // public function view_pre_registro_cnpj_when_checkEndEmpresa_on()
-    // {
-    //     $admin = $this->signInAsAdmin();
+    /** @test */
+    public function view_pre_registro_cnpj_when_checkEndEmpresa_on()
+    {
+        $admin = $this->signInAsAdmin();
 
-    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
-    //     $preRegistroCnpj->update([
-    //         'cep' => $preRegistroCnpj->preRegistro->cep,
-    //         'logradouro' => $preRegistroCnpj->preRegistro->logradouro,
-    //         'numero' => $preRegistroCnpj->preRegistro->numero,
-    //         'complemento' => $preRegistroCnpj->preRegistro->complemento,
-    //         'bairro' => $preRegistroCnpj->preRegistro->bairro,
-    //         'cidade' => $preRegistroCnpj->preRegistro->cidade,
-    //         'uf' => $preRegistroCnpj->preRegistro->uf,
-    //     ]);
-    //     $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL]);
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
+        $preRegistroCnpj->update([
+            'cep' => $preRegistroCnpj->preRegistro->cep,
+            'logradouro' => $preRegistroCnpj->preRegistro->logradouro,
+            'numero' => $preRegistroCnpj->preRegistro->numero,
+            'complemento' => $preRegistroCnpj->preRegistro->complemento,
+            'bairro' => $preRegistroCnpj->preRegistro->bairro,
+            'cidade' => $preRegistroCnpj->preRegistro->cidade,
+            'uf' => $preRegistroCnpj->preRegistro->uf,
+        ]);
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL]);
         
-    //     $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
-    //     ->assertSeeText('Mesmo endereço da correspondência');
-    // }
+        $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
+        ->assertSeeText('Mesmo endereço da correspondência');
+    }
 
-    // /** @test */
-    // public function view_text_justificado_cnpj()
-    // {
-    //     $admin = $this->signInAsAdmin();
+    /** @test */
+    public function view_text_justificado_cnpj()
+    {
+        $admin = $this->signInAsAdmin();
 
-    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('justificado')->create();
-    //     $justificativas = $preRegistroCnpj->preRegistro->getJustificativaArray();
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('justificado')->create();
+        $justificativas = $preRegistroCnpj->preRegistro->getJustificativaArray();
 
-    //     $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
-    //     ->assertSeeText($justificativas['razao_social'])
-    //     ->assertSeeText($justificativas['nire'])
-    //     ->assertSeeText($justificativas['tipo_empresa'])
-    //     ->assertSeeText($justificativas['dt_inicio_atividade'])
-    //     ->assertSeeText($justificativas['inscricao_municipal'])
-    //     ->assertSeeText($justificativas['inscricao_estadual'])
-    //     ->assertSeeText($justificativas['capital_social'])
-    //     ->assertSeeText($justificativas['cep'])
-    //     ->assertSeeText($justificativas['logradouro'])
-    //     ->assertSeeText($justificativas['numero'])
-    //     ->assertSeeText($justificativas['complemento'])
-    //     ->assertSeeText($justificativas['bairro'])
-    //     ->assertSeeText($justificativas['cidade'])
-    //     ->assertSeeText($justificativas['uf']);
-    // }
+        $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
+        ->assertSeeText($justificativas['razao_social'])
+        ->assertSeeText($justificativas['nire'])
+        ->assertSeeText($justificativas['tipo_empresa'])
+        ->assertSeeText($justificativas['dt_inicio_atividade'])
+        ->assertSeeText($justificativas['inscricao_municipal'])
+        ->assertSeeText($justificativas['inscricao_estadual'])
+        ->assertSeeText($justificativas['capital_social'])
+        ->assertSeeText($justificativas['cep'])
+        ->assertSeeText($justificativas['logradouro'])
+        ->assertSeeText($justificativas['numero'])
+        ->assertSeeText($justificativas['complemento'])
+        ->assertSeeText($justificativas['bairro'])
+        ->assertSeeText($justificativas['cidade'])
+        ->assertSeeText($justificativas['uf']);
+    }
 
-    // /** @test */
-    // public function view_text_justificado_cnpj_when_checkEndEmpresa_on()
-    // {
-    //     $faker = \Faker\Factory::create();
-    //     $admin = $this->signInAsAdmin();
+    /** @test */
+    public function view_text_justificado_cnpj_when_checkEndEmpresa_on()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
 
-    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('justificado')->create();
-    //     $preRegistroCnpj->update([
-    //         'cep' => $preRegistroCnpj->preRegistro->cep,
-    //         'logradouro' => $preRegistroCnpj->preRegistro->logradouro,
-    //         'numero' => $preRegistroCnpj->preRegistro->numero,
-    //         'complemento' => $preRegistroCnpj->preRegistro->complemento,
-    //         'bairro' => $preRegistroCnpj->preRegistro->bairro,
-    //         'cidade' => $preRegistroCnpj->preRegistro->cidade,
-    //         'uf' => $preRegistroCnpj->preRegistro->uf,
-    //     ]);
-    //     $preRegistroCnpj->preRegistro->update([
-    //         'justificativa' => json_encode(['checkEndEmpresa' => $faker->text(500)], JSON_FORCE_OBJECT)
-    //     ]);
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('justificado')->create();
+        $preRegistroCnpj->update([
+            'cep' => $preRegistroCnpj->preRegistro->cep,
+            'logradouro' => $preRegistroCnpj->preRegistro->logradouro,
+            'numero' => $preRegistroCnpj->preRegistro->numero,
+            'complemento' => $preRegistroCnpj->preRegistro->complemento,
+            'bairro' => $preRegistroCnpj->preRegistro->bairro,
+            'cidade' => $preRegistroCnpj->preRegistro->cidade,
+            'uf' => $preRegistroCnpj->preRegistro->uf,
+        ]);
+        $preRegistroCnpj->preRegistro->update([
+            'justificativa' => json_encode(['checkEndEmpresa' => $faker->text(500)], JSON_FORCE_OBJECT)
+        ]);
 
-    //     $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
-    //     ->assertSeeText($preRegistroCnpj->preRegistro->getJustificativaArray()['checkEndEmpresa']);
-    // }
+        $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
+        ->assertSeeText($preRegistroCnpj->preRegistro->getJustificativaArray()['checkEndEmpresa']);
+    }
 
-    // /** @test */
-    // public function view_label_campo_alterado_pj()
-    // {
-    //     $admin = $this->signInAsAdmin();
+    /** @test */
+    public function view_label_campo_alterado_pj()
+    {
+        $admin = $this->signInAsAdmin();
 
-    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('campos_editados')->create();
-    //     $preRegistroCnpj->preRegistro->update([
-    //         'opcional_celular' => 'SMS;TELEGRAM',
-    //         'telefone' => '(11) 00000-0000;(11) 00000-0000',
-    //         'tipo_telefone' => mb_strtoupper(tipos_contatos()[0] . ';' . tipos_contatos()[0], 'UTF-8'),
-    //     ]);
-    //     $camposEditados = json_decode($preRegistroCnpj->preRegistro->campos_editados, true);
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('campos_editados')->create();
+        $preRegistroCnpj->preRegistro->update([
+            'opcional_celular' => 'SMS;TELEGRAM',
+            'telefone' => '(11) 00000-0000;(11) 00000-0000',
+            'tipo_telefone' => mb_strtoupper(tipos_contatos()[0] . ';' . tipos_contatos()[0], 'UTF-8'),
+        ]);
+        $camposEditados = json_decode($preRegistroCnpj->preRegistro->campos_editados, true);
 
-    //     foreach($camposEditados as $key => $value)
-    //     {
-    //         $preRegistroCnpj->preRegistro->update([
-    //             'campos_editados' => json_encode([$key => null], JSON_FORCE_OBJECT)
-    //         ]);
-    //         $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
-    //         ->assertSee('<span class="badge badge-danger ml-2">Campos alterados</span>')
-    //         ->assertSee('<span class="badge badge-danger ml-2">Campo alterado</span>');
-    //     }
-    // }
+        foreach($camposEditados as $key => $value)
+        {
+            $preRegistroCnpj->preRegistro->update([
+                'campos_editados' => json_encode([$key => null], JSON_FORCE_OBJECT)
+            ]);
+            $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
+            ->assertSee('<span class="badge badge-danger ml-2">Campos alterados</span>')
+            ->assertSee('<span class="badge badge-danger ml-2">Campo alterado</span>');
+        }
+    }
 
-    // /** @test */
-    // public function view_label_campo_alterado_checkEndEmpresa_pj()
-    // {
-    //     $admin = $this->signInAsAdmin();
+    /** @test */
+    public function view_label_campo_alterado_checkEndEmpresa_pj()
+    {
+        $admin = $this->signInAsAdmin();
 
-    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('campos_editados')->create();
-    //     $preRegistroCnpj->update([
-    //         'cep' => $preRegistroCnpj->preRegistro->cep,
-    //         'logradouro' => $preRegistroCnpj->preRegistro->logradouro,
-    //         'numero' => $preRegistroCnpj->preRegistro->numero,
-    //         'complemento' => $preRegistroCnpj->preRegistro->complemento,
-    //         'bairro' => $preRegistroCnpj->preRegistro->bairro,
-    //         'cidade' => $preRegistroCnpj->preRegistro->cidade,
-    //         'uf' => $preRegistroCnpj->preRegistro->uf,
-    //     ]);
-    //     $preRegistroCnpj->preRegistro->update([
-    //         'opcional_celular' => 'SMS;TELEGRAM',
-    //         'telefone' => '(11) 00000-0000;(11) 00000-0000',
-    //         'tipo_telefone' => mb_strtoupper(tipos_contatos()[0] . ';' . tipos_contatos()[0], 'UTF-8'),
-    //         'campos_editados' => json_encode(['checkEndEmpresa' => null], JSON_FORCE_OBJECT)
-    //     ]);
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('campos_editados')->create();
+        $preRegistroCnpj->update([
+            'cep' => $preRegistroCnpj->preRegistro->cep,
+            'logradouro' => $preRegistroCnpj->preRegistro->logradouro,
+            'numero' => $preRegistroCnpj->preRegistro->numero,
+            'complemento' => $preRegistroCnpj->preRegistro->complemento,
+            'bairro' => $preRegistroCnpj->preRegistro->bairro,
+            'cidade' => $preRegistroCnpj->preRegistro->cidade,
+            'uf' => $preRegistroCnpj->preRegistro->uf,
+        ]);
+        $preRegistroCnpj->preRegistro->update([
+            'opcional_celular' => 'SMS;TELEGRAM',
+            'telefone' => '(11) 00000-0000;(11) 00000-0000',
+            'tipo_telefone' => mb_strtoupper(tipos_contatos()[0] . ';' . tipos_contatos()[0], 'UTF-8'),
+            'campos_editados' => json_encode(['checkEndEmpresa' => null], JSON_FORCE_OBJECT)
+        ]);
 
-    //     $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
-    //     ->assertSee('<span class="badge badge-danger ml-2">Campos alterados</span>')
-    //     ->assertSee('<span class="badge badge-danger ml-2">Campo alterado</span>');
-    // }
+        $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
+        ->assertSee('<span class="badge badge-danger ml-2">Campos alterados</span>')
+        ->assertSee('<span class="badge badge-danger ml-2">Campo alterado</span>');
+    }
 }

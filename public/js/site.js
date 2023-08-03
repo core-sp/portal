@@ -1175,7 +1175,7 @@ function putDadosPreRegistro(objeto)
 		},
 		data: campo == 'path' ? frmData : dados,
 		dataType: 'json',
-		url: classe == 'Arquivo-Excluir' ? link_delete + '/' : link_post + '/',
+		url: classe == 'Arquivo-Excluir' ? link_delete : link_post,
 		processData: pD,
         contentType: cT,
 		cache: false,

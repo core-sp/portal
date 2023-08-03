@@ -20,7 +20,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function view_msg_update()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
         ->assertSeeText('Atualizado em: ')
@@ -50,7 +50,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function can_update_table_responsaveis_tecnicos_by_ajax()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -73,7 +73,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function can_update_table_responsaveis_tecnicos_by_ajax_with_upperCase()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -119,7 +119,7 @@ class ResponsavelTecnicoTest extends TestCase
             ])
         ]);
 
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -166,7 +166,7 @@ class ResponsavelTecnicoTest extends TestCase
             ])
         ]);
 
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
         $rt = factory('App\ResponsavelTecnico')->raw();
@@ -190,7 +190,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_wrong_input_name()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
         $rt = factory('App\ResponsavelTecnico')->raw();
@@ -211,7 +211,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_without_classe()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -234,7 +234,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_wrong_classe()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -257,7 +257,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_without_campo()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -281,22 +281,21 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_input_type_text_more_191_chars()
     {
         $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = [
-            'nome' => $faker->sentence(400),
-            'nome_social' => $faker->sentence(400),
-            'logradouro' => $faker->sentence(400),
-            'complemento' => $faker->sentence(400),
-            'bairro' => $faker->sentence(400),
-            'cidade' => $faker->sentence(400),
-            'nome_mae' => $faker->sentence(400),
-            'nome_pai' => $faker->sentence(400),
-            'tipo_identidade' => $faker->sentence(400),
-            'identidade' => $faker->sentence(400),
-            'orgao_emissor' => $faker->sentence(400),
+            'nome' => $faker->text(500),
+            'nome_social' => $faker->text(500),
+            'logradouro' => $faker->text(500),
+            'complemento' => $faker->text(500),
+            'bairro' => $faker->text(500),
+            'cidade' => $faker->text(500),
+            'nome_mae' => $faker->text(500),
+            'nome_pai' => $faker->text(500),
+            'identidade' => $faker->text(500),
+            'orgao_emissor' => $faker->text(500),
         ];
                 
         foreach($rt as $key => $value)
@@ -315,7 +314,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_cpf_wrong()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -337,7 +336,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_under_18_years_old()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -359,7 +358,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_dt_expedicao_after_today()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -381,7 +380,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_without_date_type()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -406,7 +405,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_sexo_rt_value_wrong()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -425,7 +424,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_tipo_identidade_rt_value_wrong()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -444,7 +443,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_uf_rt_value_wrong()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -463,7 +462,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_without_relationship()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -487,7 +486,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_when_remove_relationship()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -532,7 +531,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function get_responsavel_tecnico_by_ajax_when_exists_in_database()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = factory('App\ResponsavelTecnico')->create();
@@ -548,7 +547,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function get_responsavel_tecnico_by_ajax_when_exists_in_gerenti()
     {
         // Caso dê erro, analisar o GerentiMock para editar em gerentiBusca(), em pessoa física, no campo ASS_TP_ASSOC para 5
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = [
@@ -575,7 +574,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_when_clean_inputs()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -604,10 +603,12 @@ class ResponsavelTecnicoTest extends TestCase
         ]);
     }
 
+    // Status do pré-registro
+
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_status_different_aguardando_correcao_or_sendo_elaborado()
     {
-        $externo = $this->signInAsUserExterno();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $rt = factory('App\ResponsavelTecnico')->create();
         $preRegistro = factory('App\PreRegistroCnpj')->create([
@@ -659,35 +660,17 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function view_message_errors_when_submit_with_cnpj()
     {
-        $externo = $this->signInAsUserExterno();
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
-        $prCnpjCampos = factory('App\PreRegistroCnpj')->states('request')->make();
-        $dados = Arr::except($prCnpjCampos->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
-        $dados['nome_rt'] = null;
-        $dados['nome_social_rt'] = 'R';
-        $dados['sexo_rt'] = null;
-        $dados['dt_nascimento_rt'] = null;
-        $dados['cep_rt'] = null;
-        $dados['logradouro_rt'] = null;
-        $dados['numero_rt'] = null;
-        $dados['complemento_rt'] = 'f';
-        $dados['bairro_rt'] = null;
-        $dados['cidade_rt'] = null;
-        $dados['uf_rt'] = null;
-        $dados['nome_mae_rt'] = null;
-        $dados['nome_pai_rt'] = 'g';
-        $dados['tipo_identidade_rt'] = null;
-        $dados['identidade_rt'] = null;
-        $dados['orgao_emissor_rt'] = null;
-        $dados['dt_expedicao_rt'] = null;
-        $dados['path'] = null;
+        $dados = [
+            'nome_rt' => null, 'nome_social_rt' => 'R', 'sexo_rt' => null, 'dt_nascimento_rt' => null, 'cep_rt' => null, 'logradouro_rt' => null,
+            'numero_rt' => null, 'complemento_rt' => 'f', 'bairro_rt' => null, 'cidade_rt' => null, 'uf_rt' => null, 'nome_mae_rt' => null, 'nome_pai_rt' => 'g',
+            'tipo_identidade_rt' => null, 'identidade_rt' => null, 'orgao_emissor_rt' => null, 'dt_expedicao_rt' => null, 'path' => null
+        ];
 
-        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertStatus(302);
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertRedirect(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));
 
         $errors = session('errors');
         $keys = array();
@@ -702,35 +685,24 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function can_submit_pre_registro_cnpj_if_rt_exists_in_database()
     {
-        Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $rt = $preRegistroCnpj->rt;
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-        $this->post(route('externo.inserir.preregistro.ajax'), [
-            'classe' => 'anexos',
-            'campo' => 'path',
-            'valor' => [UploadedFile::fake()->create('random.pdf')]
-        ])->assertOk();
-        
-        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertOk();
+        $rt = factory('App\ResponsavelTecnico')->states('low')->create()->toArray();
 
-        $this->put(route('externo.inserir.preregistro'), $dados)
-        ->assertRedirect(route('externo.preregistro.view'));
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
 
-        foreach($rt as $key => $value)
-            $rt[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : $value;
-        $this->assertDatabaseHas('responsaveis_tecnicos', $rt);
+        $pr = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make();
+        $dados = $pr->final;
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+
+        $this->assertDatabaseHas('responsaveis_tecnicos', [
+            'nome_mae' => $rt['nome_mae'],
+            'identidade' => $rt['identidade'],
+            'logradouro' => $rt['logradouro'],
+            'numero' => $rt['numero'],
+            'cpf' => $rt['cpf'],
+            'nome' => $rt['nome']
+        ]);
         $this->assertEquals(ResponsavelTecnico::count(), 1);
     }
 
@@ -738,58 +710,47 @@ class ResponsavelTecnicoTest extends TestCase
     public function can_submit_pre_registro_cnpj_if_rt_exists_in_gerenti()
     {
         // Caso dê erro, analisar o GerentiMock para editar em gerentiBusca(), em pessoa física, no campo ASS_TP_ASSOC para 5
-        Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
+        $rt = factory('App\ResponsavelTecnico')->states('low')->raw([
+            'cpf' => '86294373085',
         ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $rt = $preRegistroCnpj->rt;
-        $rt['cpf'] = '86294373085';
-        $dados['cpf_rt'] = '86294373085';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-        $this->post(route('externo.inserir.preregistro.ajax'), [
-            'classe' => 'anexos',
-            'campo' => 'path',
-            'valor' => [UploadedFile::fake()->create('random.pdf')]
-        ])->assertOk();
-        
-        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertOk();
 
-        $this->put(route('externo.inserir.preregistro'), $dados)
-        ->assertRedirect(route('externo.preregistro.view'));
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $pr = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make([
+            'responsavel_tecnico_id' => null,
+        ]);
+        $dados = $pr->final;
+        foreach($rt as $chave => $val)
+            !in_array($chave, ['registro']) ? $dados[$chave.'_rt'] = $val : null;
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
 
         foreach($rt as $key => $value)
-            $rt[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : null;
-        $this->assertDatabaseHas('responsaveis_tecnicos', $rt);
+            $rt[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : $value;
+        $this->assertDatabaseHas('responsaveis_tecnicos', [
+            'id' => 1,
+            'nome_mae' => $rt['nome_mae'],
+            'identidade' => $rt['identidade'],
+            'logradouro' => $rt['logradouro'],
+            'numero' => $rt['numero'],
+            'cpf' => $rt['cpf'],
+            'nome' => $rt['nome'],
+            'registro' => '0000000001'
+        ]);
+        
         $this->assertEquals(ResponsavelTecnico::count(), 1);
     }
 
     /** @test */
     public function cannot_submit_pre_registro_cnpj_without_cpf_rt()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['cpf_rt'] = '';
         
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
-
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cpf_rt');
     }
@@ -797,20 +758,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_cpf_rt_with_wrong_value()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['cpf_rt'] = '0123456789';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['cpf_rt'] = '12345678922';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cpf_rt');
@@ -819,20 +771,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_without_nome_rt()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['nome_rt'] = '';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_rt');
@@ -841,21 +784,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_nome_rt_less_than_5_chars()
     {
-        $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['nome_rt'] = 'Nome';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_rt');
@@ -865,20 +798,11 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_nome_rt_more_than_191_chars()
     {
         $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['nome_rt'] = $faker->sentence(400);
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['nome_rt'] = $faker->text(500);
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_rt');
@@ -887,20 +811,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_nome_rt_with_numbers()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['nome_rt'] = 'N0me RT';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['nome_rt'] = 'N0me com númer0';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_rt');
@@ -909,20 +824,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_nome_social_rt_less_than_5_chars()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['nome_social_rt'] = 'Nome';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_social_rt');
@@ -932,20 +838,11 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_nome_social_rt_more_than_191_chars()
     {
         $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['nome_social_rt'] = $faker->sentence(400);
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['nome_social_rt'] = $faker->text(500);
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_social_rt');
@@ -954,20 +851,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_nome_social_rt_with_numbers()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['nome_social_rt'] = 'N0me RT';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['nome_social_rt'] = 'Nom3 com numeros';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_social_rt');
@@ -976,20 +864,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_without_sexo_rt()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['sexo_rt'] = '';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('sexo_rt');
@@ -998,20 +877,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_sexo_rt_wrong_value()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['sexo_rt'] = 'E';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('sexo_rt');
@@ -1020,20 +890,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_without_dt_nascimento_rt()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['dt_nascimento_rt'] = '';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_nascimento_rt');
@@ -1042,20 +903,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_dt_nascimento_rt_incorrect_format()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['dt_nascimento_rt'] = '2000/01/01';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_nascimento_rt');
@@ -1064,20 +916,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_dt_nascimento_rt_without_date_type()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['dt_nascimento_rt'] = 'texto';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_nascimento_rt');
@@ -1086,20 +929,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_dt_nascimento_rt_under_18_years_old()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['dt_nascimento_rt'] = Carbon::today()->subYears(17)->format('Y-m-d');
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_nascimento_rt');
@@ -1108,20 +942,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_without_tipo_identidade_rt()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['tipo_identidade_rt'] = '';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('tipo_identidade_rt');
@@ -1130,20 +955,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_tipo_identidade_rt_with_wrong_value()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['tipo_identidade_rt'] = 'Doc';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('tipo_identidade_rt');
@@ -1152,20 +968,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_without_identidade_rt()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['identidade_rt'] = '';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('identidade_rt');
@@ -1174,20 +981,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_identidade_rt_less_than_4_chars()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['identidade_rt'] = '12A';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('identidade_rt');
@@ -1196,20 +994,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_identidade_rt_more_than_30_chars()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['identidade_rt'] = '1234567891234567891234567891234';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['identidade_rt'] = '123456789012345678901234567890123';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('identidade_rt');
@@ -1218,20 +1007,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_without_orgao_emissor_rt()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['orgao_emissor_rt'] = '';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('orgao_emissor_rt');
@@ -1240,21 +1020,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_orgao_emissor_rt_less_than_3_chars()
     {
-        $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['orgao_emissor_rt'] = 'sp';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['orgao_emissor_rt'] = 'sd';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('orgao_emissor_rt');
@@ -1264,20 +1034,11 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_orgao_emissor_rt_more_than_191_chars()
     {
         $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['orgao_emissor_rt'] = $faker->sentence(400);
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['orgao_emissor_rt'] = $faker->text(500);
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('orgao_emissor_rt');
@@ -1286,20 +1047,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_without_dt_expedicao_rt()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['dt_expedicao_rt'] = '';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_expedicao_rt');
@@ -1308,20 +1060,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_dt_expedicao_rt_without_date_type()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['dt_expedicao_rt'] = 'texto';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_expedicao_rt');
@@ -1330,20 +1073,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_dt_expedicao_rt_incorrect_format()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['dt_expedicao_rt'] = '2000/01/01';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['dt_expedicao_rt'] = '2000/01/25';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_expedicao_rt');
@@ -1352,20 +1086,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_dt_expedicao_rt_after_today()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['dt_expedicao_rt'] = Carbon::today()->addDay()->format('Y-m-d');
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_expedicao_rt');
@@ -1374,20 +1099,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_without_cep_rt()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['cep_rt'] = '';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cep_rt');
@@ -1396,20 +1112,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_cep_rt_more_than_9_chars()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['cep_rt'] = '1234567891';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['cep_rt'] = '012345698';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cep_rt');
@@ -1418,20 +1125,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_cep_rt_incorrect_format()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['cep_rt'] = '1234-56789';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['cep_rt'] = '012-12365';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cep_rt');
@@ -1440,20 +1138,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_without_bairro_rt()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['bairro_rt'] = '';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('bairro_rt');
@@ -1462,21 +1151,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_bairro_rt_less_than_4_chars()
     {
-        $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['bairro_rt'] = 'Bai';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('bairro_rt');
@@ -1486,20 +1165,11 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_bairro_rt_more_than_191_chars()
     {
         $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['bairro_rt'] = $faker->sentence(400);
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['bairro_rt'] = $faker->text(500);
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('bairro_rt');
@@ -1508,20 +1178,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_without_logradouro_rt()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['logradouro_rt'] = '';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('logradouro_rt');
@@ -1530,21 +1191,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_logradouro_rt_less_than_4_chars()
     {
-        $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['logradouro_rt'] = 'Bai';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['logradouro_rt'] = 'Log';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('logradouro_rt');
@@ -1554,20 +1205,11 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_logradouro_rt_more_than_191_chars()
     {
         $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['logradouro_rt'] = $faker->sentence(400);
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['logradouro_rt'] = $faker->text(500);
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('logradouro_rt');
@@ -1576,20 +1218,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_without_numero_rt()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['numero_rt'] = '';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('numero_rt');
@@ -1598,20 +1231,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_numero_rt_more_than_10_chars()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['numero_rt'] = '12345678912';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['numero_rt'] = '123456789lp';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('numero_rt');
@@ -1621,20 +1245,11 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_complemento_rt_more_than_50_chars()
     {
         $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['complemento_rt'] = $faker->sentence(400);
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['complemento_rt'] = $faker->text(200);
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('complemento_rt');
@@ -1643,20 +1258,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_without_cidade_rt()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['cidade_rt'] = '';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cidade_rt');
@@ -1666,20 +1272,11 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_cidade_rt_more_than_191_chars()
     {
         $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['cidade_rt'] = $faker->sentence(400);
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['cidade_rt'] = $faker->text(500);
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cidade_rt');
@@ -1688,20 +1285,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_without_uf_rt()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['uf_rt'] = '';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('uf_rt');
@@ -1710,20 +1298,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_uf_rt_with_wrong_value()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['uf_rt'] = 'PP';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['uf_rt'] = 'UF';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('uf_rt');
@@ -1732,20 +1311,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_without_nome_mae_rt()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['nome_mae_rt'] = '';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_mae_rt');
@@ -1754,21 +1324,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_nome_mae_rt_less_than_5_chars()
     {
-        $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['nome_mae_rt'] = 'Nome';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['nome_mae_rt'] = 'Mãen';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_mae_rt');
@@ -1778,20 +1338,11 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_nome_mae_rt_more_than_191_chars()
     {
         $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['nome_mae_rt'] = $faker->sentence(400);
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['nome_mae_rt'] = $faker->text(500);
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_mae_rt');
@@ -1800,20 +1351,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_nome_mae_rt_with_numbers()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['nome_mae_rt'] = 'M4e RT';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['nome_mae_rt'] = 'M4mãe';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_mae_rt');
@@ -1822,20 +1364,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_nome_pai_rt_less_than_5_chars()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['nome_pai_rt'] = 'Nome';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['nome_pai_rt'] = 'paiz';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_pai_rt');
@@ -1845,20 +1378,11 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_nome_pai_rt_more_than_191_chars()
     {
         $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['nome_pai_rt'] = $faker->sentence(400);
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['nome_pai_rt'] = $faker->text(500);
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_pai_rt');
@@ -1867,20 +1391,11 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_nome_pai_rt_with_numbers()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
-        $final = Arr::except($preRegistroCnpj->final, [
-            'registro_secundario','user_externo_id','contabil_id','idusuario','status','justificativa','confere_anexos','historico_contabil',
-            'historico_status','campos_espelho','campos_editados'
-        ]);
-        $prCnpj = Arr::except($preRegistroCnpj->toArray(), [
-            'final','preRegistro','contabil','rt','historico_rt','pre_registro_id','responsavel_tecnico_id'
-        ]);
-        $dados = array_merge(Arr::except($prCnpj, ['cep','logradouro','numero','complemento','bairro','cidade','uf']), $final, ['path' => '1', 'checkEndEmpresa' => '']);
-        $dados['nome_pai_rt'] = 'N0me pai';
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+
+        $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
+        $dados['nome_pai_rt'] = 'pa1 teste';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_pai_rt');

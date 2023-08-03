@@ -161,6 +161,7 @@ class PreRegistroAjaxRequest extends FormRequest
             'total.required' => 'A soma do tamanho dos arquivos ultrapassa 5 MB',
             'campo.in' => 'Campo não encontrado ou não permitido alterar',
             'valor.in' => 'Valor não encontrado',
+            'valor.array' => 'Formato da requisição do upload do anexo está errado',
             'required' => 'Falta dados para enviar a requisição',
             'mimetypes' => 'O arquivo não possui extensão permitida ou está com erro',
             'file' => 'Deve ser um arquivo',

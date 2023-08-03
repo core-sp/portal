@@ -113,12 +113,14 @@ $factory->afterMakingState(PreRegistroCnpj::class, 'request', function ($prCnpj,
     $prCnpj->preRegistro->opcional_celular = [opcoes_celular()[0], opcoes_celular()[2]];
 
     $contabil = array();
-    foreach($prCnpj->preRegistro->contabil->attributesToArray() as $key => $val)
-        in_array($key, ['cnpj', 'nome', 'email', 'nome_contato', 'telefone']) ? $contabil[$key . '_contabil'] = $val : null;
+    if(isset($prCnpj->preRegistro->contabil))
+        foreach($prCnpj->preRegistro->contabil->attributesToArray() as $key => $val)
+            in_array($key, ['cnpj', 'nome', 'email', 'nome_contato', 'telefone']) ? $contabil[$key . '_contabil'] = $val : null;
 
     $rt = array();
-    foreach($prCnpj->responsavelTecnico->attributesToArray() as $key1 => $val1)
-        !in_array($key1, ['registro', 'created_at', 'updated_at', 'deleted_at', 'id']) ? $rt[$key1 . '_rt'] = $val1 : null;
+    if(isset($prCnpj->responsavelTecnico))
+        foreach($prCnpj->responsavelTecnico->attributesToArray() as $key1 => $val1)
+            !in_array($key1, ['registro', 'created_at', 'updated_at', 'deleted_at', 'id']) ? $rt[$key1 . '_rt'] = $val1 : null;
 
     $endereco = ['cep_empresa' => '01234-050', 'logradouro_empresa' => 'RUA TESTE DA RUA', 'numero_empresa' => '25A', 'complemento_empresa' => null, 
     'bairro_empresa' => 'TESTE BAIRRO', 'cidade_empresa' => 'SÃO PAULO', 'uf_empresa' => 'SP'];
@@ -135,12 +137,14 @@ $factory->afterMakingState(PreRegistroCnpj::class, 'request_mesmo_endereco', fun
     $prCnpj->preRegistro->opcional_celular = [opcoes_celular()[0], opcoes_celular()[2]];
 
     $contabil = array();
-    foreach($prCnpj->preRegistro->contabil->attributesToArray() as $key => $val)
-        in_array($key, ['cnpj', 'nome', 'email', 'nome_contato', 'telefone']) ? $contabil[$key . '_contabil'] = $val : null;
+    if(isset($prCnpj->preRegistro->contabil))
+        foreach($prCnpj->preRegistro->contabil->attributesToArray() as $key => $val)
+            in_array($key, ['cnpj', 'nome', 'email', 'nome_contato', 'telefone']) ? $contabil[$key . '_contabil'] = $val : null;
 
     $rt = array();
-    foreach($prCnpj->responsavelTecnico->attributesToArray() as $key1 => $val1)
-        !in_array($key1, ['registro', 'created_at', 'updated_at', 'deleted_at', 'id']) ? $rt[$key1 . '_rt'] = $val1 : null;
+    if(isset($prCnpj->responsavelTecnico))
+        foreach($prCnpj->responsavelTecnico->attributesToArray() as $key1 => $val1)
+            !in_array($key1, ['registro', 'created_at', 'updated_at', 'deleted_at', 'id']) ? $rt[$key1 . '_rt'] = $val1 : null;
 
     $pj = $prCnpj->makeHidden(['id', 'pre_registro_id', 'historico_rt', 'responsavel_tecnico_id']);
 
