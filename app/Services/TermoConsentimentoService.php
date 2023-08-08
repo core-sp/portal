@@ -5,11 +5,16 @@ namespace App\Services;
 use App\TermoConsentimento;
 use App\Contracts\TermoConsentimentoServiceInterface;
 use App\Events\ExternoEvent;
-use Illuminate\Support\Facades\File;
-
-
+use Illuminate\Support\Facades\Storage;
 
 class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
+
+    private $path_termos_servicos;
+
+    public function __construct()
+    {
+        $this->path_termos_servicos = 'termos';
+    }
 
     public function save($ip, $email)
     {
@@ -35,9 +40,9 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
 
     public function caminhoFile()
     {
-        $pdf = 'arquivos/CORE-SP_Termo_de_consentimento.pdf';
-
-        return File::exists($pdf) ? $pdf : null;
+        if(Storage::disk('public')->exists($this->path_termos_servicos.'/CORE-SP_Termo_de_consentimento.pdf'))
+            return Storage::disk('public')->path($this->path_termos_servicos.'/CORE-SP_Termo_de_consentimento.pdf');
+        return null;
     }
 
     public function download()
