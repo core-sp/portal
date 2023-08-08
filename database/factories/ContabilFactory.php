@@ -34,3 +34,36 @@ $factory->state(Contabil::class, 'cadastro', function (Faker $faker) {
         'password_confirmation' => 'Teste102030'
     ];
 });
+
+$factory->state(Contabil::class, 'sem_login', function (Faker $faker) {
+    return [
+        'password' => null, 
+        'verify_token' => null, 
+        'ativo' => null,
+        'aceite' => null
+    ];
+});
+
+$factory->afterMakingState(Contabil::class, 'sem_login', function ($contabil, $faker) {
+    $contabil->makeHidden([
+        'password', 
+        'verify_token', 
+        'ativo',
+        'aceite',
+        'created_at', 
+        'updated_at', 
+        'deleted_at',
+    ]);
+});
+
+$factory->afterCreatingState(Contabil::class, 'sem_login', function ($contabil, $faker) {
+    $contabil->makeHidden([
+        'password', 
+        'verify_token', 
+        'ativo',
+        'aceite',
+        'created_at', 
+        'updated_at', 
+        'deleted_at',
+    ]);
+});

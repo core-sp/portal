@@ -375,6 +375,43 @@ class UserExternoTest extends TestCase
 
     /** @test 
      * 
+     * Pode se registrar se ativo 0.
+    */
+    public function register_new_user_externo_when_ativo_0_after_24h()
+    {
+        Mail::fake();
+
+        $user_externo = factory('App\UserExterno')->create([
+            'ativo' => 0,
+        ]);
+        UserExterno::first()->update(['updated_at' => Carbon::today()->subDay()]);
+
+        $dados = factory('App\UserExterno')->states('cadastro')->raw([
+            'nome' => $user_externo['nome'],
+            'cpf_cnpj' => $user_externo['cpf_cnpj'],
+            'email' => $user_externo['email'],
+        ]);
+
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), $dados);
+
+        Mail::assertQueued(CadastroUserExternoMail::class);
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => $user_externo['cpf_cnpj'], 
+            'ativo' => 0,
+            'deleted_at' => null
+        ]);
+
+        // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
+        $this->get(route('externo.verifica-email', ['tipo' => 'user_externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => $user_externo['cpf_cnpj'], 
+            'ativo' => 1
+        ]);
+    }
+
+    /** @test 
+     * 
     */
     public function cannot_register_new_user_externo_when_ativo_0_in_24h()
     {
@@ -1817,5 +1854,137 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.editar.view'))->assertRedirect(route('externo.login'));
         $this->get(route('externo.editar.senha.view'))->assertRedirect(route('externo.login'));
         $this->get(route('externo.preregistro.view'))->assertRedirect(route('externo.login'));
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES PRÉ-REGISTRO USUÁRIO EXTERNO
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function cannot_access_links_pre_registro_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        
+        $this->get(route('externo.relacao.preregistros'))->assertRedirect(route('externo.login'));
+
+        $this->post(route('externo.contabil.inserir.preregistro'), [
+            'cpf_cnpj' => '49931920000112', 
+            'email' => 'teste@teste.com', 
+            'nome' => 'Teste Nome'
+        ])->assertRedirect(route('externo.login'));
+
+        $this->get(route('externo.relacao.preregistros', ['preRegistro' => 1]))->assertRedirect(route('externo.login'));
+    }
+
+    /** @test */
+    public function cannot_access_links_pre_registro_with_parameter_pre_registro()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on', 'preRegistro' => 1]))
+        ->assertRedirect(route('externo.dashboard'));
+
+        $pr = factory('App\PreRegistroCpf')->states('request')->make();
+        $dados = $pr->final;
+        $pr = $pr->makeHidden(['final'])->attributesToArray();
+
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertRedirect(route('externo.dashboard'));
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertRedirect(route('externo.dashboard'));
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'contabil',
+            'campo' => 'cnpj_contabil',
+            'valor' => '78087976000130'
+        ])->assertRedirect(route('externo.dashboard'));
+
+        $this->get(route('externo.preregistro.anexo.download', ['id' => 1, 'preRegistro' => 1]))
+        ->assertRedirect(route('externo.dashboard'));
+
+        $this->delete(route('externo.preregistro.anexo.excluir', ['id' => 1, 'preRegistro' => 1]))
+        ->assertRedirect(route('externo.dashboard'));
+    }
+
+    /** @test */
+    public function can_register_when_created_by_contabilidade()
+    {
+        Mail::fake();
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => $dados['cpf_cnpj'], 
+            'nome' => $dados['nome'],
+            'email' => $dados['email'],
+            'ativo' => 0,
+            'aceite' => 0
+        ]);
+
+        $dados = factory('App\UserExterno')->states('cadastro')->raw();
+        $this->post(route('externo.cadastro.submit'), $dados);
+
+        Mail::assertQueued(CadastroUserExternoMail::class);
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => $dados['cpf_cnpj'], 
+            'nome' => $dados['nome'],
+            'email' => $dados['email'],
+            'ativo' => 0,
+            'aceite' => 1
+        ]);
+
+        $this->get(route('externo.verifica-email', ['tipo' => 'user_externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => $dados['cpf_cnpj'], 
+            'nome' => $dados['nome'],
+            'email' => $dados['email'],
+            'ativo' => 1,
+            'aceite' => 1
+        ]);
+    }
+
+    /** @test */
+    public function can_register_when_ativo_0_after_24h_when_created_by_contabilidade()
+    {
+        Mail::fake();
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => $dados['cpf_cnpj'], 
+            'nome' => $dados['nome'],
+            'email' => $dados['email'],
+            'ativo' => 0,
+            'aceite' => 0
+        ]);
+
+        UserExterno::first()->update(['updated_at' => Carbon::today()->subDays(2)]);
+
+        $dados = factory('App\UserExterno')->states('cadastro')->raw();
+        $this->post(route('externo.cadastro.submit'), $dados);
+
+        Mail::assertQueued(CadastroUserExternoMail::class);
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => $dados['cpf_cnpj'], 
+            'aceite' => 1,
+            'ativo' => 0,
+            'deleted_at' => null
+        ]);
+
+        $this->get(route('externo.verifica-email', ['tipo' => 'user_externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => $dados['cpf_cnpj'], 
+            'ativo' => 1,
+            'aceite' => 1
+        ]);
     }
 }

@@ -29,3 +29,18 @@ $factory->state(UserExterno::class, 'cadastro', function (Faker $faker) {
         'password_confirmation' => 'Teste102030'
     ];
 });
+
+$factory->state(UserExterno::class, 'cadastro_by_contabil', function (Faker $faker) {
+    return [
+        'password' => null, 
+        'verify_token' => null, 
+        'ativo' => 0,
+        'aceite' => 0
+    ];
+});
+
+$factory->afterMakingState(UserExterno::class, 'cadastro_by_contabil', function ($externo, $faker) {
+    $externo->makeHidden([
+        'password', 'verify_token', 'ativo', 'aceite',
+    ]);
+});

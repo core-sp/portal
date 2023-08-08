@@ -261,6 +261,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
             $string = 'Contabilidade com cnpj '.$externo->cnpj;
             $string .= ', criou a solicitação de registro com a id: ' . $criado['resultado']->id;
             event(new ExternoEvent($string));
+            Mail::to($externo->email)->queue(new PreRegistroMail($criado['resultado']->fresh()));
 
             return $criado['resultado'];
         }          

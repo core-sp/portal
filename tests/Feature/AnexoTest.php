@@ -801,32 +801,890 @@ class AnexoTest extends TestCase
         $this->get(route('externo.preregistro.anexo.download', 1))->assertStatus(401);
     }
 
-    // /** @test */
-    // public function filled_campos_editados_anexos_when_form_is_submitted_when_status_aguardando_correcao()
-    // {
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
-    //     $preRegistroCpf = factory('App\PreRegistroCpf')->create([
-    //         'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()->id
-    //     ])->makeHidden(['pre_registro_id', 'created_at', 'updated_at', 'id']);
+    /** @test */
+    public function filled_campos_editados_anexos_when_form_is_submitted_when_status_aguardando_correcao()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()->id
+        ])->makeHidden(['pre_registro_id', 'created_at', 'updated_at', 'id']);
 
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        Anexo::find(1)->delete();
 
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
-    //     ])->assertOk();
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
+        ])->assertOk();
 
-    //     $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
 
-    //     $pr = PreRegistro::first();
-    //     $dados = Arr::except($dados, ['final', 'created_at', 'updated_at', 'deleted_at', 'pergunta']);
+        $pr = PreRegistro::first();
+        $dados = Arr::except($dados, ['final', 'created_at', 'updated_at', 'deleted_at', 'pergunta']);
 
-    //     $arrayFinal = array_diff(array_keys($dados), array_keys(json_decode($pr->campos_espelho, true)));
-    //     $this->assertEquals($arrayFinal, array());
-    //     $this->assertEquals(json_decode($pr->campos_editados, true), ['path' => 2]);
-    // }
+        $arrayFinal = array_diff(array_keys($dados), array_keys(json_decode($pr->campos_espelho, true)));
+        $this->assertEquals($arrayFinal, array());
+        $this->assertEquals(json_decode($pr->campos_editados, true)['path'], 2);
+    }
+
+    /** 
+     * ==============================================================================================================
+     * TESTES PRE-REGISTRO ANEXO - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
+     * ===============================================================================================================
+     */
+
+    /** @test */
+    public function view_files_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $anexos = [
+            UploadedFile::fake()->image('random.jpg')->size(300),
+            UploadedFile::fake()->image('random1.png')->size(400),
+            UploadedFile::fake()->create('random2.pdf')->size(100),
+        ];
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => $anexos
+        ])->assertStatus(200);
+        
+        $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))
+        ->assertSee(Anexo::find(1)->nome_original);
+
+        Storage::disk('local')->assertExists('userExterno/pre_registros/1/'.Anexo::find(1)->nome_original);
+    }
+
+    /** @test */
+    public function view_msg_update_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))
+        ->assertSeeText('Atualizado em: ')
+        ->assertSeeText(PreRegistro::first()->updated_at->format('d\/m\/Y, \à\s H:i:s'));
+        
+        PreRegistro::first()->update(['updated_at' => PreRegistro::first()->updated_at->subHour()]);
+        $atual = PreRegistro::first()->updated_at->format('d\/m\/Y, \à\s H:i:s');
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->image('random.jpg')]
+        ])->assertStatus(200);
+        
+        $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))
+        ->assertSeeText('Atualizado em: ')
+        ->assertSeeText(PreRegistro::first()->updated_at->format('d\/m\/Y, \à\s H:i:s'));
+        $this->assertNotEquals($atual, PreRegistro::first()->updated_at->format('d\/m\/Y, \à\s H:i:s'));
+    }
+
+    /** @test */
+    public function can_create_anexos_by_ajax_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->image('random.jpg')]
+        ])->assertStatus(200);
+        
+        $this->assertDatabaseHas('anexos', [
+            'nome_original' => 'random.jpg',
+            'pre_registro_id' => 1
+        ]);
+
+        $anexos = $externo->load('preRegistros')->preRegistros->first()->anexos;
+        Storage::disk('local')->assertExists($anexos->get(0)->path);
+    }
+
+    /** @test */
+    public function cannot_create_anexos_by_ajax_after_aprovado_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'status' => 'Aprovado'
+            ]),
+        ]);
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados)
+        ->assertRedirect(route('externo.preregistro.view'));
+        
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->image('random.jpg')]
+        ])->assertStatus(401);
+        
+        $this->assertDatabaseMissing('anexos', [
+            'nome_original' => 'random.jpg',
+            'pre_registro_id' => 2
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_anexo_created_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->image('random.jpg')]
+        ])->assertStatus(200);
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Contabilidade com cnpj ' . $externo->cnpj . ' realizou a operação para o Usuário Externo com cpf '.$externo->preRegistros->first()->userExterno->cpf_cnpj;
+        $txt .= ', anexou o arquivo "'.Anexo::first()->nome_original.'"';
+        $txt .= ', que possui a ID: ' . Anexo::first()->id . ' na solicitação de registro com a id: ' . $externo->preRegistros->first()->id;
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function can_upload_anexo_up_to_15_files_by_ajax_by_contabilidade()
+    {
+        Storage::fake('local');
+        
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $anexos = [
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+        ];
+        
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => $anexos
+        ])->assertStatus(200);
+        
+        $this->assertDatabaseHas('anexos', [
+            'nome_original' => Anexo::find(1)->nome_original,
+            'pre_registro_id' => $externo->preRegistros->first()->id
+        ]);
+
+        Storage::disk('local')->assertExists(Anexo::find(1)->path);
+    }
+
+    /** @test */
+    public function cannot_upload_more_than_15_files_by_ajax_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $anexos = [
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+            UploadedFile::fake()->image('random.jpg')->size(10),
+        ];
+        
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => $anexos
+        ])->assertSessionHasErrors(['valor']);
+        
+        $this->assertDatabaseMissing('anexos', [
+            'id' => 1,
+            'pre_registro_id' => $externo->preRegistros->first()->id
+        ]);
+    }
+
+    /** @test */
+    public function can_upload_up_to_10_anexos_with_15_files_if_pf_by_ajax_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $id = $externo->preRegistros->first()->id;
+
+        $anexos = [
+            UploadedFile::fake()->image('random1.jpg')->size(10),
+            UploadedFile::fake()->image('random2.jpg')->size(10),
+            UploadedFile::fake()->image('random3.jpg')->size(10),
+            UploadedFile::fake()->image('random4.jpg')->size(10),
+            UploadedFile::fake()->image('random5.jpg')->size(10),
+            UploadedFile::fake()->image('random6.jpg')->size(10),
+            UploadedFile::fake()->image('random7.jpg')->size(10),
+            UploadedFile::fake()->image('random8.jpg')->size(10),
+            UploadedFile::fake()->image('random9.jpg')->size(10),
+            UploadedFile::fake()->image('random10.jpg')->size(10),
+            UploadedFile::fake()->image('random11.jpg')->size(10),
+            UploadedFile::fake()->image('random12.jpg')->size(10),
+            UploadedFile::fake()->image('random13.jpg')->size(10),
+            UploadedFile::fake()->image('random14.jpg')->size(10),
+            UploadedFile::fake()->image('random15.jpg')->size(10),
+        ];
+
+        for($cont = 1; $cont <= 10; $cont++)
+        {
+            $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+                'classe' => 'anexos',
+                'campo' => 'path',
+                'valor' => $anexos
+            ])->assertStatus(200);
+
+            $this->assertDatabaseHas('anexos', [
+                'nome_original' => Anexo::find($cont)->nome_original,
+                'pre_registro_id' => $id
+            ]);
+
+            Storage::disk('local')->assertExists(Anexo::find($cont)->path);
+        }
+
+        $this->assertEquals(Anexo::count(), 10);
+    }
+
+    /** @test */
+    public function cannot_create_if_pf_and_more_than_10_anexos_by_ajax_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $id = $externo->preRegistros->first()->id;
+
+        for($cont = 1; $cont <= 10; $cont++)
+        {
+            $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+                'classe' => 'anexos',
+                'campo' => 'path',
+                'valor' => [UploadedFile::fake()->image('random_' . $cont . '.jpg')->size(10)]
+            ])->assertStatus(200);
+
+            $this->assertDatabaseHas('anexos', [
+                'nome_original' => Anexo::find($cont)->nome_original,
+                'pre_registro_id' => $id
+            ]);
+
+            Storage::disk('local')->assertExists(Anexo::find($cont)->path);
+        }
+
+        $this->assertEquals(Anexo::count(), 10);
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->image('random_11.jpg')->size(10)]
+        ])->assertStatus(200);
+
+        $this->assertEquals(Anexo::count(), 10);
+    }
+
+    /** @test */
+    public function can_total_upload_to_15_anexos_if_pj_by_ajax_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $id = $externo->preRegistros->first()->id;
+
+        for($cont = 1; $cont <= 15; $cont++)
+        {
+            $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+                'classe' => 'anexos',
+                'campo' => 'path',
+                'valor' => [UploadedFile::fake()->image('random_' . $cont . '.jpg')->size(10)]
+            ])->assertStatus(200);
+
+            $this->assertDatabaseHas('anexos', [
+                'nome_original' => Anexo::find($cont)->nome_original,
+                'pre_registro_id' => $id
+            ]);
+
+            Storage::disk('local')->assertExists(Anexo::find($cont)->path);
+        }
+
+        $this->assertEquals(Anexo::count(), 15);
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->image('random_16.jpg')->size(10)]
+        ])->assertStatus(200);
+
+        $this->assertEquals(Anexo::count(), 15);
+    }
+
+    /** @test */
+    public function can_upload_up_to_15_anexos_with_15_files_if_pj_by_ajax_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $id = $externo->preRegistros->first()->id;
+
+        $anexos = [
+            UploadedFile::fake()->image('random1.jpg')->size(10),
+            UploadedFile::fake()->image('random2.jpg')->size(10),
+            UploadedFile::fake()->image('random3.jpg')->size(10),
+            UploadedFile::fake()->image('random4.jpg')->size(10),
+            UploadedFile::fake()->image('random5.jpg')->size(10),
+            UploadedFile::fake()->image('random6.jpg')->size(10),
+            UploadedFile::fake()->image('random7.jpg')->size(10),
+            UploadedFile::fake()->image('random8.jpg')->size(10),
+            UploadedFile::fake()->image('random9.jpg')->size(10),
+            UploadedFile::fake()->image('random10.jpg')->size(10),
+            UploadedFile::fake()->image('random11.jpg')->size(10),
+            UploadedFile::fake()->image('random12.jpg')->size(10),
+            UploadedFile::fake()->image('random13.jpg')->size(10),
+            UploadedFile::fake()->image('random14.jpg')->size(10),
+            UploadedFile::fake()->image('random15.jpg')->size(10),
+        ];
+
+        for($cont = 1; $cont <= 15; $cont++)
+        {
+            $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+                'classe' => 'anexos',
+                'campo' => 'path',
+                'valor' => $anexos
+            ])->assertStatus(200);
+
+            $this->assertDatabaseHas('anexos', [
+                'nome_original' => Anexo::find($cont)->nome_original,
+                'pre_registro_id' => $id
+            ]);
+
+            Storage::disk('local')->assertExists(Anexo::find($cont)->path);
+        }
+
+        $this->assertEquals(Anexo::count(), 15);
+    }
+
+    /** @test */
+    public function cannot_upload_more_than_15_files_if_pj_by_ajax_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $id = $externo->preRegistros->first()->id;
+
+        $anexos = [
+            UploadedFile::fake()->image('random1.jpg')->size(10),
+            UploadedFile::fake()->image('random2.jpg')->size(10),
+            UploadedFile::fake()->image('random3.jpg')->size(10),
+            UploadedFile::fake()->image('random4.jpg')->size(10),
+            UploadedFile::fake()->image('random5.jpg')->size(10),
+            UploadedFile::fake()->image('random6.jpg')->size(10),
+            UploadedFile::fake()->image('random7.jpg')->size(10),
+            UploadedFile::fake()->image('random8.jpg')->size(10),
+            UploadedFile::fake()->image('random9.jpg')->size(10),
+            UploadedFile::fake()->image('random10.jpg')->size(10),
+            UploadedFile::fake()->image('random11.jpg')->size(10),
+            UploadedFile::fake()->image('random12.jpg')->size(10),
+            UploadedFile::fake()->image('random13.jpg')->size(10),
+            UploadedFile::fake()->image('random14.jpg')->size(10),
+            UploadedFile::fake()->image('random15.jpg')->size(10),
+            UploadedFile::fake()->image('random15.jpg')->size(10),
+        ];
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => $anexos
+        ])->assertSessionHasErrors(['valor']);
+
+        $this->assertDatabaseMissing('anexos', [
+            'id' => 1,
+            'pre_registro_id' => $id
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_if_pj_and_more_than_15_anexos_by_ajax_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $id = $externo->preRegistros->first()->id;
+
+        for($cont = 1; $cont <= 15; $cont++)
+        {
+            $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+                'classe' => 'anexos',
+                'campo' => 'path',
+                'valor' => [UploadedFile::fake()->image('random_' . $cont . '.jpg')->size(10)]
+            ])->assertStatus(200);
+
+            $this->assertDatabaseHas('anexos', [
+                'nome_original' => Anexo::find($cont)->nome_original,
+                'pre_registro_id' => $id
+            ]);
+
+            Storage::disk('local')->assertExists(Anexo::find($cont)->path);
+        }
+
+        for($cont = 1; $cont <= 15; $cont++)
+        {
+            $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+                'classe' => 'anexos',
+                'campo' => 'path',
+                'valor' => [UploadedFile::fake()->image('random_' . $cont . '.jpg')->size(10)]
+            ])->assertStatus(200);
+
+            $this->assertDatabaseHas('anexos', [
+                'nome_original' => Anexo::find($cont)->nome_original,
+                'pre_registro_id' => $id
+            ]);
+
+            Storage::disk('local')->assertExists(Anexo::find($cont)->path);
+        }
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->image('random_16.jpg')->size(10)]
+        ])->assertStatus(200);
+
+        $this->assertEquals(Anexo::count(), 15);
+    }
+
+    /** @test */
+    public function cannot_create_anexos_by_ajax_wrong_input_name_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $id = $externo->preRegistros->first()->id;
+        
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path_erro',
+            'valor' => [UploadedFile::fake()->image('random.jpg')]
+        ])->assertSessionHasErrors('campo');
+        
+        $this->assertDatabaseMissing('anexos', [
+            'nome_original' => 'random.jpg',
+            'pre_registro_id' => $id
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_anexos_by_ajax_without_classe_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $id = $externo->preRegistros->first()->id;
+        
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => '',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->image('random.jpg')]
+        ])->assertSessionHasErrors('classe');
+        
+        $this->assertDatabaseMissing('anexos', [
+            'nome_original' => 'random.jpg',
+            'pre_registro_id' => $id
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_anexos_by_ajax_wrong_classe_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $id = $externo->preRegistros->first()->id;
+        
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos_erro',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->image('random.jpg')]
+        ])->assertSessionHasErrors('classe');
+        
+        $this->assertDatabaseMissing('anexos', [
+            'nome_original' => 'random.jpg',
+            'pre_registro_id' => $id
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_anexos_by_ajax_without_campo_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $id = $externo->preRegistros->first()->id;
+        
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => '',
+            'valor' => [UploadedFile::fake()->image('random.jpg')]
+        ])->assertSessionHasErrors('campo');
+        
+        $this->assertDatabaseMissing('anexos', [
+            'nome_original' => 'random.jpg',
+            'pre_registro_id' => $id
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_anexos_by_ajax_without_type_file_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $id = $externo->preRegistros->first()->id;
+        
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => ['C://teste.jpg']
+        ])->assertSessionHasErrors('valor.0');
+        
+        $this->assertDatabaseMissing('anexos', [
+            'nome_original' => 'random.jpg',
+            'pre_registro_id' => $id
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_anexos_by_ajax_with_wrong_extension_file_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $extensoes = ['gif', 'txt', 'doc', 'docx', 'ppt', 'pptx', 'exe', 'php', 'xlsx', 'sql'];
+
+        foreach($extensoes as $extensao)
+        {
+            $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+                'classe' => 'anexos',
+                'campo' => 'path',
+                'valor' => [UploadedFile::fake()->create('random.' . $extensao)]
+            ])->assertSessionHasErrors('valor.0');
+
+            $this->assertDatabaseMissing('anexos', [
+                'pre_registro_id' => 1,
+                'nome_original' => 'random.' . $extensao
+            ]);
+        }
+
+        $this->assertEquals(Anexo::count(), 0);
+    }
+
+    /** @test */
+    public function cannot_create_anexos_by_ajax_with_size_more_than_5120_kb_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $id = $externo->preRegistros->first()->id;
+        
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')->size(5121)]
+        ])->assertSessionHasErrors('total');
+        
+        $this->assertDatabaseMissing('anexos', [
+            'nome_original' => 'random.pdf',
+            'pre_registro_id' => $id
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_anexos_by_ajax_with_size_more_than_5120_kb_if_zip_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $id = $externo->preRegistros->first()->id;
+        
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [
+                UploadedFile::fake()->create('random.pdf')->size(2500),
+                UploadedFile::fake()->create('random1.pdf')->size(2500),
+                UploadedFile::fake()->create('random2.pdf')->size(150),
+            ]
+        ])->assertSessionHasErrors('total');
+    }
+
+    /** @test */
+    public function cannot_create_anexos_by_ajax_without_type_array_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $id = $externo->preRegistros->first()->id;
+        
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')->size(2500)->path()
+        ])->assertSessionHasErrors('valor');
+    }
+
+    /** @test */
+    public function owner_can_delete_file_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
+        ])->assertOk();
+
+        Storage::disk('local')->assertExists(Anexo::find(1)->path);
+        $caminho = Anexo::find(1)->path;
+
+        $this->delete(route('externo.preregistro.anexo.excluir', ['id' => Anexo::find(1)->id, 'preRegistro' => 1]))->assertOk();
+
+        $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))
+        ->assertDontSee('random.pdf');
+
+        $this->assertDatabaseMissing('anexos', [
+            'pre_registro_id' => 1,
+            'nome_original' => 'random.pdf'
+        ]);
+
+        Storage::disk('local')->assertMissing($caminho);
+    }
+
+    /** @test */
+    public function log_is_generated_when_anexo_deleted_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
+        ])->assertOk();
+
+        Storage::disk('local')->assertExists(Anexo::find(1)->path);
+        $caminho = Anexo::find(1)->path;
+
+        $this->delete(route('externo.preregistro.anexo.excluir', ['id' => Anexo::find(1)->id, 'preRegistro' => 1]))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Contabilidade com cnpj '.$externo->cnpj.' realizou a operação para o Usuário Externo com cpf: ';
+        $txt .= $externo->preRegistros->first()->userExterno->cpf_cnpj.', excluiu o arquivo com a ID: 1 na solicitação de registro com a id: 1';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function owner_can_download_file_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
+        ])->assertOk();
+
+        Storage::disk('local')->assertExists(Anexo::find(1)->path);
+
+        $this->get(route('externo.preregistro.anexo.download', ['id' => Anexo::find(1)->id, 'preRegistro' => 1]))->assertOk();
+    }
+
+    /** @test */
+    public function not_owner_cannot_delete_file_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
+        ])->assertOk();
+
+        $pr = $externo->preRegistros->first();
+        $anexo = $pr->anexos->first();
+        Storage::disk('local')->assertExists($anexo->path);
+
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->delete(route('externo.preregistro.anexo.excluir', ['id' => $anexo->id, 'preRegistro' => 2]))->assertStatus(401);
+
+        $this->assertDatabaseHas('anexos', [
+            'path' => $anexo->path,
+            'nome_original' => $anexo->nome_original,
+            'pre_registro_id' => $pr->id
+        ]);
+
+        Storage::disk('local')->assertExists($anexo->path);
+    }
+
+    /** @test */
+    public function not_owner_cannot_download_file_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
+        ])->assertOk();
+
+        $anexo = $externo->preRegistros->first()->anexos->first();
+        Storage::disk('local')->assertExists($anexo->path);
+
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->get(route('externo.preregistro.anexo.download', ['id' => $anexo->id, 'preRegistro' => 2]))->assertStatus(401);
+    }
+
+    /** @test */
+    public function owner_cannot_delete_without_file_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->delete(route('externo.preregistro.anexo.excluir', ['id' => 1, 'preRegistro' => 1]))->assertStatus(401);
+    }
+
+    /** @test */
+    public function owner_cannot_download_without_file_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->get(route('externo.preregistro.anexo.download', ['id' => 1, 'preRegistro' => 1]))->assertStatus(401);
+    }
+
+    /** @test */
+    public function filled_campos_editados_anexos_when_form_is_submitted_when_status_aguardando_correcao_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $externo = $this->signInAsUserExterno('contabil');
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()->id
+        ])->makeHidden(['pre_registro_id', 'created_at', 'updated_at', 'id']);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        Anexo::find(1)->delete();
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
+        ])->assertOk();
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
+
+        $pr = PreRegistro::first();
+        $dados = Arr::except($dados, ['final', 'created_at', 'updated_at', 'deleted_at', 'pergunta']);
+
+        $arrayFinal = array_diff(array_keys($dados), array_keys(json_decode($pr->campos_espelho, true)));
+        $this->assertEquals($arrayFinal, array());
+        $this->assertEquals(json_decode($pr->campos_editados, true)['path'], 2);
+    }
 
     /** 
      * =======================================================================================================

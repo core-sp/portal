@@ -177,7 +177,8 @@ class PreRegistroRequest extends FormRequest
                 'cnpj_contabil' => $contabil->cnpj,
                 'nome_contabil' => $contabil->nome,
                 'email_contabil' => $contabil->email,
-                'nome_contato_contabil' => $contabil->nome_contato
+                'nome_contato_contabil' => $contabil->nome_contato,
+                'telefone_contabil' => $contabil->telefone,
             ]);
         }
     }

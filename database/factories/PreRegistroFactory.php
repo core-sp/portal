@@ -23,7 +23,7 @@ $factory->define(PreRegistro::class, function (Faker $faker) {
         'tipo_telefone' => mb_strtoupper(tipos_contatos()[0], 'UTF-8'),
         'opcional_celular' => mb_strtoupper(opcoes_celular()[1], 'UTF-8'),
         'user_externo_id' => UserExterno::count() > 0 ? UserExterno::count() : factory('App\UserExterno'),
-        'contabil_id' => Contabil::count() > 0 ? Contabil::count() : factory('App\Contabil'),
+        'contabil_id' => Contabil::count() > 0 ? Contabil::count() : factory('App\Contabil')->states('sem_login'),
         'idregional' => factory('App\Regional'),
         'idusuario' => factory('App\User'),
         'status' => PreRegistro::STATUS_CRIADO,
@@ -43,13 +43,14 @@ $factory->state(PreRegistro::class, 'low', function (Faker $faker) {
         'segmento' => segmentos()[$faker->numberBetween(0, $totalSegmentos)],
         'tipo_telefone' => tipos_contatos()[0],
         'opcional_celular' => opcoes_celular()[1],
-        'contabil_id' => Contabil::count() > 0 ? Contabil::count() : factory('App\Contabil')->states('low'),
+        'contabil_id' => Contabil::count() > 0 ? Contabil::count() : factory('App\Contabil')->states('sem_login', 'low'),
     ];
 });
 
 $factory->state(PreRegistro::class, 'pj', function (Faker $faker) {
+    $count = UserExterno::count();
     return [
-        'user_externo_id' => UserExterno::count() > 0 ? UserExterno::count() : factory('App\UserExterno')->states('pj'),
+        'user_externo_id' => ($count > 0) && !UserExterno::all()->get($count - 1)->isPessoaFisica() ? $count : factory('App\UserExterno')->states('pj'),
     ];
 });
 

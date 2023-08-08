@@ -124,6 +124,9 @@ class UserExternoSiteController extends Controller
     public function preRegistroView($preRegistro = null)
     {
         try{
+            if(isset($preRegistro) && !auth()->guard('contabil')->check())
+                return redirect()->route('externo.dashboard');
+
             $pr = isset($preRegistro) && auth()->guard('contabil')->check() ? 
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro) :
             auth()->guard('user_externo')->user();
@@ -175,6 +178,9 @@ class UserExternoSiteController extends Controller
             if(($request->checkPreRegistro != 'on') && auth()->guard('user_externo')->check())
                 return redirect()->route('externo.preregistro.view');
 
+            if(isset($preRegistro) && !auth()->guard('contabil')->check())
+                return redirect()->route('externo.dashboard');
+
             $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
@@ -214,6 +220,9 @@ class UserExternoSiteController extends Controller
     public function inserirPreRegistroAjax(PreRegistroAjaxRequest $request, $preRegistro = null)
     {
         try{
+            if(isset($preRegistro) && !auth()->guard('contabil')->check())
+                return redirect()->route('externo.dashboard');
+
             $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
@@ -237,6 +246,9 @@ class UserExternoSiteController extends Controller
     public function verificaPendenciaPreRegistro(PreRegistroRequest $request, $preRegistro = null)
     {
         try{
+            if(isset($preRegistro) && !auth()->guard('contabil')->check())
+                return redirect()->route('externo.dashboard');
+
             $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
@@ -286,6 +298,9 @@ class UserExternoSiteController extends Controller
     public function inserirPreRegistro(PreRegistroRequest $request, $preRegistro = null)
     {
         try{
+            if(isset($preRegistro) && !auth()->guard('contabil')->check())
+                return redirect()->route('externo.dashboard');
+
             $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
@@ -313,6 +328,9 @@ class UserExternoSiteController extends Controller
     public function preRegistroAnexoDownload($id, $preRegistro = null)
     {
         try{
+            if(isset($preRegistro) && !auth()->guard('contabil')->check())
+                return redirect()->route('externo.dashboard');
+
             $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
@@ -339,6 +357,9 @@ class UserExternoSiteController extends Controller
     public function preRegistroAnexoExcluir($id, $preRegistro = null)
     {
         try{
+            if(isset($preRegistro) && !auth()->guard('contabil')->check())
+                return redirect()->route('externo.dashboard');
+            
             $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();

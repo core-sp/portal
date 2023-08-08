@@ -74,7 +74,7 @@ $factory->state(PreRegistroCnpj::class, 'request', function (Faker $faker) {
     factory('App\Anexo')->states('pre_registro')->create();
 
     return [
-        'pre_registro_id' => factory('App\PreRegistro')->states('low')->create([
+        'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'low')->create([
             'user_externo_id' => factory('App\UserExterno')->create([
                 'cpf_cnpj' => '12434268000110'
             ])
@@ -90,7 +90,7 @@ $factory->state(PreRegistroCnpj::class, 'request_mesmo_endereco', function (Fake
     factory('App\Anexo')->states('pre_registro')->create();
 
     return [
-        'pre_registro_id' => factory('App\PreRegistro')->states('low')->create([
+        'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'low')->create([
             'user_externo_id' => factory('App\UserExterno')->create([
                 'cpf_cnpj' => '12434268000110'
             ])
