@@ -208,6 +208,7 @@ class TermoConsentimentoTest extends TestCase
     }
 
     /** @test */
+    /** @test */
     public function view_pdf_termo()
     {
         $this->get(route('termo.consentimento.pdf'))
