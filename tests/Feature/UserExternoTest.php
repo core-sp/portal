@@ -328,7 +328,7 @@ class UserExternoTest extends TestCase
         ]);
 
         // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
-        $this->get(route('externo.verifica-email', ['tipo' => 'user_externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]));
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $dados['cpf_cnpj'], 
             'ativo' => 1
@@ -366,7 +366,7 @@ class UserExternoTest extends TestCase
         ]);
 
         // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
-        $this->get(route('externo.verifica-email', ['tipo' => 'user_externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]));
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'], 
             'ativo' => 1
@@ -403,7 +403,7 @@ class UserExternoTest extends TestCase
         ]);
 
         // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
-        $this->get(route('externo.verifica-email', ['tipo' => 'user_externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]));
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'], 
             'ativo' => 1
@@ -463,7 +463,7 @@ class UserExternoTest extends TestCase
 
         UserExterno::first()->update(['updated_at' => Carbon::today()->subDays(2)]);
         
-        $this->get(route('externo.verifica-email', ['tipo' => 'user_externo', 'token'=> UserExterno::first()->verify_token]))
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]))
         ->assertRedirect(route('externo.login'));
 
         $this->get(route('externo.login'))
@@ -495,7 +495,7 @@ class UserExternoTest extends TestCase
             'ativo' => 0
         ]);
         
-        $this->get(route('externo.verifica-email', ['tipo' => 'user_externo', 'token'=> UserExterno::first()->verify_token . '5']))
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token . '5']))
         ->assertStatus(302);
 
         $this->get(route('externo.login'))
@@ -527,7 +527,7 @@ class UserExternoTest extends TestCase
             'ativo' => 0
         ]);
         
-        $this->get(route('externo.verifica-email', ['tipo' => 'user_externos', 'token'=> UserExterno::first()->verify_token]))
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externos', 'token'=> UserExterno::first()->verify_token]))
         ->assertNotFound();
         
         $this->assertDatabaseHas('users_externo', [
@@ -559,7 +559,7 @@ class UserExternoTest extends TestCase
         ]);
 
         UserExterno::first()->update(['updated_at' => Carbon::today()->subDays(2)]);
-        $this->get(route('externo.verifica-email', ['tipo' => 'user_externo', 'token'=> UserExterno::first()->verify_token]))
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]))
         ->assertRedirect(route('externo.login'));
 
         $this->get(route('externo.login'))
@@ -586,7 +586,7 @@ class UserExternoTest extends TestCase
         ]);
 
         // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
-        $this->get(route('externo.verifica-email', ['tipo' => 'user_externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]));
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => '36982299007', 
             'ativo' => 1
@@ -655,7 +655,7 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.cadastro'))->assertOk();
         $this->post(route('externo.cadastro.submit'), $dados);
 
-        $this->get(route('externo.verifica-email', ['tipo' => 'user_externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -1940,7 +1940,7 @@ class UserExternoTest extends TestCase
             'aceite' => 1
         ]);
 
-        $this->get(route('externo.verifica-email', ['tipo' => 'user_externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]));
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $dados['cpf_cnpj'], 
             'nome' => $dados['nome'],
@@ -1980,7 +1980,7 @@ class UserExternoTest extends TestCase
             'deleted_at' => null
         ]);
 
-        $this->get(route('externo.verifica-email', ['tipo' => 'user_externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]));
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $dados['cpf_cnpj'], 
             'ativo' => 1,
