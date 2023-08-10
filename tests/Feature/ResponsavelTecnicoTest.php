@@ -101,7 +101,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $preRegistroCnpj_1 = factory('App\PreRegistroCnpj')->create([
             'dt_inicio_atividade' => '2000-03-10',
-            'pre_registro_id' => factory('App\PreRegistro')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj')->create([
                 'user_externo_id' => factory('App\UserExterno')->create([
                     'cpf_cnpj' => '67779004000190'
                 ])
@@ -111,7 +111,7 @@ class ResponsavelTecnicoTest extends TestCase
         $preRegistroCnpj_2 = factory('App\PreRegistroCnpj')->create([
             'dt_inicio_atividade' => '2010-10-15',
             'responsavel_tecnico_id' => $preRegistroCnpj_1->responsavel_tecnico_id,
-            'pre_registro_id' => factory('App\PreRegistro')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj')->create([
                 'contabil_id' => $preRegistroCnpj_1->preRegistro->contabil_id,
                 'user_externo_id' => factory('App\UserExterno')->create([
                     'cpf_cnpj' => '56821972000100'
@@ -148,7 +148,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $preRegistroCnpj_1 = factory('App\PreRegistroCnpj')->create([
             'dt_inicio_atividade' => '2000-03-10',
-            'pre_registro_id' => factory('App\PreRegistro')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj')->create([
                 'user_externo_id' => factory('App\UserExterno')->create([
                     'cpf_cnpj' => '67779004000190'
                 ])
@@ -158,7 +158,7 @@ class ResponsavelTecnicoTest extends TestCase
         $preRegistroCnpj_2 = factory('App\PreRegistroCnpj')->create([
             'dt_inicio_atividade' => '2010-10-15',
             'responsavel_tecnico_id' => $preRegistroCnpj_1->responsavel_tecnico_id,
-            'pre_registro_id' => factory('App\PreRegistro')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj')->create([
                 'contabil_id' => $preRegistroCnpj_1->preRegistro->contabil_id,
                 'user_externo_id' => factory('App\UserExterno')->create([
                     'cpf_cnpj' => '56821972000100'
@@ -1487,7 +1487,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $preRegistroCnpj_1 = factory('App\PreRegistroCnpj')->create([
             'dt_inicio_atividade' => '2000-03-10',
-            'pre_registro_id' => factory('App\PreRegistro')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj')->create([
                 'user_externo_id' => factory('App\UserExterno')->create([
                     'cpf_cnpj' => '67779004000190'
                 ])
@@ -1497,7 +1497,7 @@ class ResponsavelTecnicoTest extends TestCase
         $preRegistroCnpj_2 = factory('App\PreRegistroCnpj')->create([
             'dt_inicio_atividade' => '2010-10-15',
             'responsavel_tecnico_id' => $preRegistroCnpj_1->responsavel_tecnico_id,
-            'pre_registro_id' => factory('App\PreRegistro')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj')->create([
                 'contabil_id' => $preRegistroCnpj_1->preRegistro->contabil_id,
                 'user_externo_id' => factory('App\UserExterno')->create([
                     'cpf_cnpj' => '56821972000100'
@@ -1535,7 +1535,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $preRegistroCnpj_1 = factory('App\PreRegistroCnpj')->create([
             'dt_inicio_atividade' => '2000-03-10',
-            'pre_registro_id' => factory('App\PreRegistro')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj')->create([
                 'user_externo_id' => factory('App\UserExterno')->create([
                     'cpf_cnpj' => '67779004000190'
                 ])
@@ -1545,7 +1545,7 @@ class ResponsavelTecnicoTest extends TestCase
         $preRegistroCnpj_2 = factory('App\PreRegistroCnpj')->create([
             'dt_inicio_atividade' => '2010-10-15',
             'responsavel_tecnico_id' => $preRegistroCnpj_1->responsavel_tecnico_id,
-            'pre_registro_id' => factory('App\PreRegistro')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj')->create([
                 'contabil_id' => $preRegistroCnpj_1->preRegistro->contabil_id,
                 'user_externo_id' => factory('App\UserExterno')->create([
                     'cpf_cnpj' => '56821972000100'
