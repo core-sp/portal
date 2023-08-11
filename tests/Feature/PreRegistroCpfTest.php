@@ -3148,7 +3148,7 @@ class PreRegistroCpfTest extends TestCase
         }
 
         $this->assertDatabaseHas('pre_registros', [
-            'justificativa' => json_encode($justificativas, JSON_FORCE_OBJECT)
+            'justificativa' => json_encode($justificativas, JSON_FORCE_OBJECT),
         ]);
     }
 
@@ -3675,7 +3675,35 @@ class PreRegistroCpfTest extends TestCase
 
         $this->assertDatabaseHas('pre_registros', [
             'status' => PreRegistro::STATUS_CORRECAO,
-            'idusuario' => $admin->idusuario
+            'idusuario' => $admin->idusuario,
+            'historico_justificativas' => $preRegistroCpf->fresh()->preRegistro->historico_justificativas
+        ]);
+    }
+
+    /** @test */
+    public function can_update_historico_justificativas_when_status_enviar_para_correcao()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->states('justificado')->create();
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+        $preRegistroCpf->fresh()->preRegistro->setHistoricoStatus();
+
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'corrigir'])
+        ->assertRedirect(route('preregistro.index'));
+
+        $hist_justificativas = $preRegistroCpf->fresh()->preRegistro->getHistoricoJustificativas();
+        $just_1 = $hist_justificativas[0];
+        $just_2 = $hist_justificativas[1];
+        
+        $this->get(route('preregistro.view', $preRegistroCpf->pre_registro_id))
+        ->assertSee('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+        ->assertSeeInOrder($just_1)
+        ->assertSeeInOrder($just_2);
+
+        $this->assertDatabaseHas('pre_registros', [
+            'status' => PreRegistro::STATUS_CORRECAO,
+            'historico_justificativas' => $preRegistroCpf->fresh()->preRegistro->historico_justificativas,
         ]);
     }
 
@@ -3837,6 +3865,41 @@ class PreRegistroCpfTest extends TestCase
         $this->assertDatabaseMissing('anexos', [
             'path' => $anexo->path,
             'pre_registro_id' => $anexo->pre_registro_id
+        ]);
+    }
+
+    /** @test */
+    public function can_update_historico_justificativas_with_status_negado()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->states('justificado')->create();
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+        $preRegistroCpf->fresh()->preRegistro->setHistoricoStatus();
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+            'acao' => 'justificar',
+            'campo' => 'negado',
+            'valor' => $faker->text(500)
+        ])->assertStatus(200); 
+
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'negar'])
+        ->assertRedirect(route('preregistro.index'));
+        
+        $hist_justificativas = $preRegistroCpf->fresh()->preRegistro->getHistoricoJustificativas();
+        $just_1 = $hist_justificativas[0];
+        $just_2 = $hist_justificativas[1];
+
+        $this->get(route('preregistro.view', $preRegistroCpf->pre_registro_id))
+        ->assertSee('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+        ->assertSeeInOrder($just_1)
+        ->assertSeeInOrder($just_2);
+
+        $this->assertDatabaseHas('pre_registros', [
+            'status' => PreRegistro::STATUS_NEGADO,
+            'idusuario' => $admin->idusuario,
+            'historico_justificativas' => $preRegistroCpf->fresh()->preRegistro->historico_justificativas,
         ]);
     }
 

@@ -1996,7 +1996,7 @@ class PreRegistroTest extends TestCase
         $externo = $this->signInAsUserExterno();
 
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-        $dados['pergunta'] = $faker->text(400);
+        $dados['pergunta'] = $faker->text(500);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
@@ -2007,12 +2007,50 @@ class PreRegistroTest extends TestCase
         $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-        $dados['pergunta'] = $faker->text(400);
+        $dados['pergunta'] = $faker->text(500);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('pergunta');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_pf_with_status_aguardando_correcao_without_update_input()
+    {
+        $externo = $this->signInAsUserExterno();
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados);
+        $this->put(route('externo.inserir.preregistro'), $dados);
+        $externo->preRegistro->update(['status' => PreRegistro::STATUS_CORRECAO]);
+
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertRedirect(route('externo.preregistro.view'));
+
+        $this->get(route('externo.preregistro.view'))
+        ->assertSee('<i class="fas fa-times"></i> Formulário não foi enviado para análise da correção, pois precisa editar dados(s) conforme justificativa(s).');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_pj_with_status_aguardando_correcao_without_update_input()
+    {
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados);
+        $this->put(route('externo.inserir.preregistro'), $dados);
+        $externo->preRegistro->update(['status' => PreRegistro::STATUS_CORRECAO]);
+
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertRedirect(route('externo.preregistro.view'));
+
+        $this->get(route('externo.preregistro.view'))
+        ->assertSee('<i class="fas fa-times"></i> Formulário não foi enviado para análise da correção, pois precisa editar dados(s) conforme justificativa(s).');
     }
 
     /** @test */
@@ -2969,982 +3007,1046 @@ class PreRegistroTest extends TestCase
         }
     }
 
-    // /** @test */
-    // public function can_update_table_pre_registros_by_ajax_with_status_aguardando_correcao_or_sendo_elaborado()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     $preRegistro = factory('App\PreRegistro')->states('sendo_elaborado')->create([
-    //         'contabil_id' => null,
-    //     ]);
-
-    //     foreach([PreRegistro::STATUS_CORRECAO, PreRegistro::STATUS_CRIADO] as $status)
-    //     {
-    //         $preRegistro->update(['status' => $status]);
-    //         foreach($preRegistro->toArray() as $key => $value)
-    //             $this->post(route('externo.inserir.preregistro.ajax'), [
-    //                 'classe' => 'preRegistro',
-    //                 'campo' => $key,
-    //                 'valor' => ''
-    //             ])->assertStatus(200);
-    //     }
-    // }
-
-    // /** 
-    //  * =======================================================================================================
-    //  * TESTES PRE-REGISTRO VIA SUBMIT - CLIENT
-    //  * =======================================================================================================
-    //  */
-
-    // /** @test */
-    // public function view_message_errors_when_submit()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));
-    //     $this->put(route('externo.verifica.inserir.preregistro'), ['cnpj_contabil' => '46217816000172'])->assertStatus(302);
-
-    //     $errors = session('errors');
-    //     $keys = array();
-    //     foreach($errors->messages() as $key => $value)
-    //         array_push($keys, '<button class="btn btn-sm btn-link erroPreRegistro" value="' . $key . '">');
-
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-    //     ->assertSeeText('Foram encontrados ' . count($errors->messages()) . ' erros:')
-    //     ->assertSeeInOrder($keys);
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));
-    //     $this->put(route('externo.verifica.inserir.preregistro'), ['cnpj_contabil' => '46217816000172'])->assertStatus(302);
-
-    //     $errors = session('errors');
-    //     $keys = array();
-    //     foreach($errors->messages() as $key => $value)
-    //         array_push($keys, '<button class="btn btn-sm btn-link erroPreRegistro" value="' . $key . '">');
-
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-    //     ->assertSeeText('Foram encontrados ' . count($errors->messages()) . ' erros:')
-    //     ->assertSeeInOrder($keys);
-    // }
-
-    // /** @test */
-    // public function view_message_errors_when_submit_with_anexos()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));
-    //     $anexo = factory('App\Anexo')->states('pre_registro')->create();
-
-    //     $this->put(route('externo.verifica.inserir.preregistro'), [])->assertStatus(302);
-    //     $errors = session('errors');
-    //     $keys = array();
-    //     foreach($errors->messages() as $key => $value)
-    //         array_push($keys, '<button class="btn btn-sm btn-link erroPreRegistro" value="' . $key . '">');
-
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-    //     ->assertSeeText('Foram encontrados ' . count($errors->messages()) . ' erros:')
-    //     ->assertSeeInOrder($keys);
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));
-    //     $anexo = factory('App\Anexo')->states('pre_registro')->create();
-
-    //     $this->put(route('externo.verifica.inserir.preregistro'), [])->assertStatus(302);
-    //     $errors = session('errors');
-    //     $keys = array();
-    //     foreach($errors->messages() as $key => $value)
-    //         array_push($keys, '<button class="btn btn-sm btn-link erroPreRegistro" value="' . $key . '">');
-
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-    //     ->assertSeeText('Foram encontrados ' . count($errors->messages()) . ' erros:')
-    //     ->assertSeeInOrder($keys);
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_without_anexo()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     PreRegistro::first()->anexos()->delete();
-
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();        
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('path');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     PreRegistro::all()->get(1)->anexos()->delete();
-
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();        
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('path');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_wrong_value_segmento()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['segmento'] = 'Qualquer coisa';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('segmento');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['segmento'] = 'Qualquer coisa';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('segmento');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_idregional_non_exists()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['idregional'] = 55;
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('idregional');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['idregional'] = 55;
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('idregional');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_cep_more_than_9_chars()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['cep'] = '0123456789';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('cep');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['cep'] = '0123456789';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('cep');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_cep_with_format_invalid()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-        
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['cep'] = '0454-4555';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('cep');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['cep'] = '0454-4555';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('cep');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_bairro_less_than_4_chars()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['bairro'] = 'bai';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('bairro');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['bairro'] = 'bai';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('bairro');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_bairro_more_than_191_chars()
-    // {
-    //     $faker = \Faker\Factory::create();
-
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['bairro'] = $faker->text(500);
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('bairro');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['bairro'] = $faker->text(500);
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('bairro');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_logradouro_less_than_4_chars()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['logradouro'] = 'log';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('logradouro');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['logradouro'] = 'log';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('logradouro');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_logradouro_more_than_191_chars()
-    // {
-    //     $faker = \Faker\Factory::create();
-
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['logradouro'] = $faker->text(500);
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('logradouro');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['logradouro'] = $faker->text(500);
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('logradouro');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_numero_more_than_10_chars()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['numero'] = '01234567890';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('numero');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['numero'] = '01234567890';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('numero');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_complemento_more_than_50_chars()
-    // {
-    //     $faker = \Faker\Factory::create();
-
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['complemento'] = $faker->text(200);
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('complemento');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['complemento'] = $faker->text(200);
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('complemento');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_cidade_less_than_4_chars()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['cidade'] = 'cid';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('cidade');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['cidade'] = 'cid';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('cidade');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_cidade_more_than_191_chars()
-    // {
-    //     $faker = \Faker\Factory::create();
-
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['cidade'] = $faker->text(500);
-
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('cidade');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['cidade'] = $faker->text(500);
-
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('cidade');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_cidade_with_numbers()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['cidade'] = 'Sã0 Paulo';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('cidade');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['cidade'] = 'Sã0 Paulo';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('cidade');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_uf_wrong_value()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['uf'] = 'SSP';
-
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('uf');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['uf'] = 'SSP';
-
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('uf');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_tipo_telefone_wrong_value()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['tipo_telefone'] = 'SSP';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('tipo_telefone');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['tipo_telefone'] = 'SSP';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('tipo_telefone');
-    // }
+    /** @test */
+    public function can_update_table_pre_registros_by_ajax_with_status_aguardando_correcao_or_sendo_elaborado_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $preRegistro = factory('App\PreRegistro')->states('sendo_elaborado')->create();
+
+        foreach([PreRegistro::STATUS_CORRECAO, PreRegistro::STATUS_CRIADO] as $status)
+        {
+            $preRegistro->update(['status' => $status]);
+            foreach($preRegistro->toArray() as $key => $value)
+                $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+                    'classe' => 'preRegistro',
+                    'campo' => $key,
+                    'valor' => ''
+                ])->assertStatus(200);
+        }
+    }
+
+    /** @test */
+    public function view_message_errors_when_submit_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $dados['segmento'] = 'BláBlá';
+
+        $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))->assertOk();
+
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertRedirect(route('externo.inserir.preregistro.view', ['preRegistro' => 1]));
+
+        $errors = session('errors');
+        $keys = array();
+        foreach($errors->messages() as $key => $value)
+            array_push($keys, '<button class="btn btn-sm btn-link erroPreRegistro" value="' . $key . '">');
+
+        $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))
+        ->assertSeeText('Foram encontrados ' . count($errors->messages()) . ' erros:')
+        ->assertSeeInOrder($keys);
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $dados['segmento'] = 'BláBlá';
+
+        $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 2]))->assertOk();
+
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 2]), $dados)
+        ->assertRedirect(route('externo.inserir.preregistro.view', ['preRegistro' => 2]));
+
+        $errors = session('errors');
+        $keys = array();
+        foreach($errors->messages() as $key => $value)
+            array_push($keys, '<button class="btn btn-sm btn-link erroPreRegistro" value="' . $key . '">');
+
+        $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 2]))
+        ->assertSeeText('Foram encontrados ' . count($errors->messages()) . ' erros:')
+        ->assertSeeInOrder($keys);
+    }
+
+    /** @test */
+    public function view_message_errors_when_submit_with_anexos_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+
+        $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))->assertOk();
+
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), [])
+        ->assertRedirect(route('externo.inserir.preregistro.view', ['preRegistro' => 1]));
+
+        $errors = session('errors');
+        $keys = array();
+        foreach($errors->messages() as $key => $value)
+            array_push($keys, '<button class="btn btn-sm btn-link erroPreRegistro" value="' . $key . '">');
+
+        $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))
+        ->assertSeeText('Foram encontrados ' . count($errors->messages()) . ' erros:')
+        ->assertSeeInOrder($keys);
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+
+        $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 2]))->assertOk();
+
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 2]), [])
+        ->assertRedirect(route('externo.inserir.preregistro.view', ['preRegistro' => 2]));
+
+        $errors = session('errors');
+        $keys = array();
+        foreach($errors->messages() as $key => $value)
+            array_push($keys, '<button class="btn btn-sm btn-link erroPreRegistro" value="' . $key . '">');
+
+        $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 2]))
+        ->assertSeeText('Foram encontrados ' . count($errors->messages()) . ' erros:')
+        ->assertSeeInOrder($keys);
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_without_anexo_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::first()->anexos()->delete();
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('path');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        PreRegistro::find(3)->anexos()->delete();
+        
+        $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 3]))->assertOk();
+
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('path');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_wrong_value_segmento_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['segmento'] = 'Qualquer coisa';
+                
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('segmento');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['segmento'] = 'Qualquer coisa';
+                
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('segmento');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_idregional_non_exists_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['idregional'] = 55;
+                
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('idregional');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['idregional'] = 55;
+                
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('idregional');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_cep_more_than_9_chars_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['cep'] = '0123456789';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('cep');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['cep'] = '0123456789';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('cep');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_cep_with_format_invalid_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['cep'] = '0454-4555';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('cep');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['cep'] = '0454-4555';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('cep');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_bairro_less_than_4_chars_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['bairro'] = 'bai';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('bairro');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['bairro'] = 'bai';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('bairro');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_bairro_more_than_191_chars_by_contabilidade()
+    {
+        $faker = \Faker\Factory::create();
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['bairro'] = $faker->text(500);
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('bairro');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['bairro'] = $faker->text(500);
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('bairro');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_logradouro_less_than_4_chars_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['logradouro'] = 'log';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('logradouro');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['logradouro'] = 'log';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('logradouro');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_logradouro_more_than_191_chars_by_contabilidade()
+    {
+        $faker = \Faker\Factory::create();
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['logradouro'] = $faker->text(500);
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('logradouro');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['logradouro'] = $faker->text(500);
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('logradouro');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_numero_more_than_10_chars_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['numero'] = '01234567890';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('numero');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['numero'] = '01234567890';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('numero');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_complemento_more_than_50_chars_by_contabilidade()
+    {
+        $faker = \Faker\Factory::create();
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['complemento'] = $faker->text(200);
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('complemento');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['complemento'] = $faker->text(200);
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('complemento');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_cidade_less_than_4_chars_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['cidade'] = 'cid';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('cidade');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['cidade'] = 'cid';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('cidade');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_cidade_more_than_191_chars_by_contabilidade()
+    {
+        $faker = \Faker\Factory::create();
+        $externo = $this->signInAsUserExterno('contabil');
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_telefone_less_than_14_chars()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['telefone'] = '(11) 123456-7';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('telefone');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['telefone'] = '(11) 123456-7';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('telefone');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_telefone_more_than_15_chars_and_value_wrong()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['telefone'] = '(11) 123456-7456';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('telefone');
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['cidade'] = $faker->text(500);
+
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('cidade');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['cidade'] = $faker->text(500);
+
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('cidade');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_cidade_with_numbers_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
 
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['telefone'] = '(11) 123456-7456';
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['cidade'] = 'Sã0 Paulo';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('cidade');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['cidade'] = 'Sã0 Paulo';
         
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('telefone');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_opcional_celular_value_wrong()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = ['KKKKKK', 'SMS'];
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('opcional_celular');
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('cidade');
+    }
 
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = ['KKKKKK', 'SMS'];
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('opcional_celular');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_opcional_celular_equals()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = ['SMS', 'SMS'];
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('opcional_celular.*');
+    /** @test */
+    public function cannot_submit_pre_registro_with_uf_wrong_value_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
 
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = ['SMS', 'SMS'];
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('opcional_celular.*');
-    // }
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['uf'] = 'SSP';
+
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('uf');
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_opcional_celular_not_type_array()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = 'SMS';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('opcional_celular');
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['uf'] = 'SSP';
 
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('uf');
+    }
 
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = 'SMS';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('opcional_celular');
-    // }
+    /** @test */
+    public function cannot_submit_pre_registro_with_tipo_telefone_wrong_value_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_empty_telefone_optional_if_tipo_telefone_optional_filled()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = null;
-    //     $dados['tipo_telefone_1'] = tipos_contatos()[0];
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['tipo_telefone'] = 'SSP';
         
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('telefone_1');
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('tipo_telefone');
 
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = null;
-    //     $dados['tipo_telefone_1'] = tipos_contatos()[0];
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['tipo_telefone'] = 'SSP';
         
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('telefone_1');
-    // }
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('tipo_telefone');
+    }
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_empty_tipo_telefone_optional_if_telefone_optional_filled()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_submit_pre_registro_with_telefone_less_than_14_chars_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
 
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = null;
-    //     $dados['telefone_1'] = '(11) 99898-8963';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('tipo_telefone_1');
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = null;
-    //     $dados['telefone_1'] = '(11) 99898-8963';
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['telefone'] = '(11) 123456-7';
         
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('tipo_telefone_1');
-    // }
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('telefone');
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_tipo_telefone_optional_wrong_value()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = null;
-    //     $dados['telefone_1'] = '(11) 99898-8963';
-    //     $dados['tipo_telefone_1'] = 'KKKKKK';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['telefone'] = '(11) 123456-7';
         
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('tipo_telefone_1');
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('telefone');
+    }
 
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = null;
-    //     $dados['telefone_1'] = '(11) 99898-8963';
-    //     $dados['tipo_telefone_1'] = 'KKKKKK';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('tipo_telefone_1');
-    // }
+    /** @test */
+    public function cannot_submit_pre_registro_with_telefone_more_than_15_chars_and_value_wrong_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_opcional_celular_1_wrong_value()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['opcional_celular_1'] = ['KKKKKK', 'SMS'];
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['telefone'] = '(11) 123456-7456';
         
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();   
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('opcional_celular_1');
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('telefone');
 
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['opcional_celular_1'] = ['KKKKKK', 'SMS'];
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['telefone'] = '(11) 123456-7456';
         
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();   
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('opcional_celular_1');
-    // }
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('telefone');
+    }
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_opcional_celular_1_equals()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_submit_pre_registro_with_opcional_celular_value_wrong_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
 
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = null;
-    //     $dados['opcional_celular_1'] = ['SMS', 'SMS'];
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('opcional_celular_1.*');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = null;
-    //     $dados['opcional_celular_1'] = ['SMS', 'SMS'];
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['opcional_celular'] = ['KKKKKK', 'SMS'];
         
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('opcional_celular_1.*');
-    // }
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('opcional_celular');
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_opcional_celular_1_not_type_array()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = null;
-    //     $dados['opcional_celular_1'] = 'SMS';
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['opcional_celular'] = ['KKKKKK', 'SMS'];
         
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('opcional_celular_1');
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('opcional_celular');
+    }
 
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+    /** @test */
+    public function cannot_submit_pre_registro_with_opcional_celular_equals_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
 
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = null;
-    //     $dados['opcional_celular_1'] = 'SMS';
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('opcional_celular_1');
-    // }
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_telefone_optional_less_than_14_chars()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = null;
-    //     $dados['telefone_1'] = '(11) 9888-322';
-    //     $dados['tipo_telefone_1'] = tipos_contatos()[0];
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['opcional_celular'] = ['SMS', 'SMS'];
         
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('telefone_1');
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('opcional_celular.*');
 
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = null;
-    //     $dados['telefone_1'] = '(11) 9888-322';
-    //     $dados['tipo_telefone_1'] = tipos_contatos()[0];
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['opcional_celular'] = ['SMS', 'SMS'];
         
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('telefone_1');
-    // }
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('opcional_celular.*');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_opcional_celular_not_type_array_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_telefone_optional_more_than_15_chars_and_wrong_value()
-    // {
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = null;
-    //     $dados['telefone_1'] = '(112) 988886-2233';
-    //     $dados['tipo_telefone_1'] = tipos_contatos()[0];
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['opcional_celular'] = 'SMS';
         
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('telefone_1');
-
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['opcional_celular'] = null;
-    //     $dados['telefone_1'] = '(112) 988886-2233';
-    //     $dados['tipo_telefone_1'] = tipos_contatos()[0];
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('opcional_celular');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['opcional_celular'] = 'SMS';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('opcional_celular');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_empty_telefone_optional_if_tipo_telefone_optional_filled_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['opcional_celular'] = null;
+        $dados['tipo_telefone_1'] = tipos_contatos()[0];
         
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-       
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('telefone_1');
-    // }
-
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_pergunta_more_than_191_chars()
-    // {
-    //     $faker = \Faker\Factory::create();
-
-    //     // PF
-    //     $externo = $this->signInAsUserExterno();
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('telefone_1');
 
-    //     $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dados['pergunta'] = $faker->text(400);
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('pergunta');
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['opcional_celular'] = null;
+        $dados['tipo_telefone_1'] = tipos_contatos()[0];
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('telefone_1');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_empty_tipo_telefone_optional_if_telefone_optional_filled_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
 
-    //     // PJ
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-    //     $dados['pergunta'] = $faker->text(400);
-        
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['opcional_celular'] = null;
+        $dados['telefone_1'] = '(11) 99898-8963';
         
-    //     $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('pergunta');
-    // }
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('tipo_telefone_1');
 
-    // /** @test */
-    // public function filled_campos_editados_pre_registro_pf_when_form_is_submitted_when_status_aguardando_correcao()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     factory('App\Regional')->create();
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['opcional_celular'] = null;
+        $dados['telefone_1'] = '(11) 99898-8963';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('tipo_telefone_1');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_tipo_telefone_optional_wrong_value_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
 
-    //     $dados = ['idregional' => 3, 'segmento' => segmentos()[7], 'cep' => '01234-050', 'logradouro' => 'Rua outro teste', 'numero' => '659',
-    //         'complemento' => 'fundos', 'bairro' => 'Bairro teste', 'cidade' => 'Osasco', 'uf' => 'SC', 'telefone' => '(12) 00000-0000',
-    //         'tipo_telefone' => tipos_contatos()[1], 'opcional_celular' => opcoes_celular()[1], 'telefone_1' => '(11) 11111-0000', 
-    //         'tipo_telefone_1' => tipos_contatos()[0], 'opcional_celular_1' => opcoes_celular()[1]];
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
-    //     $preRegistroCpf = factory('App\PreRegistroCpf')->states('justificado')->create();
-    //     $dadosTotais = factory('App\PreRegistroCpf')->states('request')->make()->final;
-    //     $dadosTotais["opcional_celular_1"] = ["SMS"];
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['opcional_celular'] = null;
+        $dados['telefone_1'] = '(11) 99898-8963';
+        $dados['tipo_telefone_1'] = 'KKKKKK';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('tipo_telefone_1');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['opcional_celular'] = null;
+        $dados['telefone_1'] = '(11) 99898-8963';
+        $dados['tipo_telefone_1'] = 'KKKKKK';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('tipo_telefone_1');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_opcional_celular_1_wrong_value_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['opcional_celular_1'] = ['KKKKKK', 'SMS'];
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('opcional_celular_1');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['opcional_celular_1'] = ['KKKKKK', 'SMS'];
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('opcional_celular_1');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_opcional_celular_1_equals_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['opcional_celular'] = null;
+        $dados['opcional_celular_1'] = ['SMS', 'SMS'];
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('opcional_celular_1.*');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['opcional_celular'] = null;
+        $dados['opcional_celular_1'] = ['SMS', 'SMS'];
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('opcional_celular_1.*');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_opcional_celular_1_not_type_array_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['opcional_celular'] = null;
+        $dados['opcional_celular_1'] = 'SMS';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('opcional_celular_1');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['opcional_celular'] = null;
+        $dados['opcional_celular_1'] = 'SMS';
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('opcional_celular_1');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_telefone_optional_less_than_14_chars_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['opcional_celular'] = null;
+        $dados['telefone_1'] = '(11) 9888-322';
+        $dados['tipo_telefone_1'] = tipos_contatos()[0];
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('telefone_1');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['opcional_celular'] = null;
+        $dados['telefone_1'] = '(11) 9888-322';
+        $dados['tipo_telefone_1'] = tipos_contatos()[0];
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('telefone_1');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_telefone_optional_more_than_15_chars_and_wrong_value_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['opcional_celular'] = null;
+        $dados['telefone_1'] = '(112) 988886-2233';
+        $dados['tipo_telefone_1'] = tipos_contatos()[0];
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('telefone_1');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['opcional_celular'] = null;
+        $dados['telefone_1'] = '(112) 988886-2233';
+        $dados['tipo_telefone_1'] = tipos_contatos()[0];
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('telefone_1');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_pergunta_more_than_191_chars_by_contabilidade()
+    {
+        $faker = \Faker\Factory::create();
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        $dados['pergunta'] = $faker->text(500);
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('pergunta');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['pergunta'] = $faker->text(500);
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertSessionHasErrors('pergunta');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_status_aguardando_correcao_without_update_input_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        PreRegistro::find(2)->update(['contabil_id' => null]);
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados);
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados);
+        PreRegistro::find(1)->update(['status' => PreRegistro::STATUS_CORRECAO]);
+
+        $this->get(route('externo.inserir.preregistro', ['preRegistro' => 1]))->assertOk();
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
+
+        $this->get(route('externo.preregistro.view', ['preRegistro' => 1]))
+        ->assertSee('<i class="fas fa-times"></i> Formulário não foi enviado para análise da correção, pois precisa editar dados(s) conforme justificativa(s).');
+    }
+
+    /** @test */
+    public function filled_campos_editados_pre_registro_pf_when_form_is_submitted_when_status_aguardando_correcao_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        factory('App\Regional')->create();
+
+        $dados = ['idregional' => 3, 'segmento' => segmentos()[7], 'cep' => '01234-050', 'logradouro' => 'Rua outro teste', 'numero' => '659',
+            'complemento' => 'fundos', 'bairro' => 'Bairro teste', 'cidade' => 'Osasco', 'uf' => 'SC', 'telefone' => '(12) 00000-0000',
+            'tipo_telefone' => tipos_contatos()[1], 'opcional_celular' => opcoes_celular()[1], 'telefone_1' => '(11) 11111-0000', 
+            'tipo_telefone_1' => tipos_contatos()[0], 'opcional_celular_1' => opcoes_celular()[1]];
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->states('justificado')->create();
+        $dadosTotais = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dadosTotais["opcional_celular_1"] = ["SMS"];
       
-    //     foreach($dados as $key => $val)
-    //         $this->post(route('externo.inserir.preregistro.ajax'), [
-    //             'classe' => 'preRegistro',
-    //             'campo' => $key,
-    //             'valor' => $val
-    //         ])->assertStatus(200);
+        foreach($dados as $key => $val)
+            $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+                'classe' => 'preRegistro',
+                'campo' => $key,
+                'valor' => $val
+            ])->assertStatus(200);
 
-    //     $dados["opcional_celular"] = [opcoes_celular()[1]];
-    //     $dados["opcional_celular_1"] = [opcoes_celular()[1]];
+        $dados["opcional_celular"] = [opcoes_celular()[1]];
+        $dados["opcional_celular_1"] = [opcoes_celular()[1]];
 
-    //     $this->put(route('externo.inserir.preregistro'), array_merge($dadosTotais, $dados))
-    //     ->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), array_merge($dadosTotais, $dados))
+        ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
-    //     $pr = PreRegistro::first();
-    //     $camposEditados = $preRegistroCpf->fresh()->preRegistro->getCamposEditados();
+        $pr = PreRegistro::first();
+        $camposEditados = $preRegistroCpf->fresh()->preRegistro->getCamposEditados();
 
-    //     $arrayFinal = array_diff(array_keys($dados), array_keys(json_decode($pr->campos_espelho, true)));
-    //     $this->assertEquals($arrayFinal, array());
-    //     $arrayFinal = array_diff(array_keys($camposEditados), array_keys($pr->getCamposEditados()));
-    //     $this->assertEquals($arrayFinal, array());
-    // }
+        $arrayFinal = array_diff(array_keys($dados), array_keys(json_decode($pr->campos_espelho, true)));
+        $this->assertEquals($arrayFinal, array());
+        $arrayFinal = array_diff(array_keys($camposEditados), array_keys($pr->getCamposEditados()));
+        $this->assertEquals($arrayFinal, array());
+    }
 
-    // /** @test */
-    // public function filled_campos_editados_pre_registro_pj_when_form_is_submitted_when_status_aguardando_correcao()
-    // {
-    //     $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-    //     factory('App\Regional')->create();
+    /** @test */
+    public function filled_campos_editados_pre_registro_pj_when_form_is_submitted_when_status_aguardando_correcao_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        factory('App\Regional')->create();
 
-    //     $dados = ['idregional' => 3, 'segmento' => segmentos()[7], 'cep' => '01234-050', 'logradouro' => 'Rua outro teste', 'numero' => '659',
-    //         'complemento' => 'fundos', 'bairro' => 'Bairro teste', 'cidade' => 'Osasco', 'uf' => 'SC', 'telefone' => '(12) 00000-0000',
-    //         'tipo_telefone' => tipos_contatos()[1], 'opcional_celular' => opcoes_celular()[1], 'telefone_1' => '(11) 11111-0000', 
-    //         'tipo_telefone_1' => tipos_contatos()[0], 'opcional_celular_1' => opcoes_celular()[1]];
+        $dados = ['idregional' => 3, 'segmento' => segmentos()[7], 'cep' => '01234-050', 'logradouro' => 'Rua outro teste', 'numero' => '659',
+            'complemento' => 'fundos', 'bairro' => 'Bairro teste', 'cidade' => 'Osasco', 'uf' => 'SC', 'telefone' => '(12) 00000-0000',
+            'tipo_telefone' => tipos_contatos()[1], 'opcional_celular' => opcoes_celular()[1], 'telefone_1' => '(11) 11111-0000', 
+            'tipo_telefone_1' => tipos_contatos()[0], 'opcional_celular_1' => opcoes_celular()[1]];
 
-    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('justificado')->create([
-    //         'responsavel_tecnico_id' => factory('App\ResponsavelTecnico')->states('low')
-    //     ]);
-    //     $dadosTotais = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('justificado')->create([
+            'responsavel_tecnico_id' => factory('App\ResponsavelTecnico')->states('low')
+        ]);
+        $dadosTotais = factory('App\PreRegistroCnpj')->states('request')->make()->final;
       
-    //     foreach($dados as $key => $val)
-    //         $this->post(route('externo.inserir.preregistro.ajax'), [
-    //             'classe' => 'preRegistro',
-    //             'campo' => $key,
-    //             'valor' => $val
-    //         ])->assertStatus(200);
+        foreach($dados as $key => $val)
+            $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+                'classe' => 'preRegistro',
+                'campo' => $key,
+                'valor' => $val
+            ])->assertStatus(200);
 
-    //     $dados["opcional_celular"] = [opcoes_celular()[1]];
-    //     $dados["opcional_celular_1"] = [opcoes_celular()[1]];
+        $dados["opcional_celular"] = [opcoes_celular()[1]];
+        $dados["opcional_celular_1"] = [opcoes_celular()[1]];
 
-    //     $this->put(route('externo.inserir.preregistro'), array_merge($dadosTotais, $dados))
-    //     ->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), array_merge($dadosTotais, $dados))
+        ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
-    //     $pr = PreRegistro::first();
-    //     $camposEditados = $preRegistroCnpj->fresh()->preRegistro->getCamposEditados();
+        $pr = PreRegistro::first();
+        $camposEditados = $preRegistroCnpj->fresh()->preRegistro->getCamposEditados();
 
-    //     $arrayFinal = array_diff(array_keys($dados), array_keys(json_decode($pr->campos_espelho, true)));
-    //     $this->assertEquals($arrayFinal, array());
-    //     $arrayFinal = array_diff(array_keys($camposEditados), array_keys($pr->getCamposEditados()));
-    //     $this->assertEquals($arrayFinal, array());
-    // }
+        $arrayFinal = array_diff(array_keys($dados), array_keys(json_decode($pr->campos_espelho, true)));
+        $this->assertEquals($arrayFinal, array());
+        $arrayFinal = array_diff(array_keys($camposEditados), array_keys($pr->getCamposEditados()));
+        $this->assertEquals($arrayFinal, array());
+    }
 
     /** 
      * =======================================================================================================
@@ -4623,5 +4725,21 @@ class PreRegistroTest extends TestCase
         ->assertSeeText($justificativas['tipo_telefone'])
         ->assertSeeText($justificativas['opcional_celular'])
         ->assertSeeText($justificativas['path']);
+    }
+
+    /** @test */
+    public function view_historico_justificativas()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistro = factory('App\PreRegistro')->states('aprovado_varias_justificativas')->create();
+        $hist_justificativas = $preRegistro->getHistoricoJustificativas();
+        $just_1 = $hist_justificativas[0];
+        $just_2 = $hist_justificativas[1];
+
+        $this->get(route('preregistro.view', $preRegistro->id))
+        ->assertSee('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+        ->assertSeeInOrder($just_1)
+        ->assertSeeInOrder($just_2);
     }
 }
