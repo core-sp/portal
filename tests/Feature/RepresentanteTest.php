@@ -357,7 +357,7 @@ class RepresentanteTest extends TestCase
         $this->post(route('representante.password.email'), ['cpf_cnpj' => $representante['cpf_cnpj']]);
 
         // Checa se e-mail contendo link para resetar senha foi enviado
-        Mail::assertSent(RepresentanteResetPasswordMail::class);
+        Mail::assertQueued(RepresentanteResetPasswordMail::class);
     }
 
     /** @test 

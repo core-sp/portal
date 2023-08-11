@@ -69,7 +69,7 @@ class Representante extends Authenticable
         $body = emailResetRepresentante($token);
 
         // $this->notify(new RepresentanteResetPasswordNotification($token)); - FALLBACK
-        Mail::to($this->email)->send(new RepresentanteResetPasswordMail($token, $body));
+        Mail::to($this->email)->queue(new RepresentanteResetPasswordMail($token, $body));
     }
 
     public function tipoPessoa()
