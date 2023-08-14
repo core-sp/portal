@@ -105,7 +105,7 @@
         <div class="col-sm mb-2-576">
             <label for="telefone_contabil">{{ $codigos[0]['telefone_contabil'] }} - Telefone <span class="text-danger">*</span></label>
             <input type="text"
-                class="{{ $classes[1] }} form-control telefoneInput {{ $errors->has('telefone_contabil') ? 'is-invalid' : '' }} obrigatorio"
+                class="{{ $classes[1] }} form-control telefone2Input {{ $errors->has('telefone_contabil') ? 'is-invalid' : '' }} obrigatorio"
                 name="telefone_contabil"
                 id="telefone_contabil"
                 value="{{ empty(old('telefone_contabil')) && isset($resultado->contabil->telefone) ? $resultado->contabil->telefone : old('telefone_contabil') }}"

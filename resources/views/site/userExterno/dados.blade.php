@@ -75,6 +75,7 @@
                     <input
                         name="nome_contato"
                         type="text"
+                        id="nome_contato"
                         class="form-control {{ $errors->has('nome_contato') ? 'is-invalid' : '' }} upperCase"
                         value="{{ empty(old('nome_contato')) && isset($resultado->nome_contato) ? $resultado->nome_contato : old('nome_contato') }}"
                         maxlength="191"
@@ -91,8 +92,8 @@
                     <input
                         type="text"
                         name="telefone"
-                        class="form-control telefoneInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
-                        id="email"
+                        class="form-control telefone2Input {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
+                        id="telefone"
                         value="{{ empty(old('telefone')) && isset($resultado->telefone) ? $resultado->telefone : old('telefone') }}"
                         placeholder="(99) 99999-9999"
                     >

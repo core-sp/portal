@@ -39,6 +39,19 @@ $(document).ready(function(){
 			element.mask("(99) 9999-99999");  
 		}  
 	});
+
+	// mascara de telefone com mudança de formato enquanto digita
+	var SPMaskBehavior = function (val) {
+		return val.replace(/\D/g, '').length === 10 ? '(00) 0000-00009' : '(00) 00000-0009';
+	},
+	optionsTel = {
+		onKeyPress: function (val, e, field, options) {
+			field.mask(SPMaskBehavior.apply({}, arguments), options);
+		}
+	};
+	$('.telefone2Input').mask(SPMaskBehavior, optionsTel);
+	// ****************************************************************
+	
 	var options = {
 		onKeyPress: function (cpf, ev, el, op) {
 			var masks = ['000.000.000-000', '00.000.000/0000-00'];
