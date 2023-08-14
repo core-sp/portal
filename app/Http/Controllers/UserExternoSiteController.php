@@ -44,7 +44,10 @@ class UserExternoSiteController extends Controller
 
         return view('site.agradecimento')->with([
             'agradece' => 'Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>',
-            'link_temp' => route('externo.verifica-email', ['tipo' => $validated['tipo_conta'], 'token' => $dados->verify_token]),
+            'link_temp' => route('externo.verifica-email', [
+                'tipo' => $this->service->getService('UserExterno')->getDefinicoes($validated['tipo_conta'])['variavel_url'], 
+                'token' => $dados->verify_token
+            ]),
         ]);
     }
 

@@ -320,7 +320,9 @@ class UserExternoTest extends TestCase
         $dados = factory('App\UserExterno')->states('cadastro')->raw();
         $this->post(route('externo.cadastro.submit'), $dados);
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'user-externo';
+        });
 
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $dados['cpf_cnpj'], 
@@ -358,7 +360,10 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.cadastro'))->assertOk();
         $this->post(route('externo.cadastro.submit'), $dados);
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'user-externo';
+        });
+
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'], 
             'ativo' => 0,
@@ -395,7 +400,10 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.cadastro'))->assertOk();
         $this->post(route('externo.cadastro.submit'), $dados);
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'user-externo';
+        });
+
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'], 
             'ativo' => 0,
@@ -454,7 +462,9 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.cadastro'))->assertOk();
         $this->post(route('externo.cadastro.submit'), $dados);
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'user-externo';
+        });
 
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $dados['cpf_cnpj'], 
@@ -488,7 +498,9 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.cadastro'))->assertOk();
         $this->post(route('externo.cadastro.submit'), $dados);
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'user-externo';
+        });
 
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => '36982299007', 
@@ -520,7 +532,9 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.cadastro'))->assertOk();
         $this->post(route('externo.cadastro.submit'), $dados);
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'user-externo';
+        });
 
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => '36982299007', 
@@ -551,7 +565,9 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.cadastro'))->assertOk();
         $this->post(route('externo.cadastro.submit'), $dados);
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'user-externo';
+        });
 
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => '36982299007', 
@@ -577,7 +593,9 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.cadastro'))->assertOk();
         $this->post(route('externo.cadastro.submit'), $dados);
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'user-externo';
+        });
 
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => '36982299007', 
@@ -1688,7 +1706,9 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.editar.view'))
         ->assertSee('Dados alterados com sucesso.');
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'user-externo';
+        });
     }
 
     /** @test */
@@ -1931,7 +1951,10 @@ class UserExternoTest extends TestCase
         $dados = factory('App\UserExterno')->states('cadastro')->raw();
         $this->post(route('externo.cadastro.submit'), $dados);
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'user-externo';
+        });
+
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $dados['cpf_cnpj'], 
             'nome' => $dados['nome'],
@@ -1972,7 +1995,10 @@ class UserExternoTest extends TestCase
         $dados = factory('App\UserExterno')->states('cadastro')->raw();
         $this->post(route('externo.cadastro.submit'), $dados);
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'user-externo';
+        });
+
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $dados['cpf_cnpj'], 
             'aceite' => 1,

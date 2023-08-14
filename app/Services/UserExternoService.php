@@ -32,12 +32,15 @@ class UserExternoService implements UserExternoServiceInterface {
 
     public function getDefinicoes($tipo)
     {
+        $tipo = $tipo == 'user-externo' ? str_replace('-', '_', $tipo) : $tipo;
+
         return [
             'tipo' => $tipo,
             'campo' => $tipo == 'contabil' ? 'cnpj' : 'cpf_cnpj',
             'classe' => $tipo == 'contabil' ? Contabil::class : UserExterno::class,
             'rotulo' => $tipo == 'contabil' ? 'Contabilidade' : 'Usuário Externo',
             'tabela' => $tipo == 'contabil' ? 'contabeis' : 'users_externo',
+            'variavel_url' => $tipo == 'user_externo' ? 'user-externo' : 'contabil',
         ];
     }
 
@@ -83,7 +86,7 @@ class UserExternoService implements UserExternoServiceInterface {
         else
             $externo = $tipo_conta['classe']::create($dados);
 
-        Mail::to($externo->email)->queue(new CadastroUserExternoMail($tipo_conta['tipo'], $dados['verify_token']));
+        Mail::to($externo->email)->queue(new CadastroUserExternoMail($tipo_conta['variavel_url'], $dados['verify_token']));
         event(new ExternoEvent('"' . formataCpfCnpj($externo[$tipo_conta['campo']]) . '" ("' . $externo->email . '") cadastrou-se na Área do Login Externo como '.$tipo_conta['rotulo'].'.'));
         
         return $externo->fresh();
@@ -116,7 +119,7 @@ class UserExternoService implements UserExternoServiceInterface {
             {
                 $externo->update(['password' => Hash::make($dados['password'])]);
 
-                Mail::to($externo->email)->queue(new CadastroUserExternoMail($tipo, null, $externo));
+                Mail::to($externo->email)->queue(new CadastroUserExternoMail($tipo_conta['variavel_url'], null, $externo));
                 event(new ExternoEvent($tipo_conta['rotulo'].' ' . $externo->id . ' ("'. formataCpfCnpj($externo[$tipo_conta['campo']]) .'") alterou a senha com sucesso na Área Restrita após logon.'));
             }else
                 return [
@@ -141,7 +144,7 @@ class UserExternoService implements UserExternoServiceInterface {
 
             $externo->update($dados);
 
-            Mail::to($externo->email)->queue(new CadastroUserExternoMail($tipo, null, $externo));
+            Mail::to($externo->email)->queue(new CadastroUserExternoMail($tipo_conta['variavel_url'], null, $externo));
             event(new ExternoEvent($tipo_conta['rotulo'].' ' . $externo->id . ' ("'. formataCpfCnpj($externo[$tipo_conta['campo']]) .'") alterou os dados com sucesso na Área Restrita após logon.'));
         }
     }
