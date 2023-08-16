@@ -258,7 +258,8 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="identidade">{{ $codigos[1]['identidade'] }} - N° do documento de identidade <span class="text-danger">*</span></label>
+        <label>{{ $codigos[1]['identidade'] }} - </label>
+        <label for="identidade">N° do documento de identidade <span class="text-danger">*</span></label>
         <input
             name="identidade"
             id="identidade"
@@ -310,6 +311,81 @@
     </div>
 </div>
 
+<div class="linha-lg-mini"></div>
+
+<div class="form-row mb-2">
+    <div class="col-sm mb-2-576">
+        <label for="titulo_eleitor">{{ $codigos[1]['titulo_eleitor'] }} - Título de Eleitor <span class="text-danger">*</span>
+        <small><em>(obrigatório para nacionalidade Brasileira)</em></small></label>
+        </label>
+        <input
+            name="titulo_eleitor"
+            id="titulo_eleitor"
+            type="text"
+            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('titulo_eleitor') ? 'is-invalid' : '' }} obrigatorio"
+            value="{{ empty(old('titulo_eleitor')) && isset($resultado->pessoaFisica->titulo_eleitor) ? $resultado->pessoaFisica->titulo_eleitor : old('titulo_eleitor') }}"
+            maxlength="15"
+        />
+        @if($errors->has('titulo_eleitor'))
+        <div class="invalid-feedback">
+            {{ $errors->first('titulo_eleitor') }}
+        </div>
+        @endif
+    </div>
+    <div class="col-sm mb-2-576">
+        <label for="zona">{{ $codigos[1]['zona'] }} - Zona Eleitoral <span class="text-danger">*</span></label>
+        <input
+            name="zona"
+            id="zona"
+            type="text"
+            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('zona') ? 'is-invalid' : '' }} obrigatorio"
+            value="{{ empty(old('zona')) && isset($resultado->pessoaFisica->zona) ? $resultado->pessoaFisica->zona : old('zona') }}"
+            maxlength="6"
+        />
+        @if($errors->has('zona'))
+        <div class="invalid-feedback">
+            {{ $errors->first('zona') }}
+        </div>
+        @endif
+    </div>
+</div>
+
+<div class="form-row mb-2">
+    <div class="col-sm mb-2-576">
+        <label for="secao">{{ $codigos[1]['secao'] }} - Seção Eleitoral <span class="text-danger">*</span></label>
+        <input
+            name="secao"
+            id="secao"
+            type="text"
+            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('secao') ? 'is-invalid' : '' }} obrigatorio"
+            value="{{ empty(old('secao')) && isset($resultado->pessoaFisica->secao) ? $resultado->pessoaFisica->secao : old('secao') }}"
+            maxlength="8"
+        />
+        @if($errors->has('secao'))
+        <div class="invalid-feedback">
+            {{ $errors->first('secao') }}
+        </div>
+        @endif
+    </div>
+    <div class="col-sm mb-2-576">
+        <label for="ra_reservista">{{ $codigos[1]['ra_reservista'] }} - RA Reservista <span class="text-danger">*</span> 
+        <small><em>(obrigatório para gênero Masculino até 45 anos)</em></small></label>
+        <input
+            name="ra_reservista"
+            id="ra_reservista"
+            type="text"
+            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('ra_reservista') ? 'is-invalid' : '' }} obrigatorio"
+            value="{{ empty(old('ra_reservista')) && isset($resultado->pessoaFisica->ra_reservista) ? $resultado->pessoaFisica->ra_reservista : old('ra_reservista') }}"
+            maxlength="15"
+        />
+        @if($errors->has('ra_reservista'))
+        <div class="invalid-feedback">
+            {{ $errors->first('ra_reservista') }}
+        </div>
+        @endif
+    </div>
+</div>
+
 @else
 
 <div class="form-row mb-2">
@@ -326,6 +402,26 @@
         @if($errors->has('razao_social'))
         <div class="invalid-feedback">
             {{ $errors->first('razao_social') }}
+        </div>
+        @endif
+    </div>
+</div>
+
+<div class="form-row mb-2">
+    <div class="col-sm mb-2-576">
+        <label for="nome_fantasia">{{ $codigos[1]['nome_fantasia'] }} - Nome Fantasia <span class="text-danger">*</span></label>
+        <input
+            type="text"
+            name="nome_fantasia"
+            id="nome_fantasia"
+            class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('nome_fantasia') ? 'is-invalid' : '' }}"
+            placeholder=""
+            value="{{ empty(old('nome_fantasia')) && isset($resultado->pessoaJuridica->nome_fantasia) ? $resultado->pessoaJuridica->nome_fantasia : old('nome_fantasia') }}"
+            maxlength="191"
+        />
+        @if($errors->has('nome_fantasia'))
+        <div class="invalid-feedback">
+            {{ $errors->first('nome_fantasia') }}
         </div>
         @endif
     </div>
@@ -412,42 +508,6 @@
     </div>
 </div>
 
-<div class="form-row mb-2">
-    <div class="col-sm mb-2-576">
-        <label for="inscricao_municipal">{{ $codigos[1]['inscricao_municipal'] }} - Inscrição Municipal</label>
-        <input
-            type="text"
-            name="inscricao_municipal"
-            id="inscricao_municipal"
-            class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('inscricao_municipal') ? 'is-invalid' : '' }}"
-            placeholder=""
-            value="{{ empty(old('inscricao_municipal')) && isset($resultado->pessoaJuridica->inscricao_municipal) ? $resultado->pessoaJuridica->inscricao_municipal : old('inscricao_municipal') }}"
-            maxlength="30"
-        />
-        @if($errors->has('inscricao_municipal'))
-        <div class="invalid-feedback">
-            {{ $errors->first('inscricao_municipal') }}
-        </div>
-        @endif
-    </div>
-    <div class="col-sm mb-2-576">
-        <label for="inscricao_estadual">{{ $codigos[1]['inscricao_estadual'] }} - Inscrição Estadual</label>
-        <input
-            type="text"
-            name="inscricao_estadual"
-            id="inscricao_estadual"
-            class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('inscricao_estadual') ? 'is-invalid' : '' }}"
-            placeholder=""
-            value="{{ empty(old('inscricao_estadual')) && isset($resultado->pessoaJuridica->inscricao_estadual) ? $resultado->pessoaJuridica->inscricao_estadual : old('inscricao_estadual') }}"
-            maxlength="30"
-        />
-        @if($errors->has('inscricao_estadual'))
-        <div class="invalid-feedback">
-            {{ $errors->first('inscricao_estadual') }}
-        </div>
-        @endif
-    </div>
-</div>
 @endif
 
 <div class="linha-lg-mini"></div>

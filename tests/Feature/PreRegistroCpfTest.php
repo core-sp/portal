@@ -643,7 +643,8 @@ class PreRegistroCpfTest extends TestCase
             'opcional_celular.*' => ['S'],'tipo_telefone_1' => '1','telefone_1' => '(1)','opcional_celular_1.*' => ['S'],
             'dt_nascimento' => null,'sexo' => null,'estado_civil' => 'e','nacionalidade' => null,'naturalidade_cidade' => 'r',
             'naturalidade_estado' => 'f','nome_mae' => null,'nome_pai' => 'p','tipo_identidade' => null,'identidade' => null,
-            'orgao_emissor' => null,'dt_expedicao' => null,'path' => null,'pergunta' => '1'
+            'orgao_emissor' => null,'dt_expedicao' => null,'titulo_eleitoral' => null,'zona' => null,'secao' => null, 
+            'ra_reservista' => '123','path' => null,'pergunta' => '1'
         ];
 
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
@@ -885,11 +886,14 @@ class PreRegistroCpfTest extends TestCase
         $prCpf = factory('App\PreRegistroCpf')->states('request')->make([
             'nome_social' => null,
             'estado_civil' => null,
-            'nome_pai' => null
+            'nome_pai' => null,
+            'ra_reservista' => null,
         ]);
         $dados = $prCpf->final;
         $pr = $prCpf->preRegistro->attributesToArray();
         $prCpf = $prCpf->makeHidden(['final'])->attributesToArray();
+        $prCpf['dt_nascimento'] = '1970-05-05';
+        $dados['dt_nascimento'] = '1970-05-05';
 
         $pr['contabil_id'] = null;
         $pr['segmento'] = null;
@@ -906,7 +910,7 @@ class PreRegistroCpfTest extends TestCase
         $dados['opcional_celular'] = [];
         $dados['telefone_1'] = null;
         $dados['tipo_telefone_1'] = null;
-        $dados['opcional_celular_1'] = [];        
+        $dados['opcional_celular_1'] = [];    
 
         $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
 
@@ -1420,6 +1424,139 @@ class PreRegistroCpfTest extends TestCase
     }
 
     /** @test */
+    public function cannot_submit_pre_registro_without_titulo_eleitor_if_nacionalidade_brasileira()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['titulo_eleitor'] = '';     
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('titulo_eleitor');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_titulo_eleitor_less_than_12_chars_if_nacionalidade_brasileira()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['titulo_eleitor'] = '23569874521';     
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('titulo_eleitor');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_titulo_eleitor_more_than_15_chars_if_nacionalidade_brasileira()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['titulo_eleitor'] = '2356987452123658';     
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('titulo_eleitor');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_without_zona_if_nacionalidade_brasileira()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['zona'] = '';     
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('zona');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_zona_more_than_6_chars_if_nacionalidade_brasileira()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['zona'] = '7536985';     
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('zona');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_without_secao_if_nacionalidade_brasileira()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['secao'] = '';     
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('secao');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_secao_more_than_8_chars_if_nacionalidade_brasileira()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['secao'] = '753698575';     
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('secao');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_without_ra_reservista_if_sexo_m_and_under_46_years_old()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        PreRegistro::first()->pessoaFisica->update(['dt_nascimento' => '1995-05-23']);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['ra_reservista'] = '';     
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('ra_reservista');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_ra_reservista_less_than_12_chars_if_sexo_m_and_under_46_years_old()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        PreRegistro::first()->pessoaFisica->update(['dt_nascimento' => '1995-05-23']);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['ra_reservista'] = '55522211174';     
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('ra_reservista');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_ra_reservista_more_than_15_chars_if_sexo_m_and_under_46_years_old()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        PreRegistro::first()->pessoaFisica->update(['dt_nascimento' => '1995-05-23']);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['ra_reservista'] = '5552221117488874';     
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('ra_reservista');
+    }
+
+    /** @test */
     public function log_is_generated_when_form_pf_is_submitted()
     {
         $externo = $this->signInAsUserExterno();
@@ -1538,6 +1675,10 @@ class PreRegistroCpfTest extends TestCase
         $dados['identidade'] = '111122233';
         $dados['orgao_emissor'] = 'DENATRAN';
         $dados['dt_expedicao'] = '2022-01-05';
+        $dados['titulo_eleitor'] = '999666888555';
+        $dados['zona'] = '1';
+        $dados['secao'] = '12';
+        $dados['ra_reservista'] = '444555666777';
       
         $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
         $pr = PreRegistro::first();
@@ -2156,7 +2297,8 @@ class PreRegistroCpfTest extends TestCase
             'opcional_celular.*' => ['S'],'tipo_telefone_1' => '1','telefone_1' => '(1)','opcional_celular_1.*' => ['S'],
             'dt_nascimento' => null,'sexo' => null,'estado_civil' => 'e','nacionalidade' => null,'naturalidade_cidade' => 'r',
             'naturalidade_estado' => 'f','nome_mae' => null,'nome_pai' => 'p','tipo_identidade' => null,'identidade' => null,
-            'orgao_emissor' => null,'dt_expedicao' => null,'path' => null,'pergunta' => '1'
+            'orgao_emissor' => null,'dt_expedicao' => null,'titulo_eleitor' => '12','zona' => '1234567','secao' => '123456789',
+            'path' => null,'pergunta' => '1'
         ];
 
         $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))->assertOk();
@@ -2975,6 +3117,149 @@ class PreRegistroCpfTest extends TestCase
     }
 
     /** @test */
+    public function cannot_submit_pre_registro_without_titulo_eleitor_if_nacionalidade_brasileira_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['titulo_eleitor'] = '';     
+        
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('titulo_eleitor');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_titulo_eleitor_less_than_12_chars_if_nacionalidade_brasileira_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['titulo_eleitor'] = '23569874521';     
+        
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('titulo_eleitor');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_titulo_eleitor_more_than_15_chars_if_nacionalidade_brasileira_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['titulo_eleitor'] = '2356987452123658';     
+        
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('titulo_eleitor');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_without_zona_if_nacionalidade_brasileira_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['zona'] = '';     
+        
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('zona');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_zona_more_than_6_chars_if_nacionalidade_brasileira_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['zona'] = '7536985';     
+        
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('zona');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_without_secao_if_nacionalidade_brasileira_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['secao'] = '';     
+        
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('secao');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_secao_more_than_8_chars_if_nacionalidade_brasileira_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['secao'] = '753698575';     
+        
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('secao');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_without_ra_reservista_if_sexo_m_and_under_46_years_old_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        PreRegistro::first()->pessoaFisica->update(['dt_nascimento' => '1995-05-23']);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['ra_reservista'] = '';     
+        
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('ra_reservista');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_ra_reservista_less_than_12_chars_if_sexo_m_and_under_46_years_old_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        PreRegistro::first()->pessoaFisica->update(['dt_nascimento' => '1995-05-23']);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['ra_reservista'] = '55522211174';     
+        
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('ra_reservista');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_ra_reservista_more_than_15_chars_if_sexo_m_and_under_46_years_old_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        PreRegistro::first()->pessoaFisica->update(['dt_nascimento' => '1995-05-23']);
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['ra_reservista'] = '5552221117488874';     
+        
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertSessionHasErrors('ra_reservista');
+    }
+
+    /** @test */
     public function log_is_generated_when_form_pf_is_submitted_by_contabilidade()
     {
         $externo = $this->signInAsUserExterno('contabil');
@@ -3097,6 +3382,10 @@ class PreRegistroCpfTest extends TestCase
         $dados['identidade'] = '111122233';
         $dados['orgao_emissor'] = 'DENATRAN';
         $dados['dt_expedicao'] = '2022-01-05';
+        $dados['titulo_eleitor'] = '999888777444';
+        $dados['zona'] = '5';
+        $dados['secao'] = '88';
+        $dados['ra_reservista'] = '222555888777';
       
         $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
@@ -4312,7 +4601,11 @@ class PreRegistroCpfTest extends TestCase
         ->assertSeeText($preRegistroCpf->tipo_identidade)
         ->assertSeeText($preRegistroCpf->identidade)
         ->assertSeeText($preRegistroCpf->orgao_emissor)
-        ->assertSeeText(onlyDate($preRegistroCpf->dt_expedicao));
+        ->assertSeeText(onlyDate($preRegistroCpf->dt_expedicao))
+        ->assertSeeText($preRegistroCpf->titulo_eleitor)
+        ->assertSeeText($preRegistroCpf->zona)
+        ->assertSeeText($preRegistroCpf->secao)
+        ->assertSeeText($preRegistroCpf->ra_reservista);
     }
 
     /** @test */
@@ -4336,7 +4629,11 @@ class PreRegistroCpfTest extends TestCase
         ->assertSeeText($justificativas['tipo_identidade'])
         ->assertSeeText($justificativas['identidade'])
         ->assertSeeText($justificativas['orgao_emissor'])
-        ->assertSeeText($justificativas['dt_expedicao']);
+        ->assertSeeText($justificativas['dt_expedicao'])
+        ->assertSeeText($justificativas['titulo_eleitor'])
+        ->assertSeeText($justificativas['zona'])
+        ->assertSeeText($justificativas['secao'])
+        ->assertSeeText($justificativas['ra_reservista']);
     }
 
     /** @test */

@@ -154,7 +154,8 @@
             @endif
         </div>
         <div class="col-md mb-2-576">
-            <label for="identidade_rt">{{ $codigos[3]['identidade_rt'] }} - N° do documento de identidade <span class="text-danger">*</span></label>
+            <label>{{ $codigos[3]['identidade_rt'] }} - </label>
+            <label for="identidade_rt">N° do documento de identidade <span class="text-danger">*</span></label>
             <input
                 name="identidade_rt"
                 type="text"
@@ -201,6 +202,79 @@
             @if($errors->has('dt_expedicao_rt'))
             <div class="invalid-feedback">
                 {{ $errors->first('dt_expedicao_rt') }}
+            </div>
+            @endif
+        </div>
+    </div>
+
+    <div class="linha-lg-mini"></div>
+
+    <div class="form-row mb-2">
+        <div class="col-sm mb-2-576">
+            <label for="titulo_eleitor_rt">{{ $codigos[3]['titulo_eleitor_rt'] }} - Título de Eleitor <span class="text-danger">*</span></label>
+            <input
+                name="titulo_eleitor_rt"
+                id="titulo_eleitor_rt"
+                type="text"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('titulo_eleitor_rt') ? 'is-invalid' : '' }} obrigatorio"
+                value="{{ empty(old('titulo_eleitor_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->titulo_eleitor) ? $resultado->pessoaJuridica->responsavelTecnico->titulo_eleitor : old('titulo_eleitor_rt') }}"
+                maxlength="15"
+            />
+            @if($errors->has('titulo_eleitor_rt'))
+            <div class="invalid-feedback">
+                {{ $errors->first('titulo_eleitor_rt') }}
+            </div>
+            @endif
+        </div>
+        <div class="col-sm mb-2-576">
+            <label for="zona_rt">{{ $codigos[3]['zona_rt'] }} - Zona Eleitoral <span class="text-danger">*</span></label>
+            <input
+                name="zona_rt"
+                id="zona_rt"
+                type="text"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('zona_rt') ? 'is-invalid' : '' }} obrigatorio"
+                value="{{ empty(old('zona_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->zona) ? $resultado->pessoaJuridica->responsavelTecnico->zona : old('zona_rt') }}"
+                maxlength="6"
+            />
+            @if($errors->has('zona_rt'))
+            <div class="invalid-feedback">
+                {{ $errors->first('zona_rt') }}
+            </div>
+            @endif
+        </div>
+    </div>
+
+    <div class="form-row mb-2">
+        <div class="col-sm mb-2-576">
+            <label for="secao_rt">{{ $codigos[3]['secao_rt'] }} - Seção Eleitoral <span class="text-danger">*</span></label>
+            <input
+                name="secao_rt"
+                id="secao_rt"
+                type="text"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('secao_rt') ? 'is-invalid' : '' }} obrigatorio"
+                value="{{ empty(old('secao_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->secao) ? $resultado->pessoaJuridica->responsavelTecnico->secao : old('secao_rt') }}"
+                maxlength="8"
+            />
+            @if($errors->has('secao_rt'))
+            <div class="invalid-feedback">
+                {{ $errors->first('secao_rt') }}
+            </div>
+            @endif
+        </div>
+        <div class="col-sm mb-2-576">
+            <label for="ra_reservista_rt">{{ $codigos[3]['ra_reservista_rt'] }} - RA Reservista <span class="text-danger">*</span> 
+            <small><em>(obrigatório para gênero Masculino até 45 anos)</em></small></label>
+            <input
+                name="ra_reservista_rt"
+                id="ra_reservista_rt"
+                type="text"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('ra_reservista_rt') ? 'is-invalid' : '' }} obrigatorio"
+                value="{{ empty(old('ra_reservista_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->ra_reservista) ? $resultado->pessoaJuridica->responsavelTecnico->ra_reservista : old('ra_reservista_rt') }}"
+                maxlength="15"
+            />
+            @if($errors->has('ra_reservista_rt'))
+            <div class="invalid-feedback">
+                {{ $errors->first('ra_reservista_rt') }}
             </div>
             @endif
         </div>

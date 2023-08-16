@@ -29,7 +29,11 @@ class PreRegistroCpf extends Model
             'pf10' => 'tipo_identidade',
             'pf11' => 'identidade',
             'pf12' => 'orgao_emissor',
-            'pf13' => 'dt_expedicao'
+            'pf13' => 'dt_expedicao',
+            'pf14' => 'titulo_eleitor',
+            'pf15' => 'zona',
+            'pf16' => 'secao',
+            'pf17' => 'ra_reservista',
         ];
     }
 

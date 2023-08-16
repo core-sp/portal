@@ -26,11 +26,16 @@ class UserExternoRequest extends FormRequest
         $this->replace($all);
 
         if(\Route::is('externo.editar'))
-            auth()->guard('contabil')->check() ? $this->merge(['tipo_conta' => 'contabil', 'acao' => 'editar']) : $this->merge(['tipo_conta' => 'user_externo', 'acao' => 'editar']);
+            auth()->guard('contabil')->check() ? $this->merge(['tipo_conta' => 'contabil', 'acao' => 'editar']) : 
+            $this->merge(['tipo_conta' => 'user_externo', 'acao' => 'editar']);
 
         if(\Route::is('externo.cadastro.submit'))
+        {
+            foreach(['tipo_conta', 'password', 'cpf_cnpj', 'email', 'nome', 'aceite'] as $val)
+                request()->missing($val) ? $this->merge([$val => null]) : null;
             $this->regrasUnique = $this->tipo_conta == 'contabil' ? 'unique:contabeis,cnpj,NULL,id,deleted_at,NULL,ativo,1' : 
-                'unique:users_externo,cpf_cnpj,NULL,id,deleted_at,NULL,ativo,1';
+            'unique:users_externo,cpf_cnpj,NULL,id,deleted_at,NULL,ativo,1';
+        }
         else
             $this->regrasUnique = '';
     }

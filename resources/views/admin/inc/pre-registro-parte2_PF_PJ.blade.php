@@ -197,6 +197,62 @@
         @endif
     </p>
 
+    <p id="titulo_eleitor">
+        <span class="font-weight-bolder">{{ $codigos[1]['titulo_eleitor'] }} - Título de Eleitor: </span>
+        {{ isset($resultado->pessoaFisica->titulo_eleitor) ? $resultado->pessoaFisica->titulo_eleitor : '------' }}
+        @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
+            'campo' => 'titulo_eleitor',
+            'resultado' => $arrayJustificativas
+        ])
+        @endcomponent
+        @if(array_key_exists('titulo_eleitor', $camposEditados))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
+    </p>
+
+    <p id="zona">
+        <span class="font-weight-bolder">{{ $codigos[1]['zona'] }} - Zona Eleitoral: </span>
+        {{ isset($resultado->pessoaFisica->zona) ? $resultado->pessoaFisica->zona : '------' }}
+        @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
+            'campo' => 'zona',
+            'resultado' => $arrayJustificativas
+        ])
+        @endcomponent
+        @if(array_key_exists('zona', $camposEditados))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
+    </p>
+
+    <p id="secao">
+        <span class="font-weight-bolder">{{ $codigos[1]['secao'] }} - Seção Eleitoral: </span>
+        {{ isset($resultado->pessoaFisica->secao) ? $resultado->pessoaFisica->secao : '------' }}
+        @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
+            'campo' => 'secao',
+            'resultado' => $arrayJustificativas
+        ])
+        @endcomponent
+        @if(array_key_exists('secao', $camposEditados))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
+    </p>
+
+    <p id="ra_reservista">
+        <span class="font-weight-bolder">{{ $codigos[1]['ra_reservista'] }} - RA Reservista: </span>
+        {{ isset($resultado->pessoaFisica->ra_reservista) ? $resultado->pessoaFisica->ra_reservista : '------' }}
+        @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
+            'campo' => 'ra_reservista',
+            'resultado' => $arrayJustificativas
+        ])
+        @endcomponent
+        @if(array_key_exists('ra_reservista', $camposEditados))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
+    </p>
+
 @else
 
     <p id="razao_social">
@@ -209,6 +265,20 @@
         ])
         @endcomponent
         @if(array_key_exists('razao_social', $camposEditados))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
+    </p>
+
+    <p id="nome_fantasia">
+        <span class="font-weight-bolder">{{ $codigos[1]['nome_fantasia'] }} - Nome Fantasia: </span>
+        {{ isset($resultado->pessoaJuridica->nome_fantasia) ? $resultado->pessoaJuridica->nome_fantasia : '------' }}
+        @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
+            'campo' => 'nome_fantasia',
+            'resultado' => $arrayJustificativas
+        ])
+        @endcomponent
+        @if(array_key_exists('nome_fantasia', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -269,33 +339,6 @@
         @endif
     </p>
 
-    <p id="inscricao_municipal">
-        <span class="font-weight-bolder">{{ $codigos[1]['inscricao_municipal'] }} - Inscrição Municipal: </span>
-        {{ isset($resultado->pessoaJuridica->inscricao_municipal) ? $resultado->pessoaJuridica->inscricao_municipal : '------' }}
-        @component('components.justificativa_pre_registro_admin', [
-            'preRegistro' => $resultado,
-            'campo' => 'inscricao_municipal',
-            'resultado' => $arrayJustificativas
-        ])
-        @endcomponent
-        @if(array_key_exists('inscricao_municipal', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
-    </p>
-
-    <p id="inscricao_estadual">
-        <span class="font-weight-bolder">{{ $codigos[1]['inscricao_estadual'] }} - Inscrição Estadual: </span>
-        {{ isset($resultado->pessoaJuridica->inscricao_estadual) ? $resultado->pessoaJuridica->inscricao_estadual : '------' }}
-        @component('components.justificativa_pre_registro_admin', [
-            'preRegistro' => $resultado,
-            'campo' => 'inscricao_estadual',
-            'resultado' => $arrayJustificativas
-        ])
-        @endcomponent
-        @if(array_key_exists('inscricao_estadual', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
-    </p>
 
 @endif
 

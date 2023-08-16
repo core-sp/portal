@@ -26,6 +26,10 @@ $factory->define(ResponsavelTecnico::class, function (Faker $faker) {
         'identidade' => '221111113',
         'orgao_emissor' => 'SSP- SP',
         'dt_expedicao' => '2021-05-20',
+        'titulo_eleitor' => '875698541236',
+        'zona' => '123',
+        'secao' => '12345',
+        'ra_reservista' => '789547896325',
     ];
 });
 

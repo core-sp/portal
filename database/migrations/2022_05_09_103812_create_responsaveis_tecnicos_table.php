@@ -15,7 +15,7 @@ class CreateResponsaveisTecnicosTable extends Migration
     {
         Schema::create('responsaveis_tecnicos', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('cpf', 11)->unique()->nullable();
+            $table->string('cpf', 11)->unique();
             $table->string('registro')->unique()->nullable();
             $table->string('nome')->nullable();
             $table->string('nome_social')->nullable();
@@ -34,6 +34,10 @@ class CreateResponsaveisTecnicosTable extends Migration
             $table->string('identidade')->nullable();
             $table->string('orgao_emissor')->nullable();
             $table->date('dt_expedicao')->nullable();
+            $table->string('titulo_eleitor')->nullable();
+            $table->string('zona')->nullable();
+            $table->string('secao')->nullable();
+            $table->string('ra_reservista')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

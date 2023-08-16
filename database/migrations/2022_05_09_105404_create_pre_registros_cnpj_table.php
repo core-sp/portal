@@ -19,8 +19,7 @@ class CreatePreRegistrosCnpjTable extends Migration
             $table->string('nire', 20)->nullable();
             $table->string('tipo_empresa')->nullable();
             $table->date('dt_inicio_atividade')->nullable();
-            $table->string('inscricao_municipal')->nullable();
-            $table->string('inscricao_estadual')->nullable();
+            $table->string('nome_fantasia')->nullable();
             $table->string('capital_social')->nullable();
             $table->string('cep', 10)->nullable();
             $table->string('logradouro')->nullable();

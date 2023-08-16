@@ -34,6 +34,10 @@ class ResponsavelTecnico extends Model
             'rt17' => 'uf',
             'rt18' => 'nome_mae',
             'rt19' => 'nome_pai',
+            'rt20' => 'titulo_eleitor',
+            'rt21' => 'zona',
+            'rt22' => 'secao',
+            'rt23' => 'ra_reservista',
         ];
     }
 

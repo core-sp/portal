@@ -28,6 +28,10 @@ class CreatePreRegistrosCpfTable extends Migration
             $table->string('identidade')->nullable();
             $table->string('orgao_emissor')->nullable();
             $table->date('dt_expedicao')->nullable();
+            $table->string('titulo_eleitor')->nullable();
+            $table->string('zona')->nullable();
+            $table->string('secao')->nullable();
+            $table->string('ra_reservista')->nullable();
             $table->bigInteger('pre_registro_id')->unsigned();
             $table->foreign('pre_registro_id')->references('id')->on('pre_registros');
             $table->timestamps();

@@ -36,11 +36,8 @@ class UserExternoSiteController extends Controller
             abort(500, 'Erro ao criar o cadastro no Login Externo');
         }
 
-        if(isset($dados['erro']))
-            return redirect()->route('externo.cadastro')->withInput()->with([
-                'message' => $dados['erro'],
-                'class' => $dados['class']
-            ]);
+        if(isset($dados['message']))
+            return redirect()->route('externo.cadastro')->withInput()->with($dados);
 
         return view('site.agradecimento')->with([
             'agradece' => 'Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>',

@@ -58,7 +58,7 @@ class UserExternoService implements UserExternoServiceInterface {
 
         if($emails >= 2)
             return [
-                'erro' => 'Este email já alcançou o limite de cadastro, por favor insira outro.',
+                'message' => 'Este email já alcançou o limite de cadastro, por favor insira outro.',
                 'class' => 'alert-danger'
             ];
 
@@ -76,7 +76,7 @@ class UserExternoService implements UserExternoServiceInterface {
         {
             if($externo->podeAtivar())
                 return [
-                    'erro' => 'Esta conta já solicitou o cadastro. Verifique seu email para ativar. Caso não tenha mais acesso ao e-mail, aguarde 24h para se recadastrar',
+                    'message' => 'Esta conta já solicitou o cadastro. Verifique seu email para ativar. Caso não tenha mais acesso ao e-mail, aguarde 24h para se recadastrar',
                     'class' => 'alert-danger'
                 ];
             if($externo->trashed())

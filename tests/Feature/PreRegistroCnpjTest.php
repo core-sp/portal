@@ -430,8 +430,7 @@ class PreRegistroCnpjTest extends TestCase
 
         $preRegistroCnpj = [
             'razao_social' => $faker->text(500),
-            'inscricao_municipal' => $faker->text(500),
-            'inscricao_estadual' => $faker->text(500),
+            'nome_fantasia' => $faker->text(500),
             'capital_social' => $faker->text(500),
             'logradouro' => $faker->text(500),
             'complemento' => $faker->text(500),
@@ -683,12 +682,12 @@ class PreRegistroCnpjTest extends TestCase
             'idregional' => null,'segmento' => '1','cep' => null,'logradouro' => null,'numero' => null,'bairro' => null,
             'cidade' => null,'uf' => null,'telefone' => null,'tipo_telefone' => null,'opcional_celular.*' => ['S'],
             'tipo_telefone_1' => '1','telefone_1' => '(1)','opcional_celular_1.*' => ['S'],'razao_social' => null,
-            'tipo_empresa' => null,'dt_inicio_atividade' => null,'inscricao_municipal' => '1','inscricao_estadual' => '1',
+            'tipo_empresa' => null,'dt_inicio_atividade' => null,'nome_fantasia' => null,
             'capital_social' => null,'cep_empresa' => null,'logradouro_empresa' => null,'numero_empresa' => null,'bairro_empresa' => null,
             'cidade_empresa' => null,'uf_empresa' => null,'cpf_rt' => '1','nome_rt' => null,'sexo_rt' => null,'dt_nascimento_rt' => null,
             'cep_rt' => null,'logradouro_rt' => null,'numero_rt' => null,'bairro_rt' => null,'cidade_rt' => null,'uf_rt' => null,
             'nome_mae_rt' => null,'tipo_identidade_rt' => null,'identidade_rt' => null,'orgao_emissor_rt' => null,'dt_expedicao_rt' => null,
-            'path' => null,'pergunta' => '1',
+            'titulo_eleitor_rt' => null,'zona_rt' => null,'secao_rt' => null,'ra_reservista_rt' => '123','path' => null,'pergunta' => '1',
         ];
 
         $this->put(route('externo.inserir.preregistro'), $dados)
@@ -714,13 +713,14 @@ class PreRegistroCnpjTest extends TestCase
             'idregional' => null,'segmento' => '1','cep' => null,'logradouro' => null,'numero' => null,
             'bairro' => null,'cidade' => null,'uf' => null,'telefone' => null,'tipo_telefone' => null,
             'opcional_celular.*' => ['S'],'tipo_telefone_1' => '1','telefone_1' => '(1)','opcional_celular_1.*' => ['S'],
-            'razao_social' => null,'tipo_empresa' => null,'dt_inicio_atividade' => null,'inscricao_municipal' => '1',
-            'inscricao_estadual' => '1','capital_social' => null,'checkEndEmpresa' => 'on','cep_empresa' => null,
+            'razao_social' => null,'tipo_empresa' => null,'dt_inicio_atividade' => null,'nome_fantasia' => null,
+            'capital_social' => null,'checkEndEmpresa' => 'on','cep_empresa' => null,
             'logradouro_empresa' => null,'numero_empresa' => null,'bairro_empresa' => null,'cidade_empresa' => null,
             'uf_empresa' => null,'cpf_rt' => '1','nome_rt' => null,'sexo_rt' => null,'dt_nascimento_rt' => null,
             'cep_rt' => null,'logradouro_rt' => null,'numero_rt' => null,'bairro_rt' => null,'cidade_rt' => null,
             'uf_rt' => null,'nome_mae_rt' => null,'tipo_identidade_rt' => null,'identidade_rt' => null,
-            'orgao_emissor_rt' => null,'dt_expedicao_rt' => null,'path' => null,'pergunta' => '1',
+            'orgao_emissor_rt' => null,'dt_expedicao_rt' => null,'titulo_eleitor_rt' => null,'zona_rt' => null,
+            'secao_rt' => null,'ra_reservista_rt' => '123','path' => null,'pergunta' => '1',
         ];
 
         $this->put(route('externo.inserir.preregistro'), $dados)
@@ -1009,8 +1009,6 @@ class PreRegistroCnpjTest extends TestCase
         $pr['telefone'] = '(11) 00000-0000;';
         $pr['tipo_telefone'] = 'CELULAR;';
         $prCnpj['nire'] = null;
-        $prCnpj['inscricao_municipal'] = null;
-        $prCnpj['inscricao_estadual'] = null;
 
         $dados['contabil_id'] = null;
         $dados['cnpj_contabil'] = null;
@@ -1024,11 +1022,10 @@ class PreRegistroCnpjTest extends TestCase
         $dados['tipo_telefone_1'] = null;
         $dados['opcional_celular_1'] = [];
         $dados['nire'] = null;
-        $dados['inscricao_municipal'] = null;
-        $dados['inscricao_estadual'] = null;
         $dados['nome_social_rt'] = null;
         $dados['complemento_rt'] = null;
         $dados['nome_pai_rt'] = null;
+        $dados['ra_reservista_rt'] = null;
         
         $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
         
@@ -1053,6 +1050,7 @@ class PreRegistroCnpjTest extends TestCase
             'cidade_empresa' => '','uf_empresa' => '','nome_rt' => '','sexo_rt' => '','dt_nascimento_rt' => '','cpf_rt' => '',
             'tipo_identidade_rt' => '','identidade_rt' => '','orgao_emissor_rt' => '','dt_expedicao_rt' => '','cep_rt' => '',
             'bairro_rt' => '','logradouro_rt' => '','numero_rt' => '','cidade_rt' => '','uf_rt' => '','nome_mae_rt' => '',
+            'titulo_eleitor_rt' => '', 'zona_rt' => '', 'secao_rt' => '',
         ];
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();        
@@ -1062,7 +1060,7 @@ class PreRegistroCnpjTest extends TestCase
             'capital_social','tipo_empresa','dt_inicio_atividade','cep_empresa','bairro_empresa','logradouro_empresa',
             'numero_empresa','cidade_empresa','uf_empresa','nome_rt','sexo_rt','dt_nascimento_rt','cpf_rt','tipo_identidade_rt',
             'identidade_rt','orgao_emissor_rt','dt_expedicao_rt','cep_rt','bairro_rt','logradouro_rt','numero_rt','cidade_rt',
-            'uf_rt','nome_mae_rt',
+            'uf_rt','nome_mae_rt','titulo_eleitor_rt','zona_rt','secao_rt',
         ]);
 
         $pr = $externo->load('preRegistro')->preRegistro;
@@ -1286,55 +1284,43 @@ class PreRegistroCnpjTest extends TestCase
     }
 
     /** @test */
-    public function cannot_submit_pre_registro_cnpj_with_inscricao_municipal_less_than_5_chars()
+    public function cannot_submit_pre_registro_cnpj_without_nome_fantasia()
     {
         $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-        $dados['inscricao_municipal'] = '1234';
+        $dados['nome_fantasia'] = '';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-        ->assertSessionHasErrors('inscricao_municipal');
+        ->assertSessionHasErrors('nome_fantasia');
     }
 
     /** @test */
-    public function cannot_submit_pre_registro_cnpj_with_inscricao_municipal_more_than_30_chars()
+    public function cannot_submit_pre_registro_cnpj_with_nome_fantasia_less_than_5_chars()
     {
         $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-        $dados['inscricao_municipal'] = '1234567890123456789012345678901';
+        $dados['nome_fantasia'] = 'Fant';
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-        ->assertSessionHasErrors('inscricao_municipal');
+        ->assertSessionHasErrors('nome_fantasia');
     }
 
     /** @test */
-    public function cannot_submit_pre_registro_cnpj_with_inscricao_estadual_less_than_5_chars()
+    public function cannot_submit_pre_registro_cnpj_with_nome_fantasia_more_than_191_chars()
     {
+        $faker = \Faker\Factory::create();
         $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-        $dados['inscricao_estadual'] = '1234';
+        $dados['nome_fantasia'] = $faker->text(500);
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-        ->assertSessionHasErrors('inscricao_estadual');
-    }
-
-    /** @test */
-    public function cannot_submit_pre_registro_cnpj_with_inscricao_estadual_more_than_30_chars()
-    {
-        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-
-        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-        $dados['inscricao_estadual'] = '1234567890123456789012345678901';
-        
-        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-        ->assertSessionHasErrors('inscricao_estadual');
+        ->assertSessionHasErrors('nome_fantasia');
     }
 
     /** @test */
@@ -1692,8 +1678,6 @@ class PreRegistroCnpjTest extends TestCase
         $dados['nire'] = '1988963';
         $dados['tipo_empresa'] = tipos_empresa()[2];
         $dados['dt_inicio_atividade'] = '2019-12-10';
-        $dados['inscricao_municipal'] = null;
-        $dados['inscricao_estadual'] = null;
         $dados['capital_social'] = '5.000,00';
 
         $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
@@ -2093,8 +2077,7 @@ class PreRegistroCnpjTest extends TestCase
 
         $preRegistroCnpj = [
             'razao_social' => $faker->text(500),
-            'inscricao_municipal' => $faker->text(500),
-            'inscricao_estadual' => $faker->text(500),
+            'nome_fantasia' => $faker->text(500),
             'capital_social' => $faker->text(500),
             'logradouro' => $faker->text(500),
             'complemento' => $faker->text(500),
@@ -2323,12 +2306,12 @@ class PreRegistroCnpjTest extends TestCase
             'idregional' => null,'segmento' => '1','cep' => null,'logradouro' => null,'numero' => null,'bairro' => null,
             'cidade' => null,'uf' => null,'telefone' => null,'tipo_telefone' => null,'opcional_celular.*' => ['S'],
             'tipo_telefone_1' => '1','telefone_1' => '(1)','opcional_celular_1.*' => ['S'],'razao_social' => null,
-            'tipo_empresa' => null,'dt_inicio_atividade' => null,'inscricao_municipal' => '1','inscricao_estadual' => '1',
+            'tipo_empresa' => null,'dt_inicio_atividade' => null,'nome_fantasia' => null,
             'capital_social' => null,'cep_empresa' => null,'logradouro_empresa' => null,'numero_empresa' => null,'bairro_empresa' => null,
             'cidade_empresa' => null,'uf_empresa' => null,'cpf_rt' => '1','nome_rt' => null,'sexo_rt' => null,'dt_nascimento_rt' => null,
             'cep_rt' => null,'logradouro_rt' => null,'numero_rt' => null,'bairro_rt' => null,'cidade_rt' => null,'uf_rt' => null,
             'nome_mae_rt' => null,'tipo_identidade_rt' => null,'identidade_rt' => null,'orgao_emissor_rt' => null,'dt_expedicao_rt' => null,
-            'path' => null,'pergunta' => '1',
+            'titulo_eleitor_rt' => null,'zona_rt' => null,'secao_rt' => null,'ra_reservista_rt' => '123','path' => null,'pergunta' => '1',
         ];
 
         $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))->assertOk();
@@ -2357,13 +2340,14 @@ class PreRegistroCnpjTest extends TestCase
             'idregional' => null,'segmento' => '1','cep' => null,'logradouro' => null,'numero' => null,
             'bairro' => null,'cidade' => null,'uf' => null,'telefone' => null,'tipo_telefone' => null,
             'opcional_celular.*' => ['S'],'tipo_telefone_1' => '1','telefone_1' => '(1)','opcional_celular_1.*' => ['S'],
-            'razao_social' => null,'tipo_empresa' => null,'dt_inicio_atividade' => null,'inscricao_municipal' => '1',
-            'inscricao_estadual' => '1','capital_social' => null,'checkEndEmpresa' => 'on','cep_empresa' => null,
+            'razao_social' => null,'tipo_empresa' => null,'dt_inicio_atividade' => null,'nome_fantasia' => null,
+            'capital_social' => null,'checkEndEmpresa' => 'on','cep_empresa' => null,
             'logradouro_empresa' => null,'numero_empresa' => null,'bairro_empresa' => null,'cidade_empresa' => null,
             'uf_empresa' => null,'cpf_rt' => '1','nome_rt' => null,'sexo_rt' => null,'dt_nascimento_rt' => null,
             'cep_rt' => null,'logradouro_rt' => null,'numero_rt' => null,'bairro_rt' => null,'cidade_rt' => null,
             'uf_rt' => null,'nome_mae_rt' => null,'tipo_identidade_rt' => null,'identidade_rt' => null,
             'orgao_emissor_rt' => null,'dt_expedicao_rt' => null,'path' => null,'pergunta' => '1',
+            'titulo_eleitor_rt' => null,'zona_rt' => null,'secao_rt' => null,'ra_reservista_rt' => '123',
         ];
 
         $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))->assertOk();
@@ -2662,8 +2646,6 @@ class PreRegistroCnpjTest extends TestCase
         $pr['telefone'] = '(11) 00000-0000;';
         $pr['tipo_telefone'] = 'CELULAR;';
         $prCnpj['nire'] = null;
-        $prCnpj['inscricao_municipal'] = null;
-        $prCnpj['inscricao_estadual'] = null;
 
         $dados['segmento'] = null;
         $dados['opcional_celular'] = [];
@@ -2671,11 +2653,10 @@ class PreRegistroCnpjTest extends TestCase
         $dados['tipo_telefone_1'] = null;
         $dados['opcional_celular_1'] = [];
         $dados['nire'] = null;
-        $dados['inscricao_municipal'] = null;
-        $dados['inscricao_estadual'] = null;
         $dados['nome_social_rt'] = null;
         $dados['complemento_rt'] = null;
         $dados['nome_pai_rt'] = null;
+        $dados['ra_reservista_rt'] = null;
         
         $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
@@ -2703,6 +2684,7 @@ class PreRegistroCnpjTest extends TestCase
             'cidade_empresa' => '','uf_empresa' => '','nome_rt' => '','sexo_rt' => '','dt_nascimento_rt' => '','cpf_rt' => '',
             'tipo_identidade_rt' => '','identidade_rt' => '','orgao_emissor_rt' => '','dt_expedicao_rt' => '','cep_rt' => '',
             'bairro_rt' => '','logradouro_rt' => '','numero_rt' => '','cidade_rt' => '','uf_rt' => '','nome_mae_rt' => '',
+            'titulo_eleitor_rt' => '', 'zona_rt' => '', 'secao_rt' => '',
         ];
         
         $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
@@ -2711,7 +2693,7 @@ class PreRegistroCnpjTest extends TestCase
             'capital_social','tipo_empresa','dt_inicio_atividade','cep_empresa','bairro_empresa','logradouro_empresa',
             'numero_empresa','cidade_empresa','uf_empresa','nome_rt','sexo_rt','dt_nascimento_rt','cpf_rt','tipo_identidade_rt',
             'identidade_rt','orgao_emissor_rt','dt_expedicao_rt','cep_rt','bairro_rt','logradouro_rt','numero_rt','cidade_rt',
-            'uf_rt','nome_mae_rt',
+            'uf_rt','nome_mae_rt','titulo_eleitor_rt', 'zona_rt', 'secao_rt',
         ]);
 
         $pr = $externo->preRegistros->first()->fresh();
@@ -2951,59 +2933,46 @@ class PreRegistroCnpjTest extends TestCase
     }
 
     /** @test */
-    public function cannot_submit_pre_registro_cnpj_with_inscricao_municipal_less_than_5_chars_by_contabilidade()
+    public function cannot_submit_pre_registro_cnpj_without_nome_fantasia_by_contabilidade()
     {
         $externo = $this->signInAsUserExterno('contabil');
         $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
         $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
         $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-        $dados['inscricao_municipal'] = '1234';
+        $dados['nome_fantasia'] = '';
         
         $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
-        ->assertSessionHasErrors('inscricao_municipal');
+        ->assertSessionHasErrors('nome_fantasia');
     }
 
     /** @test */
-    public function cannot_submit_pre_registro_cnpj_with_inscricao_municipal_more_than_30_chars_by_contabilidade()
+    public function cannot_submit_pre_registro_cnpj_with_nome_fantasia_less_than_5_chars_by_contabilidade()
     {
         $externo = $this->signInAsUserExterno('contabil');
         $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
         $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
         $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-        $dados['inscricao_municipal'] = '1234567890123456789012345678901';
+        $dados['nome_fantasia'] = 'Fant';
         
         $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
-        ->assertSessionHasErrors('inscricao_municipal');
+        ->assertSessionHasErrors('nome_fantasia');
     }
 
     /** @test */
-    public function cannot_submit_pre_registro_cnpj_with_inscricao_estadual_less_than_5_chars_by_contabilidade()
+    public function cannot_submit_pre_registro_cnpj_with_nome_fantasia_more_than_191_chars_by_contabilidade()
     {
+        $faker = \Faker\Factory::create();
         $externo = $this->signInAsUserExterno('contabil');
         $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
         $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
         $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-        $dados['inscricao_estadual'] = '1234';
+        $dados['nome_fantasia'] = $faker->text(500);
         
         $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
-        ->assertSessionHasErrors('inscricao_estadual');
-    }
-
-    /** @test */
-    public function cannot_submit_pre_registro_cnpj_with_inscricao_estadual_more_than_30_chars_by_contabilidade()
-    {
-        $externo = $this->signInAsUserExterno('contabil');
-        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
-        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
-
-        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-        $dados['inscricao_estadual'] = '1234567890123456789012345678901';
-        
-        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
-        ->assertSessionHasErrors('inscricao_estadual');
+        ->assertSessionHasErrors('nome_fantasia');
     }
 
     /** @test */
@@ -3383,8 +3352,6 @@ class PreRegistroCnpjTest extends TestCase
         $dados['nire'] = '1988963';
         $dados['tipo_empresa'] = tipos_empresa()[2];
         $dados['dt_inicio_atividade'] = '2019-12-10';
-        $dados['inscricao_municipal'] = null;
-        $dados['inscricao_estadual'] = null;
         $dados['capital_social'] = '5.000,00';
 
         $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
@@ -4565,8 +4532,6 @@ class PreRegistroCnpjTest extends TestCase
         ->assertSeeText($preRegistroCnpj->nire)
         ->assertSeeText($preRegistroCnpj->tipo_empresa)
         ->assertSeeText(onlyDate($preRegistroCnpj->dt_inicio_atividade))
-        ->assertSeeText($preRegistroCnpj->inscricao_municipal)
-        ->assertSeeText($preRegistroCnpj->inscricao_estadual)
         ->assertSeeText($preRegistroCnpj->capital_social)
         ->assertSeeText($preRegistroCnpj->cep)
         ->assertSeeText($preRegistroCnpj->logradouro)
@@ -4611,8 +4576,7 @@ class PreRegistroCnpjTest extends TestCase
         ->assertSeeText($justificativas['nire'])
         ->assertSeeText($justificativas['tipo_empresa'])
         ->assertSeeText($justificativas['dt_inicio_atividade'])
-        ->assertSeeText($justificativas['inscricao_municipal'])
-        ->assertSeeText($justificativas['inscricao_estadual'])
+        ->assertSeeText($justificativas['nome_fantasia'])
         ->assertSeeText($justificativas['capital_social'])
         ->assertSeeText($justificativas['cep'])
         ->assertSeeText($justificativas['logradouro'])

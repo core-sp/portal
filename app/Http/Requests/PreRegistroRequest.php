@@ -5,11 +5,14 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\CpfCnpj;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class PreRegistroRequest extends FormRequest
 {
     private $regraDtNasc;
     private $regraPath;
+    private $regraReservistaPF;
+    private $regraReservistaRT;
     private $externo;
 
     private function getRules($externo)
@@ -61,6 +64,17 @@ class PreRegistroRequest extends FormRequest
             'identidade' => 'required|min:4|max:30',
             'orgao_emissor' => 'required|min:3|max:191',
             'dt_expedicao' => 'required|date_format:Y-m-d|before_or_equal:today',
+            'titulo_eleitor' => 'required_if:nacionalidade,Brasileira|nullable|min:12|max:15',
+            'zona' => 'required_if:nacionalidade,Brasileira|max:6',
+            'secao' => 'required_if:nacionalidade,Brasileira|max:8',
+            'ra_reservista' => [
+                Rule::requiredIf(function () {
+                    return ($this->sexo == 'M') && $this->regraReservistaPF;
+                }),
+                'nullable',
+                'min:12',
+                'max:15',
+            ],
         ];
         
         $pessoaJuridica = [
@@ -69,8 +83,7 @@ class PreRegistroRequest extends FormRequest
             'nire' => 'nullable|min:5|max:20',
             'tipo_empresa' => 'required|in:'.implode(',', tipos_empresa()),
             'dt_inicio_atividade' => 'required|date_format:Y-m-d|before_or_equal:today',
-            'inscricao_municipal' => 'nullable|min:5|max:30',
-            'inscricao_estadual' => 'nullable|min:5|max:30',
+            'nome_fantasia' => 'required|min:5|max:191',
             'checkEndEmpresa' => 'present',
             'cep_empresa' => 'required_if:checkEndEmpresa,off|nullable|size:9|regex:/([0-9]{5})\-([0-9]{3})/',
             'bairro_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191',
@@ -97,6 +110,17 @@ class PreRegistroRequest extends FormRequest
             'uf_rt' => 'required|in:'.implode(',', array_keys(estados())),
             'nome_mae_rt' => 'required|min:5|max:191|regex:/^\D*$/',
             'nome_pai_rt' => 'nullable|min:5|max:191|regex:/^\D*$/',
+            'titulo_eleitor_rt' => 'required|nullable|min:12|max:15',
+            'zona_rt' => 'required|max:6',
+            'secao_rt' => 'required|max:8',
+            'ra_reservista_rt' => [
+                Rule::requiredIf(function () {
+                    return ($this->sexo_rt == 'M') && $this->regraReservistaRT;
+                }),
+                'nullable',
+                'min:12',
+                'max:15',
+            ],
         ];
 
         if(\Route::is('externo.contabil.inserir.preregistro'))
@@ -128,6 +152,7 @@ class PreRegistroRequest extends FormRequest
 
         $this->regraPath = '';
         $this->regraDtNasc = Carbon::today()->subYears(18)->format('Y-m-d');
+        $dataReservista = Carbon::today()->subYears(46)->format('Y-m-d');
 
         if($anexosCount == 0)
         {
@@ -142,6 +167,9 @@ class PreRegistroRequest extends FormRequest
         
         if(!$this->externo->isPessoaFisica())
         {
+            $this->regraReservistaRT = $this->filled('dt_nascimento_rt') && Carbon::hasFormat($this->dt_nascimento_rt, 'Y-m-d') && 
+            ($this->dt_nascimento_rt > $dataReservista);
+
             if(!isset(request()->checkEndEmpresa) || (isset(request()->checkEndEmpresa) && (request()->checkEndEmpresa != 'on')))
                 $this->merge([
                     'checkEndEmpresa' => "off",
@@ -155,7 +183,10 @@ class PreRegistroRequest extends FormRequest
         
         if($this->externo->isPessoaFisica())
         {
-            if(request()->nacionalidade != "Brasileira")
+            $this->regraReservistaPF = $this->filled('nacionalidade') && ($this->nacionalidade == 'Brasileira') && 
+            $this->filled('dt_nascimento') && Carbon::hasFormat($this->dt_nascimento, 'Y-m-d') && ($this->dt_nascimento > $dataReservista);
+
+            if($this->filled('nacionalidade') && ($this->nacionalidade != "Brasileira"))
                 $this->merge([
                     'naturalidade_cidade' => null,
                     'naturalidade_estado' => null
@@ -275,6 +306,10 @@ class PreRegistroRequest extends FormRequest
             'identidade' => '"Número de identidade"',
             'orgao_emissor' => '"Órgão emissor"',
             'dt_expedicao' => '"Data de expedição"',
+            'titulo_eleitor' => '"Título de Eleitor"',
+            'zona' => '"Zona Eleitoral"',
+            'secao' => '"Seção Eleitoral"',
+            'ra_reservista' => 'RA Reservista',
         ];
 
         $pessoaJuridica = [
@@ -283,8 +318,7 @@ class PreRegistroRequest extends FormRequest
             'nire' => '"Nire"',
             'tipo_empresa' => '"Tipo da empresa"',
             'dt_inicio_atividade' => '"Data de início das atividades"',
-            'inscricao_municipal' => '"Inscrição municipal"',
-            'inscricao_estadual' => '"Inscrição estadual"',
+            'nome_fantasia' => '"Nome Fantasia"',
             'checkEndEmpresa' => '"Opção Mesmo endereço"',
             'cep_empresa' => '"Cep da empresa"',
             'bairro_empresa' => '"Bairro da empresa"',
@@ -311,6 +345,10 @@ class PreRegistroRequest extends FormRequest
             'uf_rt' => '"Estado do responsável técnico"',
             'nome_mae_rt' => '"Nome da mãe do responsável técnico"',
             'nome_pai_rt' => '"Nome do pai do responsável técnico"',
+            'titulo_eleitor_rt' => '"Título de Eleitor do responsável técnico"',
+            'zona_rt' => '"Zona Eleitoral do responsável técnico"',
+            'secao_rt' => '"Seção Eleitoral do responsável técnico"',
+            'ra_reservista_rt' => 'RA Reservista do responsável técnico',
         ];
 
         if(\Route::is('externo.contabil.inserir.preregistro'))

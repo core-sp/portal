@@ -12,8 +12,7 @@ $factory->define(PreRegistroCnpj::class, function (Faker $faker) {
         'nire' => 12345,
         'tipo_empresa' => mb_strtoupper(tipos_empresa()[0], 'UTF-8'),
         'dt_inicio_atividade' => '2020-12-21',
-        'inscricao_municipal' => 123456,
-        'inscricao_estadual' => 123456789,
+        'nome_fantasia' => mb_strtoupper($faker->company, 'UTF-8'),
         'capital_social' => '1.000,00',
         'cep' => '01234-050',
         'logradouro' => 'RUA TESTE DA RUA',
@@ -38,9 +37,9 @@ $factory->state(PreRegistroCnpj::class, 'justificado', function (Faker $faker) {
     $campos = ['segmento','cep','logradouro','numero','complemento','bairro','cidade','uf','telefone','telefone_1','tipo_telefone',
     'tipo_telefone_1','opcional_celular','opcional_celular_1','idregional','path','cnpj_contabil','nome_contabil','email_contabil','nome_contato_contabil',
     'telefone_contabil','cpf_rt','registro','nome_rt','nome_social_rt','sexo_rt','dt_nascimento_rt','cep_rt','logradouro_rt','numero_rt','complemento_rt',
-    'bairro_rt','cidade_rt','uf_rt','nome_mae_rt','nome_pai_rt','tipo_identidade_rt','identidade_rt','orgao_emissor_rt','dt_expedicao_rt','razao_social',
-    'nire','tipo_empresa','dt_inicio_atividade','inscricao_municipal','inscricao_estadual','capital_social','cep_empresa','logradouro_empresa','numero_empresa',
-    'complemento_empresa','bairro_empresa','cidade_empresa','uf_empresa'];
+    'bairro_rt','cidade_rt','uf_rt','nome_mae_rt','nome_pai_rt','tipo_identidade_rt','identidade_rt','orgao_emissor_rt','dt_expedicao_rt','titulo_eleitor_rt',
+    'zona_rt','secao_rt','ra_reservista_rt','razao_social','nome_fantasia','nire','tipo_empresa','dt_inicio_atividade','capital_social','cep_empresa',
+    'logradouro_empresa','numero_empresa','complemento_empresa','bairro_empresa','cidade_empresa','uf_empresa'];
     $arrayFinal = array();
     foreach($campos as $campo)
         $arrayFinal[$campo] = $faker->text(500);
@@ -56,9 +55,9 @@ $factory->state(PreRegistroCnpj::class, 'campos_editados', function (Faker $fake
     $campos = ['segmento','cep','logradouro','numero','complemento','bairro','cidade','uf','telefone','telefone_1','tipo_telefone',
     'tipo_telefone_1','opcional_celular','opcional_celular_1','idregional','cnpj_contabil','nome_contabil','email_contabil','nome_contato_contabil',
     'telefone_contabil','cpf_rt','nome_rt','nome_social_rt','sexo_rt','dt_nascimento_rt','cep_rt','logradouro_rt','numero_rt','complemento_rt',
-    'bairro_rt','cidade_rt','uf_rt','nome_mae_rt','nome_pai_rt','tipo_identidade_rt','identidade_rt','orgao_emissor_rt','dt_expedicao_rt','razao_social',
-    'nire','tipo_empresa','dt_inicio_atividade','inscricao_municipal','inscricao_estadual','capital_social','cep_empresa','logradouro_empresa','numero_empresa',
-    'complemento_empresa','bairro_empresa','cidade_empresa','uf_empresa'];
+    'bairro_rt','cidade_rt','uf_rt','nome_mae_rt','nome_pai_rt','tipo_identidade_rt','identidade_rt','orgao_emissor_rt','dt_expedicao_rt','titulo_eleitor_rt',
+    'zona_rt','secao_rt','ra_reservista_rt','razao_social','nome_fantasia','nire','tipo_empresa','dt_inicio_atividade','capital_social','cep_empresa',
+    'logradouro_empresa','numero_empresa','complemento_empresa','bairro_empresa','cidade_empresa','uf_empresa'];
     $arrayFinal = array();
     foreach($campos as $campo)
         $arrayFinal[$campo] = null;

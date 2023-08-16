@@ -288,7 +288,7 @@ class UserExternoTest extends TestCase
     {
         $pre = factory('App\UserExterno')->create();
         $pre2 = factory('App\UserExterno')->create([
-            'cpf_cnpj' => '03961439893',
+            'cpf_cnpj' => '89878398000177',
             'email' => $pre->email
         ]);
         $dados = factory('App\UserExterno')->states('cadastro')->raw([

@@ -22,6 +22,10 @@ $factory->define(PreRegistroCpf::class, function (Faker $faker) {
         'identidade' => '111111111',
         'orgao_emissor' => 'SSP - SP',
         'dt_expedicao' => '2020-01-05',
+        'titulo_eleitor' => '775692145782',
+        'zona' => '123',
+        'secao' => '12345',
+        'ra_reservista' => '236587963257',
         'pre_registro_id' => factory('App\PreRegistro'),
     ];
 });
@@ -43,7 +47,7 @@ $factory->state(PreRegistroCpf::class, 'justificado', function (Faker $faker) {
     $campos = ['segmento','cep','logradouro','numero','complemento','bairro','cidade','uf','telefone','telefone_1','tipo_telefone',
     'tipo_telefone_1','opcional_celular','opcional_celular_1','idregional','path','cnpj_contabil','nome_contabil','email_contabil','nome_contato_contabil',
     'telefone_contabil','nome_social','dt_nascimento','sexo','estado_civil','nacionalidade','naturalidade_cidade','naturalidade_estado','nome_mae','nome_pai','tipo_identidade','identidade',
-    'orgao_emissor','dt_expedicao'];
+    'orgao_emissor','dt_expedicao','titulo_eleitor','zona','secao','ra_reservista'];
     $arrayFinal = array();
     foreach($campos as $campo)
         $arrayFinal[$campo] = $faker->text(500);
@@ -59,7 +63,7 @@ $factory->state(PreRegistroCpf::class, 'campos_editados', function (Faker $faker
     $campos = ['segmento','cep','logradouro','numero','complemento','bairro','cidade','uf','telefone','telefone_1','tipo_telefone',
     'tipo_telefone_1','opcional_celular','opcional_celular_1','idregional','cnpj_contabil','nome_contabil','email_contabil','nome_contato_contabil',
     'telefone_contabil','nome_social','dt_nascimento','sexo','estado_civil','nacionalidade','naturalidade_cidade','naturalidade_estado','nome_mae',
-    'nome_pai','tipo_identidade','identidade','orgao_emissor','dt_expedicao'];
+    'nome_pai','tipo_identidade','identidade','orgao_emissor','dt_expedicao','titulo_eleitor','zona','secao','ra_reservista'];
     $arrayFinal = array();
     foreach($campos as $campo)
         $arrayFinal[$campo] = null;

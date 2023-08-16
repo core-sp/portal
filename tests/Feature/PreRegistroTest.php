@@ -50,7 +50,7 @@ class PreRegistroTest extends TestCase
         $externo = $this->signInAsUserExterno();
 
         factory('App\UserExterno')->create([
-            'cpf_cnpj' => '03961439893'
+            'cpf_cnpj' => '68778785405'
         ]);
 
         $this->get(route('externo.relacao.preregistros'))->assertRedirect(route('externo.login'));
@@ -78,7 +78,7 @@ class PreRegistroTest extends TestCase
         $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         factory('App\UserExterno')->create([
-            'cpf_cnpj' => '03961439893'
+            'cpf_cnpj' => '68778785405'
         ]);
 
         $this->get(route('externo.relacao.preregistros'))->assertRedirect(route('externo.login'));
@@ -108,7 +108,7 @@ class PreRegistroTest extends TestCase
         factory('App\UserExterno')->create();
 
         factory('App\UserExterno')->create([
-            'cpf_cnpj' => '03961439893'
+            'cpf_cnpj' => '68778785405'
         ]);
 
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
