@@ -6,6 +6,8 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\CpfCnpj;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
+use App\Rules\Cnpj;
+use App\Rules\Cpf;
 
 class PreRegistroRequest extends FormRequest
 {
@@ -18,14 +20,14 @@ class PreRegistroRequest extends FormRequest
     private function getRules($externo)
     {
         $contabilCriarPR = [
-            'cpf_cnpj' => ['required', new CpfCnpj],
+            'cpf_cnpj' => ['required', new CpfCnpj, 'unique:contabeis,cnpj'],
             'nome' => 'required|min:5|max:191',
             'email' => 'required|email:rfc,filter|min:10|max:191',
         ];
 
         $rules = [
             'path' => $this->regraPath,
-            'cnpj_contabil' => ['nullable', new CpfCnpj],
+            'cnpj_contabil' => ['nullable', new Cnpj, 'unique:users_externo,cpf_cnpj'],
             'nome_contabil' => 'required_with:cnpj_contabil|nullable|min:5|max:191',
             'email_contabil' => 'required_with:cnpj_contabil|nullable|email:rfc,filter|min:10|max:191',
             'nome_contato_contabil' => 'required_with:cnpj_contabil|nullable|min:5|max:191|regex:/^\D*$/',
@@ -96,7 +98,7 @@ class PreRegistroRequest extends FormRequest
             'nome_social_rt' => 'nullable|min:5|max:191|regex:/^\D*$/',
             'sexo_rt' => 'required|in:'.implode(',', array_keys(generos())),
             'dt_nascimento_rt' => 'required|date_format:Y-m-d|before_or_equal:'.$this->regraDtNasc,
-            'cpf_rt' => ['required', new CpfCnpj],
+            'cpf_rt' => ['required', new Cpf],
             'tipo_identidade_rt' => 'required|in:'.implode(',', tipos_identidade()),
             'identidade_rt' => 'required|min:4|max:30',
             'orgao_emissor_rt' => 'required|min:3|max:191',
@@ -251,6 +253,8 @@ class PreRegistroRequest extends FormRequest
             'regex' => 'Formato inválido' . $attr,
             'distinct' => 'Os valores devem ser diferentes' . $attr,
             'array' => 'Formato inválido' . $attr,
+            'cpf_cnpj.unique' => 'Não pode solicitar pré-registro com o CNPJ fornecido devido constar no Portal como Contabilidade',
+            'cnpj_contabil.unique' => 'O CNPJ fornecido já consta no Portal com outro tipo de conta',
         ];
     }
 

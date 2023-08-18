@@ -14,6 +14,11 @@ class UserExternoRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+        $uniqueContabil = ['unique:contabeis,cnpj,NULL,id,deleted_at,NULL,ativo,1'];
+        $uniqueComum = ['unique:users_externo,cpf_cnpj,NULL,id,deleted_at,NULL,ativo,1'];
+        $uniqueComumNaoAtivo = ['unique:users_externo,cpf_cnpj'];
+        $uniqueContabilNaoAtivo = ['unique:contabeis,cnpj'];
+
         $all = $this->all();
         if(request()->filled('cpf_cnpj'))
             $all['cpf_cnpj'] = apenasNumeros(request()->cpf_cnpj);
@@ -33,11 +38,12 @@ class UserExternoRequest extends FormRequest
         {
             foreach(['tipo_conta', 'password', 'cpf_cnpj', 'email', 'nome', 'aceite'] as $val)
                 request()->missing($val) ? $this->merge([$val => null]) : null;
-            $this->regrasUnique = $this->tipo_conta == 'contabil' ? 'unique:contabeis,cnpj,NULL,id,deleted_at,NULL,ativo,1' : 
-            'unique:users_externo,cpf_cnpj,NULL,id,deleted_at,NULL,ativo,1';
+
+            request()->filled('cpf_cnpj') && (strlen($this->cpf_cnpj) == 14) && ($this->tipo_conta != 'contabil') ? $uniqueComum[1] = $uniqueContabilNaoAtivo[0] : null;
+            $this->regrasUnique = $this->tipo_conta == 'contabil' ? array_merge($uniqueContabil, $uniqueComumNaoAtivo) : $uniqueComum;
         }
         else
-            $this->regrasUnique = '';
+            $this->regrasUnique = [];
     }
 
     public function rules()
@@ -51,7 +57,8 @@ class UserExternoRequest extends FormRequest
                 'sometimes',
                 'required',
                 $this->tipo_conta == 'contabil' ? new Cnpj : new CpfCnpj,
-                $this->regrasUnique,
+                isset($this->regrasUnique[0]) ? $this->regrasUnique[0] : null,
+                isset($this->regrasUnique[1]) ? $this->regrasUnique[1] : null,
             ],
             'nome' => 'sometimes|required|min:5|max:191|string',
             'email' => 'sometimes|required|email:rfc,filter|max:191',

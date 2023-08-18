@@ -2479,7 +2479,7 @@ class PreRegistroCnpjTest extends TestCase
             ])
         ])->attributesToArray();
 
-        $externo = $this->signInAsUserExterno('contabil', factory('App\Contabil')->create(['cnpj' => '67779004000190']));
+        $externo = $this->signInAsUserExterno('contabil', factory('App\Contabil')->create(['cnpj' => '89081587000114']));
         $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
         $this->post(route('externo.contabil.inserir.preregistro'), $dados);
     

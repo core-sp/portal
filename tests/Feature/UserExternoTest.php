@@ -23,22 +23,13 @@ class UserExternoTest extends TestCase
     public function cannot_register_without_mandatory_inputs()
     {
         $this->get(route('externo.cadastro'))->assertOk();
-        $this->post(route('externo.cadastro.submit'), [
-            'tipo_conta' => null,
-            'cpf_cnpj' => null, 
-            'nome' => null,
-            'email' => '', 
-            'password' => '', 
-            'password_confirmation' => null, 
-            'aceite' => ''
-        ])
+        $this->post(route('externo.cadastro.submit'), [])
         ->assertSessionHasErrors([
             'tipo_conta',
             'cpf_cnpj',
             'nome',
             'email',
             'password',
-            'password_confirmation', 
             'aceite'
         ]);
     }
@@ -259,6 +250,96 @@ class UserExternoTest extends TestCase
         ]);
         $this->assertDatabaseMissing('users_externo', [
             'nome' => $dados['nome']
+        ]);
+    }
+
+    /** @test **/
+    public function cannot_register_if_exists_cpfcnpj_in_contabeis_table()
+    {
+        $pre = factory('App\Contabil')->create();
+        $dados = factory('App\UserExterno')->states('cadastro')->raw([
+            'cpf_cnpj' => $pre->cnpj,
+        ]);
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
+        $this->assertDatabaseMissing('users_externo', [
+            'nome' => $dados['nome']
+        ]);
+        $this->assertDatabaseHas('contabeis', [
+            'cnpj' => $pre->cnpj
+        ]);
+    }
+
+    /** @test **/
+    public function cannot_register_if_exists_cpfcnpj_in_contabeis_table_and_ativo_0()
+    {
+        $pre = factory('App\Contabil')->create([
+            'ativo' => 0
+        ]);
+        $dados = factory('App\UserExterno')->states('cadastro')->raw([
+            'cpf_cnpj' => $pre->cnpj,
+        ]);
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
+        $this->assertDatabaseMissing('users_externo', [
+            'nome' => $dados['nome']
+        ]);
+        $this->assertDatabaseHas('contabeis', [
+            'cnpj' => $pre->cnpj,
+            'ativo' => 0
+        ]);
+    }
+
+    /** @test **/
+    public function cannot_register_if_exists_cpfcnpj_in_contabeis_table_and_ativo_0_and_aceite_0()
+    {
+        $pre = factory('App\Contabil')->create([
+            'ativo' => 0,
+            'aceite' => 0
+        ]);
+        $dados = factory('App\UserExterno')->states('cadastro')->raw([
+            'cpf_cnpj' => $pre->cnpj,
+        ]);
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
+        $this->assertDatabaseMissing('users_externo', [
+            'nome' => $dados['nome']
+        ]);
+        $this->assertDatabaseHas('contabeis', [
+            'cnpj' => $pre->cnpj,
+            'ativo' => 0,
+            'aceite' => 0
+        ]);
+    }
+
+    /** @test **/
+    public function cannot_register_new_user_externo_if_cnpj_deleted_in_contabeis_table()
+    {
+        $dados = factory('App\Contabil')->create([
+            'deleted_at' => now()
+        ]);
+
+        $this->get(route('externo.cadastro'))->assertOk();
+        $dados = factory('App\UserExterno')->states('cadastro')->raw([
+            'cpf_cnpj' => $dados->cnpj
+        ]);
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertSessionHasErrors('cpf_cnpj');
+
+        $this->assertDatabaseMissing('users_externo', [
+            'nome' => $dados['nome']
+        ]);
+        $this->assertSoftDeleted('contabeis', [
+            'cnpj' => $dados['cpf_cnpj'],
         ]);
     }
 

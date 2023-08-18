@@ -30,22 +30,13 @@ class ContabilTest extends TestCase
     public function cannot_register_without_mandatory_inputs()
     {
         $this->get(route('externo.cadastro'))->assertOk();
-        $this->post(route('externo.cadastro.submit'), [
-            'tipo_conta' => null,
-            'cpf_cnpj' => null, 
-            'nome' => null,
-            'email' => '', 
-            'password' => '', 
-            'password_confirmation' => null, 
-            'aceite' => ''
-        ])
+        $this->post(route('externo.cadastro.submit'), [])
         ->assertSessionHasErrors([
             'tipo_conta',
             'cpf_cnpj',
             'nome',
             'email',
             'password',
-            'password_confirmation', 
             'aceite'
         ]);
     }
@@ -224,7 +215,7 @@ class ContabilTest extends TestCase
     }
 
     /** @test */
-    public function cannot_register_if_exist_cpfcnpj_in_contabil_table()
+    public function cannot_register_if_exists_cpfcnpj_in_contabil_table()
     {
         $pre = factory('App\Contabil')->create();
         $dados = factory('App\Contabil')->states('cadastro')->raw([
@@ -237,6 +228,98 @@ class ContabilTest extends TestCase
         ]);
         $this->assertDatabaseMissing('contabeis', [
             'nome' => $dados['nome']
+        ]);
+    }
+
+    /** @test */
+    public function cannot_register_if_exists_cpfcnpj_in_users_externo_table()
+    {
+        $pre = factory('App\UserExterno')->states('pj')->create();
+        $dados = factory('App\Contabil')->states('cadastro')->raw([
+            'cpf_cnpj' => $pre->cpf_cnpj,
+        ]);
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
+        $this->assertDatabaseMissing('contabeis', [
+            'nome' => $dados['nome']
+        ]);
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => $pre->cpf_cnpj
+        ]);
+    }
+
+    /** @test */
+    public function cannot_register_if_exists_cpfcnpj_in_users_externo_table_and_ativo_0()
+    {
+        $pre = factory('App\UserExterno')->states('pj')->create([
+            'ativo' => 0
+        ]);
+        $dados = factory('App\Contabil')->states('cadastro')->raw([
+            'cpf_cnpj' => $pre->cpf_cnpj,
+        ]);
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
+        $this->assertDatabaseMissing('contabeis', [
+            'nome' => $dados['nome']
+        ]);
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => $pre->cpf_cnpj,
+            'ativo' => 0
+        ]);
+    }
+
+    /** @test */
+    public function cannot_register_if_exists_cpfcnpj_in_users_externo_table_and_ativo_0_and_aceite_0()
+    {
+        $pre = factory('App\UserExterno')->states('pj')->create([
+            'ativo' => 0,
+            'aceite' => 0
+        ]);
+        $dados = factory('App\Contabil')->states('cadastro')->raw([
+            'cpf_cnpj' => $pre->cpf_cnpj,
+        ]);
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
+        $this->assertDatabaseMissing('contabeis', [
+            'nome' => $dados['nome']
+        ]);
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => $pre->cpf_cnpj,
+            'ativo' => 0,
+            'aceite' => 0
+        ]);
+    }
+
+    /** @test */
+    public function cannot_register_new_contabil_if_cnpj_deleted_in_users_externo_table()
+    {
+        $dados = factory('App\UserExterno')->states('pj')->create([
+            'deleted_at' => now()
+        ]);
+
+        $this->get(route('externo.cadastro'))->assertOk();
+        $dados = factory('App\Contabil')->states('cadastro')->raw([
+            'cnpj' => $dados->cpf_cnpj
+        ]);
+        $dados['cpf_cnpj'] = $dados['cnpj'];
+
+        $this->post(route('externo.cadastro.submit'), $dados)->dumpSession()
+        ->assertSessionHasErrors('cpf_cnpj');
+
+        $this->assertDatabaseMissing('contabeis', [
+            'nome' => $dados['nome']
+        ]);
+        $this->assertSoftDeleted('users_externo', [
+            'cpf_cnpj' => $dados['cpf_cnpj'],
         ]);
     }
 
@@ -2500,8 +2583,8 @@ class ContabilTest extends TestCase
         ->assertSee('Solicitações de registro gerenciados pela Contabilidade')
         ->assertSee('Listagem das solicitações de registro que os <strong>Representantes Comerciais</strong> relacionaram a sua contabilidade e as solicitações criadas pela própria contabilidade.')
         ->assertSee('<p class="pb-0">ID: <strong>'.$solicitacao->id.'</strong></p>')
-        ->assertSee('<p class="pb-0">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacao->userExterno->cpf_cnpj) .'</strong></p>')
-        ->assertSee('<p class="pb-0">Nome: <strong>'. $solicitacao->userExterno->nome .'</strong></p>')
+        ->assertSee('<span class="text-nowrap">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacao->userExterno->cpf_cnpj) .'</strong>&nbsp;&nbsp; | &nbsp;</span>')
+        ->assertSee('<span class="text-nowrap">Nome: <strong>'. $solicitacao->userExterno->nome .'</strong></span>')
         ->assertSee('<a class="btn btn-primary btn-sm text-white" href="'. route('externo.preregistro.view', $solicitacao->id) .'">');
 
         $this->post(route('externo.logout'));
@@ -2694,6 +2777,41 @@ class ContabilTest extends TestCase
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
         $txt = $inicio . 'Contabilidade com cnpj '.$externo['cnpj'].', criou a solicitação de registro com a id: 1';
         $this->assertStringContainsString($txt, $log[1]);
+    }
+
+    /** @test */
+    public function cannot_to_create_pre_registro_by_contabilidade_if_exists_in_contabeis_table()
+    {
+        factory('App\Contabil')->create([
+            'cnpj' => '89081587000114'
+        ]);
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $dados['cpf_cnpj'] = '89081587000114';
+
+        $this->get(route('externo.preregistro.view'))->assertOk();
+
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('cpf_cnpj');
+
+        $this->assertDatabaseMissing('users_externo', [
+            'cpf_cnpj' => $dados['cpf_cnpj']
+        ]);
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $dados['cpf_cnpj'] = '89081587000114';
+
+        $this->get(route('externo.preregistro.view'))->assertOk();
+
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('cpf_cnpj');
+
+        $this->assertDatabaseMissing('users_externo', [
+            'cpf_cnpj' => $dados['cpf_cnpj']
+        ]);
     }
 
     /** @test */
@@ -2911,16 +3029,16 @@ class ContabilTest extends TestCase
         ->assertSee('Solicitações de registro gerenciados pela Contabilidade')
         ->assertSee('Listagem das solicitações de registro que os <strong>Representantes Comerciais</strong> relacionaram a sua contabilidade e as solicitações criadas pela própria contabilidade.')
         ->assertSee('<p class="pb-0">ID: <strong>'.$solicitacoes->get(0)->id.'</strong></p>')
-        ->assertSee('<p class="pb-0">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacoes->get(0)->userExterno->cpf_cnpj) .'</strong></p>')
-        ->assertSee('<p class="pb-0">Nome: <strong>'. $solicitacoes->get(0)->userExterno->nome .'</strong></p>')
+        ->assertSee('<span class="text-nowrap">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacoes->get(0)->userExterno->cpf_cnpj) .'</strong>&nbsp;&nbsp; | &nbsp;</span>')
+        ->assertSee('<span class="text-nowrap">Nome: <strong>'. $solicitacoes->get(0)->userExterno->nome .'</strong></span>')
         ->assertSee('<a class="btn btn-primary btn-sm text-white" href="'. route('externo.preregistro.view', $solicitacoes->get(0)->id) .'">')
         ->assertSee('<p class="pb-0">ID: <strong>'.$solicitacoes->get(1)->id.'</strong></p>')
-        ->assertSee('<p class="pb-0">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacoes->get(1)->userExterno->cpf_cnpj) .'</strong></p>')
-        ->assertSee('<p class="pb-0">Nome: <strong>'. $solicitacoes->get(1)->userExterno->nome .'</strong></p>')
+        ->assertSee('<span class="text-nowrap">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacoes->get(1)->userExterno->cpf_cnpj) .'</strong>&nbsp;&nbsp; | &nbsp;</span>')
+        ->assertSee('<span class="text-nowrap">Nome: <strong>'. $solicitacoes->get(1)->userExterno->nome .'</strong></span>')
         ->assertSee('<a class="btn btn-primary btn-sm text-white" href="'. route('externo.preregistro.view', $solicitacoes->get(1)->id) .'">')
         ->assertDontSee('<p class="pb-0">ID: <strong>'.$solicitacoes->get(2)->id.'</strong></p>')
-        ->assertDontSee('<p class="pb-0">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacoes->get(2)->userExterno->cpf_cnpj) .'</strong></p>')
-        ->assertDontSee('<p class="pb-0">Nome: <strong>'. $solicitacoes->get(2)->userExterno->nome .'</strong></p>')
+        ->assertDontSee('<span class="text-nowrap">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacoes->get(2)->userExterno->cpf_cnpj) .'</strong>&nbsp;&nbsp; | &nbsp;</span>')
+        ->assertDontSee('<span class="text-nowrap">Nome: <strong>'. $solicitacoes->get(2)->userExterno->nome .'</strong></span>')
         ->assertDontSee('<a class="btn btn-primary btn-sm text-white" href="'. route('externo.preregistro.view', $solicitacoes->get(2)->id) .'">');
     }
 

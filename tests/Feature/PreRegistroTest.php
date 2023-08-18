@@ -1090,6 +1090,52 @@ class PreRegistroTest extends TestCase
         ]);
     }
 
+    /** @test */
+    public function cannot_update_table_pre_registros_by_ajax_when_exists_cnpj_in_users_externo_table_in_historico_contabil()
+    {
+        $pj = factory('App\UserExterno')->states('pj')->create();
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'contabil_id' => null,
+        ]);
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'contabil',
+            'campo' => 'cnpj_contabil',
+            'valor' => $pj->cpf_cnpj
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseMissing('pre_registros', [
+            'contabil_id' => '1',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registros_by_ajax_when_exists_cnpj_deleted_in_users_externo_table_in_historico_contabil()
+    {
+        $pj = factory('App\UserExterno')->states('pj')->create([
+            'deleted_at' => now()
+        ]);
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'contabil_id' => null,
+        ]);
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'contabil',
+            'campo' => 'cnpj_contabil',
+            'valor' => $pj->cpf_cnpj
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseMissing('pre_registros', [
+            'contabil_id' => '1',
+        ]);
+    }
+
     // Status do pré-registro
 
     /** @test */
@@ -1281,6 +1327,67 @@ class PreRegistroTest extends TestCase
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('idregional');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_cnpj_contabil_exists_in_users_externo_table()
+    {
+        $pj = factory('App\UserExterno')->create([
+            'cpf_cnpj' => '89081587000114'
+        ]);
+
+        // PF
+        $externo = $this->signInAsUserExterno();
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['cnpj_contabil'] = $pj->cpf_cnpj;
+        
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('cnpj_contabil');
+
+        // PJ
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['cnpj_contabil'] = $pj->cpf_cnpj;
+        
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('cnpj_contabil');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_cnpj_contabil_exists_in_users_externo_table_and_deleted()
+    {
+        $pj = factory('App\UserExterno')->create([
+            'cpf_cnpj' => '89081587000114',
+            'deleted_at' => now()
+        ]);
+
+        // PF
+        $externo = $this->signInAsUserExterno();
+
+        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
+        $dados['cnpj_contabil'] = $pj->cpf_cnpj;
+        
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('cnpj_contabil');
+
+        // PJ
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+
+        $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
+        $dados['cnpj_contabil'] = $pj->cpf_cnpj;
+        
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('cnpj_contabil');
     }
 
     /** @test */

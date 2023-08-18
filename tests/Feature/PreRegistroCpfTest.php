@@ -413,6 +413,10 @@ class PreRegistroCpfTest extends TestCase
             'nome_pai' => $faker->text(500),
             'identidade' => $faker->text(500),
             'orgao_emissor' => $faker->text(500),
+            'titulo_eleitor' => $faker->text(500),
+            'zona' => $faker->text(500),
+            'secao' => $faker->text(500),
+            'ra_reservista' => $faker->text(500),
         ];
         
         foreach($preRegistroCpf as $key => $value)
@@ -711,7 +715,11 @@ class PreRegistroCpfTest extends TestCase
         $pr = factory('App\PreRegistroCpf')->states('request')->make([
             'nacionalidade' => 'Chilena',
             'naturalidade_cidade' => null,
-            'naturalidade_estado' => null
+            'naturalidade_estado' => null,
+            'titulo_eleitor' => null,
+            'zona' => null,
+            'secao' => null,
+            'ra_reservista' => null,
         ]);
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();
@@ -2063,6 +2071,10 @@ class PreRegistroCpfTest extends TestCase
             'nome_pai' => $faker->text(500),
             'identidade' => $faker->text(500),
             'orgao_emissor' => $faker->text(500),
+            'titulo_eleitor' => $faker->text(500),
+            'zona' => $faker->text(500),
+            'secao' => $faker->text(500),
+            'ra_reservista' => $faker->text(500),
         ];
         
         foreach($preRegistroCpf as $key => $value)
@@ -2370,7 +2382,11 @@ class PreRegistroCpfTest extends TestCase
         $pr = factory('App\PreRegistroCpf')->states('request')->make([
             'nacionalidade' => 'Chilena',
             'naturalidade_cidade' => null,
-            'naturalidade_estado' => null
+            'naturalidade_estado' => null,
+            'titulo_eleitor' => null,
+            'zona' => null,
+            'secao' => null,
+            'ra_reservista' => null,
         ]);
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();

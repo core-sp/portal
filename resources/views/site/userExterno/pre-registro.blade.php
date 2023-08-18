@@ -35,6 +35,11 @@
                                     <strong>Status:</strong> <span class="badge badge{{ $preRegistro->getLabelStatus($preRegistro->status) }}">{{ $preRegistro->status }}</span>
                                     {{ $preRegistro->status == $preRegistro::STATUS_NEGADO ? '- ' . $preRegistro->getJustificativaNegado() : '' }}
                                 </p>
+                                @if($preRegistro->isAprovado())
+                                <a class="btn btn-success text-white mt-3" href="{{-- route('externo.preregistro.view', $solicitacao->id) --}}">
+                                    Baixar boleto
+                                </a>
+                                @endif
                                 <hr />
                             @endif
                         @endforeach

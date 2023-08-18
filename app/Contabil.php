@@ -61,8 +61,7 @@ class Contabil extends Authenticatable
         {
             if(isset($valor) && (strlen($valor) == 14)) 
                 return Contabil::buscar($valor, $canEdit);
-            if(!isset($valor))
-                return 'remover';
+            return 'remover';
         }
 
         return null;
@@ -71,7 +70,7 @@ class Contabil extends Authenticatable
     public function updateAjax($campo, $valor)
     {
         if(!$this->possuiLogin())
-            $this->update([$campo => $valor]);
+            $campo != 'cnpj' ? $this->update([$campo => $valor]) : null;
     }
 
     public static function atualizar($arrayCampos)
@@ -80,7 +79,10 @@ class Contabil extends Authenticatable
         {
             $contabil = Contabil::buscar($arrayCampos['cnpj']);
             if(!$contabil->possuiLogin())
+            {
+                unset($arrayCampos['cnpj']);
                 $contabil->update($arrayCampos);
+            }
             return $contabil;
         }
 

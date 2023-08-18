@@ -70,8 +70,7 @@ class ResponsavelTecnico extends Model
         {
             if(isset($valor) && (strlen($valor) == 11)) 
                 return ResponsavelTecnico::buscar($valor, $gerenti, $canEdit);
-            if(!isset($valor))
-                return 'remover';
+            return 'remover';
         }
 
         return null;
@@ -79,7 +78,8 @@ class ResponsavelTecnico extends Model
 
     public function updateAjax($campo, $valor)
     {
-        $this->update([$campo => $valor]);
+        if($campo != 'cpf')
+            $this->update([$campo => $valor]);
     }
 
     public static function atualizar($arrayCampos, $gerenti)
@@ -87,6 +87,7 @@ class ResponsavelTecnico extends Model
         if(isset($arrayCampos['cpf']) && (strlen($arrayCampos['cpf']) == 11))
         {
             $rt = ResponsavelTecnico::buscar($arrayCampos['cpf'], $gerenti);
+            unset($arrayCampos['cpf']);
             $rt->update($arrayCampos);
             return $rt;
         }

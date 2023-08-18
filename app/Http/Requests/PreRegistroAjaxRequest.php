@@ -6,6 +6,8 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Contracts\MediadorServiceInterface;
 use App\Rules\CpfCnpj;
 use Carbon\Carbon;
+use App\Rules\Cnpj;
+use App\Rules\Cpf;
 
 class PreRegistroAjaxRequest extends FormRequest
 {
@@ -13,6 +15,7 @@ class PreRegistroAjaxRequest extends FormRequest
     private $service;
     private $classes;
     private $todos;
+    private $msgUnique;
 
     public function __construct(MediadorServiceInterface $service)
     {
@@ -21,6 +24,8 @@ class PreRegistroAjaxRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+        $this->msgUnique = 'Valor não permitido';
+
         $campos_array = $this->service->getService('PreRegistro')->getNomesCampos();
         if(auth()->guard('contabil')->check() && (strpos($this->campo, 'contabil') !== false))
             $this->merge([
@@ -84,12 +89,18 @@ class PreRegistroAjaxRequest extends FormRequest
 
         if((strpos(request()->campo, 'cpf') !== false) || (strpos(request()->campo, 'cnpj') !== false))
         {
-            if(isset(request()->valor))
-            {
-                $this->regraValor = [new CpfCnpj];
-                $this->merge([
-                    'valor' => apenasNumeros(request()->valor)
-                ]);
+            $this->merge(['valor' => apenasNumeros($this->valor)]);
+            switch ($this->campo) {
+                case 'cpf_rt':
+                    $this->regraValor = ['nullable', new Cpf];
+                    break;
+                case 'cnpj_contabil':
+                    $this->regraValor = ['nullable', new Cnpj, 'unique:users_externo,cpf_cnpj'];
+                    $this->msgUnique = 'O CNPJ fornecido já consta no Portal com outro tipo de conta';
+                    break;
+                default:
+                    $this->regraValor = ['nullable', new CpfCnpj];
+                    break;
             }
         }
 
@@ -161,6 +172,7 @@ class PreRegistroAjaxRequest extends FormRequest
             'total.required' => 'A soma do tamanho dos arquivos ultrapassa 5 MB',
             'campo.in' => 'Campo não encontrado ou não permitido alterar',
             'valor.in' => 'Valor não encontrado',
+            'valor.unique' => $this->msgUnique,
             'valor.array' => 'Formato da requisição do upload do anexo está errado',
             'required' => 'Falta dados para enviar a requisição',
             'mimetypes' => 'O arquivo não possui extensão permitida ou está com erro',

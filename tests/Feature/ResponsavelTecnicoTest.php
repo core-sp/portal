@@ -296,6 +296,10 @@ class ResponsavelTecnicoTest extends TestCase
             'nome_pai' => $faker->text(500),
             'identidade' => $faker->text(500),
             'orgao_emissor' => $faker->text(500),
+            'titulo_eleitor' => $faker->text(500),
+            'zona' => $faker->text(500),
+            'secao' => $faker->text(500),
+            'ra_reservista' => $faker->text(500),
         ];
                 
         foreach($rt as $key => $value)
@@ -572,7 +576,7 @@ class ResponsavelTecnicoTest extends TestCase
     }
 
     /** @test */
-    public function cannot_update_table_responsaveis_tecnicos_by_ajax_when_clean_inputs()
+    public function can_update_table_responsaveis_tecnicos_by_ajax_when_clean_inputs()
     {
         $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
@@ -591,15 +595,15 @@ class ResponsavelTecnicoTest extends TestCase
         ]);
 
         foreach($rt->toArray() as $key => $value)
-            $this->post(route('externo.inserir.preregistro.ajax'), [
+            $key != 'cpf' ? $this->post(route('externo.inserir.preregistro.ajax'), [
                 'classe' => 'pessoaJuridica.responsavelTecnico',
                 'campo' => $key . '_rt',
                 'valor' => ''
-            ])->assertOk();
+            ])->assertOk() : null;
         
-        $this->assertDatabaseHas('responsaveis_tecnicos', $rt->toArray());
+        $this->assertDatabaseHas('responsaveis_tecnicos', $rt->fresh()->toArray());
         $this->assertDatabaseHas('pre_registros_cnpj', [
-            'responsavel_tecnico_id' => null
+            'responsavel_tecnico_id' => $rt->id
         ]);
     }
 
@@ -1823,6 +1827,10 @@ class ResponsavelTecnicoTest extends TestCase
             'nome_pai' => $faker->text(500),
             'identidade' => $faker->text(500),
             'orgao_emissor' => $faker->text(500),
+            'titulo_eleitor' => $faker->text(500),
+            'zona' => $faker->text(500),
+            'secao' => $faker->text(500),
+            'ra_reservista' => $faker->text(500),
         ];
                 
         foreach($rt as $key => $value)
@@ -2101,7 +2109,7 @@ class ResponsavelTecnicoTest extends TestCase
     }
 
     /** @test */
-    public function cannot_update_table_responsaveis_tecnicos_by_ajax_when_clean_inputs_by_contabilidade()
+    public function can_update_table_responsaveis_tecnicos_by_ajax_when_clean_inputs_by_contabilidade()
     {
         $externo = $this->signInAsUserExterno('contabil');
         $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
@@ -2120,15 +2128,15 @@ class ResponsavelTecnicoTest extends TestCase
         ]);
 
         foreach($rt->toArray() as $key => $value)
-            $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            $key != 'cpf' ? $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
                 'classe' => 'pessoaJuridica.responsavelTecnico',
                 'campo' => $key . '_rt',
                 'valor' => ''
-            ])->assertOk();
+            ])->assertOk() : null;
         
-        $this->assertDatabaseHas('responsaveis_tecnicos', $rt->toArray());
+        $this->assertDatabaseHas('responsaveis_tecnicos', $rt->fresh()->toArray());
         $this->assertDatabaseHas('pre_registros_cnpj', [
-            'responsavel_tecnico_id' => null
+            'responsavel_tecnico_id' => $rt->id
         ]);
     }
 

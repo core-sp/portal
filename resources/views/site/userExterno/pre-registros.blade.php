@@ -26,13 +26,21 @@
             @foreach($resultados as $solicitacao)
             <div class="list-group-item light d-block">
                 <p class="pb-0">ID: <strong>{{ $solicitacao->id }}</strong></p>
-                <p class="pb-0">CPF / CNPJ: <strong>{{ formataCpfCnpj($solicitacao->userExterno->cpf_cnpj) }}</strong></p>
-                <p class="pb-0">Nome: <strong>{{ $solicitacao->userExterno->nome }}</strong></p>
-                <p class="pb-0">Status: {!! $solicitacao->getLabelStatusUser() !!}</p>
-                <p class="pb-0 pt-2">
+                <p class="pb-0">
+                    <span class="text-nowrap">CPF / CNPJ: <strong>{{ formataCpfCnpj($solicitacao->userExterno->cpf_cnpj) }}</strong>&nbsp;&nbsp; | &nbsp;</span>
+                    <span class="text-nowrap">Nome: <strong>{{ $solicitacao->userExterno->nome }}</strong></span>
+                </p>
+                
+                <p class="pb-0">Status: {!! $solicitacao->getLabelStatusUser(true) !!}&nbsp;&nbsp; | &nbsp;
                     <a class="btn btn-primary btn-sm text-white" href="{{ route('externo.preregistro.view', $solicitacao->id) }}">
-                         Visualizar solicitação
+                         Visualizar
                     </a>
+                    @if($solicitacao->isAprovado())
+                    &nbsp; | &nbsp;
+                    <a class="btn btn-success btn-sm text-white" href="{{-- route('externo.preregistro.view', $solicitacao->id) --}}">
+                         Baixar boleto
+                    </a>
+                    @endif
                 </p>
             </div>
             @endforeach
