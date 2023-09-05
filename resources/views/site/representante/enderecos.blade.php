@@ -14,9 +14,9 @@
         <div class="linha-lg-mini mb-2"></div>
         <h5 class="mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;SOLICITAÇÕES</h5>
         @if ($possuiSolicitacaoEnderecos)
-            <div class="list-group w-100" data-clarity-mask="True">
+            <div class="list-group w-100">
                 @foreach ($solicitacoesEnderecos as $item)
-                    <div class="list-group-item light d-block bg-info">
+                    <div class="list-group-item light d-block bg-info" data-clarity-mask="True">
                         <p class="pb-0 branco">Endereço: <strong>{{ $item->logradouro }}, {{ $item->numero }} {{ isset($item->complemento) ? ' - ' . $item->complemento : '' }}</strong></p>
                         <p class="pb-0 branco">Bairro: <strong>{{ $item->bairro }}</strong></p>
                         <p class="pb-0 branco">Município: <strong>{{ $item->municipio }}</strong></p>
