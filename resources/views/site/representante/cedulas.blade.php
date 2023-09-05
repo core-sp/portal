@@ -23,7 +23,7 @@
                 </div>
             @endif
             @if ($cedulas->total() > 0)
-                <div class="list-group w-100">
+                <div class="list-group w-100" data-clarity-mask="True">
                     @foreach ($cedulas as $item)
                         <div class="list-group-item light d-block bg-info">
                             <p class="pb-0 branco">Código: <strong>{{ $item->id }}</strong></p>

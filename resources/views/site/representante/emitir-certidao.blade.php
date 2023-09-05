@@ -19,7 +19,7 @@
         @if(isset($certidoes))
         <h5 class="mt-3 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;CERTIDÕES EMITIDAS</h5>   
 
-        <div class="contatos-table">
+        <div class="contatos-table" data-clarity-mask="True">
             @forelse ($certidoes as $certidao)
             <div class="contato-single {{ $loop->last ? '' : 'b-dashed' }}">
                 <p class="pb-0">

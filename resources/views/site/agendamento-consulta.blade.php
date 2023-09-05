@@ -85,7 +85,7 @@
 @if(request()->query('protocolo'))
   <div class="container">
   @if(isset($resultado))
-    <div class="row mt-4 mb-2">
+    <div class="row mt-4 mb-2" data-clarity-mask="True">
       <div class="col mt-2">
         <strong>Agendamento encontrado!</strong><br /><br/>
         <strong>Protocolo:</strong> {{ $resultado->protocolo }}<br />

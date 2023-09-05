@@ -14,7 +14,7 @@
         <div class="linha-lg-mini mb-2"></div>
         <h5 class="mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;SOLICITAÇÕES</h5>
         @if ($possuiSolicitacaoEnderecos)
-            <div class="list-group w-100">
+            <div class="list-group w-100" data-clarity-mask="True">
                 @foreach ($solicitacoesEnderecos as $item)
                     <div class="list-group-item light d-block bg-info">
                         <p class="pb-0 branco">Endereço: <strong>{{ $item->logradouro }}, {{ $item->numero }} {{ isset($item->complemento) ? ' - ' . $item->complemento : '' }}</strong></p>
@@ -42,7 +42,7 @@
         <div class="contatos-table space-single">
             @if($endereco['CEP'] !== null)
                 @foreach ($endereco as $key => $item)
-                    <p class="pb-0">{{ $key }}: <strong class="text-uppercase">{{ !empty($item) ? $item : '-----' }}</strong></p>
+                    <p class="pb-0" data-clarity-mask="True">{{ $key }}: <strong class="text-uppercase">{{ !empty($item) ? $item : '-----' }}</strong></p>
                 @endforeach
             @else
                 <p class="pb-0">Nenhum endereço cadastrado.</p>

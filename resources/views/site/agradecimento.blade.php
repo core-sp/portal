@@ -32,7 +32,7 @@
     <div class="linha-lg"></div>
     <div class="row">
       <div class="col">
-        <div class="novo-core-box">
+        <div class="novo-core-box" data-clarity-mask="True">
           @if(isset($agradece))
             <h5 class="light branco">{!! $agradece !!}</h5>
           @endif

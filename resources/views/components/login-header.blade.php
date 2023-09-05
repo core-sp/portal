@@ -1,4 +1,4 @@
-<div class="row nomargin mb-3 login-header">
+<div class="row nomargin mb-3 login-header" data-clarity-mask="True">
     @if(Auth::guard('representante')->check())
         <p class="cinza-claro p-restrita m-auto-992">
             <small>

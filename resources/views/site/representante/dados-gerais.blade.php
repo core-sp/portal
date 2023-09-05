@@ -12,7 +12,7 @@
     <div class="conteudo-txt-mini light">
         <h4 class="pt-1 pb-1">Dados gerais</h4>
         <div class="linha-lg-mini mb-3"></div>
-        <div class="contatos-table">
+        <div class="contatos-table" data-clarity-mask="True">
             <div class="contato-single b-dashed">
                 <p class="pb-0">Nome: <strong>{{ $nome }}</strong></p>
             </div>
