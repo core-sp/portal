@@ -19,8 +19,8 @@
         <h5 class="mt-3 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;CONTATOS CADASTRADOS</h5>
             <div class="contatos-table">
                 @forelse ($contatos as $contato)
-                <div class="contato-single {{ $loop->last ? '' : 'b-dashed' }}" data-clarity-mask="True">
-                    <p class="pb-0">
+                <div class="contato-single {{ $loop->last ? '' : 'b-dashed' }}">
+                    <p class="pb-0" data-clarity-mask="True">
                         {{ $gerentiTiposContatos[$contato['CXP_TIPO']] }}:&nbsp;<strong>{{ $contato['CXP_VALOR'] }}</strong>
                         <small class="light">{{ $contato['CXP_STATUS'] === 1 ? '(Ativo)' : '(Inativo)' }}</small>
                     </p>

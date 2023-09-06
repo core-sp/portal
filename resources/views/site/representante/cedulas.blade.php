@@ -38,7 +38,7 @@
                             @endif
                             <p class="pb-0 branco">Status: <strong class="{{ $item->status === 'Recusado' ? 'text-dark' : 'text-warning' }} text-uppercase">{{ $item->status }}</strong></p>
                             @isset($item->justificativa)
-                                <p class="pb-0 lh-1 cinza-claro"><small class="light">{!! '—————<br>' . $item->justificativa !!}</small></p>
+                                <p class="pb-0 lh-1 cinza-claro" data-clarity-mask="True"><small class="light">{!! '—————<br>' . $item->justificativa !!}</small></p>
                             @endisset
                         </div>
                     @endforeach

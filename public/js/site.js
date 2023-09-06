@@ -913,6 +913,7 @@ $('.emitirCertidaoBtn').on('click', function(){
 	const acceptCookies = () => {
 	  document.querySelector(".box-cookies").classList.add('hide');
 	  localStorage.setItem("pureJavaScriptCookies", "accept");
+	  window.clarity('consent');
 	};
 	
 	const btnCookies = document.querySelector(".btn-cookies");

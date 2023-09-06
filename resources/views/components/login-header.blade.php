@@ -1,8 +1,8 @@
-<div class="row nomargin mb-3 login-header" data-clarity-mask="True">
+<div class="row nomargin mb-3 login-header">
     @if(Auth::guard('representante')->check())
         <p class="cinza-claro p-restrita m-auto-992">
             <small>
-                <a href="{{ route('representante.dashboard') }}">
+                <a href="{{ route('representante.dashboard') }}" data-clarity-mask="True">
                     <i class="fas fa-user"></i>&nbsp;
                    {{ limitRepresentanteName(Auth::guard('representante')->user()->nome) }}
                 </a>
