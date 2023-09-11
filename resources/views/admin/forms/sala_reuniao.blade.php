@@ -4,11 +4,60 @@
         @method('PUT')
     @endif
     @php
+        $todasHoras = todasHoras();
+        array_push($todasHoras, '18:00');
         $manha = $resultado::horasManha();
         $tarde = $resultado::horasTarde();
     @endphp
     <div class="card-body">
         <h4>Regional - {{ $resultado->regional->regional }}</h4>
+
+        <hr />
+
+        <div class="mb-5">
+            <h4 class="text-primary">Horário final dos períodos manhã e tarde</h4>
+            <div class="form-row mb-3">
+                <div class="col-sm mb-2-576">
+                    <label for="hora_limite_final_manha">Horário do almoço</label>
+                    <select 
+                        name="hora_limite_final_manha" 
+                        class="form-control {{ $errors->has('hora_limite_final_manha') ? 'is-invalid' : '' }}" 
+                        id="hora_limite_final_manha" 
+                    >
+                    @foreach(array_slice($todasHoras, 4, 7) as $hora)
+                        <option value="{{ $hora }}">
+                            {{ $hora }}
+                        </option>
+                    @endforeach
+                    </select>
+                    @if($errors->has('hora_limite_final_manha'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('hora_limite_final_manha') }}
+                    </div>
+                    @endif
+                </div>
+
+                <div class="col-sm mb-2-576">
+                    <label for="hora_limite_final_tarde">Horário fim de expediente</label>
+                    <select 
+                        name="hora_limite_final_tarde" 
+                        class="form-control {{ $errors->has('hora_limite_final_tarde') ? 'is-invalid' : '' }}" 
+                        id="hora_limite_final_tarde" 
+                    >
+                    @foreach(array_slice($todasHoras, 12, 7) as $hora)
+                        <option value="{{ $hora }}">
+                            {{ $hora }}
+                        </option>
+                    @endforeach
+                    </select>
+                    @if($errors->has('hora_limite_final_tarde'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('hora_limite_final_tarde') }}
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
 
         <hr />
 
