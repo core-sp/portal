@@ -148,7 +148,7 @@
                       <a href="{{ route('fiscalizacao.acoesfiscalizacao') }}" class="dropdown-item">Ações da fiscalização</a>
                       <a href="{{ route('fiscalizacao.espacoContador') }}" class="dropdown-item">Espaço do Contador</a>
                       <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank" class="dropdown-item">Denuncie</a>
-                      <a href="/sobre-a-fiscalizacao" class="dropdown-item bb-0">Sobre o departamento</a>
+                      <a href="/sobre-a-fiscalizacao" class="dropdown-item bb-0">Sobre a Fiscalização</a>
                     </div>
                   </li>
                   <li class="nav-item">
