@@ -21,6 +21,7 @@ class CreateAgendamentosSalas extends Migration
             $table->text('participantes')->nullable();
             $table->date('dia');
             $table->string('periodo');
+            $table->boolean('periodo_todo')->default(false);
             $table->string('tipo_sala');
             $table->string('status')->nullable();
             $table->text('justificativa')->nullable();

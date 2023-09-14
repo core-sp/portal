@@ -105,7 +105,7 @@ class AgendamentoSala extends Model
 
     public function getPeriodo()
     {
-    	return $this->periodo == 'manha' ? 'Manhã' : 'Tarde';
+    	return str_replace(' - ', ' até ', $this->periodo);
     }
 
     public function getParticipantes()

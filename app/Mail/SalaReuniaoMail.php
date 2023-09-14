@@ -24,6 +24,11 @@ class SalaReuniaoMail extends Mailable
         $this->body .= "<br><br>";
         $this->body .= "<strong>Os itens / participantes abaixo foram alterados:</strong>";
         $this->body .= "<br><br>";
+        
+        if(isset($itens['final_manha']))
+            $this->body .= "<strong>Horário final do período da manhã</strong><br><br>Antes: ".$itens['final_manha']."; Atual: ".$sala->hora_limite_final_manha."<br><br>";
+        if(isset($itens['final_tarde']))
+            $this->body .= "<strong>Horário final do período da tarde</strong><br><br>Antes: ".$itens['final_tarde']."; Atual: ".$sala->hora_limite_final_tarde."<br><br>";
         if(isset($itens['reuniao']) && !empty($itens['reuniao'])){
             $this->body .= "<strong>Sala de Reunião</strong>";
             $this->body .= "<br><br>";

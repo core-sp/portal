@@ -19,13 +19,16 @@ class SalaReuniaoRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        $this->horas = $this->service->getHoras();
+        $this->horas = todasHoras();
 
-        $this->required_horas_reuniao['manha'] = $this->participantes_reuniao > 0 ? 'required_if:tarde_horarios_reuniao,' : 'required_unless:participantes_reuniao,0';
-        $this->required_horas_reuniao['tarde'] = $this->participantes_reuniao > 0 ? 'required_if:manha_horarios_reuniao,' : 'required_unless:participantes_reuniao,0';
+        $this->required_horas_reuniao = $this->participantes_reuniao > 0 ? 'required_if:horarios_reuniao,' : 'required_unless:participantes_reuniao,0';
+        $this->required_horas_coworking = $this->participantes_coworking > 0 ? 'required_if:horarios_coworking,' : 'required_unless:participantes_coworking,0';
 
-        $this->required_horas_coworking['manha'] = $this->participantes_coworking > 0 ? 'required_if:tarde_horarios_coworking,' : 'required_unless:participantes_coworking,0';
-        $this->required_horas_coworking['tarde'] = $this->participantes_coworking > 0 ? 'required_if:manha_horarios_coworking,' : 'required_unless:participantes_coworking,0';
+        if($this->filled('hora_limite_final_manha') && in_array($this->hora_limite_final_manha, $this->horas))
+            unset($this->horas[array_search($this->hora_limite_final_manha, $this->horas)]);
+
+        if($this->filled('hora_limite_final_tarde') && in_array($this->hora_limite_final_tarde, $this->horas))
+            unset($this->horas[array_search($this->hora_limite_final_tarde, $this->horas)]);
 
         if($this->filled('itens_reuniao') && is_array($this->itens_reuniao))
         {
@@ -48,19 +51,18 @@ class SalaReuniaoRequest extends FormRequest
     public function rules()
     {
         return [
+            'hora_limite_final_manha' => 'required|in:' . implode(',', $this->service->getHorasPeriodo('manha')),
+            'hora_limite_final_tarde' => 'required|in:' . implode(',', $this->service->getHorasPeriodo('tarde')),
+
             'participantes_reuniao' => 'required|integer|not_in:1',
-            'manha_horarios_reuniao' => $this->required_horas_reuniao['manha'] . '|array|in:' . implode(',', $this->horas['manha']),
-            'manha_horarios_reuniao.*' => 'distinct',
-            'tarde_horarios_reuniao' => $this->required_horas_reuniao['tarde'] . '|array|in:' . implode(',', $this->horas['tarde']),
-            'tarde_horarios_reuniao.*' => 'distinct',
+            'horarios_reuniao' => $this->required_horas_reuniao . '|array|in:' . implode(',', $this->horas),
+            'horarios_reuniao.*' => 'distinct',
             'itens_reuniao' => 'required_unless:participantes_reuniao,0|array',
             'itens_reuniao.*' => 'distinct',
 
             'participantes_coworking' => 'required|integer',
-            'manha_horarios_coworking' => $this->required_horas_coworking['manha'] . '|array|in:' . implode(',', $this->horas['manha']),
-            'manha_horarios_coworking.*' => 'distinct',
-            'tarde_horarios_coworking' => $this->required_horas_coworking['tarde'] . '|array|in:' . implode(',', $this->horas['tarde']),
-            'tarde_horarios_coworking.*' => 'distinct',
+            'horarios_coworking' => $this->required_horas_coworking . '|array|in:' . implode(',', $this->horas),
+            'horarios_coworking.*' => 'distinct',
             'itens_coworking' => 'required_unless:participantes_coworking,0|array|in:' . implode(',', $this->service->getItensByTipo('coworking')),
             'itens_coworking.*' => 'distinct',
         ];
@@ -73,11 +75,9 @@ class SalaReuniaoRequest extends FormRequest
             'itens_coworking.required_unless' => 'O campo é obrigatório / itens editáveis não alterados ou com erro',
             'required' => 'O campo é obrigatório',
             'required_unless' => 'O campo é obrigatório se participantes maior que 0',
-            'manha_horarios_reuniao.required_if' => 'O campo é obrigatório se participantes maior que 0 e horarios tarde não selecionados',
-            'tarde_horarios_reuniao.required_if' => 'O campo é obrigatório se participantes maior que 0 e horarios manhã não selecionados',
-            'manha_horarios_coworking.required_if' => 'O campo é obrigatório se participantes maior que 0 e horarios tarde não selecionados',
-            'tarde_horarios_coworking.required_if' => 'O campo é obrigatório se participantes maior que 0 e horarios manhã não selecionados',
-            'in' => 'Esse valor não existe',
+            'horarios_reuniao.required_if' => 'O campo é obrigatório se participantes maior que 0',
+            'horarios_coworking.required_if' => 'O campo é obrigatório se participantes maior que 0',
+            'in' => 'Esse valor não existe ou não pode ser inserido',
             'array' => 'Formato inválido',
             'integer' => 'Deve ser um número',
             'distinct' => 'Existe valor repetido',

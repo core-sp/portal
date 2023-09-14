@@ -3,12 +3,6 @@
     @if(isset($resultado))
         @method('PUT')
     @endif
-    @php
-        $todasHoras = todasHoras();
-        array_push($todasHoras, '18:00');
-        $manha = $resultado::horasManha();
-        $tarde = $resultado::horasTarde();
-    @endphp
     <div class="card-body">
         <h4>Regional - {{ $resultado->regional->regional }}</h4>
 
@@ -22,10 +16,14 @@
                     <select 
                         name="hora_limite_final_manha" 
                         class="form-control {{ $errors->has('hora_limite_final_manha') ? 'is-invalid' : '' }}" 
-                        id="hora_limite_final_manha" 
+                        id="hora_limite_final_manha"
+                        required
                     >
-                    @foreach(array_slice($todasHoras, 4, 7) as $hora)
-                        <option value="{{ $hora }}">
+                    @foreach($resultado::periodoManha() as $hora)
+                        <option 
+                            value="{{ $hora }}"
+                            {{ ($hora == old('hora_limite_final_manha')) || ($hora == $resultado->hora_limite_final_manha) ? 'selected' : '' }}
+                        >
                             {{ $hora }}
                         </option>
                     @endforeach
@@ -42,10 +40,14 @@
                     <select 
                         name="hora_limite_final_tarde" 
                         class="form-control {{ $errors->has('hora_limite_final_tarde') ? 'is-invalid' : '' }}" 
-                        id="hora_limite_final_tarde" 
+                        id="hora_limite_final_tarde"
+                        required
                     >
-                    @foreach(array_slice($todasHoras, 12, 7) as $hora)
-                        <option value="{{ $hora }}">
+                    @foreach($resultado::periodoTarde() as $hora)
+                        <option 
+                            value="{{ $hora }}"
+                            {{ ($hora == old('hora_limite_final_tarde')) || ($hora == $resultado->hora_limite_final_tarde) ? 'selected' : '' }}
+                        >
                             {{ $hora }}
                         </option>
                     @endforeach
@@ -68,7 +70,7 @@
                 <i>
                     para desativar a sala de reunião nesta regional, coloque zero (0) no total de participantes.
                     <br>
-                    Somente <strong>um (1)</strong> agendamento por período (Manhã, Tarde).
+                    Somente <strong>um (1)</strong> agendamento por horário ou período.
                 </i>
             </p>
             <div class="form-row mb-3">
@@ -90,57 +92,27 @@
                 </div>
 
                 <div class="col-sm mb-2-576">
-                    <label for="manha_horarios_reuniao">Período Manhã</label>
+                    <label for="horarios_reuniao">Horários</label>
                     <select 
-                        name="manha_horarios_reuniao[]" 
-                        class="form-control {{ $errors->has('manha_horarios_reuniao') || $errors->has('manha_horarios_reuniao.*') ? 'is-invalid' : '' }}" 
-                        id="manha_horarios_reuniao" 
+                        name="horarios_reuniao[]" 
+                        class="form-control {{ $errors->has('horarios_reuniao') || $errors->has('horarios_reuniao.*') ? 'is-invalid' : '' }}" 
+                        id="horarios_reuniao" 
                         multiple
                     >
-                    @foreach($manha as $horaRM)
+                    @foreach(todasHoras() as $horaR)
                         <option 
-                            value="{{ $horaRM }}" 
-                            {{ (is_array(old('manha_horarios_reuniao')) && in_array($horaRM, old('manha_horarios_reuniao'))) || in_array($horaRM, $resultado->getHorariosManha('reuniao')) ? 
+                            value="{{ $horaR }}" 
+                            {{ (is_array(old('horarios_reuniao')) && in_array($horaR, old('horarios_reuniao'))) || in_array($horaR, $resultado->getHorarios('reuniao')) ? 
                                 'selected' : '' }}
                             >
-                            {{ $horaRM }}
+                            {{ $horaR }}
                         </option>
                     @endforeach
                     </select>
 
-                    @if($errors->has('manha_horarios_reuniao') || $errors->has('manha_horarios_reuniao.*'))
+                    @if($errors->has('horarios_reuniao') || $errors->has('horarios_reuniao.*'))
                     <div class="invalid-feedback">
-                        {{ $errors->has('manha_horarios_reuniao') ? $errors->first('manha_horarios_reuniao') : $errors->first('manha_horarios_reuniao.*') }}
-                    </div>
-                    @endif
-
-                    <small class="form-text text-muted">
-                        <em>* Segure Ctrl para selecionar mais de um horário ou Shift para selecionar um grupo de horários</em>
-                    </small>
-                </div>
-
-                <div class="col-sm mb-2-576">
-                    <label for="tarde_horarios_reuniao">Período Tarde</label>
-                    <select 
-                        name="tarde_horarios_reuniao[]" 
-                        class="form-control {{ $errors->has('tarde_horarios_reuniao') || $errors->has('tarde_horarios_reuniao.*') ? 'is-invalid' : '' }}" 
-                        id="tarde_horarios_reuniao" 
-                        multiple
-                    >
-                    @foreach($tarde as $horaRT)
-                        <option 
-                            value="{{ $horaRT }}" 
-                            {{ (is_array(old('tarde_horarios_reuniao')) && in_array($horaRT, old('tarde_horarios_reuniao'))) || in_array($horaRT, $resultado->getHorariosTarde('reuniao')) ? 
-                                'selected' : '' }}
-                            >
-                            {{ $horaRT }}
-                        </option>
-                    @endforeach
-                    </select>
-
-                    @if($errors->has('tarde_horarios_reuniao') || $errors->has('tarde_horarios_reuniao.*'))
-                    <div class="invalid-feedback">
-                        {{ $errors->has('tarde_horarios_reuniao') ? $errors->first('tarde_horarios_reuniao') : $errors->first('tarde_horarios_reuniao.*') }}
+                        {{ $errors->has('horarios_reuniao') ? $errors->first('horarios_reuniao') : $errors->first('horarios_reuniao.*') }}
                     </div>
                     @endif
 
@@ -220,7 +192,7 @@
                 <i>
                     para desativar a sala de coworking nesta regional, coloque zero (0) no total de participantes.
                     <br>
-                    O total de participantes determina quantos agendamentos são permitidos em cada período (Manhã, Tarde).
+                    O total de participantes determina quantos agendamentos são permitidos por horário ou período.
                 </i>
             </p>
             <div class="form-row mb-3">
@@ -242,49 +214,23 @@
                 </div>
 
                 <div class="col-sm mb-2-576">
-                    <label for="manha_horarios_coworking">Período Manhã</label>
+                    <label for="horarios_coworking">Horários</label>
                     <select 
-                        name="manha_horarios_coworking[]" 
-                        class="form-control {{ $errors->has('manha_horarios_coworking') || $errors->has('manha_horarios_coworking.*') ? 'is-invalid' : '' }}" 
-                        id="manha_horarios_coworking" 
+                        name="horarios_coworking[]" 
+                        class="form-control {{ $errors->has('horarios_coworking') || $errors->has('horarios_coworking.*') ? 'is-invalid' : '' }}" 
+                        id="horarios_coworking" 
                         multiple
                     >
-                    @foreach($manha as $horaCM)
-                        <option value="{{ $horaCM }}" {{ (is_array(old('manha_horarios_coworking')) && in_array($horaCM, old('manha_horarios_coworking'))) || in_array($horaCM, $resultado->getHorariosManha('coworking')) ? 'selected' : '' }}>
-                            {{ $horaCM }}
+                    @foreach(todasHoras() as $horaC)
+                        <option value="{{ $horaC }}" {{ (is_array(old('horarios_coworking')) && in_array($horaC, old('horarios_coworking'))) || in_array($horaC, $resultado->getHorarios('coworking')) ? 'selected' : '' }}>
+                            {{ $horaC }}
                         </option>
                     @endforeach
                     </select>
 
-                    @if($errors->has('manha_horarios_coworking') || $errors->has('manha_horarios_coworking.*'))
+                    @if($errors->has('horarios_coworking') || $errors->has('horarios_coworking.*'))
                     <div class="invalid-feedback">
-                        {{ $errors->has('manha_horarios_coworking') ? $errors->first('manha_horarios_coworking') : $errors->first('manha_horarios_coworking.*') }}
-                    </div>
-                    @endif
-
-                    <small class="form-text text-muted">
-                        <em>* Segure Ctrl para selecionar mais de um horário ou Shift para selecionar um grupo de horários</em>
-                    </small>
-                </div>
-
-                <div class="col-sm mb-2-576">
-                    <label for="tarde_horarios_coworking">Período Tarde</label>
-                    <select 
-                        name="tarde_horarios_coworking[]" 
-                        class="form-control {{ $errors->has('tarde_horarios_coworking') || $errors->has('tarde_horarios_coworking.*') ? 'is-invalid' : '' }}" 
-                        id="tarde_horarios_coworking" 
-                        multiple
-                    >
-                    @foreach($tarde as $horaCT)
-                        <option value="{{ $horaCT }}" {{ (is_array(old('tarde_horarios_coworking')) && in_array($horaCT, old('tarde_horarios_coworking'))) || in_array($horaCT, $resultado->getHorariosTarde('coworking')) ? 'selected' : '' }}>
-                            {{ $horaCT }}
-                        </option>
-                    @endforeach
-                    </select>
-
-                    @if($errors->has('tarde_horarios_coworking') || $errors->has('tarde_horarios_coworking.*'))
-                    <div class="invalid-feedback">
-                        {{ $errors->has('tarde_horarios_coworking') ? $errors->first('tarde_horarios_coworking') : $errors->first('tarde_horarios_coworking.*') }}
+                        {{ $errors->has('horarios_coworking') ? $errors->first('horarios_coworking') : $errors->first('horarios_coworking.*') }}
                     </div>
                     @endif
 

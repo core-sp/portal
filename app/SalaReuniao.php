@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 
 class SalaReuniao extends Model
 {
@@ -19,14 +20,17 @@ class SalaReuniao extends Model
     const ITEM_CAFE = 'Café';
     const ITEM_WIFI = 'Wi-Fi';
 
-    public static function horasManha()
+    public static function periodoManha()
     {
-        return array_slice(todasHoras(), 0, 6);
+        return array_slice(todasHoras(), 4, 7);
     }
 
-    public static function horasTarde()
+    public static function periodoTarde()
     {
-        return array_slice(todasHoras(), 9, 6);
+        $todasHoras = todasHoras();
+        array_push($todasHoras, '18:00');
+
+        return array_slice($todasHoras, 12, 7);
     }
 
     public static function itens()
@@ -73,39 +77,66 @@ class SalaReuniao extends Model
         return $itens;
     }
 
-    // Sobrescreve o atributo de horários da instancia do objeto
-    private function getPeriodosCombloqueio($bloqueios, $dia, $tipo, $horarios)
+    private function getPeriodosCombloqueio($bloqueios, $dia, $horarios)
     {
         $dia = Carbon::parse($dia);
 
         if($dia->isWeekend())
             return [];
 
-        $periodos = array();
-        $manha = array();
-        $tarde = array();
-
         if($bloqueios->isNotEmpty())
             foreach($bloqueios as $bloqueio)
                 $horarios = $bloqueio->getHorarios($horarios, $dia);
 
-        foreach($horarios as $hora)
+        return $horarios;
+    }
+
+    private function confereLotadoDiaPorTipo($tipo, $agendado, $horarios)
+    {
+        $total_periodos = 0;
+
+        $total_periodos = count(Arr::where($horarios, function ($value, $key) {
+            return $value <= $this->hora_limite_final_manha;
+        })) > 0 ? $total_periodos + 1 : $total_periodos;
+
+        $total_periodos = count(Arr::where($horarios, function ($value, $key) {
+            return $value > $this->hora_limite_final_manha;
+        })) > 0 ? $total_periodos + 1 : $total_periodos;
+
+        $qtd_periodo_todo = $tipo == 'reuniao' ? $total_periodos : $this->participantes_coworking * $total_periodos;
+        $qtd_por_hora = $tipo == 'reuniao' ? count($horarios) : $this->participantes_coworking * count($horarios);
+
+        if($agendado->periodo_todo && ($agendado->total >= $qtd_periodo_todo))
+            return true;
+
+        if(!$agendado->periodo_todo && ($agendado->total >= $qtd_por_hora))
+            return true;
+
+        return false;
+    }
+
+    private function removeHorasPorHora($hora, $horarios, $horarios_agendar, $periodo_todo = true)
+    {
+        $nome_periodo = $hora <= $this->hora_limite_final_manha ? 'manha' : 'tarde';
+
+        if($periodo_todo)
         {
-            if($hora < '12:30'){
-                array_push($periodos, 'manha');
-                array_push($manha, $hora);
-            }else{
-                array_push($periodos, 'tarde');
-                array_push($tarde, $hora);
-            }
+            $temp = $this->horariosPeriodoPorHora($hora, $horarios);
+            $horarios = Arr::except($horarios, array_keys($temp));
+            $horarios_agendar = Arr::except($horarios_agendar, array_values($temp));
+            unset($horarios_agendar[$nome_periodo]);
+        }
+        else
+        {
+            unset($horarios[array_search($hora, $horarios)]);
+            $horarios_agendar = Arr::except($horarios_agendar, $hora);
+            unset($horarios_agendar[$nome_periodo]);
         }
 
-        if($tipo == 'reuniao')
-            $this->horarios_reuniao = json_encode(['manha' => $manha, 'tarde' => $tarde], JSON_FORCE_OBJECT);
-        else
-            $this->horarios_coworking = json_encode(['manha' => $manha, 'tarde' => $tarde], JSON_FORCE_OBJECT);
-
-        return array_unique($periodos);
+        return [
+            'horarios' => $horarios,
+            'horarios_agendar' => $horarios_agendar
+        ];
     }
 
     public function regional()
@@ -134,6 +165,23 @@ class SalaReuniao extends Model
             });
     }
 
+    public function horariosPeriodoPorHora($hora, $horarios = null, $tipo = 'reuniao')
+    {
+        if(!isset($horarios))
+            $horarios = $tipo == 'reuniao' ? explode(',', $this->horarios_reuniao) : explode(',', $this->horarios_coworking);
+
+        $final = $horarios;
+
+        $final = $hora <= $this->hora_limite_final_manha ? 
+            Arr::where($horarios, function ($value, $key) {
+                return $value <= $this->hora_limite_final_manha;
+            }) : Arr::where($horarios, function ($value, $key) {
+                return $value > $this->hora_limite_final_manha;
+            });
+
+        return $final;
+    }
+
     public function isAtivo($tipo)
     {
         if($tipo == 'reuniao')
@@ -150,32 +198,18 @@ class SalaReuniao extends Model
         return 0;
     }
 
-    public function getHorariosManha($tipo)
+    public function getHorarios($tipo)
     {
         if($tipo == 'reuniao')
-            return json_decode($this->horarios_reuniao, true)['manha'];
+            return explode(',', $this->horarios_reuniao);
         if($tipo == 'coworking')
-            return json_decode($this->horarios_coworking, true)['manha'];
-        return array();
-    }
-
-    public function getHorariosTarde($tipo)
-    {
-        if($tipo == 'reuniao')
-            return json_decode($this->horarios_reuniao, true)['tarde'];
-        if($tipo == 'coworking')
-            return json_decode($this->horarios_coworking, true)['tarde'];
+            return explode(',', $this->horarios_coworking);
         return array();
     }
 
     public function getTodasHoras()
     {
-        $manha = array_merge(json_decode($this->horarios_reuniao, true)['manha'], json_decode($this->horarios_coworking, true)['manha']);
-        $tarde = array_merge(json_decode($this->horarios_reuniao, true)['tarde'], json_decode($this->horarios_coworking, true)['tarde']);
-        $horas = array_unique(array_merge($manha, $tarde));
-        sort($horas, SORT_NATURAL);
-
-        return $horas;
+        return array_unique(array_merge(implode(',', $this->horarios_reuniao), implode(',', $this->horarios_coworking)));
     }
 
     public function getItens($tipo)
@@ -258,11 +292,17 @@ class SalaReuniao extends Model
         return $original;
     }
 
-    public function verificaAlteracaoItens($reuniao, $coworking, $participantes)
+    public function verificaAlteracaoItens($reuniao, $coworking, $participantes, $periodos)
     {
         $itens['reuniao'] = array();
         $itens['coworking'] = array();
         $gerente = null;
+
+        if($this->wasChanged('hora_limite_final_manha'))
+            $itens['final_manha'] = $periodos['final_manha'];
+
+        if($this->wasChanged('hora_limite_final_tarde'))
+            $itens['final_tarde'] = $periodos['final_tarde'];
 
         if($this->wasChanged('itens_reuniao')){
             $itens['reuniao'] = array_diff($reuniao, $this->getItens('reuniao'));
@@ -278,7 +318,7 @@ class SalaReuniao extends Model
         if($this->wasChanged('participantes_coworking'))
             $itens['coworking']['participantes'] = $participantes['coworking'];
 
-        if(!empty($itens['reuniao']) || !empty($itens['coworking'])){
+        if(!empty($itens['reuniao']) || !empty($itens['coworking']) || (isset($itens['final_manha']) || isset($itens['final_tarde']))){
             $gerente = $this->regional->users()
             ->when(in_array($this->idregional, [1, 14]), function ($query){
                 return $query->select('nome', 'email')->where('idusuario', 39);
@@ -293,28 +333,69 @@ class SalaReuniao extends Model
         ];
     }
 
+    public function formatarHorariosAgendamento($horarios)
+    {
+        if(empty($horarios))
+            return array();
+
+        $formatado = array();
+        $separador = ' - ';
+
+        $final['manha'] = Arr::where($horarios, function ($value, $key) {
+            return $value <= $this->hora_limite_final_manha;
+        });
+
+        $final['tarde'] = Arr::where($horarios, function ($value, $key) {
+            return $value > $this->hora_limite_final_manha;
+        });
+
+        if((count($final['manha']) > 0) || (count($final['tarde']) > 0))
+        {
+            foreach($final as $periodo => $arrayHoras)
+            {
+                if(count($arrayHoras) == 0)
+                    continue;
+
+                $hora_final = $periodo == 'manha' ? $this->hora_limite_final_manha : $this->hora_limite_final_tarde;
+                $periodo_todo = $arrayHoras[array_keys($arrayHoras)[0]] . $separador . $hora_final;
+                foreach($arrayHoras as $key => $val)
+                {
+                    if(count($arrayHoras) == 1)
+                        break;
+                    $seguinte = $key + 1;
+                    $formatado[$val] = $val != last($arrayHoras) && isset($arrayHoras[$seguinte]) ? $val . $separador . $arrayHoras[$seguinte] : $val . $separador . $hora_final;
+                }
+                $formatado[$periodo] = $periodo_todo;
+            }
+        }
+
+        return $formatado;
+    }
+
     public function getDiasSeLotado($tipo)
     {
         if(!$this->isAtivo($tipo) || !in_array($tipo, ['reuniao', 'coworking']))
             return null;
 
-        $horarios = array_merge($this->getHorariosManha($tipo), $this->getHorariosTarde($tipo));
+        $horarios = $this->getHorarios($tipo);
         $diasLotados = array();
         $diaslotadosBloqueio = array();
         $bloqueios = $this->bloqueios;
         $agendados = $this->agendamentosSala()
-            ->select('dia', DB::raw('count(*) as total'))
+            ->select('dia', 'periodo_todo', DB::raw('count(*) as total'))
             ->where('tipo_sala', $tipo)
             ->whereNull('status')
             ->whereBetween('dia', [Carbon::tomorrow()->format('Y-m-d'), Carbon::today()->addMonth()->format('Y-m-d')])
             ->groupBy('dia')
+            ->groupBy('periodo_todo')
             ->orderBy('dia')
             ->get();
 
         $dia = Carbon::tomorrow();
+
         for($dia; $dia->lte(Carbon::today()->addMonth()); $dia->addDay())
         {
-            $periodosTotal = $this->getPeriodosComBloqueio($bloqueios, $dia->format('Y-m-d'), $tipo, $horarios);
+            $periodosTotal = $this->getPeriodosComBloqueio($bloqueios, $dia->format('Y-m-d'), $horarios);
             if(sizeof($periodosTotal) == 0)
             {
                 array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
@@ -327,9 +408,8 @@ class SalaReuniao extends Model
             $dia = Carbon::parse($agendado->dia);
             if(!array_search($dia->format('Y-m-d'), $diaslotadosBloqueio))
             {
-                $periodosTotal = $this->getPeriodosComBloqueio($bloqueios, $dia->format('Y-m-d'), $tipo, $horarios);
-                $total = $tipo == 'reuniao' ? sizeof($periodosTotal) : sizeof($periodosTotal) * $this->participantes_coworking;
-                if($agendado->total >= $total)
+                $periodosTotal = $this->getPeriodosComBloqueio($bloqueios, $dia->format('Y-m-d'), $horarios);
+                if($this->confereLotadoDiaPorTipo($tipo, $agendado, $periodosTotal))
                     array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
             }
         }
@@ -342,46 +422,47 @@ class SalaReuniao extends Model
         if(!$this->isAtivo($tipo) || !in_array($tipo, ['reuniao', 'coworking']))
             return array();
 
-        $horarios = array_merge($this->getHorariosManha($tipo), $this->getHorariosTarde($tipo));
+        $horarios = $this->getHorarios($tipo);
         $bloqueios = $this->bloqueios;
-        $periodos = $this->getPeriodosComBloqueio($bloqueios, $dia, $tipo, $horarios);
-        $final_periodos = $periodos;
+        $horarios = $this->getPeriodosComBloqueio($bloqueios, $dia, $horarios);
+        $retorno = ['horarios' => $horarios, 'horarios_agendar' => $this->formatarHorariosAgendamento($horarios)];
 
-        if(sizeof($periodos) == 0)
-            return $periodos;
+        if(sizeof($horarios) == 0)
+            return $horarios;
 
-        $agendado = $this->agendamentosSala()
-            ->select('periodo', DB::raw('count(*) as total'))
+        $agendados = $this->agendamentosSala()
+            ->select('periodo', 'periodo_todo', DB::raw('count(*) as total'))
             ->where('tipo_sala', $tipo)
             ->whereNull('status')
             ->whereDate('dia', $dia)
             ->groupBy('periodo')
+            ->groupBy('periodo_todo')
             ->orderBy('periodo')
             ->get();
 
-        if($agendado->isNotEmpty())
+        if($agendados->isNotEmpty())
         {
-            $soma = 0;
-            foreach($agendado as $value)
+            foreach($agendados as $value)
             {
-                $soma += $value->total;
+                $hora = explode(' - ', $value->periodo)[0];
+
                 switch ($tipo) {
                     case 'reuniao':
-                        if($value->total >= 1)
-                            unset($periodos[array_search($value->periodo, $periodos)]);
-                        if($soma >= count($final_periodos))
-                            $periodos = array();
+                        if($value->periodo_todo)
+                            $retorno = $this->removeHorasPorHora($hora, $retorno['horarios'], $retorno['horarios_agendar']);
+                        elseif(in_array($hora, $horarios))
+                            $retorno = $this->removeHorasPorHora($hora, $retorno['horarios'], $retorno['horarios_agendar'], false);
                         break;
                     case 'coworking':
-                        if($value->total >= $this->participantes_coworking)
-                            unset($periodos[array_search($value->periodo, $periodos)]);
-                        if($soma >= (count($final_periodos) * $this->participantes_coworking))
-                            $periodos = array();
+                        if($value->periodo_todo && ($value->total >= $this->participantes_coworking))
+                            $retorno = $this->removeHorasPorHora($hora, $retorno['horarios'], $retorno['horarios_agendar']);
+                        elseif(!$value->periodo_todo && in_array($hora, $horarios) && ($value->total >= $this->participantes_coworking))
+                            $retorno = $this->removeHorasPorHora($hora, $retorno['horarios'], $retorno['horarios_agendar'], false);
                         break;
                 }
             }
         }
         
-        return $periodos;
+        return $retorno;
     }
 }

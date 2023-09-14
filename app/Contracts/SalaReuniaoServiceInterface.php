@@ -3,8 +3,7 @@
 namespace App\Contracts;
 
 interface SalaReuniaoServiceInterface {
-
-    public function getHoras();
+    public function getHorasPeriodo($periodo);
 
     public function getItensByTipo($tipo);
 

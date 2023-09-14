@@ -676,14 +676,13 @@ $('#ano-mapa').on({
 	}
 
 	function formatPeriodos(response, tipo){
-		if(!jQuery.isEmptyObject(response)) {
+		if(!jQuery.isEmptyObject(response['horarios'])) {
 			$('#agendamentoSala #periodo').empty();
-			$.each(response, function(i, periodo) {
-				if((i != 'itens') && (i != 'total'))
-					$('#agendamentoSala #periodo').append($('<option>', { 
-						value: i,
-						text : periodo 
-					}));
+			$.each(response['horarios'], function(i, periodo) {
+				$('#agendamentoSala #periodo').append($('<option>', { 
+					value: periodo,
+					text : (i == 'manha') || (i == 'tarde') ? 'Período todo: ' + periodo.replace(' - ', ' até ') : periodo.replace(' - ', ' até ')
+				}));
 			});
 			var itens = '';
 			$.each(response.itens, function(i, valor) {

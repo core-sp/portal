@@ -70,13 +70,15 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
         return $tabela;
     }
 
-    public function getHoras()
+    public function getHorasPeriodo($periodo)
     {
-        return [
-            'manha' => SalaReuniao::horasManha(),
-            'tarde' => SalaReuniao::horasTarde()
-        ];
+        if($periodo == 'manha')
+            return SalaReuniao::periodoManha();
+        if($periodo == 'tarde')
+            return SalaReuniao::periodoTarde();
+        return array();
     }
+
     public function getItensByTipo($tipo)
     {
         switch($tipo){
@@ -116,6 +118,8 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
     {
         $sala = SalaReuniao::findOrFail($id);
 
+        $dados['itens_reuniao'] = isset($dados['itens_reuniao']) ? $dados['itens_reuniao'] : array();
+
         // Item "Mesa..." da reunião adicionada é preenchida com o mesmo valor de participantes reunião.
         $indice_mesa = array_keys(array_filter($dados['itens_reuniao'], function($v, $k){
             return strpos($v, 'Mesa com ') !== false;
@@ -127,24 +131,21 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
         $participantes['reuniao'] = $sala->participantes_reuniao;
         $itens_coworking = $sala->getItens('coworking');
         $participantes['coworking'] = $sala->participantes_coworking;
+        $periodos = ['final_manha' => $sala->hora_limite_final_manha, 'final_tarde' => $sala->hora_limite_final_tarde];
 
         $sala->update([
-            'horarios_reuniao' => json_encode([
-                'manha' => isset($dados['manha_horarios_reuniao']) ? $dados['manha_horarios_reuniao'] : array(),
-                'tarde' => isset($dados['tarde_horarios_reuniao']) ? $dados['tarde_horarios_reuniao'] : array()
-            ], JSON_FORCE_OBJECT),
-            'horarios_coworking' => json_encode([
-                'manha' => isset($dados['manha_horarios_coworking']) ? $dados['manha_horarios_coworking'] : array(),
-                'tarde' => isset($dados['tarde_horarios_coworking']) ? $dados['tarde_horarios_coworking'] : array(),
-            ], JSON_FORCE_OBJECT),
+            'horarios_reuniao' => isset($dados['horarios_reuniao']) ? implode(',', $dados['horarios_reuniao']) : null,
+            'horarios_coworking' => isset($dados['horarios_coworking']) ? implode(',', $dados['horarios_coworking']) : null,
             'participantes_reuniao' => $dados['participantes_reuniao'],
             'participantes_coworking' => $dados['participantes_coworking'],
             'itens_reuniao' => json_encode(isset($dados['itens_reuniao']) ? $dados['itens_reuniao'] : array(), JSON_FORCE_OBJECT),
             'itens_coworking' => json_encode(isset($dados['itens_coworking']) ? $dados['itens_coworking'] : array(), JSON_FORCE_OBJECT),
+            'hora_limite_final_manha' => $dados['hora_limite_final_manha'],
+            'hora_limite_final_tarde' => $dados['hora_limite_final_tarde'],
             'idusuario' => $user->idusuario
         ]);
 
-        $final = $sala->verificaAlteracaoItens($itens_reuniao, $itens_coworking, $participantes);
+        $final = $sala->verificaAlteracaoItens($itens_reuniao, $itens_coworking, $participantes, $periodos);
         if(isset($final['gerente']))
         {
             $gerente = $final['gerente'];
@@ -187,7 +188,7 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
                 if(!Carbon::hasFormat($dia, 'd/m/Y'))
                     return null;
                 $dia = Carbon::createFromFormat('d/m/Y', $dia)->format('Y-m-d');
-                $periodos = $sala->removeHorariosSeLotado($tipo, $dia);
+                $periodos = $sala->removeHorariosSeLotado($tipo, $dia)['horarios_agendar'];
 
                 if(isset($user))
                 {
@@ -205,11 +206,7 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
 
                 if(!empty($periodos))
                 {
-                    if(in_array('manha', $periodos))
-                        $final['manha'] = 'Manhã: '.implode(', ',$sala->getHorariosManha($tipo));
-                    if(in_array('tarde', $periodos))
-                        $final['tarde'] = 'Tarde: '.implode(', ',$sala->getHorariosTarde($tipo));
-
+                    $final['horarios'] = $periodos;
                     $final['itens'] = $sala->getItensHtml($tipo);
                     $final['total'] = $sala->getParticipantesAgendar($tipo);
                 }
