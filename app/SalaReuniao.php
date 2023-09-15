@@ -133,10 +133,7 @@ class SalaReuniao extends Model
             unset($horarios_agendar[$nome_periodo]);
         }
 
-        return [
-            'horarios' => $horarios,
-            'horarios_agendar' => $horarios_agendar
-        ];
+        return $horarios_agendar;
     }
 
     public function regional()
@@ -425,7 +422,7 @@ class SalaReuniao extends Model
         $horarios = $this->getHorarios($tipo);
         $bloqueios = $this->bloqueios;
         $horarios = $this->getPeriodosComBloqueio($bloqueios, $dia, $horarios);
-        $retorno = ['horarios' => $horarios, 'horarios_agendar' => $this->formatarHorariosAgendamento($horarios)];
+        $horarios_agendar = $this->formatarHorariosAgendamento($horarios);
 
         if(sizeof($horarios) == 0)
             return $horarios;
@@ -449,20 +446,20 @@ class SalaReuniao extends Model
                 switch ($tipo) {
                     case 'reuniao':
                         if($value->periodo_todo)
-                            $retorno = $this->removeHorasPorHora($hora, $retorno['horarios'], $retorno['horarios_agendar']);
+                            $horarios_agendar = $this->removeHorasPorHora($hora, $horarios, $horarios_agendar);
                         elseif(in_array($hora, $horarios))
-                            $retorno = $this->removeHorasPorHora($hora, $retorno['horarios'], $retorno['horarios_agendar'], false);
+                            $horarios_agendar = $this->removeHorasPorHora($hora, $horarios, $horarios_agendar, false);
                         break;
                     case 'coworking':
                         if($value->periodo_todo && ($value->total >= $this->participantes_coworking))
-                            $retorno = $this->removeHorasPorHora($hora, $retorno['horarios'], $retorno['horarios_agendar']);
+                            $horarios_agendar = $this->removeHorasPorHora($hora, $horarios, $horarios_agendar);
                         elseif(!$value->periodo_todo && in_array($hora, $horarios) && ($value->total >= $this->participantes_coworking))
-                            $retorno = $this->removeHorasPorHora($hora, $retorno['horarios'], $retorno['horarios_agendar'], false);
+                            $horarios_agendar = $this->removeHorasPorHora($hora, $horarios, $horarios_agendar, false);
                         break;
                 }
             }
         }
         
-        return $retorno;
+        return $horarios_agendar;
     }
 }

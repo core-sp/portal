@@ -99,6 +99,7 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
             'participantes' => $participantes,
             'dia' => $dia,
             'periodo' => $dados['periodo'],
+            'periodo_todo' => $dados['periodo_todo'],
             'tipo_sala' => $dados['tipo_sala'],
             'protocolo' => $protocolo,
         ]);
@@ -225,21 +226,18 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
 
     public function participantesVetados($dia, $periodo, $array_cpfs, $id = null)
     {
-        if(in_array($periodo, ['manha', 'tarde']))
-        {
-            if(!Carbon::hasFormat($dia, 'd/m/Y') && !Carbon::hasFormat($dia, 'Y-m-d'))
-                return null;
+        if(!Carbon::hasFormat($dia, 'd/m/Y') && !Carbon::hasFormat($dia, 'Y-m-d'))
+            return null;
             
-            if(Carbon::hasFormat($dia, 'd/m/Y'))
-                $dia = Carbon::createFromFormat('d/m/Y', $dia)->format('Y-m-d');
-            $vetados = AgendamentoSala::participantesVetados($dia, $periodo, $array_cpfs, $id);
+        if(Carbon::hasFormat($dia, 'd/m/Y'))
+            $dia = Carbon::createFromFormat('d/m/Y', $dia)->format('Y-m-d');
+        $vetados = AgendamentoSala::participantesVetados($dia, $periodo, $array_cpfs, $id);
 
-            if(!empty($vetados))
-                foreach($vetados as $chave => $val)
-                    $vetados[$chave] = formataCpfCnpj($val);
+        if(!empty($vetados))
+            foreach($vetados as $chave => $val)
+                $vetados[$chave] = formataCpfCnpj($val);
 
-            return $vetados;
-        }
+        return $vetados;
     }
 
     public function getAgendadosParticipante($user)

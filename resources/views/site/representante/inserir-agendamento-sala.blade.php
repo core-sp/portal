@@ -4,7 +4,22 @@
 
 <div class="representante-content w-100">
   <div class="conteudo-txt-mini light w-100">
-    <h4 class="pt-0 pb-0">Agendamento de Sala</h4>
+    <h4 class="pt-0 pb-0">
+      @switch($acao)
+        @case('editar')
+          Editar
+          @break
+        @case('cancelar')
+          Cancelar
+          @break
+        @case('justificar')
+          Justificar
+          @break
+        @default
+          Criar
+        @endswitch
+      agendamento de sala
+    </h4>
     <div class="linha-lg-mini mb-3"></div>
 
     @if($errors->has('participante_vetado') || $errors->has('participante_suspenso') || $errors->has('participantes_cpf') || $errors->has('participantes_cpf.*') || $errors->has('participantes_nome') || $errors->has('participantes_nome.*'))

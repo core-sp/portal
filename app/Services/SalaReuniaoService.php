@@ -188,7 +188,7 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
                 if(!Carbon::hasFormat($dia, 'd/m/Y'))
                     return null;
                 $dia = Carbon::createFromFormat('d/m/Y', $dia)->format('Y-m-d');
-                $periodos = $sala->removeHorariosSeLotado($tipo, $dia)['horarios_agendar'];
+                $periodos = $sala->removeHorariosSeLotado($tipo, $dia);
 
                 if(isset($user))
                 {

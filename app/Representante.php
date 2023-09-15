@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticable;
 use App\Notifications\RepresentanteResetPasswordNotification;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 
 class Representante extends Authenticable
 {
@@ -184,11 +185,27 @@ class Representante extends Authenticable
         ->orderBy('dia')
         ->get();
 
+        $manha = in_array('manha', array_keys($periodosDisponiveis)) ? explode(' - ', $periodosDisponiveis['manha'])[1] : null;
+
         foreach($agendados as $agendado)
         {
-            foreach($periodosDisponiveis as $key => $periodo){
+            foreach($periodosDisponiveis as $chave => $periodo){
                 if($periodo == $agendado->periodo)
-                    unset($periodosDisponiveis[$key]);
+                {
+                    $ultima_hora = explode(' - ', $agendado->periodo)[1];
+                    if($agendado->periodo_todo)
+                        $periodosDisponiveis = Arr::except($periodosDisponiveis, 
+                        array_keys(Arr::where($periodosDisponiveis, function ($value, $key) use($chave, $ultima_hora) {
+                            return $chave == 'manha' ? $value <= $ultima_hora : $value > $ultima_hora;
+                        })));
+                    else{
+                        unset($periodosDisponiveis[$chave]);
+                        if(isset($manha) && ($ultima_hora <= $manha))
+                            unset($periodosDisponiveis['manha']);
+                        else
+                            unset($periodosDisponiveis['tarde']);
+                    }
+                }
             }
         }
 

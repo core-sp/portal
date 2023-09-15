@@ -679,9 +679,12 @@ $('#ano-mapa').on({
 		if(!jQuery.isEmptyObject(response['horarios'])) {
 			$('#agendamentoSala #periodo').empty();
 			$.each(response['horarios'], function(i, periodo) {
+				var periodo_texto = periodo.replace(' - ', ' até ');
+				periodo_texto = (i == 'manha') || (i == 'tarde') ? 'Período todo: ' + periodo_texto : periodo_texto;
+				
 				$('#agendamentoSala #periodo').append($('<option>', { 
 					value: periodo,
-					text : (i == 'manha') || (i == 'tarde') ? 'Período todo: ' + periodo.replace(' - ', ' até ') : periodo.replace(' - ', ' até ')
+					text : periodo_texto
 				}));
 			});
 			var itens = '';

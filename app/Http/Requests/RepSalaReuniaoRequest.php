@@ -14,6 +14,7 @@ class RepSalaReuniaoRequest extends FormRequest
     private $total_cpfs;
     private $proprio_cpf;
     private $salas_ids;
+    private $horas;
 
     public function __construct(MediadorServiceInterface $service)
     {
@@ -39,7 +40,8 @@ class RepSalaReuniaoRequest extends FormRequest
             'tipo_sala' => 'required|in:reuniao,coworking',
             'sala_reuniao_id' => 'required|in:'.$this->salas_ids,
             'dia' => 'required|date_format:d/m/Y|after:'.date('d\/m\/Y').'|before_or_equal:'.Carbon::today()->addMonth()->format('d/m/Y'),
-            'periodo' => 'required|in:manha,tarde',
+            'periodo' => 'required|in:' . implode(',', array_values($this->horas)),
+            'periodo_todo' => '',
             'aceite' => 'required|accepted',
             'ip' => '',
         ];
@@ -61,6 +63,7 @@ class RepSalaReuniaoRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+        $this->horas = array();
         if(($this->acao == 'cancelar') || ($this->acao == 'justificar'))
             return;
 
@@ -79,17 +82,19 @@ class RepSalaReuniaoRequest extends FormRequest
 
             $this->disponivel = $this->service->getDiasHoras($this->tipo_sala, $this->sala_reuniao_id, $this->dia, $user);
             $this->total_cpfs = isset($this->disponivel['total']) ? $this->disponivel['total'] : 0;
+            $this->horas = isset($this->disponivel['horarios']) ? $this->disponivel['horarios'] : $this->horas;
 
-            if(!isset($this->disponivel) || (!isset($this->disponivel['manha']) && !isset($this->disponivel['tarde']))){
+            if(!isset($this->disponivel)){
                 $this->merge([
                     'dia' => '',
                     'periodo' => '',
                 ]);
                 return;
             }
-    
-            if((($this->periodo == 'manha') && !isset($this->disponivel['manha'])) || (($this->periodo == 'tarde') && !isset($this->disponivel['tarde'])))
-                $this->merge(['periodo' => '']);
+
+            $periodo_todo = array_keys($this->horas, $this->periodo, true);
+            $periodo_todo = isset($periodo_todo[0]) && in_array($periodo_todo[0], ['manha', 'tarde']) ? 1 : 0;
+            $this->merge(['periodo_todo' => $periodo_todo]);
 
             $this->merge(['ip' => request()->ip()]);
         }
@@ -161,7 +166,7 @@ class RepSalaReuniaoRequest extends FormRequest
             'required' => 'O campo é obrigatório',
             'required_if' => 'É obrigatório ter participante',
             'sala_reuniao_id.in' => 'Essa sala não está disponível',
-            'in' => 'Essa opção não existe',
+            'in' => 'Essa opção não existe ou não está disponível',
             'date_format' => 'Formato inválido de dia',
             'after' => 'Não pode agendar no dia de hoje',
             'before_or_equal' => 'Não pode agendar depois de 1 mês',
