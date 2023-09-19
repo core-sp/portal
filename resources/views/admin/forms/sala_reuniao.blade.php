@@ -3,6 +3,7 @@
     @if(isset($resultado))
         @method('PUT')
     @endif
+    <input id="valor_id" type="hidden" value="{{ $resultado->id }}">
     <div class="card-body">
         <h4>Regional - {{ $resultado->regional->regional }}</h4>
 
@@ -22,7 +23,7 @@
                     @foreach($resultado::periodoManha() as $hora)
                         <option 
                             value="{{ $hora }}"
-                            {{ ($hora == old('hora_limite_final_manha')) || ($hora == $resultado->hora_limite_final_manha) ? 'selected' : '' }}
+                            {{ ($hora == old('hora_limite_final_manha')) || ($hora == $resultado->horaAlmoco()) ? 'selected' : '' }}
                         >
                             {{ $hora }}
                         </option>
@@ -46,7 +47,7 @@
                     @foreach($resultado::periodoTarde() as $hora)
                         <option 
                             value="{{ $hora }}"
-                            {{ ($hora == old('hora_limite_final_tarde')) || ($hora == $resultado->hora_limite_final_tarde) ? 'selected' : '' }}
+                            {{ ($hora == old('hora_limite_final_tarde')) || ($hora == $resultado->horaFimExpediente()) ? 'selected' : '' }}
                         >
                             {{ $hora }}
                         </option>
@@ -119,6 +120,11 @@
                     <small class="form-text text-muted">
                         <em>* Segure Ctrl para selecionar mais de um horário ou Shift para selecionar um grupo de horários</em>
                     </small>
+                </div>
+
+                <div class="col-sm mb-2-576">
+                    <label for="horarios_reuniao_rep">Visualizar horários de agendamento</label>
+                    <p id="horarios_reuniao_rep" class="border border-muted rounded p-2 pl-3">{!! $resultado->formatarHorariosAgendamentoHTML('reuniao') !!}</p>
                 </div>
             </div>
 
@@ -237,6 +243,11 @@
                     <small class="form-text text-muted">
                         <em>* Segure Ctrl para selecionar mais de um horário ou Shift para selecionar um grupo de horários</em>
                     </small>
+                </div>
+
+                <div class="col-sm mb-2-576">
+                    <label for="horarios_coworking_rep">Visualizar horários de agendamento</label>
+                    <p id="horarios_coworking_rep" class="border border-muted rounded p-2 pl-3">{!! $resultado->formatarHorariosAgendamentoHTML('coworking') !!}</p>
                 </div>
 
             </div>

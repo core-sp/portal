@@ -244,6 +244,7 @@ Route::middleware(['block_ip'])->group(function () {
         Route::put('/editar/{id}', 'SalaReuniaoController@update')->name('editar');
         Route::get('/regionais-salas-ativas/{tipo}', 'SalaReuniaoController@getRegionaisAtivas')->name('regionais.ativas');
         Route::get('/sala-dias-horas/{tipo}', 'SalaReuniaoController@getDiasHoras')->name('dias.horas');
+        Route::post('/sala-horario-formatado/{id}', 'SalaReuniaoController@getHorarioFormatado')->name('horario.formatado');
 
         Route::prefix('agendados')->group(function(){
           Route::name('agendados.')->group(function () {

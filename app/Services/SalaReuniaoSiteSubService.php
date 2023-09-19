@@ -224,14 +224,14 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
         Mail::to($user->email)->queue(new AgendamentoSalaMail($agendamento->fresh(), 'justificar'));
     }
 
-    public function participantesVetados($dia, $periodo, $array_cpfs, $id = null)
+    public function participantesVetados($dia, $periodo, $array_cpfs, $periodoTodo = true, $id = null)
     {
         if(!Carbon::hasFormat($dia, 'd/m/Y') && !Carbon::hasFormat($dia, 'Y-m-d'))
             return null;
             
         if(Carbon::hasFormat($dia, 'd/m/Y'))
             $dia = Carbon::createFromFormat('d/m/Y', $dia)->format('Y-m-d');
-        $vetados = AgendamentoSala::participantesVetados($dia, $periodo, $array_cpfs, $id);
+        $vetados = AgendamentoSala::participantesVetados($dia, $periodo, $array_cpfs, $periodoTodo, $id);
 
         if(!empty($vetados))
             foreach($vetados as $chave => $val)

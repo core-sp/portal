@@ -21,10 +21,10 @@ class CreateSalasReunioes extends Migration
             $table->string('horarios_coworking')->nullable();
             $table->unsignedTinyInteger('participantes_reuniao')->default(0);
             $table->unsignedTinyInteger('participantes_coworking')->default(0);
-            $table->string('itens_reuniao')->default(json_encode(array(), JSON_FORCE_OBJECT));
-            $table->string('itens_coworking')->default(json_encode(array(), JSON_FORCE_OBJECT));
-            $table->string('hora_limite_final_manha', 20)->nullable();
-            $table->string('hora_limite_final_tarde', 20)->nullable();
+            $table->string('itens_reuniao', 255)->default(json_encode(array(), JSON_FORCE_OBJECT));
+            $table->string('itens_coworking', 255)->default(json_encode(array(), JSON_FORCE_OBJECT));
+            $table->string('hora_limite_final_manha', 20)->default('12:00');
+            $table->string('hora_limite_final_tarde', 20)->default('16:00');
             $table->bigInteger('idusuario')->unsigned();
             $table->foreign('idusuario')->references('idusuario')->on('users');
             $table->timestamps();

@@ -20,6 +20,14 @@ class SalaReuniao extends Model
     const ITEM_CAFE = 'Café';
     const ITEM_WIFI = 'Wi-Fi';
 
+    public static function getFormatHorariosHTML($horarios = array())
+    {
+        foreach($horarios as $key => $hora)
+            $horarios[$key] = in_array($key, ['manha', 'tarde']) ? 'Período todo: ' . $hora : $hora;
+
+        return implode('<br>', $horarios);
+    }
+
     public static function periodoManha()
     {
         return array_slice(todasHoras(), 4, 7);
@@ -106,10 +114,10 @@ class SalaReuniao extends Model
         $qtd_periodo_todo = $tipo == 'reuniao' ? $total_periodos : $this->participantes_coworking * $total_periodos;
         $qtd_por_hora = $tipo == 'reuniao' ? count($horarios) : $this->participantes_coworking * count($horarios);
 
-        if($agendado->periodo_todo && ($agendado->total >= $qtd_periodo_todo))
-            return true;
+        $periodo_todo = $agendado->where('periodo_todo', 1)->first();
+        $total = $agendado->sum('total');
 
-        if(!$agendado->periodo_todo && ($agendado->total >= $qtd_por_hora))
+        if((isset($periodo_todo) && ($periodo_todo->total >= $qtd_periodo_todo)) || ($total >= $qtd_por_hora))
             return true;
 
         return false;
@@ -117,21 +125,17 @@ class SalaReuniao extends Model
 
     private function removeHorasPorHora($hora, $horarios, $horarios_agendar, $periodo_todo = true)
     {
-        $nome_periodo = $hora <= $this->hora_limite_final_manha ? 'manha' : 'tarde';
+        $nome_periodo = $hora <= $this->horaAlmoco() ? 'manha' : 'tarde';
 
         if($periodo_todo)
         {
-            $temp = $this->horariosPeriodoPorHora($hora, $horarios);
-            $horarios = Arr::except($horarios, array_keys($temp));
-            $horarios_agendar = Arr::except($horarios_agendar, array_values($temp));
-            unset($horarios_agendar[$nome_periodo]);
+            $horarios = $this->horariosPeriodoPorHora($hora, $horarios);
+            $horarios_agendar = Arr::except($horarios_agendar, array_values($horarios));
         }
         else
-        {
-            unset($horarios[array_search($hora, $horarios)]);
             $horarios_agendar = Arr::except($horarios_agendar, $hora);
-            unset($horarios_agendar[$nome_periodo]);
-        }
+
+        unset($horarios_agendar[$nome_periodo]);
 
         return $horarios_agendar;
     }
@@ -167,16 +171,12 @@ class SalaReuniao extends Model
         if(!isset($horarios))
             $horarios = $tipo == 'reuniao' ? explode(',', $this->horarios_reuniao) : explode(',', $this->horarios_coworking);
 
-        $final = $horarios;
-
-        $final = $hora <= $this->hora_limite_final_manha ? 
+        return $hora <= $this->horaAlmoco() ? 
             Arr::where($horarios, function ($value, $key) {
-                return $value <= $this->hora_limite_final_manha;
+                return $value <= $this->horaAlmoco();
             }) : Arr::where($horarios, function ($value, $key) {
-                return $value > $this->hora_limite_final_manha;
+                return $value > $this->horaAlmoco();
             });
-
-        return $final;
     }
 
     public function isAtivo($tipo)
@@ -206,7 +206,10 @@ class SalaReuniao extends Model
 
     public function getTodasHoras()
     {
-        return array_unique(array_merge(implode(',', $this->horarios_reuniao), implode(',', $this->horarios_coworking)));
+        $final = array_unique(array_merge(explode(',', $this->horarios_reuniao), explode(',', $this->horarios_coworking)));
+        sort($final);
+
+        return $final;
     }
 
     public function getItens($tipo)
@@ -216,6 +219,16 @@ class SalaReuniao extends Model
         if($tipo == 'coworking')
             return json_decode($this->itens_coworking, true);
         return array();
+    }
+
+    public function horaAlmoco()
+    {
+        return $this->hora_limite_final_manha;
+    }
+
+    public function horaFimExpediente()
+    {
+        return $this->hora_limite_final_tarde;
     }
 
     public function getItensHtml($tipo)
@@ -330,20 +343,20 @@ class SalaReuniao extends Model
         ];
     }
 
-    public function formatarHorariosAgendamento($horarios)
+    public function formatarHorariosAgendamento($horarios = array())
     {
-        if(empty($horarios))
+        if(empty($horarios) || (isset($horarios[0]) && (strlen($horarios[0]) == 0)))
             return array();
 
         $formatado = array();
         $separador = ' - ';
 
         $final['manha'] = Arr::where($horarios, function ($value, $key) {
-            return $value <= $this->hora_limite_final_manha;
+            return $value <= $this->horaAlmoco();
         });
 
         $final['tarde'] = Arr::where($horarios, function ($value, $key) {
-            return $value > $this->hora_limite_final_manha;
+            return $value > $this->horaAlmoco();
         });
 
         if((count($final['manha']) > 0) || (count($final['tarde']) > 0))
@@ -353,20 +366,31 @@ class SalaReuniao extends Model
                 if(count($arrayHoras) == 0)
                     continue;
 
-                $hora_final = $periodo == 'manha' ? $this->hora_limite_final_manha : $this->hora_limite_final_tarde;
+                $hora_final = $periodo == 'manha' ? $this->horaAlmoco() : $this->horaFimExpediente();
                 $periodo_todo = $arrayHoras[array_keys($arrayHoras)[0]] . $separador . $hora_final;
                 foreach($arrayHoras as $key => $val)
                 {
                     if(count($arrayHoras) == 1)
                         break;
                     $seguinte = $key + 1;
-                    $formatado[$val] = $val != last($arrayHoras) && isset($arrayHoras[$seguinte]) ? $val . $separador . $arrayHoras[$seguinte] : $val . $separador . $hora_final;
+                    $formatado[$val] = $val != last($arrayHoras) && isset($arrayHoras[$seguinte]) ? 
+                    $val . $separador . $arrayHoras[$seguinte] : $val . $separador . $hora_final;
                 }
                 $formatado[$periodo] = $periodo_todo;
             }
         }
 
         return $formatado;
+    }
+
+    public function formatarHorariosAgendamentoHTML($tipo)
+    {
+        if(!in_array($tipo, ['reuniao', 'coworking']))
+            return array();
+
+        $horarios = $this->formatarHorariosAgendamento($this->getHorarios($tipo));
+
+        return self::getFormatHorariosHTML($horarios);
     }
 
     public function getDiasSeLotado($tipo)
@@ -386,6 +410,7 @@ class SalaReuniao extends Model
             ->groupBy('dia')
             ->groupBy('periodo_todo')
             ->orderBy('dia')
+            ->orderBy('periodo_todo', 'DESC')
             ->get();
 
         $dia = Carbon::tomorrow();
@@ -400,9 +425,10 @@ class SalaReuniao extends Model
             }
         }
 
+        $agendados = $agendados->groupBy('dia');
         foreach($agendados as $agendado)
         {
-            $dia = Carbon::parse($agendado->dia);
+            $dia = Carbon::parse($agendado->get(0)->dia);
             if(!array_search($dia->format('Y-m-d'), $diaslotadosBloqueio))
             {
                 $periodosTotal = $this->getPeriodosComBloqueio($bloqueios, $dia->format('Y-m-d'), $horarios);
@@ -425,7 +451,7 @@ class SalaReuniao extends Model
         $horarios_agendar = $this->formatarHorariosAgendamento($horarios);
 
         if(sizeof($horarios) == 0)
-            return $horarios;
+            return $horarios_agendar;
 
         $agendados = $this->agendamentosSala()
             ->select('periodo', 'periodo_todo', DB::raw('count(*) as total'))
@@ -441,7 +467,7 @@ class SalaReuniao extends Model
         {
             foreach($agendados as $value)
             {
-                $hora = explode(' - ', $value->periodo)[0];
+                $hora = $value->inicioDoPeriodo();
 
                 switch ($tipo) {
                     case 'reuniao':

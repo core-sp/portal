@@ -96,4 +96,17 @@ class SalaReuniaoController extends Controller
 
         return response()->json($dados);
     }
+
+    public function getHorarioFormatado(Request $request, $id)
+    {
+        try{
+            $validate = $request->filled('horarios') ? $request->only('horarios') : ['horarios' => array()];
+            $dados = $this->service->getService('SalaReuniao')->getHorarioFormatadoById($id, $validate['horarios']);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar o horário formatado via ajax.");
+        }
+
+        return response()->json($dados);
+    }
 }

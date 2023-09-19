@@ -131,7 +131,7 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
         $participantes['reuniao'] = $sala->participantes_reuniao;
         $itens_coworking = $sala->getItens('coworking');
         $participantes['coworking'] = $sala->participantes_coworking;
-        $periodos = ['final_manha' => $sala->hora_limite_final_manha, 'final_tarde' => $sala->hora_limite_final_tarde];
+        $periodos = ['final_manha' => $sala->horaAlmoco(), 'final_tarde' => $sala->horaFimExpediente()];
 
         $sala->update([
             'horarios_reuniao' => isset($dados['horarios_reuniao']) ? implode(',', $dados['horarios_reuniao']) : null,
@@ -198,7 +198,8 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
                     // verifica agendamentos como participante
                     if($user->tipoPessoa() == 'PF'){
                         foreach($periodos as $chave => $valor){
-                            if(!empty($this->site()->participantesVetados($dia, $valor, [apenasNumeros($user->cpf_cnpj)])))
+                            $periodoTodo = in_array($chave, ['manha', 'tarde']);
+                            if(!empty($this->site()->participantesVetados($dia, $valor, [apenasNumeros($user->cpf_cnpj)], $periodoTodo)))
                                 unset($periodos[$chave]);
                         }
                     }
@@ -228,6 +229,13 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
     public function getTodasHorasById($id)
     {
         return SalaReuniao::findOrFail($id)->getTodasHoras();
+    }
+
+    public function getHorarioFormatadoById($id, $arrayHorarios)
+    {
+        $horarios = SalaReuniao::findOrFail($id)->formatarHorariosAgendamento($arrayHorarios);
+
+        return SalaReuniao::getFormatHorariosHTML($horarios);
     }
     
     public function site()

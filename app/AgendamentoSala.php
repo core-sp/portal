@@ -153,24 +153,53 @@ class AgendamentoSala extends Model
         return $dia->format('Y-m-d');
     }
 
-    public static function participantesVetados($dia, $periodo, $cpfs, $id = null)
+    public function inicioDoPeriodo()
+    {
+        return explode(' - ', $this->periodo)[0];
+    }
+
+    public function fimDoPeriodo()
+    {
+        return explode(' - ', $this->periodo)[1];
+    }
+
+    public static function participantesVetados($dia, $periodo, $cpfs, $periodoTodo = true, $id = null)
     {
         $vetados = array();
+        $periodo_inicial = explode(' - ', $periodo)[0];
 
         $agendados = self::when(isset($id), function($query) use($id){
             return $query->where('id', '!=', $id);
         })
         ->whereNull('status')
         ->where('dia', $dia)
-        ->where('periodo', $periodo)
+        ->where(function($q) use($cpfs) {
+            $q->whereHas('representante', function($query) use($cpfs){
+                $query->whereIn('cpf_cnpj', $cpfs);
+            })
+            ->orWhere('tipo_sala', 'reuniao');
+        })
         ->get();        
         
         foreach ($agendados as $key => $value) {
+            $temp = array();
+            $tipo_periodo = $periodo_inicial <= $value->sala->horaAlmoco() ? 'manha' : 'tarde';
+            $tipo_periodo_agendado = $value->inicioDoPeriodo() <= $value->sala->horaAlmoco() ? 'manha' : 'tarde';
+
             if($value->representante->tipoPessoa() == 'PF')
-                $vetados = array_merge($vetados, array_intersect($cpfs, [apenasNumeros($value->representante->cpf_cnpj)]));
+                $temp = array_intersect($cpfs, [apenasNumeros($value->representante->cpf_cnpj)]);
             if($value->isReuniao()){
                 $participantes = array_keys(json_decode($value->participantes, true));
-                $vetados = array_merge($vetados, array_intersect($cpfs, $participantes));
+                $temp = array_merge($temp, array_intersect($cpfs, $participantes));
+            }
+            if(!empty($temp))
+            {
+                if($value->periodo_todo && ($tipo_periodo_agendado == $tipo_periodo))
+                    $vetados = array_merge($vetados, $temp);
+                elseif(!$value->periodo_todo && $periodoTodo && ($tipo_periodo_agendado == $tipo_periodo))
+                    $vetados = array_merge($vetados, $temp);
+                elseif(!$value->periodo_todo && ($periodo_inicial == $value->inicioDoPeriodo()))
+                    $vetados = array_merge($vetados, $temp);
             }
         }
 

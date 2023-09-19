@@ -131,9 +131,10 @@ class Representante extends Authenticable
         ->paginate(4);
     }
 
-    // limite conforme a resolução: no máximo pode agendar 4x por mês
     public function podeAgendar($mes = null, $ano = null)
     {
+        $total = 4;
+
         $atual = $this->agendamentosSalas()
         ->when(isset($mes) && !isset($ano), function($query) use($mes){
             $query->whereMonth('dia', $mes)
@@ -157,7 +158,7 @@ class Representante extends Authenticable
             $query->whereNull('status')
             ->orWhere('status', 'Compareceu');
         })        
-        ->count() < 4;
+        ->count() < $total;
 
         $seguinte = false;
         $dataSeguinte = now()->addMonth();
@@ -172,7 +173,7 @@ class Representante extends Authenticable
                 $query->whereNull('status')
                 ->orWhere('status', 'Compareceu');
             }) 
-            ->count() < 4;
+            ->count() < $total;
 
         return $atual || $seguinte;
     }
@@ -189,23 +190,17 @@ class Representante extends Authenticable
 
         foreach($agendados as $agendado)
         {
-            foreach($periodosDisponiveis as $chave => $periodo){
-                if($periodo == $agendado->periodo)
-                {
-                    $ultima_hora = explode(' - ', $agendado->periodo)[1];
-                    if($agendado->periodo_todo)
-                        $periodosDisponiveis = Arr::except($periodosDisponiveis, 
-                        array_keys(Arr::where($periodosDisponiveis, function ($value, $key) use($chave, $ultima_hora) {
-                            return $chave == 'manha' ? $value <= $ultima_hora : $value > $ultima_hora;
-                        })));
-                    else{
-                        unset($periodosDisponiveis[$chave]);
-                        if(isset($manha) && ($ultima_hora <= $manha))
-                            unset($periodosDisponiveis['manha']);
-                        else
-                            unset($periodosDisponiveis['tarde']);
-                    }
-                }
+            $inicio = Carbon::parse($agendado->inicioDoPeriodo());
+            $final = Carbon::parse($agendado->fimDoPeriodo());
+            if($agendado->periodo_todo)
+                $periodosDisponiveis = Arr::except($periodosDisponiveis, 
+                    array_values(array_keys(Arr::where($periodosDisponiveis, function ($value, $key) use($inicio, $final) {
+                        return Carbon::parse(explode(' - ', $value)[0])->between($inicio, $final);
+                    }))));
+            else{
+                unset($periodosDisponiveis[$agendado->inicioDoPeriodo()]);
+                $tipo_periodo = isset($manha) && ($agendado->fimDoPeriodo() <= $manha) ? 'manha' : 'tarde';
+                unset($periodosDisponiveis[$tipo_periodo]);
             }
         }
 

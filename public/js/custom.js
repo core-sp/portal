@@ -512,3 +512,43 @@ $('#form_salaReuniao button[type="submit"]').click(function(){
   $('#itens_reuniao option').prop('selected', true);
   $('#itens_coworking option').prop('selected', true);
 });
+
+function hideShowHorasLimitesSala()
+{
+  $('#horarios_reuniao option, #horarios_coworking option').each(function(){
+    (this.value == $('#hora_limite_final_manha').val()) || (this.value >= $('#hora_limite_final_tarde').val()) ?
+    $(this).hide() : $(this).show();
+  });
+}
+
+$('#form_salaReuniao #hora_limite_final_manha, #form_salaReuniao #hora_limite_final_tarde').ready(function(){
+    hideShowHorasLimitesSala();
+});
+
+$('#form_salaReuniao #hora_limite_final_manha, #form_salaReuniao #hora_limite_final_tarde').change(function(){
+  hideShowHorasLimitesSala();
+});
+
+$('#form_salaReuniao #horarios_reuniao, #form_salaReuniao #horarios_coworking').change(function(){
+  var id = this.id;
+  const selectedValues = Array.from($('#' + id + ' option:selected')).map(
+    option => option.value,
+  );
+
+  $.ajax({
+    type: "POST",
+    data: {
+      _method: "POST",
+      _token: $('meta[name="csrf-token"]').attr('content'),
+      horarios: selectedValues,
+    },
+    dataType: 'json',
+    url: "/admin/salas-reunioes/sala-horario-formatado/" + $('#valor_id').val(),
+    success: function(response) {
+      $('#' + id + '_rep').html(response);
+    },
+    error: function() {
+      alert('Erro ao carregar os horários formatados. Recarregue a página.');
+    }
+  });
+});

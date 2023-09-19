@@ -22,13 +22,13 @@ class SalaReuniaoMail extends Mailable
     {
         $this->body = "<strong>A seccional ". $sala->regional->regional ." sofreu alteração nos itens e/ou no total de participantes da(s) sala(s)!</strong>";
         $this->body .= "<br><br>";
-        $this->body .= "<strong>Os itens / participantes abaixo foram alterados:</strong>";
+        $this->body .= "<strong>Os dados abaixo foram alterados:</strong>";
         $this->body .= "<br><br>";
         
         if(isset($itens['final_manha']))
-            $this->body .= "<strong>Horário final do período da manhã</strong><br><br>Antes: ".$itens['final_manha']."; Atual: ".$sala->hora_limite_final_manha."<br><br>";
+            $this->body .= "<strong>Horário final do período da manhã</strong><br><br>Antes: ".$itens['final_manha']."; Atual: ".$sala->horaAlmoco()."<br><br>";
         if(isset($itens['final_tarde']))
-            $this->body .= "<strong>Horário final do período da tarde</strong><br><br>Antes: ".$itens['final_tarde']."; Atual: ".$sala->hora_limite_final_tarde."<br><br>";
+            $this->body .= "<strong>Horário final do período da tarde</strong><br><br>Antes: ".$itens['final_tarde']."; Atual: ".$sala->horaFimExpediente()."<br><br>";
         if(isset($itens['reuniao']) && !empty($itens['reuniao'])){
             $this->body .= "<strong>Sala de Reunião</strong>";
             $this->body .= "<br><br>";
@@ -49,7 +49,7 @@ class SalaReuniaoMail extends Mailable
         } 
 
         $this->body .= "<br>";
-        $this->body .= "<strong>Itens / participantes das salas após alteração:</strong>";
+        $this->body .= "<strong>Dados das salas após alteração:</strong>";
         $this->body .= "<br><br>";
         $this->body .= "<strong>Sala de Reunião</strong>";
         $this->body .= "<br><br>";
@@ -72,7 +72,7 @@ class SalaReuniaoMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Alteração de itens / participantes da sala de reunião')
+        return $this->subject('Alteração de dados da sala de reunião')
             ->view('emails.default');
     }
 }
