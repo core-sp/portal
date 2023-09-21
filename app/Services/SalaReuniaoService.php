@@ -36,10 +36,10 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
         ];
         // Opções de conteúdo da tabela
         $contents = [];
-        // $userPodeEditar = $user->can('updateOther', auth()->user());
+        $userPodeEditar = $user->can('updateOther', auth()->user());
         foreach($resultados as $resultado) {
             $acoes = '';
-            // if($userPodeEditar)
+            if($userPodeEditar)
                 $acoes = '<a href="' .route('sala.reuniao.editar.view', $resultado->id). '" class="btn btn-sm btn-primary">Editar</a> ';
             $conteudo = [
                 $resultado->id,
@@ -65,7 +65,7 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
         $upload_form .= '<button class="btn btn-sm btn-primary mb-2" type="submit">Enviar</button>';
         $upload_form .= '<span class="ml-3 mb-2"><a class="btn btn-sm btn-success" href="'. route('termo.consentimento.pdf', 'sala-reuniao') .'" target="_blank">Abrir</a></span></form></div><hr />';
 
-        $tabela = /*$userPodeEditar ? */$upload_form . montaTabela($headers, $contents, $classes)/* : montaTabela($headers, $contents, $classes)*/;
+        $tabela = $userPodeEditar ? $upload_form . montaTabela($headers, $contents, $classes) : montaTabela($headers, $contents, $classes);
         
         return $tabela;
     }

@@ -284,7 +284,9 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
                         $q1->whereHas('representante', function ($q2) use ($busca){
                             $q2->where('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%');
                         })
-                        ->orWhere('id', apenasNumeros($busca));
+                        ->orWhere('id', apenasNumeros($busca))
+                        ->orWhere('periodo', 'LIKE', $busca . ' - %')
+                        ->orWhere('periodo', 'LIKE', '% - ' . $busca);
                     }, function ($q1) use($busca) {
                         $q1->where('protocolo', 'LIKE', 'RC-AGE-'. str_replace('RC-AGE-', '', $busca).'%');
                     });
@@ -294,11 +296,15 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
                     $q1->whereHas('representante', function ($q2) use ($busca){
                         $q2->where('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%');
                     })
-                    ->orWhere('id', apenasNumeros($busca));
+                    ->orWhere('id', apenasNumeros($busca))
+                    ->orWhere('periodo', 'LIKE', $busca . ' - %')
+                    ->orWhere('periodo', 'LIKE', '% - ' . $busca);
                 }, function ($q1) use($busca) {
                     $q1->where('protocolo', 'LIKE', 'RC-AGE-'. str_replace('RC-AGE-', '', $busca).'%');
                 });
             })
+            ->orderBy('dia', 'DESC')
+            ->orderBy('periodo')
             ->paginate(25);
 
         return [

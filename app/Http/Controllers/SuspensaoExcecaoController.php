@@ -18,7 +18,7 @@ class SuspensaoExcecaoController extends Controller
 
     public function index()
     {
-        // $this->authorize('viewAny', auth()->user());
+        $this->authorize('viewAny', auth()->user());
         try{
             $dados = $this->service->getService('SalaReuniao')->suspensaoExcecao()->listar(auth()->user());
         } catch (\Exception $e) {
@@ -31,7 +31,7 @@ class SuspensaoExcecaoController extends Controller
 
     public function view($id)
     {
-        // $this->authorize('viewAny', auth()->user());
+        $this->authorize('viewAny', auth()->user());
         try{
             $dados = $this->service->getService('SalaReuniao')->suspensaoExcecao()->view(auth()->user(), $id);
         } catch (\Exception $e) {
@@ -44,7 +44,7 @@ class SuspensaoExcecaoController extends Controller
 
     public function edit($id, $situacao)
     {
-        // $this->authorize('updateOther', auth()->user());
+        $this->authorize('updateOther', auth()->user());
 
         try{
             $dados = $this->service->getService('SalaReuniao')->suspensaoExcecao()->view(auth()->user(), $id);
@@ -63,7 +63,7 @@ class SuspensaoExcecaoController extends Controller
 
     public function update(SuspensaoExcecaoRequest $request, $id, $situacao)
     {
-        // $this->authorize('updateOther', auth()->user());
+        $this->authorize('updateOther', auth()->user());
 
         try{
             $validated = $request->validated();
@@ -81,7 +81,7 @@ class SuspensaoExcecaoController extends Controller
 
     public function create()
     {
-        // $this->authorize('create', auth()->user());
+        $this->authorize('create', auth()->user());
 
         try{
             $dados = $this->service->getService('SalaReuniao')->suspensaoExcecao()->view(auth()->user());
@@ -95,7 +95,7 @@ class SuspensaoExcecaoController extends Controller
 
     public function store(SuspensaoExcecaoRequest $request)
     {
-        // $this->authorize('create', auth()->user());
+        $this->authorize('create', auth()->user());
 
         try{
             $validated = $request->validated();
@@ -113,7 +113,7 @@ class SuspensaoExcecaoController extends Controller
 
     public function busca(Request $request)
     {
-        // $this->authorize('viewAny', auth()->user());
+        $this->authorize('viewAny', auth()->user());
 
         try{
             if(strlen($request->q) == 0)

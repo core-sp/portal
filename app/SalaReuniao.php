@@ -23,7 +23,10 @@ class SalaReuniao extends Model
     public static function getFormatHorariosHTML($horarios = array())
     {
         foreach($horarios as $key => $hora)
+        {
+            $hora = str_replace(' - ', ' até ', $hora);
             $horarios[$key] = in_array($key, ['manha', 'tarde']) ? 'Período todo: ' . $hora : $hora;
+        }
 
         return implode('<br>', $horarios);
     }

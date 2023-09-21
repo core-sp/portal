@@ -18,7 +18,7 @@ class SalaReuniaoController extends Controller
 
     public function index()
     {
-        // $this->authorize('viewAny', auth()->user());
+        $this->authorize('viewAny', auth()->user());
         try{
             $dados = $this->service->getService('SalaReuniao')->listar(auth()->user());
         } catch (\Exception $e) {
@@ -39,7 +39,7 @@ class SalaReuniaoController extends Controller
 
     public function edit($id)
     {
-        // $this->authorize('updateOther', auth()->user());
+        $this->authorize('updateOther', auth()->user());
         try{
             $dados = $this->service->getService('SalaReuniao')->view($id);
         } catch (\Exception $e) {
@@ -52,7 +52,7 @@ class SalaReuniaoController extends Controller
 
     public function update(SalaReuniaoRequest $request, $id)
     {
-        // $this->authorize('updateOther', auth()->user());
+        $this->authorize('updateOther', auth()->user());
         try{
             $validated = $request->validated();
             $this->service->getService('SalaReuniao')->save($validated, $id, auth()->user());
@@ -99,6 +99,7 @@ class SalaReuniaoController extends Controller
 
     public function getHorarioFormatado(Request $request, $id)
     {
+        $this->authorize('viewAny', auth()->user());
         try{
             $validate = $request->filled('horarios') ? $request->only('horarios') : ['horarios' => array()];
             $dados = $this->service->getService('SalaReuniao')->getHorarioFormatadoById($id, $validate['horarios']);

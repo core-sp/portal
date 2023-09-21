@@ -44,8 +44,8 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
     {
         $tipo_servico = isset($tipo_servico) ? Str::studly(str_replace('-', '_', $tipo_servico)) : $tipo_servico;
 
-        // if(!perfisPermitidos($tipo_servico . 'Controller', 'edit'))
-        //     throw new \Exception('Não autorizado a realizar upload do termo no serviço ' . $tipo_servico, 403);
+        if(!perfisPermitidos($tipo_servico . 'Controller', 'edit'))
+            throw new \Exception('Não autorizado a realizar upload do termo no serviço ' . $tipo_servico, 403);
 
         $nome = Str::snake($tipo_servico) . '_condicoes.pdf';
 

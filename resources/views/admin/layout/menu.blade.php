@@ -295,8 +295,8 @@
             $representante = in_array($idperfil, $permitidos->find(47)['perfis']);
             $representanteEndereco = in_array($idperfil, $permitidos->find(45)['perfis']);
             $representanteCedula = in_array($idperfil, $permitidos->find(59)['perfis']);
-            $salas = true/*in_array($idperfil, $permitidos->find(59)['perfis'])*/;
-            $suspensao = true/*in_array($idperfil, $permitidos->find(59)['perfis'])*/;
+            $salas = in_array($idperfil, $permitidos->find(67)['perfis']);
+            $suspensao = in_array($idperfil, $permitidos->find(69)['perfis']);
         @endphp
         
         @if($agendamento || $agendamentobloqueio || $representante || $representanteEndereco || $representanteCedula || $salas || $suspensao)

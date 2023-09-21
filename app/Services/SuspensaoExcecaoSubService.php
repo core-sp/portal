@@ -41,13 +41,15 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
         ];
         // Opções de conteúdo da tabela
         $contents = [];
-        // $userPodeEditar = $user->can('updateOther', $user);
+        $userPodeEditar = $user->can('updateOther', $user);
         foreach($resultados as $resultado) {
             $acoes = '';
             $acoes .= '<a href="' .route('sala.reuniao.suspensao.view', $resultado->id). '" class="btn btn-sm btn-primary">Ver</a>&nbsp;&nbsp;&nbsp;';
-            // if($userPodeEditar)
-            $acoes .= '<a href="' .route('sala.reuniao.suspensao.edit', [$resultado->id, 'suspensao']). '" class="btn btn-sm btn-warning">Editar Suspensão</a>&nbsp;&nbsp;&nbsp;';
-            $acoes .= '<a href="' .route('sala.reuniao.suspensao.edit', [$resultado->id, 'excecao']). '" class="btn btn-sm btn-success">Editar Exceção</a>';
+            if($userPodeEditar)
+            {
+                $acoes .= '<a href="' .route('sala.reuniao.suspensao.edit', [$resultado->id, 'suspensao']). '" class="btn btn-sm btn-warning">Editar Suspensão</a>&nbsp;&nbsp;&nbsp;';
+                $acoes .= '<a href="' .route('sala.reuniao.suspensao.edit', [$resultado->id, 'excecao']). '" class="btn btn-sm btn-success">Editar Exceção</a>';
+            }
             $conteudo = [
                 $resultado->id,
                 $resultado->getCpfCnpj() . $resultado->getTextoHTMLSeCadastro(),
@@ -79,8 +81,8 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
         ->orderBy('data_final_excecao')
         ->paginate(15);
 
-        // if($user->cannot('create', $user))
-        //     unset($this->variaveis['btn_criar']);
+        if($user->cannot('create', $user))
+            unset($this->variaveis['btn_criar']);
 
         return [
             'tabela' => $this->tabelaCompleta($suspensos, $user),
