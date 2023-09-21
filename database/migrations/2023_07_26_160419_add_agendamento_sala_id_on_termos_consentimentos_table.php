@@ -27,7 +27,8 @@ class AddAgendamentoSalaIdOnTermosConsentimentosTable extends Migration
     public function down()
     {
         Schema::table('termos_consentimentos', function (Blueprint $table) {
-            $table->dropColumn('agendamento_sala_id');
+            $table->dropForeign(['agendamento_sala_id']);
+            $table->dropColumn(['agendamento_sala_id']);
         });
     }
 }
