@@ -166,7 +166,7 @@ class AgendamentoSala extends Model
     public static function participantesVetados($dia, $periodo, $cpfs, $periodoTodo = true, $id = null)
     {
         $vetados = array();
-        $periodo_inicial = explode(' - ', $periodo)[0];
+        $periodo = explode(' - ', $periodo);
 
         $agendados = self::when(isset($id), function($query) use($id){
             return $query->where('id', '!=', $id);
@@ -179,12 +179,15 @@ class AgendamentoSala extends Model
             })
             ->orWhere('tipo_sala', 'reuniao');
         })
+        ->orderBy('dia')
+        ->orderBy('periodo_todo', 'DESC')
         ->get();        
         
         foreach ($agendados as $key => $value) {
             $temp = array();
-            $tipo_periodo = $periodo_inicial <= $value->sala->horaAlmoco() ? 'manha' : 'tarde';
-            $tipo_periodo_agendado = $value->inicioDoPeriodo() <= $value->sala->horaAlmoco() ? 'manha' : 'tarde';
+            $almoco = $value->sala->horaAlmoco();
+            $tipo_periodo = $periodo[0] <= $almoco ? 'manha' : 'tarde';
+            $tipo_periodo_agendado = $value->inicioDoPeriodo() <= $almoco ? 'manha' : 'tarde';
 
             if($value->representante->tipoPessoa() == 'PF')
                 $temp = array_intersect($cpfs, [apenasNumeros($value->representante->cpf_cnpj)]);
@@ -194,12 +197,16 @@ class AgendamentoSala extends Model
             }
             if(!empty($temp))
             {
+                $periodo_inicio_agendado = Carbon::parse($value->inicioDoPeriodo());
+                $periodo_final_agendado = Carbon::parse($value->fimDoPeriodo());
+
                 if($value->periodo_todo && ($tipo_periodo_agendado == $tipo_periodo))
                     $vetados = array_merge($vetados, $temp);
                 elseif(!$value->periodo_todo && $periodoTodo && ($tipo_periodo_agendado == $tipo_periodo))
                     $vetados = array_merge($vetados, $temp);
-                elseif(!$value->periodo_todo && ($periodo_inicial == $value->inicioDoPeriodo()))
-                    $vetados = array_merge($vetados, $temp);
+                elseif(!$value->periodo_todo && !$periodoTodo)
+                    $periodo_inicio_agendado->addMinute()->between($periodo[0], $periodo[1]) || $periodo_final_agendado->subMinute()->between($periodo[0], $periodo[1]) ? 
+                    $vetados = array_merge($vetados, $temp) : null;
             }
         }
 

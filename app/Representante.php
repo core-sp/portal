@@ -184,22 +184,28 @@ class Representante extends Authenticable
         ->where('dia', $dia)
         ->whereNull('status')
         ->orderBy('dia')
+        ->orderBy('periodo_todo', 'DESC')
         ->get();
-
-        $manha = in_array('manha', array_keys($periodosDisponiveis)) ? explode(' - ', $periodosDisponiveis['manha'])[1] : null;
 
         foreach($agendados as $agendado)
         {
-            $inicio = Carbon::parse($agendado->inicioDoPeriodo());
-            $final = Carbon::parse($agendado->fimDoPeriodo());
+            $manha = $agendado->sala->horaAlmoco();
+            $tipo_periodo = $agendado->inicioDoPeriodo() <= $manha ? 'manha' : 'tarde';
+            
             if($agendado->periodo_todo)
                 $periodosDisponiveis = Arr::except($periodosDisponiveis, 
-                    array_values(array_keys(Arr::where($periodosDisponiveis, function ($value, $key) use($inicio, $final) {
-                        return Carbon::parse(explode(' - ', $value)[0])->between($inicio, $final);
+                    array_values(array_keys(Arr::where($periodosDisponiveis, function ($value, $key) use($tipo_periodo, $manha) {
+                        $temp = explode(' - ', $value);
+                        return $tipo_periodo == 'manha' ? $temp[0] <= $manha : $temp[0] > $manha;
                     }))));
             else{
-                unset($periodosDisponiveis[$agendado->inicioDoPeriodo()]);
-                $tipo_periodo = isset($manha) && ($agendado->fimDoPeriodo() <= $manha) ? 'manha' : 'tarde';
+                $periodosDisponiveis = Arr::except($periodosDisponiveis, 
+                    array_values(array_keys(Arr::where($periodosDisponiveis, function ($value, $key) use($agendado) {
+                        $temp = explode(' - ', $value);
+                        $inicio = Carbon::parse($agendado->inicioDoPeriodo());
+                        $final = Carbon::parse($agendado->fimDoPeriodo());
+                        return $inicio->addMinute()->between($temp[0], $temp[1]) || $final->subMinute()->between($temp[0], $temp[1]);
+                    }))));
                 unset($periodosDisponiveis[$tipo_periodo]);
             }
         }

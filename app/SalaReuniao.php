@@ -126,19 +126,27 @@ class SalaReuniao extends Model
         return false;
     }
 
-    private function removeHorasPorHora($hora, $horarios, $horarios_agendar, $periodo_todo = true)
+    private function removeHorasPorHora($periodo, $horarios_agendar, $periodo_todo = true)
     {
-        $nome_periodo = $hora <= $this->horaAlmoco() ? 'manha' : 'tarde';
+        $periodo = explode(' - ', $periodo);
+        $manha = $this->horaAlmoco();
+        $tipo_periodo = $periodo[0] <= $manha ? 'manha' : 'tarde';
+        
+        $horarios_agendar = $periodo_todo ? 
+            Arr::except($horarios_agendar, 
+                array_values(array_keys(Arr::where($horarios_agendar, function ($value, $key) use($tipo_periodo, $manha) {
+                    $temp = explode(' - ', $value);
+                    return $tipo_periodo == 'manha' ? $temp[0] <= $manha : $temp[0] > $manha;
+                })))) : 
+            Arr::except($horarios_agendar, 
+                array_values(array_keys(Arr::where($horarios_agendar, function ($value, $key) use($periodo) {
+                    $temp = explode(' - ', $value);
+                    $periodo_inicio = Carbon::parse($periodo[0]);
+                    $periodo_final = Carbon::parse($periodo[1]);
+                    return $periodo_inicio->addMinute()->between($temp[0], $temp[1]) || $periodo_final->subMinute()->between($temp[0], $temp[1]);
+                }))));
 
-        if($periodo_todo)
-        {
-            $horarios = $this->horariosPeriodoPorHora($hora, $horarios);
-            $horarios_agendar = Arr::except($horarios_agendar, array_values($horarios));
-        }
-        else
-            $horarios_agendar = Arr::except($horarios_agendar, $hora);
-
-        unset($horarios_agendar[$nome_periodo]);
+        unset($horarios_agendar[$tipo_periodo]);
 
         return $horarios_agendar;
     }
@@ -166,19 +174,6 @@ class SalaReuniao extends Model
             ->orWhere(function($query) {
                 $query->where('sala_reuniao_id', $this->id)
                 ->whereNull('dataFinal');
-            });
-    }
-
-    public function horariosPeriodoPorHora($hora, $horarios = null, $tipo = 'reuniao')
-    {
-        if(!isset($horarios))
-            $horarios = $tipo == 'reuniao' ? explode(',', $this->horarios_reuniao) : explode(',', $this->horarios_coworking);
-
-        return $hora <= $this->horaAlmoco() ? 
-            Arr::where($horarios, function ($value, $key) {
-                return $value <= $this->horaAlmoco();
-            }) : Arr::where($horarios, function ($value, $key) {
-                return $value > $this->horaAlmoco();
             });
     }
 
@@ -463,29 +458,17 @@ class SalaReuniao extends Model
             ->whereDate('dia', $dia)
             ->groupBy('periodo')
             ->groupBy('periodo_todo')
-            ->orderBy('periodo')
+            ->orderBy('periodo_todo', 'DESC')
             ->get();
 
         if($agendados->isNotEmpty())
         {
             foreach($agendados as $value)
             {
-                $hora = $value->inicioDoPeriodo();
-
-                switch ($tipo) {
-                    case 'reuniao':
-                        if($value->periodo_todo)
-                            $horarios_agendar = $this->removeHorasPorHora($hora, $horarios, $horarios_agendar);
-                        elseif(in_array($hora, $horarios))
-                            $horarios_agendar = $this->removeHorasPorHora($hora, $horarios, $horarios_agendar, false);
-                        break;
-                    case 'coworking':
-                        if($value->periodo_todo && ($value->total >= $this->participantes_coworking))
-                            $horarios_agendar = $this->removeHorasPorHora($hora, $horarios, $horarios_agendar);
-                        elseif(!$value->periodo_todo && in_array($hora, $horarios) && ($value->total >= $this->participantes_coworking))
-                            $horarios_agendar = $this->removeHorasPorHora($hora, $horarios, $horarios_agendar, false);
-                        break;
-                }
+                if(($tipo == 'reuniao') || (($tipo == 'coworking') && ($value->total >= $this->participantes_coworking)))
+                    $horarios_agendar = $value->periodo_todo ? 
+                    $this->removeHorasPorHora($value->periodo, $horarios_agendar) : 
+                    $this->removeHorasPorHora($value->periodo, $horarios_agendar, false);
             }
         }
         
