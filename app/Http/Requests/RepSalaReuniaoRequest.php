@@ -84,7 +84,7 @@ class RepSalaReuniaoRequest extends FormRequest
             $this->total_cpfs = isset($this->disponivel['total']) ? $this->disponivel['total'] : 0;
             $this->horas = isset($this->disponivel['horarios']) ? $this->disponivel['horarios'] : $this->horas;
 
-            if(!isset($this->disponivel)){
+            if(!isset($this->disponivel) || empty($this->disponivel)){
                 $this->merge([
                     'dia' => '',
                     'periodo' => '',
@@ -126,7 +126,7 @@ class RepSalaReuniaoRequest extends FormRequest
             $this->total_cpfs = $this->total_cpfs < count($cpfs) ? 0 : count($cpfs);
         }
 
-        if($this->total_cpfs > 0)
+        if(($this->total_cpfs > 0) && is_array($this->participantes_cpf))
         {
             $vetados = $this->service->site()->participantesVetados($this->dia, $this->periodo, $this->participantes_cpf, $this->periodo_todo, $this->id);
             if(!isset($vetados))

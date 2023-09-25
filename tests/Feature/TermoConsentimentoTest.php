@@ -20,14 +20,17 @@ class TermoConsentimentoTest extends TestCase
         $this->post(route('termo.consentimento.upload', 'sala-reuniao'))->assertRedirect(route('login'));
     }
 
-    // /** @test */
-    // public function non_authorized_users_cannot_access_links()
-    // {
-    //     $this->signIn();
-    //     $this->assertAuthenticated('web');
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        factory('App\User')->create();
+        $this->signIn();
+        $this->assertAuthenticated('web');
         
-    //     $this->post(route('termo.consentimento.upload', 'sala-reuniao'))->assertForbidden();
-    // }
+        $this->post(route('termo.consentimento.upload', 'sala-reuniao'), [
+            'file' => UploadedFile::fake()->create('teste.pdf')
+        ])->assertForbidden();
+    }
 
     /** @test */
     public function not_found_tipo_servico_post()

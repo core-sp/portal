@@ -19,7 +19,7 @@ interface SalaReuniaoServiceInterface {
 
     public function getTodasHorasById($id);
 
-    public function getHorarioFormatadoById($id, $arrayHorarios);
+    public function getHorarioFormatadoById($id, $arrayHorarios, $final_manha = null, $final_tarde = null);
 
     public function site();
 

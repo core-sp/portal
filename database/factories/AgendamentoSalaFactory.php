@@ -20,12 +20,14 @@ $factory->define(AgendamentoSala::class, function (Faker $faker) {
         'idrepresentante' => auth()->guard('representante')->id() !== null ? auth()->guard('representante')->id() : factory('App\Representante'),
         'participantes' => null,
         'dia' => $amanha->format('Y-m-d'),
-        'periodo' => 'manha',
+        'periodo' => '09:00 - 10:00',
+        'periodo_todo' => 0,
         'tipo_sala' => 'coworking',
         'status' => null,
         'justificativa' => null,
         'anexo' => null,
         'sala_reuniao_id' => factory('App\SalaReuniao'),
+        'justificativa_admin' => null,
         'idusuario' => null
     ];
 });

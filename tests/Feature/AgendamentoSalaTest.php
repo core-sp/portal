@@ -943,9 +943,13 @@ class AgendamentoSalaTest extends TestCase
     /** @test */
     public function view_message_erro_when_agendar_sala_without_situacao_em_dia()
     {
-        // Tem de alterar o retorno em GerentiMock
+        // Tem de alterar o retorno em GerentiMock gerentiStatus()
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
+
+        $amanha = Carbon::tomorrow();
+        while($amanha->isWeekend())
+            $amanha->addDay();
 
         $dados = factory('App\SalaReuniao')->create();
 
@@ -956,7 +960,7 @@ class AgendamentoSalaTest extends TestCase
         ->assertSee('<i class="fas fa-exclamation-triangle"></i>&nbsp;Para liberar o seu agendamento entre em contato com o setor de atendimento da <a href="'.route('regionais.siteGrid').'" target="_blank">seccional</a> de interesse.');
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
-            'tipo_sala' => 'coworking', 'sala_reuniao_id' => $dados->id, 'dia' => now()->addDay()->format('d/m/Y'), 'periodo' => 'manha', 'aceite' => 'on'
+            'tipo_sala' => 'coworking', 'sala_reuniao_id' => $dados->id, 'dia' => $amanha->format('d/m/Y'), 'periodo' => '09:00 - 12:00', 'aceite' => 'on'
         ])->assertRedirect(route('representante.agendar.inserir.view'));
 
         $this->get(route('representante.agendar.inserir.view'))
@@ -1082,7 +1086,7 @@ class AgendamentoSalaTest extends TestCase
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $string = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
         $string .= $representante->nome.' (CPF / CNPJ: '.$representante->cpf_cnpj.') *agendou* reserva da sala em *'.$agenda->sala->regional->regional;
-        $string .= '* no dia '.onlyDate($agenda->dia).' para '.$agenda->tipo_sala.', no período ' .$agenda->periodo;
+        $string .= '* no dia '.onlyDate($agenda->dia).' para '.$agenda->tipo_sala.', no período ' .$agenda->periodo . ' e foi criado um novo registro no termo de consentimento, com a id: 1';
         $this->assertStringContainsString($string, $log);
     }
 
@@ -1257,6 +1261,10 @@ class AgendamentoSalaTest extends TestCase
     /** @test */
     public function cannot_submit_agendar_sala_with_dia_after_1_month()
     {
+        $mes_seguinte = Carbon::tomorrow()->addMonth();
+        while($mes_seguinte->isWeekend())
+            $mes_seguinte->addDay();
+
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->raw();
@@ -1264,7 +1272,7 @@ class AgendamentoSalaTest extends TestCase
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => 'coworking',
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
-            'dia' => now()->addMonth()->addDays(5)->format('d/m/Y'), 
+            'dia' => $mes_seguinte->format('d/m/Y'), 
             'periodo' => $agenda['periodo'],
             'aceite' => 'on'
         ])
@@ -1303,7 +1311,7 @@ class AgendamentoSalaTest extends TestCase
             'tipo_sala' => 'coworking',
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
             'dia' => onlyDate($agenda['dia']), 
-            'periodo' => 'madrugada',
+            'periodo' => '18:00 - 19:00',
             'aceite' => 'on'
         ])
         ->assertSessionHasErrors([
@@ -1565,7 +1573,7 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
-    public function cannot_submit_agendar_sala_reuniao_with_participantes_vetados()
+    public function cannot_submit_agendar_sala_reuniao_with_participantes_vetados_with_same_hour()
     {
         $representante1 = factory('App\Representante')->create([
             'cpf_cnpj' => '73525258000185'
@@ -1584,6 +1592,98 @@ class AgendamentoSalaTest extends TestCase
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
             'dia' => onlyDate($agenda['dia']), 
             'periodo' => $agenda['periodo'],
+            'participantes_cpf' => ['569.832.380-10', '819.219.230-08'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+            'aceite' => 'on'
+        ])
+        ->assertSessionHasErrors([
+            'participante_vetado'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_submit_agendar_sala_reuniao_with_participantes_vetados_with_periodo_todo_true()
+    {
+        $representante1 = factory('App\Representante')->create([
+            'cpf_cnpj' => '73525258000185'
+        ]);
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $agenda1 = factory('App\AgendamentoSala')->states('reuniao')->create([
+            'idrepresentante' => $representante1->id
+        ]);
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => $agenda['tipo_sala'],
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'],
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => '09:00 - 12:00',
+            'periodo_todo' => 1,
+            'participantes_cpf' => ['569.832.380-10', '819.219.230-08'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+            'aceite' => 'on'
+        ])
+        ->assertSessionHasErrors([
+            'participante_vetado'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_submit_agendar_sala_reuniao_with_participantes_vetados_with_periodo_todo_false()
+    {
+        $representante1 = factory('App\Representante')->create([
+            'cpf_cnpj' => '73525258000185'
+        ]);
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $agenda1 = factory('App\AgendamentoSala')->states('reuniao')->create([
+            'idrepresentante' => $representante1->id,
+            'periodo' => '09:00 - 12:00',
+            'periodo_todo' => 1,
+        ]);
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => $agenda['tipo_sala'],
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'],
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => '10:00 - 11:00',
+            'participantes_cpf' => ['569.832.380-10', '819.219.230-08'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+            'aceite' => 'on'
+        ])
+        ->assertSessionHasErrors([
+            'participante_vetado'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_submit_agendar_sala_reuniao_with_participantes_vetados_with_periodo_todo_false_and_range()
+    {
+        $representante1 = factory('App\Representante')->create([
+            'cpf_cnpj' => '73525258000185'
+        ]);
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $agenda1 = factory('App\AgendamentoSala')->states('reuniao')->create([
+            'idrepresentante' => $representante1->id,
+            'periodo' => '10:00 - 11:00',
+        ]);
+        $agenda1->sala->update(['horarios_reuniao' => '09:30,10:30,11:30']);
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => $agenda['tipo_sala'],
+            'sala_reuniao_id' => $agenda1->sala->id,
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => '10:30 - 11:30',
             'participantes_cpf' => ['569.832.380-10', '819.219.230-08'],
             'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
             'aceite' => 'on'
@@ -1711,11 +1811,13 @@ class AgendamentoSalaTest extends TestCase
 
         $agenda1 = factory('App\AgendamentoSala')->states('reuniao')->create([
             'idrepresentante' => $representante1->id,
-            'periodo' => 'manha'
+            'periodo' => '09:00 - 12:00',
+            'periodo_todo' => 1,
         ]);
         factory('App\AgendamentoSala')->states('reuniao')->create([
             'idrepresentante' => $representante1->id,
-            'periodo' => 'tarde',
+            'periodo' => '14:00 - 17:00',
+            'periodo_todo' => 1,
             'sala_reuniao_id' => $agenda1->sala_reuniao_id
         ]);
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
@@ -1724,9 +1826,9 @@ class AgendamentoSalaTest extends TestCase
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda1->sala_reuniao_id,
             'dia' => onlyDate($agenda['dia']), 
-            'periodo' => 'manha',
-            'participantes_cpf' => ['569.832.380-10', '819.219.230-08'],
-            'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+            'periodo' => '09:00 - 10:00',
+            'participantes_cpf' => ['651.337.265-89'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM'],
             'aceite' => 'on'
         ])
         ->assertSessionHasErrors([
@@ -1738,9 +1840,9 @@ class AgendamentoSalaTest extends TestCase
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda1->sala_reuniao_id,
             'dia' => onlyDate($agenda['dia']), 
-            'periodo' => 'tarde',
-            'participantes_cpf' => ['569.832.380-10', '819.219.230-08'],
-            'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+            'periodo' => '14:30 - 15:30',
+            'participantes_cpf' => ['651.337.265-89'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM'],
             'aceite' => 'on'
         ])
         ->assertSessionHasErrors([
@@ -1760,7 +1862,8 @@ class AgendamentoSalaTest extends TestCase
 
         $agenda1 = factory('App\AgendamentoSala')->states('reuniao')->create([
             'idrepresentante' => $representante1->id,
-            'periodo' => 'manha'
+            'periodo' => '09:00 - 12:00',
+            'periodo_todo' => 1,
         ]);
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
 
@@ -1768,13 +1871,12 @@ class AgendamentoSalaTest extends TestCase
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda1->sala_reuniao_id,
             'dia' => onlyDate($agenda['dia']), 
-            'periodo' => 'manha',
-            'participantes_cpf' => ['569.832.380-10', '819.219.230-08'],
-            'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+            'periodo' => '09:00 - 10:00',
+            'participantes_cpf' => ['651.337.265-89'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM'],
             'aceite' => 'on'
         ])
         ->assertSessionHasErrors([
-            'dia',
             'periodo'
         ]);
     }
@@ -1788,7 +1890,7 @@ class AgendamentoSalaTest extends TestCase
         $this->actingAs($representante, 'representante');
 
         factory('App\AgendamentoSala')->states('reuniao')->create([
-            'periodo' => 'manha'
+            'periodo' => '09:00 - 10:00'
         ]);
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
 
@@ -1796,13 +1898,12 @@ class AgendamentoSalaTest extends TestCase
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
             'dia' => onlyDate($agenda['dia']), 
-            'periodo' => 'manha',
-            'participantes_cpf' => ['569.832.380-10', '819.219.230-08'],
-            'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+            'periodo' => '09:00 - 10:00',
+            'participantes_cpf' => ['651.337.265-89'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM'],
             'aceite' => 'on'
         ])
         ->assertSessionHasErrors([
-            'dia',
             'periodo'
         ]);
     }
@@ -1818,7 +1919,7 @@ class AgendamentoSalaTest extends TestCase
         factory('App\AgendamentoSala')->states('reuniao')->create([
             'idrepresentante' => $representante1->id,
             'participantes' => json_encode([apenasNumeros($representante->cpf_cnpj) => 'NOME PARTICIPANTE UM'], JSON_FORCE_OBJECT),
-            'periodo' => 'manha'
+            'periodo' => '09:00 - 10:00'
         ]);
 
         $this->actingAs($representante, 'representante');
@@ -1901,7 +2002,7 @@ class AgendamentoSalaTest extends TestCase
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
             'dia' => $dia->format('d/m/Y'), 
-            'periodo' => 'tarde',
+            'periodo' => '09:00 - 10:00',
             'aceite' => 'on'
         ])
         ->assertRedirect(route('representante.agendar.inserir.view'));
@@ -1929,7 +2030,7 @@ class AgendamentoSalaTest extends TestCase
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
             'dia' => $dia->format('d/m/Y'), 
-            'periodo' => 'tarde',
+            'periodo' => '13:00 - 17:00',
             'aceite' => 'on'
         ])
         ->assertRedirect(route('representante.agendar.inserir.view'));
@@ -1958,7 +2059,7 @@ class AgendamentoSalaTest extends TestCase
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
             'dia' => $dia->format('d/m/Y'), 
-            'periodo' => 'tarde',
+            'periodo' => '13:00 - 17:00',
             'aceite' => 'on'
         ])
         ->assertRedirect(route('representante.agendar.inserir.view'));
@@ -1976,7 +2077,13 @@ class AgendamentoSalaTest extends TestCase
         $agenda1 = factory('App\AgendamentoSala')->states('reuniao')->create();
         factory('App\AgendamentoSala')->states('reuniao')->create([
             'sala_reuniao_id' => $agenda1->sala_reuniao_id,
-            'periodo' => 'tarde'
+            'periodo' => '9:00 - 12:00',
+            'periodo_todo' => 1
+        ]);
+        factory('App\AgendamentoSala')->states('reuniao')->create([
+            'sala_reuniao_id' => $agenda1->sala_reuniao_id,
+            'periodo' => '14:00 - 17:00',
+            'periodo_todo' => 1
         ]);
 
         $dia = Carbon::parse($agenda1->dia);
@@ -2004,7 +2111,13 @@ class AgendamentoSalaTest extends TestCase
         ]);
         factory('App\AgendamentoSala')->create([
             'sala_reuniao_id' => $sala->id,
-            'periodo' => 'tarde'
+            'periodo' => '9:00 - 12:00',
+            'periodo_todo' => 1
+        ]);
+        factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $agenda1->sala_reuniao_id,
+            'periodo' => '13:00 - 17:00',
+            'periodo_todo' => 1
         ]);
 
         $dia = Carbon::parse($agenda1->dia);
@@ -2025,6 +2138,9 @@ class AgendamentoSalaTest extends TestCase
         $this->actingAs($representante, 'representante');
 
         $agenda1 = factory('App\AgendamentoSala')->states('reuniao')->create();
+        $horarios = $agenda1->sala->formatarHorariosAgendamento($agenda1->sala->getHorarios('reuniao'));
+        unset($horarios['09:00']);
+        unset($horarios['manha']);
 
         $dia = Carbon::parse($agenda1->dia);
         $this->get(route('sala.reuniao.dias.horas', [
@@ -2033,7 +2149,7 @@ class AgendamentoSalaTest extends TestCase
             'tipo' => 'reuniao',
         ]))
         ->assertJsonFragment([
-            'tarde' => "Tarde: ".implode(', ', $agenda1->sala->getHorariosTarde('reuniao'))
+            'horarios' => $horarios
         ]);
     }
 
@@ -2050,6 +2166,10 @@ class AgendamentoSalaTest extends TestCase
             'sala_reuniao_id' => $sala->id
         ]);
 
+        $horarios = $agenda1->sala->formatarHorariosAgendamento($agenda1->sala->getHorarios('coworking'));
+        unset($horarios['09:00']);
+        unset($horarios['manha']);
+
         $dia = Carbon::parse($agenda1->dia);
         $this->get(route('sala.reuniao.dias.horas', [
             'sala_id' => $agenda1->sala_reuniao_id,
@@ -2057,7 +2177,7 @@ class AgendamentoSalaTest extends TestCase
             'tipo' => 'coworking',
         ]))
         ->assertJsonFragment([
-            'tarde' => "Tarde: ".implode(', ', $agenda1->sala->getHorariosTarde('coworking'))
+            'horarios' => $horarios
         ]);
     }
 
@@ -2867,7 +2987,13 @@ class AgendamentoSalaTest extends TestCase
         ]);
         $agendamento = factory('App\AgendamentoSala')->states('reuniao')->create([
             'sala_reuniao_id' => $sala->id,
-            'periodo' => 'tarde'
+            'periodo' => '09:00 - 12:00',
+            'periodo_todo' => 1
+        ]);
+        factory('App\AgendamentoSala')->states('reuniao')->create([
+            'sala_reuniao_id' => $sala->id,
+            'periodo' => '14:00 - 17:00',
+            'periodo_todo' => 1
         ]);
         
         $dia = Carbon::parse($agendamento->dia);
@@ -2959,7 +3085,7 @@ class AgendamentoSalaTest extends TestCase
     
         $bloqueio = factory('App\SalaReuniaoBloqueio')->create([
             'sala_reuniao_id' => $sala->id,
-            'horarios' => implode(',', $sala->getHorariosManha('coworking')),
+            'horarios' => '09:00,10:00,11:00'
         ]);
 
         $lotado = [$dia->month, $dia->day, 'lotado'];
@@ -2987,11 +3113,13 @@ class AgendamentoSalaTest extends TestCase
             
         $agendamento = factory('App\AgendamentoSala')->create([
             'sala_reuniao_id' => $sala->id,
+            'periodo' => '13:00 - 17:00',
+            'periodo_todo' => 1
         ]);
 
         $bloqueio = factory('App\SalaReuniaoBloqueio')->create([
             'sala_reuniao_id' => $sala->id,
-            'horarios' => implode(',', $sala->getHorariosManha('coworking')),
+            'horarios' => '09:00,10:00,11:00',
         ]);
 
         $lotado = [$dia->month, $dia->day, 'lotado'];
@@ -3099,7 +3227,8 @@ class AgendamentoSalaTest extends TestCase
 
         $agendamento1 = factory('App\AgendamentoSala')->create([
             'sala_reuniao_id' => $sala->id,
-            'periodo' => 'tarde',
+            'periodo' => '13:00 - 17:00',
+            'periodo_todo' => 1,
             'dia' => $outroDia->format('Y-m-d')
         ]);
 
@@ -3124,15 +3253,13 @@ class AgendamentoSalaTest extends TestCase
         ]);
 
         $agendamento = factory('App\AgendamentoSala')->raw();
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
 
         $this->get(route('sala.reuniao.dias.horas', [
             'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => onlyDate($agendamento['dia'])
         ]))
         ->assertJsonFragment([
-            'manha' => 'Manhã: '.implode(', ', $sala->getHorariosManha('coworking')),
-        ])
-        ->assertJsonFragment([
-            'tarde' => 'Tarde: '.implode(', ', $sala->getHorariosTarde('coworking')),
+            'horarios' => $horarios,
         ]);
     }
 
@@ -3149,15 +3276,18 @@ class AgendamentoSalaTest extends TestCase
         $agendamento = factory('App\AgendamentoSala')->create([
             'sala_reuniao_id' => $sala->id,
         ]);
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
+        unset($horarios['09:00']);
+        unset($horarios['manha']);
 
         $this->get(route('sala.reuniao.dias.horas', [
             'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => onlyDate($agendamento['dia'])
         ]))
         ->assertJsonMissing([
-            'manha' => 'Manhã: '.implode(', ', $sala->getHorariosManha('coworking')),
+            '09:00' => '09:00 - 10:00',
         ])
         ->assertJsonFragment([
-            'tarde' => 'Tarde: '.implode(', ', $sala->getHorariosTarde('coworking')),
+            'horarios' => $horarios,
         ]);
     }
 
@@ -3180,18 +3310,23 @@ class AgendamentoSalaTest extends TestCase
 
         $agendamento = factory('App\AgendamentoSala')->create([
             'sala_reuniao_id' => $sala->id,
-            'periodo' => 'tarde',
+            'periodo' => '11:00 - 12:00',
             'idrepresentante' => $representante1->id
         ]);
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
+        unset($horarios['09:00']);
+        unset($horarios['11:00']);
+        unset($horarios['manha']);
 
         $this->get(route('sala.reuniao.dias.horas', [
             'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => onlyDate($agendamento['dia'])
         ]))
         ->assertJsonMissing([
-            'manha' => 'Manhã: '.implode(', ', $sala->getHorariosManha('coworking')),
+            '09:00' => '09:00 - 10:00',
+            '11:00' => '11:00 - 12:00',
         ])
-        ->assertJsonMissing([
-            'tarde' => 'Tarde: '.implode(', ', $sala->getHorariosTarde('coworking')),
+        ->assertJsonFragment([
+            'horarios' => $horarios,
         ]);
     }
 
@@ -3209,15 +3344,13 @@ class AgendamentoSalaTest extends TestCase
         while(!$sabado->isSaturday())
             $sabado->addDay();
         $lotado = [$sabado->month, $sabado->day, 'lotado'];
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
 
         $this->get(route('sala.reuniao.dias.horas', [
             'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $sabado->format('d/m/Y')
         ]))
         ->assertJsonMissing([
-            'manha' => 'Manhã: '.implode(', ', $sala->getHorariosManha('coworking')),
-        ])
-        ->assertJsonMissing([
-            'tarde' => 'Tarde: '.implode(', ', $sala->getHorariosTarde('coworking')),
+            'horarios' => $horarios,
         ]);
 
         $domingo = Carbon::tomorrow();
@@ -3229,10 +3362,7 @@ class AgendamentoSalaTest extends TestCase
             'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $domingo->format('d/m/Y')
         ]))
         ->assertJsonMissing([
-            'manha' => 'Manhã: '.implode(', ', $sala->getHorariosManha('coworking')),
-        ])
-        ->assertJsonMissing([
-            'tarde' => 'Tarde: '.implode(', ', $sala->getHorariosTarde('coworking')),
+            'horarios' => $horarios,
         ]);
     }
 
@@ -3248,8 +3378,13 @@ class AgendamentoSalaTest extends TestCase
 
         $bloqueio = factory('App\SalaReuniaoBloqueio')->create([
             'sala_reuniao_id' => $sala->id,
-            'horarios' => '10:00',
+            'horarios' => '09:00,10:00',
         ]);
+
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
+        unset($horarios['09:00']);
+        unset($horarios['10:00']);
+        unset($horarios['11:00']);
 
         $dia = Carbon::tomorrow();
         while($dia->isWeekend())
@@ -3259,10 +3394,13 @@ class AgendamentoSalaTest extends TestCase
             'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia->format('d/m/Y')
         ]))
         ->assertJsonFragment([
-            'manha' => 'Manhã: 09:00',
+            "manha" => "11:00 - 12:00",
+            "tarde" => "13:00 - 17:00"
         ])
         ->assertJsonMissing([
-            'manha' => 'Manhã: '.implode(', ', $sala->getHorariosManha('coworking')),
+            '09:00' => '09:00 - 10:00',
+            '10:00' => '10:00 - 11:00',
+            '11:00' => '11:00 - 12:00',
         ]);
     }
 
@@ -3278,8 +3416,10 @@ class AgendamentoSalaTest extends TestCase
 
         $bloqueio = factory('App\SalaReuniaoBloqueio')->create([
             'sala_reuniao_id' => $sala->id,
-            'horarios' => implode(',', $sala->getHorariosManha('coworking')),
+            'horarios' => implode(',', $sala->getHorarios('coworking')),
         ]);
+
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
 
         $dia = Carbon::tomorrow();
         while($dia->isWeekend())
@@ -3289,7 +3429,7 @@ class AgendamentoSalaTest extends TestCase
             'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia->format('d/m/Y')
         ]))
         ->assertJsonMissing([
-            'manha' => 'Manhã: '.implode(', ', $sala->getHorariosManha('coworking')),
+            'horarios' => $horarios,
         ]);
     }
 
@@ -3305,9 +3445,11 @@ class AgendamentoSalaTest extends TestCase
 
         $bloqueio = factory('App\SalaReuniaoBloqueio')->create([
             'sala_reuniao_id' => $sala->id,
-            'horarios' => implode(',', $sala->getHorariosTarde('coworking')),
+            'horarios' => implode(',', $sala->getHorarios('coworking')),
             'dataFinal' => null
         ]);
+
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
 
         $dia = Carbon::tomorrow()->addDays(7);
         while($dia->isWeekend())
@@ -3317,7 +3459,100 @@ class AgendamentoSalaTest extends TestCase
             'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia->format('d/m/Y')
         ]))
         ->assertJsonMissing([
-            'tarde' => 'Tarde: '.implode(', ', $sala->getHorariosTarde('coworking')),
+            'horarios' => $horarios,
+        ]);
+    }
+
+    /** @test */
+    public function remove_periodo_todo_when_by_hour()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create();
+
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
+        unset($horarios['manha']);
+        unset($horarios['09:00']);
+
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $sala->id,
+        ]);
+
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $sala->id,
+        ]);
+
+        $dia = Carbon::parse($agendamento->dia)->format('d/m/Y');
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia, '09:00 - 12:00'
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios,
+        ]);
+    }
+
+    /** @test */
+    public function remove_hours_when_periodo_todo()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create();
+
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
+        unset($horarios['manha']);
+        unset($horarios['09:00']);
+        unset($horarios['10:00']);
+        unset($horarios['11:00']);
+
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $sala->id,
+            'periodo' => '09:00 - 12:00',
+            'periodo_todo' => 1
+        ]);
+
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $sala->id,
+            'periodo' => '09:00 - 12:00',
+            'periodo_todo' => 1
+        ]);
+
+        $dia = Carbon::parse($agendamento->dia)->format('d/m/Y');
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia, '09:00 - 10:00'
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios,
+        ]);
+    }
+
+    /** @test */
+    public function remove_hours_within_range()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create([
+            'participantes_coworking' => 1
+        ]);
+
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $sala->id,
+        ]);
+
+        $sala->update(['horarios_coworking' => '09:30,10:30,11:30']);
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
+        unset($horarios['manha']);
+        unset($horarios['09:30']);
+
+        $dia = Carbon::parse($agendamento->dia)->format('d/m/Y');
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia, '09:30 - 10:30'
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios,
         ]);
     }
 

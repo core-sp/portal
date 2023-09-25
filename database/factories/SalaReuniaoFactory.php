@@ -14,12 +14,14 @@ $factory->define(SalaReuniao::class, function (Faker $faker) {
 
     return [
         'idregional' => factory('App\Regional'),
-        'horarios_reuniao' => json_encode(['manha' => ['10:00','11:00'], 'tarde' => ['14:00', '15:00', '16:00']], JSON_FORCE_OBJECT),
-        'horarios_coworking' => json_encode(['manha' => ['09:00','10:00'], 'tarde' => ['15:00', '16:00']], JSON_FORCE_OBJECT),
-        'participantes_reuniao' => 4,
-        'participantes_coworking' => 3,
+        'horarios_reuniao' => '09:00,10:00,11:00,14:00',
+        'horarios_coworking' => '09:00,10:00,11:00,13:00',
+        'participantes_reuniao' => 3,
+        'participantes_coworking' => 2,
         'itens_reuniao' => json_encode(array_values($itensReuniao), JSON_FORCE_OBJECT),
         'itens_coworking' => json_encode(array_values(SalaReuniao::itensCoworking()), JSON_FORCE_OBJECT),
+        'hora_limite_final_manha' => '12:00',
+        'hora_limite_final_tarde' => '17:00',
         'idusuario' => auth()->guard('web')->id() !== null ? auth()->guard('web')->id() : factory('App\User')
     ];
 });

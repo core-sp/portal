@@ -34,28 +34,33 @@ class SuspensaoExcecaoTest extends TestCase
         $this->get(route('sala.reuniao.suspensao.busca'))->assertRedirect(route('login'));
     }
 
-    // /** @test */
-    // public function non_authorized_users_cannot_access_links()
-    // {
-    //     $faker = \Faker\Factory::create();
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $faker = \Faker\Factory::create();
 
-    //     $this->signIn();
-    //     $this->assertAuthenticated('web');
+        $this->signIn();
+        $this->assertAuthenticated('web');
 
-    //     $suspenso = factory('App\SuspensaoExcecao')->create();
+        $suspenso = factory('App\SuspensaoExcecao')->create();
         
-    //     $this->get(route('sala.reuniao.suspensao.lista'))->assertForbidden();
-    //     $this->get(route('sala.reuniao.suspensao.view', $suspenso->id))->assertForbidden();
-    //     $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'suspensao']))->assertForbidden();
-    //     $this->put(route('sala.reuniao.suspensao.update', [$suspenso->id, 'excecao']), [
-    //         'data_inicial_excecao' => now()->format('Y-m-d'),
-    //         'data_final_excecao' => now()->format('Y-m-d'),
-    //         'justificativa' => $faker->sentence(100)
-    //     ])->assertForbidden();
-    //     $this->get(route('sala.reuniao.suspensao.criar'))->assertForbidden();
-    //     $this->post(route('sala.reuniao.suspensao.store'))->assertForbidden();
-    //     $this->get(route('sala.reuniao.suspensao.busca'))->assertForbidden();
-    // }
+        $this->get(route('sala.reuniao.suspensao.lista'))->assertForbidden();
+        $this->get(route('sala.reuniao.suspensao.view', $suspenso->id))->assertForbidden();
+        $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'suspensao']))->assertForbidden();
+        $this->put(route('sala.reuniao.suspensao.update', [$suspenso->id, 'excecao']), [
+            'data_inicial_excecao' => now()->format('Y-m-d'),
+            'data_final_excecao' => now()->format('Y-m-d'),
+            'justificativa' => $faker->sentence(100)
+        ])->assertForbidden();
+        $this->get(route('sala.reuniao.suspensao.criar'))->assertForbidden();
+        $this->post(route('sala.reuniao.suspensao.store'), [
+            'cpf_cnpj' => '11748345000144',
+            'data_inicial' => now()->format('Y-m-d'),
+            'data_final' => now()->addMonth()->format('Y-m-d'),
+            'justificativa' => $faker->sentence(100)
+        ])->assertForbidden();
+        $this->get(route('sala.reuniao.suspensao.busca'))->assertForbidden();
+    }
 
     /** @test */
     public function suspensao_can_be_created_without_representante()

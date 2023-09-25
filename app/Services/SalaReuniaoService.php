@@ -134,8 +134,8 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
         $periodos = ['final_manha' => $sala->horaAlmoco(), 'final_tarde' => $sala->horaFimExpediente()];
 
         $sala->update([
-            'horarios_reuniao' => isset($dados['horarios_reuniao']) ? implode(',', $dados['horarios_reuniao']) : null,
-            'horarios_coworking' => isset($dados['horarios_coworking']) ? implode(',', $dados['horarios_coworking']) : null,
+            'horarios_reuniao' => isset($dados['horarios_reuniao']) && !empty($dados['horarios_reuniao']) ? implode(',', $dados['horarios_reuniao']) : null,
+            'horarios_coworking' => isset($dados['horarios_coworking']) && !empty($dados['horarios_coworking']) ? implode(',', $dados['horarios_coworking']) : null,
             'participantes_reuniao' => $dados['participantes_reuniao'],
             'participantes_coworking' => $dados['participantes_coworking'],
             'itens_reuniao' => json_encode(isset($dados['itens_reuniao']) ? $dados['itens_reuniao'] : array(), JSON_FORCE_OBJECT),
@@ -176,54 +176,52 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
 
     public function getDiasHoras($tipo, $id, $dia = null, $user = null)
     {
-        if(in_array($tipo, ['reuniao', 'coworking']))
-        {
-            $sala = SalaReuniao::where('id', $id)->where('participantes_'.$tipo, '>', 0)->first();
-            if(!isset($sala))
-                return null;
+        if(!in_array($tipo, ['reuniao', 'coworking']))
+            return null;
+
+        $sala = SalaReuniao::where('id', $id)->where('participantes_'.$tipo, '>', 0)->first();
+        if(!isset($sala))
+            return null;
             
-            if(isset($dia))
-            {
-                $final = array();
-                if(!Carbon::hasFormat($dia, 'd/m/Y'))
-                    return null;
-                $dia = Carbon::createFromFormat('d/m/Y', $dia)->format('Y-m-d');
-                $periodos = $sala->removeHorariosSeLotado($tipo, $dia);
-
-                if(isset($user))
-                {
-                    // verifica agendamentos que criou
-                    $periodos = $user->getPeriodoByDia($dia, $periodos);
-
-                    // verifica agendamentos como participante
-                    if($user->tipoPessoa() == 'PF'){
-                        foreach($periodos as $chave => $valor){
-                            $periodoTodo = in_array($chave, ['manha', 'tarde']);
-                            if(!empty($this->site()->participantesVetados($dia, $valor, [apenasNumeros($user->cpf_cnpj)], $periodoTodo)))
-                                unset($periodos[$chave]);
-                        }
-                    }
-                }
-
-                if(!empty($periodos))
-                {
-                    $final['horarios'] = $periodos;
-                    $final['itens'] = $sala->getItensHtml($tipo);
-                    $final['total'] = $sala->getParticipantesAgendar($tipo);
-                }
-                
-                return $final;
-            }
-
-            $lotados = $sala->getDiasSeLotado($tipo);
+        if(isset($dia))
+        {
+            $final = array();
+            if(!Carbon::hasFormat($dia, 'd/m/Y'))
+                return null;
+            $dia = Carbon::createFromFormat('d/m/Y', $dia)->format('Y-m-d');
+            $periodos = $sala->removeHorariosSeLotado($tipo, $dia);
 
             if(isset($user))
-                $lotados = array_merge($lotados, $user->getAgendamentos30Dias($lotados));
-            
-            return $lotados;
+            {
+                // verifica agendamentos que criou
+                $periodos = $user->getPeriodoByDia($dia, $periodos);
+
+                // verifica agendamentos como participante
+                if($user->tipoPessoa() == 'PF'){
+                    foreach($periodos as $chave => $valor){
+                        $periodoTodo = in_array($chave, ['manha', 'tarde']);
+                        if(!empty($this->site()->participantesVetados($dia, $valor, [apenasNumeros($user->cpf_cnpj)], $periodoTodo)))
+                            unset($periodos[$chave]);
+                    }
+                }
+            }
+
+            if(!empty($periodos))
+            {
+                $final['horarios'] = $periodos;
+                $final['itens'] = $sala->getItensHtml($tipo);
+                $final['total'] = $sala->getParticipantesAgendar($tipo);
+            }
+                
+            return $final;
         }
 
-        return null;
+        $lotados = $sala->getDiasSeLotado($tipo);
+
+        if(isset($user))
+            $lotados = array_merge($lotados, $user->getAgendamentos30Dias($lotados));
+            
+        return $lotados;
     }
 
     public function getTodasHorasById($id)
@@ -231,9 +229,17 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
         return SalaReuniao::findOrFail($id)->getTodasHoras();
     }
 
-    public function getHorarioFormatadoById($id, $arrayHorarios)
+    public function getHorarioFormatadoById($id, $arrayHorarios, $final_manha = null, $final_tarde = null)
     {
-        $horarios = SalaReuniao::findOrFail($id)->formatarHorariosAgendamento($arrayHorarios);
+        $sala = SalaReuniao::findOrFail($id);
+
+        if(isset($final_manha))
+            $sala->hora_limite_final_manha = $final_manha;
+
+        if(isset($final_tarde))
+            $sala->hora_limite_final_tarde = $final_tarde;
+
+        $horarios = $sala->formatarHorariosAgendamento($arrayHorarios);
 
         return SalaReuniao::getFormatHorariosHTML($horarios);
     }

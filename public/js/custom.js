@@ -515,22 +515,20 @@ $('#form_salaReuniao button[type="submit"]').click(function(){
 
 function hideShowHorasLimitesSala()
 {
+  var hide_proxima_hora = false;
   $('#horarios_reuniao option, #horarios_coworking option').each(function(){
-    (this.value == $('#hora_limite_final_manha').val()) || (this.value >= $('#hora_limite_final_tarde').val()) ?
-    $(this).hide() : $(this).show();
+    if(this.value == $('#hora_limite_final_manha').val() || hide_proxima_hora){
+      $(this).hide().prop('selected', false);
+      hide_proxima_hora = hide_proxima_hora ? false : true;
+    }else if(this.value >= $('#hora_limite_final_tarde').val())
+      $(this).hide().prop('selected', false);
+    else
+      $(this).show();
   });
 }
 
-$('#form_salaReuniao #hora_limite_final_manha, #form_salaReuniao #hora_limite_final_tarde').ready(function(){
-    hideShowHorasLimitesSala();
-});
-
-$('#form_salaReuniao #hora_limite_final_manha, #form_salaReuniao #hora_limite_final_tarde').change(function(){
-  hideShowHorasLimitesSala();
-});
-
-$('#form_salaReuniao #horarios_reuniao, #form_salaReuniao #horarios_coworking').change(function(){
-  var id = this.id;
+function ajaxHorariosViewSala(id)
+{
   const selectedValues = Array.from($('#' + id + ' option:selected')).map(
     option => option.value,
   );
@@ -541,6 +539,8 @@ $('#form_salaReuniao #horarios_reuniao, #form_salaReuniao #horarios_coworking').
       _method: "POST",
       _token: $('meta[name="csrf-token"]').attr('content'),
       horarios: selectedValues,
+      hora_limite_final_manha: $('#hora_limite_final_manha').val(),
+      hora_limite_final_tarde: $('#hora_limite_final_tarde').val(),
     },
     dataType: 'json',
     url: "/admin/salas-reunioes/sala-horario-formatado/" + $('#valor_id').val(),
@@ -551,4 +551,18 @@ $('#form_salaReuniao #horarios_reuniao, #form_salaReuniao #horarios_coworking').
       alert('Erro ao carregar os horários formatados. Recarregue a página.');
     }
   });
+}
+
+$('#form_salaReuniao #hora_limite_final_manha, #form_salaReuniao #hora_limite_final_tarde').ready(function(){
+    hideShowHorasLimitesSala();
+});
+
+$('#form_salaReuniao #hora_limite_final_manha, #form_salaReuniao #hora_limite_final_tarde').change(function(){
+  hideShowHorasLimitesSala();
+  ajaxHorariosViewSala('horarios_reuniao');
+  ajaxHorariosViewSala('horarios_coworking');
+});
+
+$('#form_salaReuniao #horarios_reuniao, #form_salaReuniao #horarios_coworking').change(function(){
+  ajaxHorariosViewSala(this.id);
 });
