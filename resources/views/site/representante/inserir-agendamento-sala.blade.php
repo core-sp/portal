@@ -24,7 +24,7 @@
 
     @if($errors->has('participante_vetado') || $errors->has('participante_suspenso') || $errors->has('participantes_cpf') || $errors->has('participantes_cpf.*') || $errors->has('participantes_nome') || $errors->has('participantes_nome.*'))
     <div class="d-block w-100">
-      <p class="alert alert-danger">
+      <p class="alert alert-danger" data-clarity-mask="True">
         <i class="fas fa-times"></i>&nbsp;&nbsp;
         @if($errors->has('participante_vetado') || $errors->has('participante_suspenso'))
         {!! $errors->has('participante_vetado') ? $errors->first('participante_vetado') : $errors->first('participante_suspenso') !!}
@@ -291,7 +291,7 @@
               id="comprovante-justificativa"
               accept="image/png, image/jpeg, image/jpg, application/pdf"
             >
-            <label class="custom-file-label" for="comprovante-justificativa">Selecionar arquivo...</label>
+            <label class="custom-file-label" for="comprovante-justificativa" data-clarity-mask="True">Selecionar arquivo...</label>
             @if($errors->has('anexo_sala'))
             <div class="invalid-feedback">
               {{ $errors->first('anexo_sala') }}
