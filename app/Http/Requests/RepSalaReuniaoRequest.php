@@ -74,6 +74,9 @@ class RepSalaReuniaoRequest extends FormRequest
 
         if($this->acao == 'agendar')
         {
+            if($this->filled('periodo') && !Carbon::hasFormat($this->periodo, 'H:i - H:i'))
+                $this->merge(['periodo' => '']);
+
             if(!$this->filled('tipo_sala') || !$this->filled('sala_reuniao_id') || !$this->filled('dia') || !$this->filled('periodo'))
                 return;
 

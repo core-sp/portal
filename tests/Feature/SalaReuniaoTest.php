@@ -1073,6 +1073,12 @@ class SalaReuniaoTest extends TestCase
         ->assertJsonFragment([
             "10:30 até 11:30<br>11:30 até 12:30<br>Período todo: 10:30 até 12:30<br>14:30 até 15:30<br>15:30 até 16:30<br>Período todo: 14:30 até 16:30"
         ]);
+
+        $this->assertDatabaseHas('salas_reunioes', [
+            'id' => 1,
+            'hora_limite_final_manha' => '12:00',
+            'hora_limite_final_tarde' => '17:00',
+        ]);
     }
 
     /** @test */
@@ -1192,6 +1198,24 @@ class SalaReuniaoTest extends TestCase
         ->assertSessionHasErrors([
             'hora_limite_final_manha'
         ]);
+
+        $this->post(route('sala.reuniao.horario.formatado', $sala->id), [
+            'horarios' => ['10:34', '15:00'],
+            'hora_limite_final_manha' => '12:30',
+            'hora_limite_final_tarde' => '16:30'
+        ])
+        ->assertSessionHasErrors([
+            'horarios'
+        ]);
+
+        $this->post(route('sala.reuniao.horario.formatado', $sala->id), [
+            'horarios' => ['abc', '15:00'],
+            'hora_limite_final_manha' => '12:30',
+            'hora_limite_final_tarde' => '16:30'
+        ])
+        ->assertSessionHasErrors([
+            'horarios'
+        ]);
     }
 
     /** @test */
@@ -1208,6 +1232,24 @@ class SalaReuniaoTest extends TestCase
         ])
         ->assertSessionHasErrors([
             'hora_limite_final_tarde'
+        ]);
+
+        $this->post(route('sala.reuniao.horario.formatado', $sala->id), [
+            'horarios' => ['09:00', '14:10'],
+            'hora_limite_final_manha' => '12:30',
+            'hora_limite_final_tarde' => '16:30'
+        ])
+        ->assertSessionHasErrors([
+            'horarios'
+        ]);
+
+        $this->post(route('sala.reuniao.horario.formatado', $sala->id), [
+            'horarios' => ['09:00', 'adf12'],
+            'hora_limite_final_manha' => '12:30',
+            'hora_limite_final_tarde' => '16:30'
+        ])
+        ->assertSessionHasErrors([
+            'horarios'
         ]);
     }
 

@@ -1320,6 +1320,47 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
+    public function cannot_submit_agendar_sala_with_periodo_invalid_format()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => 'coworking',
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'],
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => '18:00 * 19:00',
+            'aceite' => 'on'
+        ])
+        ->assertSessionHasErrors([
+            'periodo'
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => 'coworking',
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'],
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => '18:00-19:00',
+            'aceite' => 'on'
+        ])
+        ->assertSessionHasErrors([
+            'periodo'
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => 'coworking',
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'],
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => '18:00-19:0',
+            'aceite' => 'on'
+        ])
+        ->assertSessionHasErrors([
+            'periodo'
+        ]);
+    }
+
+    /** @test */
     public function cannot_submit_agendar_sala_reuniao_without_participantes_cpf()
     {
         $representante = factory('App\Representante')->create();
@@ -2189,8 +2230,8 @@ class AgendamentoSalaTest extends TestCase
         $agenda = factory('App\AgendamentoSala')->create();
 
         $this->get(route('representante.agendar.inserir.view'))
-        ->assertSee('<p class="pb-0 branco">Protocolo: <strong>'.$agenda->protocolo.'</strong></p>')
-        ->assertSee('<p class="pb-0 branco">Regional: <strong>'.$agenda->sala->regional->regional.'</strong></p>')
+        ->assertSee('<p class="pb-0 branco" data-clarity-mask="True">Protocolo: <strong>'.$agenda->protocolo.'</strong></p>')
+        ->assertSee('<p class="pb-0 branco" data-clarity-mask="True">Regional: <strong>'.$agenda->sala->regional->regional.'</strong></p>')
         ->assertSee('Sala: <strong>'.$agenda->getTipoSala().'</strong>')
         ->assertSee('&nbsp;&nbsp;|&nbsp;&nbsp;Dia: <strong>'.onlyDate($agenda->dia).'</strong>')
         ->assertSee('&nbsp;&nbsp;|&nbsp;&nbsp;Período: <strong>'.$agenda->getPeriodo().'</strong>')
@@ -2213,7 +2254,7 @@ class AgendamentoSalaTest extends TestCase
         }
 
         $this->get(route('representante.agendar.inserir.view'))
-        ->assertSee('<p class="pb-0 branco"><i class="fas fa-users text-dark"></i> Participantes: ')
+        ->assertSee('<p class="pb-0 branco" data-clarity-mask="True"><i class="fas fa-users text-dark"></i> Participantes: ')
         ->assertSee('CPF: <strong>'.formataCpfCnpj($cpfs[0]) . '</strong>&nbsp;&nbsp;|&nbsp;&nbsp;Nome: <strong>' .$nomes[0].'</strong>')
         ->assertSee('CPF: <strong>'.formataCpfCnpj($cpfs[1]) . '</strong>&nbsp;&nbsp;|&nbsp;&nbsp;Nome: <strong>' .$nomes[1].'</strong>')
         ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $agenda->id]).'" class="btn btn-secondary btn-sm link-nostyle mt-2">Editar Participantes</a>');
@@ -2229,7 +2270,7 @@ class AgendamentoSalaTest extends TestCase
             'idrepresentante' => $representante1->id
         ]);
         $agenda2 = factory('App\AgendamentoSala')->states('reuniao')->create([
-            'dia' => now()->addDays(7)->format('d/m/Y'),
+            'dia' => now()->addDays(7)->format('Y-m-d'),
             'idrepresentante' => $representante1->id
         ]);
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->create([
@@ -2240,18 +2281,25 @@ class AgendamentoSalaTest extends TestCase
 
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
+
+        $agenda3 = factory('App\AgendamentoSala')->states('reuniao')->create([
+            'dia' => now()->format('Y-m-d'),
+            'idrepresentante' => $representante1->id,
+            'participantes' => json_encode([apenasNumeros($representante->cpf_cnpj) => 'NOME PARTICIPANTE UM'], JSON_FORCE_OBJECT),
+        ]);
         
         $this->get(route('representante.agendar.inserir.view'))
-        ->assertSee('<p class="pb-0 branco">Protocolo: <strong>'.$agenda->protocolo.'</strong></p>')
+        ->assertSee('<p class="pb-0 branco" data-clarity-mask="True">Protocolo: <strong>'.$agenda->protocolo.'</strong></p>')
         ->assertSee('Representante Responsável: ')
         ->assertSee('CPF / CNPJ: <strong>'.$representante1->cpf_cnpj . '</strong>')
         ->assertSee('Nome: <strong>'.$representante1->nome . '</strong>')
-        ->assertSee('<p class="pb-0 branco">Regional: <strong>'.$agenda->sala->regional->regional.'</strong></p>')
+        ->assertSee('<p class="pb-0 branco" data-clarity-mask="True">Regional: <strong>'.$agenda->sala->regional->regional.'</strong></p>')
         ->assertSee('Sala: <strong>'.$agenda->getTipoSala().'</strong>')
         ->assertSee('&nbsp;&nbsp;|&nbsp;&nbsp;Dia: <strong>'.onlyDate($agenda->dia).'</strong>')
         ->assertSee('&nbsp;&nbsp;|&nbsp;&nbsp;Período: <strong>'.$agenda->getPeriodo().'</strong>')
-        ->assertDontSee('<p class="pb-0 branco">Protocolo: <strong>'.$agenda2->protocolo.'</strong></p>')
-        ->assertDontSee('<p class="pb-0 branco">Protocolo: <strong>'.$agenda1->protocolo.'</strong></p>');
+        ->assertDontSee('<p class="pb-0 branco" data-clarity-mask="True">Protocolo: <strong>'.$agenda2->protocolo.'</strong></p>')
+        ->assertDontSee('<p class="pb-0 branco" data-clarity-mask="True">Protocolo: <strong>'.$agenda1->protocolo.'</strong></p>')
+        ->assertSee('<p class="pb-0 branco" data-clarity-mask="True">Protocolo: <strong>'.$agenda3->protocolo.'</strong></p>');
     }
 
     /** @test */

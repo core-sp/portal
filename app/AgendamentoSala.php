@@ -59,7 +59,7 @@ class AgendamentoSala extends Model
     {
     	return self::where('participantes', 'LIKE', '%"'. apenasNumeros($cpf) .'"%')
         ->whereNull('status')
-        ->whereBetween('dia', [Carbon::tomorrow()->format('Y-m-d'), Carbon::today()->addMonth()->format('Y-m-d')])
+        ->whereBetween('dia', [Carbon::today()->format('Y-m-d'), Carbon::today()->addMonth()->format('Y-m-d')])
         ->orderBy('dia')
         ->orderBy('periodo')
         ->get();

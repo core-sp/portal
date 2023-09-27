@@ -23,14 +23,14 @@ class SalaReuniaoRequest extends FormRequest
     {
         $this->horas = todasHoras();
 
-        if($this->filled('hora_limite_final_manha'))
+        if($this->filled('hora_limite_final_manha') && in_array($this->hora_limite_final_manha, $this->horas))
             $this->horas = Arr::where($this->horas, function ($value, $key) {
                 $temp = Carbon::parse($this->hora_limite_final_manha);
                 $value = Carbon::parse($value);
                 return ($value->diffInMinutes($temp) == 0) || ($value->gt($temp) && ($value->diffInMinutes($temp) == 30)) ? false : true;
             });
 
-        if($this->filled('hora_limite_final_tarde'))
+        if($this->filled('hora_limite_final_tarde') && in_array($this->hora_limite_final_tarde, $this->horas))
             $this->horas = Arr::where($this->horas, function ($value, $key) {
                 return $value < $this->hora_limite_final_tarde;
             });
