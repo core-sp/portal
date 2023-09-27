@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\CadastroUserExternoMail;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Notification;
 use Illuminate\Support\Facades\Password;
 use Carbon\Carbon;
 
@@ -1132,7 +1131,7 @@ class UserExternoTest extends TestCase
     */
     public function cannot_send_mail_reset_password_for_user_externo_not_created()
     {
-        Notification::fake();
+        Mail::fake();
 
         $user_externo = factory('App\UserExterno')->raw();
         $this->get(route('externo.password.request'))->assertOk();
@@ -1143,7 +1142,7 @@ class UserExternoTest extends TestCase
             'cpf_cnpj'
         ]);
 
-        Notification::assertNothingSent();
+        Mail::assertNothingSent();
     }
 
     /** @test 
@@ -1152,7 +1151,7 @@ class UserExternoTest extends TestCase
     */
     public function cannot_send_mail_reset_password_for_user_externo_not_actived()
     {
-        Notification::fake();
+        Mail::fake();
 
         $user_externo = factory('App\UserExterno')->create([
             'ativo' => 0
@@ -1165,14 +1164,14 @@ class UserExternoTest extends TestCase
             'cpf_cnpj'
         ]);
 
-        Notification::assertNothingSent();
+        Mail::assertNothingSent();
     }
 
     /** @test 
     */
     public function cannot_send_mail_reset_password_for_user_externo_tipo_invalid()
     {
-        Notification::fake();
+        Mail::fake();
 
         $user_externo = factory('App\UserExterno')->create();
         $this->get(route('externo.password.request'))->assertOk();
@@ -1183,7 +1182,7 @@ class UserExternoTest extends TestCase
             'tipo_conta'
         ]);
 
-        Notification::assertNothingSent();
+        Mail::assertNothingSent();
     }
 
     /** @test 
@@ -1192,7 +1191,7 @@ class UserExternoTest extends TestCase
     */
     public function send_mail_reset_password_for_user_externo()
     {
-        Notification::fake();
+        Mail::fake();
 
         $user_externo = factory('App\UserExterno')->create();
         $this->get(route('externo.password.request'))->assertOk();
@@ -1203,7 +1202,7 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.password.request'))
         ->assertSee('O link de reconfiguração de senha foi enviado ao email ' .$user_externo['email']);
         
-        Notification::hasSent($user_externo, ResetPassword::class);
+        Mail::hasSent($user_externo, ResetPassword::class);
     }
 
     /** @test 
@@ -1212,7 +1211,7 @@ class UserExternoTest extends TestCase
     */
     public function cannot_send_mail_reset_password_when_not_find_cpfcnpj()
     {
-        Notification::fake();
+        Mail::fake();
 
         factory('App\UserExterno')->create([
             'cpf_cnpj' => '43795442818'
@@ -1226,7 +1225,7 @@ class UserExternoTest extends TestCase
             'cpf_cnpj'
         ]);
 
-        Notification::assertNothingSent();
+        Mail::assertNothingSent();
     }
 
     /** @test 

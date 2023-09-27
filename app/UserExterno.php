@@ -2,16 +2,17 @@
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
+// use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Notifications\UserExternoResetPasswordNotification;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 class UserExterno extends Authenticatable
 {
-    use Notifiable;
+    // use Notifiable;
     use SoftDeletes;
 
     protected $guard = 'user_externo';
@@ -21,7 +22,8 @@ class UserExterno extends Authenticatable
 
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new UserExternoResetPasswordNotification($token));
+        // $this->notify(new UserExternoResetPasswordNotification($token));
+        Mail::to($this->email)->queue(new UserExternoResetPasswordNotification($token));
     }
 
     public function isPessoaFisica()

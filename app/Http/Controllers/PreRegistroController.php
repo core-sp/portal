@@ -19,7 +19,7 @@ class PreRegistroController extends Controller
 
     public function index(Request $request)
     {
-        // $this->authorize('viewAny', auth()->user());
+        $this->authorize('viewAny', auth()->user());
 
         try{
             $filtro = \Route::is('preregistro.filtro') ? true : null;
@@ -37,7 +37,7 @@ class PreRegistroController extends Controller
 
     public function view($id)
     {
-        // $this->authorize('updateOther', auth()->user());
+        $this->authorize('updateOther', auth()->user());
         
         try{
             $dados = $this->service->getService('PreRegistro')->admin()->view($id);
@@ -52,10 +52,10 @@ class PreRegistroController extends Controller
 
     public function busca(Request $request)
     {
-        // $this->authorize('viewAny', auth()->user());
+        $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = $this->service->getService('PreRegistro')->admin()->buscar($request->q);
+            $dados = $this->service->getService('PreRegistro')->admin()->buscar($request->q, auth()->user());
             $dados['busca'] = $request->q;
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -67,7 +67,7 @@ class PreRegistroController extends Controller
 
     public function updateAjax(PreRegistroAjaxAdminRequest $request, $id)
     {
-        // $this->authorize('updateOther', auth()->user());
+        $this->authorize('updateOther', auth()->user());
 
         try{
             $user = auth()->user();
@@ -84,7 +84,7 @@ class PreRegistroController extends Controller
 
     public function downloadAnexo($idPreRegistro, $id)
     {
-        // $this->authorize('updateOther', auth()->user());
+        $this->authorize('updateOther', auth()->user());
 
         try{
             $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $idPreRegistro);
@@ -99,7 +99,7 @@ class PreRegistroController extends Controller
 
     public function updateStatus(PreRegistroAdminRequest $request, $id)
     {
-        // $this->authorize('updateOther', auth()->user());
+        $this->authorize('updateOther', auth()->user());
 
         try{
             $validated = $request->validated();

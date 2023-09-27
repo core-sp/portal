@@ -11,7 +11,6 @@ use App\Mail\PreRegistroMail;
 use App\PreRegistro;
 use App\Contabil;
 use Illuminate\Support\Arr;
-use Notification;
 use Illuminate\Support\Facades\Password;
 use Carbon\Carbon;
 use App\Mail\CadastroUserExternoMail;
@@ -312,7 +311,7 @@ class ContabilTest extends TestCase
         ]);
         $dados['cpf_cnpj'] = $dados['cnpj'];
 
-        $this->post(route('externo.cadastro.submit'), $dados)->dumpSession()
+        $this->post(route('externo.cadastro.submit'), $dados)
         ->assertSessionHasErrors('cpf_cnpj');
 
         $this->assertDatabaseMissing('contabeis', [
@@ -994,7 +993,7 @@ class ContabilTest extends TestCase
     /** @test */
     public function cannot_send_mail_reset_password_for_contabil_not_created()
     {
-        Notification::fake();
+        Mail::fake();
 
         $user_externo = factory('App\Contabil')->raw();
         $this->get(route('externo.password.request'))->assertOk();
@@ -1005,13 +1004,13 @@ class ContabilTest extends TestCase
             'cpf_cnpj'
         ]);
 
-        Notification::assertNothingSent();
+        Mail::assertNothingSent();
     }
 
     /** @test */
     public function cannot_send_mail_reset_password_for_contabil_not_actived()
     {
-        Notification::fake();
+        Mail::fake();
 
         $user_externo = factory('App\Contabil')->create([
             'ativo' => 0
@@ -1024,13 +1023,13 @@ class ContabilTest extends TestCase
             'cpf_cnpj'
         ]);
 
-        Notification::assertNothingSent();
+        Mail::assertNothingSent();
     }
 
     /** @test */
     public function cannot_send_mail_reset_password_for_contabil_tipo_invalid()
     {
-        Notification::fake();
+        Mail::fake();
 
         $user_externo = factory('App\Contabil')->create();
         $this->get(route('externo.password.request'))->assertOk();
@@ -1041,13 +1040,13 @@ class ContabilTest extends TestCase
             'tipo_conta'
         ]);
 
-        Notification::assertNothingSent();
+        Mail::assertNothingSent();
     }
 
     /** @test */
     public function send_mail_reset_password_for_contabil()
     {
-        Notification::fake();
+        Mail::fake();
 
         $user_externo = factory('App\Contabil')->create();
         $this->get(route('externo.password.request'))->assertOk();
@@ -1058,13 +1057,13 @@ class ContabilTest extends TestCase
         $this->get(route('externo.password.request'))
         ->assertSee('O link de reconfiguração de senha foi enviado ao email ' .$user_externo['email']);
         
-        Notification::hasSent($user_externo, ResetPassword::class);
+        Mail::hasSent($user_externo, ResetPassword::class);
     }
 
     /** @test */
     public function cannot_send_mail_reset_password_when_not_find_cpfcnpj()
     {
-        Notification::fake();
+        Mail::fake();
 
         factory('App\Contabil')->create([
             'cnpj' => '49931920000112'
@@ -1078,7 +1077,7 @@ class ContabilTest extends TestCase
             'cpf_cnpj'
         ]);
 
-        Notification::assertNothingSent();
+        Mail::assertNothingSent();
     }
 
     /** @test */

@@ -13,7 +13,7 @@ interface PreRegistroAdminSubServiceInterface {
 
     public function view($id);
 
-    public function buscar($busca);
+    public function buscar($busca, User $user);
 
     public function saveAjaxAdmin($request, $id, User $user);
 

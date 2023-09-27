@@ -3,14 +3,15 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
+// use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
+// use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailable;
 
-class UserExternoResetPasswordNotification extends ResetPasswordNotification
+class UserExternoResetPasswordNotification extends Mailable
 {
-    use Queueable;
+    use Queueable, SerializesModels;
 
     public $token;
 
@@ -38,22 +39,29 @@ class UserExternoResetPasswordNotification extends ResetPasswordNotification
         $this->token = $token;
     }
 
-    public function via($notifiable)
+    public function build()
     {
-        return ['mail'];
-    }
-
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
+        return $this
             ->subject('Alteração de senha no Login Externo')
             ->view('emails.default', ['body' => $this->emailReset($this->token)]);
     }
 
-    public function toArray($notifiable)
-    {
-        return [
-            //
-        ];
-    }
+    // public function via($notifiable)
+    // {
+    //     return ['mail'];
+    // }
+
+    // public function toMail($notifiable)
+    // {
+    //     return (new MailMessage)
+    //         ->subject('Alteração de senha no Login Externo')
+    //         ->view('emails.default', ['body' => $this->emailReset($this->token)]);
+    // }
+
+    // public function toArray($notifiable)
+    // {
+    //     return [
+    //         //
+    //     ];
+    // }
 }

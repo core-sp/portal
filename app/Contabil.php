@@ -2,16 +2,17 @@
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
+// use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Notifications\UserExternoResetPasswordNotification;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 class Contabil extends Authenticatable
 {
-    use Notifiable;
+    // use Notifiable;
     use SoftDeletes;
 
     protected $guard = 'contabil';
@@ -21,7 +22,8 @@ class Contabil extends Authenticatable
 
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new UserExternoResetPasswordNotification($token));
+        // $this->notify(new UserExternoResetPasswordNotification($token));
+        Mail::to($this->email)->queue(new UserExternoResetPasswordNotification($token));
     }
 
     public static function camposPreRegistro()

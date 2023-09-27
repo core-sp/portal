@@ -120,6 +120,7 @@ $factory->state(PreRegistro::class, 'aprovado', function (Faker $faker) {
 $factory->state(PreRegistro::class, 'negado', function (Faker $faker) {
     return [
         'status' => PreRegistro::STATUS_NEGADO,
+        'justificativa' => json_encode(['negado' => $faker->sentence()], JSON_FORCE_OBJECT),
         'historico_status' => json_encode([
             PreRegistro::STATUS_CRIADO . ';' . now()->subDays(3)->format('Y-m-d H:i:s'),
             PreRegistro::STATUS_ANALISE_INICIAL . ';' . now()->subDays(2)->format('Y-m-d H:i:s'),

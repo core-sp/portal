@@ -45,6 +45,32 @@ class PreRegistroTest extends TestCase
     }
 
     /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
+
+        // ADMIN
+        $preRegistro = factory('App\PreRegistroCpf')->create();
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $preRegistro_negado = factory('App\PreRegistro')->states('negado')->create([
+            'status' => 'Em análise inicial'
+        ]);
+
+        $this->get(route('preregistro.index'))->assertForbidden();
+        $this->get(route('preregistro.view', $preRegistro->id))->assertForbidden();
+        $this->post(route('preregistro.update.ajax', $preRegistro->id), [
+            'acao' => 'justificar',
+            'valor' => null,
+            'campo' => 'segmento'
+        ])->assertForbidden();
+        $this->get(route('preregistro.anexo.download', ['idPreRegistro' => $preRegistro->id, 'id' => $anexo->id]))->assertForbidden();
+        $this->put(route('preregistro.update.status', $preRegistro_negado->id), ['situacao' => 'negar'])->assertForbidden();
+        $this->get(route('preregistro.busca'))->assertForbidden();
+        $this->get(route('preregistro.filtro'))->assertForbidden();
+    }
+
+    /** @test */
     public function users_externo_pf_cannot_access_links_without_pre_registro()
     {
         $externo = $this->signInAsUserExterno();
@@ -260,6 +286,7 @@ class PreRegistroTest extends TestCase
         $this->get(route('preregistro.index'))->assertStatus(429);
 
         $admin = $this->signInAsAdmin('e.admin@teste.com');
+        $admin->update(['idperfil' => 1]);
         $this->get(route('preregistro.index'))->assertStatus(200);
     }
 

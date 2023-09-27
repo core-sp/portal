@@ -113,6 +113,7 @@ class AdminTest extends TestCase
             ->assertDontSee('/admin/representantes')
             ->assertDontSee('/admin/representante-enderecos')
             ->assertDontSee(route('solicita-cedula.index'))
+            ->assertDontSee(route('preregistro.index'))
             ->assertDontSee(route('licitacoes.index'))
             ->assertDontSee(route('licitacoes.create'))
             ->assertDontSee(route('concursos.index'))

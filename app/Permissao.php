@@ -36,7 +36,7 @@ class Permissao extends Model
             'SolicitaCedulaController' => 'Representante - Cédula',
             'PlantaoJuridicoController' => 'Plantão Jurídico',
             'PlantaoJuridicoBloqueioController' => 'Plantão Jurídico Bloqueio',
-            // 'PreRegistroController' => 'Pré-registro',
+            'PreRegistroController' => 'Pré-registro',
         ];
     }
 }

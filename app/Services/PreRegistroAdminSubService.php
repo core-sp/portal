@@ -28,7 +28,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         ];
     }
 
-    private function tabelaCompleta($resultados)
+    private function tabelaCompleta($resultados, $user)
     {
         // Opções de cabeçalho da tabela
         $headers = [
@@ -42,11 +42,13 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         ];
         // Opções de conteúdo da tabela
         $contents = [];
+        $userPodeEditar = $user->can('updateOther', $user);
         foreach($resultados as $resultado) 
         {
             $texto = $resultado->atendentePodeEditar() ? 'Editar' : 'Visualizar';
             $cor = $resultado->atendentePodeEditar() ? 'primary' : 'info';
-            $acoes = '<a href="'.route('preregistro.view', $resultado->id).'" class="btn btn-sm btn-' . $cor . '">'. $texto .'</a> ';
+            if($userPodeEditar)
+                $acoes = '<a href="'.route('preregistro.view', $resultado->id).'" class="btn btn-sm btn-' . $cor . '">'. $texto .'</a> ';
             $textoUser = '<span class="rounded p-1 bg' . $resultado->getLabelStatus() . ' font-weight-bolder font-italic">' . $resultado->status . '</span>';
             $conteudo = [
                 'corDaLinha' => '<tr class="table' . $resultado->getLabelStatus() . '">',
@@ -187,7 +189,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
     
         return [
             'resultados' => $resultados, 
-            'tabela' => $this->tabelaCompleta($resultados), 
+            'tabela' => $this->tabelaCompleta($resultados, $user), 
             'temFiltro' => $this->filtro($request, $service, $user, $filtro),
             'variaveis' => (object) $this->variaveis,
         ];
@@ -208,7 +210,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         ];
     }
 
-    public function buscar($busca)
+    public function buscar($busca, $user)
     {
         $numero = apenasNumeros($busca);
         if(strlen($numero) == 0)
@@ -235,7 +237,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
 
         return [
             'resultados' => $resultados,
-            'tabela' => $this->tabelaCompleta($resultados), 
+            'tabela' => $this->tabelaCompleta($resultados, $user), 
             'variaveis' => (object) $this->variaveis,
         ];
     }
@@ -312,7 +314,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         ->select('id', 'status', 'created_at', 'updated_at', 'user_externo_id')
         ->where(function ($query) {
             $query->whereIn('status', [PreRegistro::STATUS_APROVADO])
-            ->where('updated_at', '<=', Carbon::today()->subWeeks(2)->toDateString());
+            ->where('updated_at', '<=', Carbon::today()->subMonth()->toDateString());
         })
         ->orWhere(function ($query) {
             $query->whereIn('status', [PreRegistro::STATUS_CRIADO, PreRegistro::STATUS_CORRECAO])
