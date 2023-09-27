@@ -131,6 +131,7 @@ class SalaReuniao extends Model
         $periodo = explode(' - ', $periodo);
         $manha = $this->horaAlmoco();
         $tipo_periodo = $periodo[0] <= $manha ? 'manha' : 'tarde';
+        $duracao = Carbon::parse($periodo[0])->diffInMinutes(Carbon::parse($periodo[1]));
         
         $horarios_agendar = $periodo_todo ? 
             Arr::except($horarios_agendar, 
@@ -139,11 +140,13 @@ class SalaReuniao extends Model
                     return $tipo_periodo == 'manha' ? $temp[0] <= $manha : $temp[0] > $manha;
                 })))) : 
             Arr::except($horarios_agendar, 
-                array_values(array_keys(Arr::where($horarios_agendar, function ($value, $key) use($periodo) {
+                array_values(array_keys(Arr::where($horarios_agendar, function ($value, $key) use($periodo, $duracao) {
                     $temp = explode(' - ', $value);
+                    $inicio_temp = Carbon::parse($temp[0]);
                     $periodo_inicio = Carbon::parse($periodo[0]);
-                    $periodo_final = Carbon::parse($periodo[1]);
-                    return $periodo_inicio->addMinute()->between($temp[0], $temp[1]) || $periodo_final->subMinute()->between($temp[0], $temp[1]);
+                    $duracao_temp = $periodo_inicio->diffInMinutes($inicio_temp);
+                    $periodo_inicio->addMinute();
+                    return $periodo_inicio->between($temp[0], $temp[1]) || ($periodo_inicio->lt($inicio_temp) && ($duracao_temp < $duracao));
                 }))));
 
         unset($horarios_agendar[$tipo_periodo]);

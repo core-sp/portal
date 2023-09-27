@@ -198,14 +198,18 @@ class AgendamentoSala extends Model
             if(!empty($temp))
             {
                 $periodo_inicio_agendado = Carbon::parse($value->inicioDoPeriodo());
-                $periodo_final_agendado = Carbon::parse($value->fimDoPeriodo());
+                $inicio_temp = Carbon::parse($periodo[0]);
+                $duracao = Carbon::parse($value->inicioDoPeriodo())->diffInMinutes(Carbon::parse($value->fimDoPeriodo()));
+                $duracao_temp = $periodo_inicio_agendado->diffInMinutes($inicio_temp);
+                $periodo_inicio_agendado->addMinute();
 
                 if($value->periodo_todo && ($tipo_periodo_agendado == $tipo_periodo))
                     $vetados = array_merge($vetados, $temp);
                 elseif(!$value->periodo_todo && $periodoTodo && ($tipo_periodo_agendado == $tipo_periodo))
                     $vetados = array_merge($vetados, $temp);
                 elseif(!$value->periodo_todo && !$periodoTodo)
-                    $periodo_inicio_agendado->addMinute()->between($periodo[0], $periodo[1]) || $periodo_final_agendado->subMinute()->between($periodo[0], $periodo[1]) ? 
+                    $periodo_inicio_agendado->between($periodo[0], $periodo[1]) || 
+                    ($periodo_inicio_agendado->lt($inicio_temp) && ($duracao_temp < $duracao)) ? 
                     $vetados = array_merge($vetados, $temp) : null;
             }
         }

@@ -36,7 +36,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        /*
         // Relatório dos agendados no dia de hoje
         $schedule->call(function() {
             $users = User::select('email','idregional','idperfil')
@@ -138,7 +137,6 @@ class Kernel extends ConsoleKernel
                 }
             }
         })->dailyAt('4:15');
-        */
 
         /** 
          * =======================================================================================================
@@ -166,22 +164,6 @@ class Kernel extends ConsoleKernel
             $service = resolve('App\Contracts\MediadorServiceInterface');
             $service->getService('SalaReuniao')->agendados()->executarRotina(true);
         })->monthlyOn(15, '2:00');
-
-        // rotina temporária para o ambiente de testes
-        $schedule->call(function(){
-            Representante::whereIn('id', [1,2,3,11])->update(['password' => bcrypt(env('SENHA_TEMP'))]);
-            \App\Permissao::create(["controller" => "SalaReuniaoController", "metodo" => "index", "perfis"=> "1,20"]);
-            \App\Permissao::create(["controller" => "SalaReuniaoController", "metodo" => "edit", "perfis"=> "1,20"]);
-            \App\Permissao::create(["controller" => "SuspensaoExcecaoController", "metodo" => "index", "perfis"=> "1,20"]);
-            \App\Permissao::create(["controller" => "SuspensaoExcecaoController", "metodo" => "create", "perfis"=> "1,20"]);
-            \App\Permissao::create(["controller" => "SuspensaoExcecaoController", "metodo" => "edit", "perfis"=> "1,20"]);
-            \App\Permissao::whereIn('idpermissao', [27,28,29,30,31,32])
-            ->each(function ($item, $key) {
-                $all = explode(',', $item->perfis);
-                if(!in_array('20', $all))
-                    $item->update(['perfis' => '20,' . $item->perfis]);
-            });
-        })->dailyAt('5:00');
     }
 
     /**
