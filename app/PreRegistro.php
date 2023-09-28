@@ -257,7 +257,7 @@ class PreRegistro extends Model
         $legenda .= $inicio . $colors[PreRegistro::STATUS_ANALISE_INICIAL] . $meio . '"<strong>Solicitante está aguardando o atendente analisar os dados</strong>">' . PreRegistro::STATUS_ANALISE_INICIAL . '</button>';
         $legenda .= $inicio . $colors[PreRegistro::STATUS_CORRECAO] . $meio . '"<strong>Atendente está aguardando o solicitante corrigir os dados</strong>">' . PreRegistro::STATUS_CORRECAO . '</button>';
         $legenda .= $inicio . $colors[PreRegistro::STATUS_ANALISE_CORRECAO] . $meio . '"<strong>Solicitante está aguardando o atendente analisar os dados após correção</strong>">' . PreRegistro::STATUS_ANALISE_CORRECAO . '</button>';
-        $legenda .= $inicio . $colors[PreRegistro::STATUS_APROVADO] . $meio . '"<strong>Atendente aprovou a solicitação</strong>">' . PreRegistro::STATUS_APROVADO . '</button>';
+        $legenda .= $inicio . $colors[PreRegistro::STATUS_APROVADO] . $meio . '"<strong>Atendente aprovou a solicitação e pode realizar o anexo do boleto</strong>">' . PreRegistro::STATUS_APROVADO . '</button>';
         $legenda .= $inicio . $colors[PreRegistro::STATUS_NEGADO] . $meio . '"<strong>Atendente negou a solicitação</strong>">' . PreRegistro::STATUS_NEGADO . '</button>';
         $legenda .= '</p><hr/>';
 
@@ -353,7 +353,7 @@ class PreRegistro extends Model
             PreRegistro::STATUS_ANALISE_INICIAL => '<span class="badge badge-primary">' . PreRegistro::STATUS_ANALISE_INICIAL . '</span><small> - O formulário foi enviado pelo solicitante e está aguardando a análise pelo atendente</small>',
             PreRegistro::STATUS_CORRECAO => '<span class="badge badge-warning">' . PreRegistro::STATUS_CORRECAO . '</span><small> - O formulário foi analisado pelo atendente e possui correções a serem realizadas pelo solicitante</small>',
             PreRegistro::STATUS_ANALISE_CORRECAO => '<span class="badge badge-info">' . PreRegistro::STATUS_ANALISE_CORRECAO . '</span><small> - O formulário foi enviado pelo solicitante e está aguardando a análise da correção pelo atendente</small>',
-            PreRegistro::STATUS_APROVADO => '<span class="badge badge-success">' . PreRegistro::STATUS_APROVADO . '</span><small> - O formulário foi aprovado pelo atendente</small>',
+            PreRegistro::STATUS_APROVADO => '<span class="badge badge-success">' . PreRegistro::STATUS_APROVADO . '</span><small> - O formulário foi aprovado pelo atendente e estará disponível o boleto para pagamento</small>',
             PreRegistro::STATUS_NEGADO => '<span class="badge badge-danger">' . PreRegistro::STATUS_NEGADO . '</span><small> - O formulário foi negado pelo atendente com justificativa</small>',
         ] : [
             PreRegistro::STATUS_CRIADO => '<span class="badge badge-secondary">' . PreRegistro::STATUS_CRIADO . '</span>',
@@ -365,6 +365,20 @@ class PreRegistro extends Model
         ];
 
         return isset($colorStatus[$this->status]) ? $colorStatus[$this->status] : null;
+    }
+
+    public function getBoleto()
+    {
+        $boleto = null;
+        if($this->anexos()->count() > 0)
+            $boleto = $this->anexos()->where('nome_original', 'boleto_aprovado_' . $this->id)->first();
+
+        return $boleto;
+    }
+
+    public function temBoleto()
+    {
+        return $this->anexos()->where('nome_original', 'boleto_aprovado_' . $this->id)->exists();
     }
 
     public function getTipoTelefone()

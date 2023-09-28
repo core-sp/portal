@@ -246,6 +246,7 @@ Route::middleware(['block_ip'])->group(function () {
       Route::put('/update-status/{preRegistro}', 'PreRegistroController@updateStatus')->name('preregistro.update.status');
       Route::get('/busca', 'PreRegistroController@busca')->name('preregistro.busca');
       Route::get('/filtro', 'PreRegistroController@index')->name('preregistro.filtro');
+      Route::post('/novo-doc/{preRegistro}', 'PreRegistroController@uploadDoc')->name('preregistro.upload.doc');
     });
 
     // Route::get('phpinfo', function () {

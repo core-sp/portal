@@ -18,6 +18,10 @@ class PreRegistroAdminRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->msg = '';
+        
+        if(\Route::is('preregistro.upload.doc'))
+            return;
+
         $preRegistro = $this->service->getService('PreRegistro')->admin()->view($this->preRegistro)['resultado'];
         $arrayStatus = [
             'aprovar' => $preRegistro::STATUS_APROVADO,
@@ -103,10 +107,13 @@ class PreRegistroAdminRequest extends FormRequest
 
     public function rules()
     {
-        return [
-            'situacao' => 'required|in:aprovar,negar,corrigir',
-            'status' => 'required',
-        ];
+        return \Route::is('preregistro.upload.doc') ? 
+            [
+                'file' => 'required|file|mimes:pdf|max:2048',
+            ] : [
+                'situacao' => 'required|in:aprovar,negar,corrigir',
+                'status' => 'required',
+            ];
     }
 
     public function messages()
@@ -115,6 +122,11 @@ class PreRegistroAdminRequest extends FormRequest
             'situacao.required' => 'Obrigatório o status requisitado',
             'situacao.in' => 'Valor do status requisitado inválido',
             'status.required' => $this->msg,
+            'mimes' => 'O arquivo não possui extensão .pdf ou está com erro',
+            'file' => 'Deve ser um arquivo',
+            'uploaded' => 'Falhou o upload por erro no servidor',
+            'file.max' => 'O arquivo deve ter um limite de até 2MB',
+            'file.required' => 'Campo obrigatório',
         ];
     }
 }

@@ -19,5 +19,7 @@ interface PreRegistroAdminSubServiceInterface {
 
     public function updateStatus($id, User $user, $status);
 
+    public function uploadDoc($id, $file, $tipo_doc);
+
     public function executarRotina();
 }

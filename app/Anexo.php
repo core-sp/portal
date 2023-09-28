@@ -100,6 +100,26 @@ class Anexo extends Model
         return null;
     }
 
+    public static function armazenarDoc($id, $file, $tipo_doc)
+    {
+        $doc = self::where('nome_original', $tipo_doc . '_aprovado_' . $id)->first();
+        if(isset($doc))
+        {
+            Storage::disk('local')->delete($doc->path);
+            $doc->delete();
+        }
+
+        $nome = (string) Str::uuid() . '.' . $file->extension();
+        $anexo = $file->storeAs(self::PATH_PRE_REGISTRO . '/' . $id, $nome, 'local');
+
+        return [
+            'path' => $anexo,
+            'nome_original' => $tipo_doc . '_aprovado_' . $id,
+            'tamanho_bytes' => Storage::size($anexo),
+            'extensao' => $file->extension(),
+        ];
+    }
+
     private static function getAceitosPreRegistro()
     {
         return [

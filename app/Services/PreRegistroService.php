@@ -453,7 +453,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
-    public function downloadAnexo($id, $idPreRegistro, $contabil = null)
+    public function downloadAnexo($id, $idPreRegistro, $doc = null, $admin = false)
     {
         $preRegistro = PreRegistro::findOrFail($idPreRegistro);
 
@@ -461,10 +461,23 @@ class PreRegistroService implements PreRegistroServiceInterface {
             throw new \Exception('Não autorizado a acessar a solicitação de registro', 401);
 
         $anexo = $preRegistro->anexos()->where('id', $id)->first();
+        $file = null;
 
         if(isset($anexo) && Storage::disk('local')->exists($anexo->path))
-            return Storage::disk('local')->path($anexo->path);
-        
+        {
+            $file = Storage::disk('local')->path($anexo->path);
+            $doc = isset($doc) && isset($file) && ($anexo->nome_original == ('boleto_aprovado_' . $preRegistro->id));
+        }
+
+        if(isset($doc) && $doc && !$admin)
+            event(new ExternoEvent('Foi realizado o download do boleto do pré-registro com ID: ' . $preRegistro->id));
+
+        if(isset($doc) && !$doc && !$admin)
+            throw new \Exception('Somente os documentos anexados pelo atendente podem ser acessados após aprovação', 401);
+
+        if(isset($file))
+            return $file;
+
         throw new \Exception('Arquivo não existe / não pode acessar', 401);
     }
 

@@ -11,7 +11,7 @@
 
 <div class="representante-content w-100">
     <div class="conteudo-txt-mini light">
-        <h4 class="pt-1 pb-1">Solicitações de registro gerenciados pela Contabilidade</h4>
+        <h4 class="pt-1 pb-1">Solicitações de registro gerenciadas pela Contabilidade</h4>
         <div class="linha-lg-mini mb-2"></div>
         <a class="btn btn-success text-white" href="{{ route('externo.preregistro.view') }}">
             Criar solicitação
@@ -37,9 +37,17 @@
                     </a>
                     @if($solicitacao->isAprovado())
                     &nbsp; | &nbsp;
-                    <a class="btn btn-success btn-sm text-white" href="{{-- route('externo.preregistro.view', $solicitacao->id) --}}">
-                         Baixar boleto
-                    </a>
+                        @if($solicitacao->temBoleto())
+                        <a 
+                            class="btn btn-success btn-sm text-white" 
+                            href="{{ route('externo.preregistro.anexo.download', ['id' => $solicitacao->getBoleto()->id, 'preRegistro' => $solicitacao->id]) }}"
+                            download
+                        >
+                            Baixar boleto
+                        </a>
+                        @else
+                        <span><i>Boleto ainda não está disponível.</i></span>
+                        @endif
                     @endif
                 </p>
             </div>

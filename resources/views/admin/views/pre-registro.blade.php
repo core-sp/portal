@@ -62,6 +62,70 @@
     </small>
     @endif
     
+    <hr />
+
+    <p class="font-weight-bolder">Documentos anexados pelo atendente após aprovação:</p>
+    @if($resultado->isAprovado())
+        @php
+            $boleto = $resultado->temBoleto() ? $resultado->getBoleto() : null;
+        @endphp
+        <p>
+            <i class="fas fa-exclamation-circle text-primary"></i>
+            &nbsp;<i>Após anexar, o documento ficará disponível para o solicitante realizar download na área restrita.</i>
+        </p>
+        @if(isset($boleto))
+            <i class="fas fa-paperclip"></i> <i>Boleto:</i> {{ $boleto->nome_original }}
+            <a href="{{ route('preregistro.anexo.download', ['idPreRegistro' => $resultado->id, 'id' => $boleto->id]) }}" 
+                class="btn btn-sm btn-primary ml-2" 
+                target="_blank" 
+            >
+                Abrir
+            </a>
+            <a href="{{ route('preregistro.anexo.download', ['idPreRegistro' => $resultado->id, 'id' => $boleto->id]) }}" 
+                class="btn btn-sm btn-primary ml-2" 
+                download
+            >
+                <i class="fas fa-download"></i>
+            </a>
+            <br>
+            <span class="mt-2"><small><i>Última atualização:</i> {{ formataData($boleto->updated_at) }}</small></span>
+        @else
+            <p>Sem boleto anexado.</p>
+        @endif
+
+    <form class="ml-1 mt-3" action="{{ route('preregistro.upload.doc', $resultado->id) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="form-row">
+            <label>Anexar novo boleto:</label>
+            <div class="custom-file">
+                <input
+                    type="file"
+                    name="file"
+                    class="custom-file-input {{ $errors->has('file') ? 'is-invalid' : '' }}"
+                    id="doc_pre_registro"
+                    accept=".pdf"
+                    role="button"
+                >
+                <label class="custom-file-label" for="doc_pre_registro">Selecionar arquivo...</label>
+                @if($errors->has('file'))
+                <div class="invalid-feedback">
+                    {{ $errors->first('file') }}
+                </div>
+                @endif
+            </div>
+        </div>
+
+        <div class="form-row mt-2">
+            <button type="submit" class="btn btn-sm btn-primary">Enviar</button>
+        </div>
+    </form>
+
+    @else
+    <p><i>Pré-registro não está aprovado.</i></p>
+    @endif
+
+    <hr />
+
     <div id="accordionPreRegistro" class="mt-3">
         <input type="hidden" name="idPreRegistro" value="{{ $resultado->id }}" />
 

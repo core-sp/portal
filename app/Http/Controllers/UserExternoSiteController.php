@@ -337,11 +337,16 @@ class UserExternoSiteController extends Controller
 
             $contabil = auth()->guard('contabil')->user();
             $preRegistro = isset($externo) ? $externo->load('preRegistro')->preRegistro : null;
+            $doc = null;
+            if(!isset($preRegistro)){
+                $preRegistro = $externo->load('preRegistroDoc')->preRegistroDoc;
+                $doc = isset($preRegistro) ? true : $doc;
+            }
 
             if(!isset($preRegistro))
                 throw new \Exception('Não autorizado a acessar a solicitação de registro', 401);
 
-            $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $preRegistro->id, $contabil);
+            $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $preRegistro->id, false, $doc);
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(404, 'Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.');

@@ -23,7 +23,7 @@ interface PreRegistroServiceInterface {
 
     public function saveSite($request, GerentiRepositoryInterface $gerentiRepository, UserExterno $externo, Contabil $contabil = null);
 
-    public function downloadAnexo($id, $idPreRegistro, Contabil $contabil = null);
+    public function downloadAnexo($id, $idPreRegistro, $admin = false, $doc = null);
 
     public function excluirAnexo($id, UserExterno $externo, Contabil $contabil = null);
 

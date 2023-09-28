@@ -46,6 +46,11 @@ class UserExterno extends Authenticatable
         return $this->preRegistros()->where('status', 'Aprovado')->count() > 0;
     }
 
+    public function preRegistroDoc()
+    {
+        return $this->hasOne('App\PreRegistro')->where('status', 'Aprovado')->latest();
+    }
+
     public function podeAtivar()
     {
         $update = Carbon::createFromFormat('Y-m-d H:i:s', $this->updated_at);

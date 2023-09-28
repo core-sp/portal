@@ -87,7 +87,7 @@ class PreRegistroController extends Controller
         $this->authorize('updateOther', auth()->user());
 
         try{
-            $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $idPreRegistro);
+            $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $idPreRegistro, true);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
@@ -113,5 +113,21 @@ class PreRegistroController extends Controller
         $link = session()->has('url_pre_registro') ? session('url_pre_registro') : route('preregistro.index');
         
         return redirect($link)->with($dados);
+    }
+
+    public function uploadDoc(PreRegistroAdminRequest $request, $preRegistro)
+    {
+        $this->authorize('updateOther', auth()->user());
+
+        try{
+            $file = $request->validated()['file'];
+            $dados = $this->service->getService('PreRegistro')->admin()->uploadDoc($preRegistro, $file, 'boleto');
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
+            abort(500, "Erro ao fazer upload do documento no pré-registro.");
+        }
+
+        return redirect()->route('preregistro.view', $preRegistro)->with($dados);
     }
 }

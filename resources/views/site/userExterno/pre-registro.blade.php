@@ -36,9 +36,17 @@
                                     {{ $preRegistro->status == $preRegistro::STATUS_NEGADO ? '- ' . $preRegistro->getJustificativaNegado() : '' }}
                                 </p>
                                 @if($preRegistro->isAprovado())
-                                <a class="btn btn-success text-white mt-3" href="{{-- route('externo.preregistro.view', $solicitacao->id) --}}">
-                                    Baixar boleto
-                                </a>
+                                    @if($preRegistro->temBoleto())
+                                    <a 
+                                        class="btn btn-success text-white mt-3" 
+                                        href="{{ route('externo.preregistro.anexo.download', $preRegistro->getBoleto()->id) }}"
+                                        download
+                                    >
+                                        Baixar boleto
+                                    </a>
+                                    @else
+                                    <p>Boleto ainda não está disponível.</p>
+                                    @endif
                                 @endif
                                 <hr />
                             @endif

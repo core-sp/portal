@@ -306,6 +306,26 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         ];
     }
 
+    public function uploadDoc($id, $file, $tipo_doc)
+    {
+        $preRegistro = PreRegistro::findOrFail($id);
+
+        if(!$preRegistro->isAprovado())
+            return [
+                'message' => '<i class="icon fas fa-times"></i> O pré-registro precisa estar aprovado para anexar documento.',
+                'class' => 'alert-danger'
+            ];
+        
+        $doc = Anexo::armazenarDoc($id, $file, 'boleto');
+        $doc = is_array($doc) ? $preRegistro->anexos()->create($doc) : null;
+        event(new CrudEvent('pré-registro', 'anexou o documento "' . $file->getClientOriginalName() . '" do tipo boleto', $id));
+
+        return [
+            'message' => '<i class="icon fa fa-check"></i> Boleto anexado com sucesso!',
+            'class' => 'alert-success'
+        ];
+    }
+
     public function executarRotina()
     {
         $diretorio = Anexo::PATH_PRE_REGISTRO . '/';
