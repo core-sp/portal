@@ -8,6 +8,8 @@ use App\Mail\RepresentanteResetPasswordMail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticable;
 use App\Notifications\RepresentanteResetPasswordNotification;
+use Carbon\Carbon;
+use Illuminate\Support\Arr;
 
 class Representante extends Authenticable
 {
@@ -115,6 +117,136 @@ class Representante extends Authenticable
     public function pagamentos()
     {
         return $this->hasMany('App\Pagamento', 'idrepresentante');
+    }
+
+    public function agendamentosSalas()
+    {
+        return $this->hasMany('App\AgendamentoSala', 'idrepresentante');
+    }
+
+    public function suspensao()
+    {
+        return $this->hasMany('App\SuspensaoExcecao', 'idrepresentante')->first();
+    }
+
+    public function agendamentosAtivos()
+    {
+        return $this->agendamentosSalas()
+        ->with('sala.regional')
+        ->whereNull('status')
+        ->orderBy('dia', 'ASC')
+        ->orderBy('periodo', 'ASC')
+        ->orderBy('status', 'ASC')
+        ->paginate(4);
+    }
+
+    public function podeAgendar($mes = null, $ano = null)
+    {
+        $total = 4;
+
+        $atual = $this->agendamentosSalas()
+        ->when(isset($mes) && !isset($ano), function($query) use($mes){
+            $query->whereMonth('dia', $mes)
+            ->whereYear('dia', now()->year);
+        })
+        ->when(isset($ano) && !isset($mes), function($query) use($ano){
+            $query->whereMonth('dia', now()->month)
+            ->whereYear('dia', $ano);
+        })
+        ->when(isset($mes) && isset($ano), function($query) use($mes, $ano){
+            $query->whereMonth('dia', $mes)
+            ->whereYear('dia', $ano);
+        })
+        ->when(!isset($mes) && !isset($ano), function($query){
+            // devido poder agendar somente no dia seguinte
+            $diaSeguinte = now()->addDay();
+            $query->whereMonth('dia', $diaSeguinte->month)
+            ->whereYear('dia', $diaSeguinte->year);
+        })
+        ->where(function($query){
+            $query->whereNull('status')
+            ->orWhere('status', 'Compareceu');
+        })        
+        ->count() < $total;
+
+        $seguinte = false;
+        $dataSeguinte = now()->addMonth();
+        $mesSeguinte = $dataSeguinte->month;
+        $anoSeguinte = $dataSeguinte->year;
+        
+        if(!isset($mes) && !isset($ano))
+            $seguinte = $this->agendamentosSalas()
+            ->whereMonth('dia', $mesSeguinte)
+            ->whereYear('dia', $anoSeguinte)
+            ->where(function($query){
+                $query->whereNull('status')
+                ->orWhere('status', 'Compareceu');
+            }) 
+            ->count() < $total;
+
+        return $atual || $seguinte;
+    }
+
+    public function getPeriodoByDia($dia, $periodosDisponiveis)
+    {
+        $agendados = $this->agendamentosSalas()
+        ->where('dia', $dia)
+        ->whereNull('status')
+        ->orderBy('dia')
+        ->orderBy('periodo_todo', 'DESC')
+        ->get();
+
+        foreach($agendados as $agendado)
+        {
+            $manha = $agendado->sala->horaAlmoco();
+            $tipo_periodo = $agendado->inicioDoPeriodo() <= $manha ? 'manha' : 'tarde';
+            $duracao = Carbon::parse($agendado->fimDoPeriodo())->diffInMinutes(Carbon::parse($agendado->fimDoPeriodo()));
+            
+            if($agendado->periodo_todo)
+                $periodosDisponiveis = Arr::except($periodosDisponiveis, 
+                    array_values(array_keys(Arr::where($periodosDisponiveis, function ($value, $key) use($tipo_periodo, $manha) {
+                        $temp = explode(' - ', $value);
+                        return $tipo_periodo == 'manha' ? $temp[0] <= $manha : $temp[0] > $manha;
+                    }))));
+            else{
+                $periodosDisponiveis = Arr::except($periodosDisponiveis, 
+                    array_values(array_keys(Arr::where($periodosDisponiveis, function ($value, $key) use($agendado, $duracao) {
+                        $temp = explode(' - ', $value);
+                        $inicio_temp = Carbon::parse($temp[0]);
+                        $inicio = Carbon::parse($agendado->inicioDoPeriodo());
+                        $duracao_temp = $inicio->diffInMinutes($inicio_temp);
+                        $inicio->addMinute();
+                        return $inicio->between($temp[0], $temp[1]) || ($inicio->lt($inicio_temp) && ($duracao_temp < $duracao));
+                    }))));
+                unset($periodosDisponiveis[$tipo_periodo]);
+            }
+        }
+
+        return $periodosDisponiveis;
+    }
+
+    public function getAgendamentos30Dias($diasLotados = array())
+    {
+        $diasAgendado = array();
+        $agendados = $this->agendamentosSalas()
+        ->whereNull('status')
+        ->whereBetween('dia', [Carbon::tomorrow()->format('Y-m-d'), Carbon::today()->addMonth()->format('Y-m-d')])
+        ->orderBy('dia')
+        ->get();
+
+        foreach($agendados as $agendado)
+        {
+            $add = true;
+            $dia = Carbon::parse($agendado->dia);
+            foreach($diasLotados as $dias){
+                if($dias === [$dia->month, $dia->day, 'lotado'])
+                    $add = false;
+            }
+            if($add)
+                array_push($diasAgendado, [$dia->month, $dia->day, 'agendado']);
+        }
+
+        return $diasAgendado;
     }
 
     public function getPagamento($cobranca_id, $pagamento_id)

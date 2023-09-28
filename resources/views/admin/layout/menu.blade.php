@@ -304,9 +304,11 @@
             $representante = in_array($idperfil, $permitidos->find(47)['perfis']);
             $representanteEndereco = in_array($idperfil, $permitidos->find(45)['perfis']);
             $representanteCedula = in_array($idperfil, $permitidos->find(59)['perfis']);
+            $salas = in_array($idperfil, $permitidos->find(67)['perfis']);
+            $suspensao = in_array($idperfil, $permitidos->find(69)['perfis']);
         @endphp
         
-        @if($agendamento || $agendamentobloqueio || $representante || $representanteEndereco || $representanteCedula)
+        @if($agendamento || $agendamentobloqueio || $representante || $representanteEndereco || $representanteCedula || $salas || $suspensao)
         <li class="nav-header">ATENDIMENTO</li>
         
         @if($agendamento || $agendamentobloqueio)
@@ -378,6 +380,53 @@
                 </li>    
                 @endif
 
+            </ul>
+        </li>
+        @endif
+
+        @if($agendamento || $agendamentobloqueio || $salas || $suspensao)
+        <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-building"></i>
+                <p>Reunião / Coworking<i class="right fa fa-angle-left"></i></p>
+            </a>
+
+            <ul class="nav nav-treeview">
+                @if($salas)
+                <li class="nav-item">
+                    <a href="{{ route('sala.reuniao.index') }}" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Salas</p>
+                    </a>
+                </li>
+                @endif
+
+                @if($agendamento)
+                <li class="nav-item">
+                    <a href="{{ route('sala.reuniao.agendados.index') }}" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Agendados</p>
+                    </a>
+                </li>
+                @endif
+
+                @if($agendamentobloqueio)
+                <li class="nav-item">
+                    <a href="{{ route('sala.reuniao.bloqueio.lista') }}" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Bloqueios</p>
+                    </a>
+                </li>
+                @endif
+
+                @if($suspensao)
+                <li class="nav-item">
+                    <a href="{{ route('sala.reuniao.suspensao.lista') }}" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Suspensos / Exceções</p>
+                    </a>
+                </li>
+                @endif
             </ul>
         </li>
         @endif

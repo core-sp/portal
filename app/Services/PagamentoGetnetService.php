@@ -161,7 +161,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $cpf_cnpj = substr($dados['customer_id'], 0, strpos($dados['customer_id'], '_'));
 
         if(strpos($dados['customer_id'], 'rep') !== false)
-            $user = $service->getService('Representante')->findByCpfCnpj($cpf_cnpj);
+            $user = $service->getService('Representante')->getRepresentanteByCpfCnpj($cpf_cnpj);
 
         $pagamento = $user->pagamentos()->create([
             'payment_id' => $dados['payment_id'],

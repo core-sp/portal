@@ -15,7 +15,7 @@
         </h5>
     @if($segmento)
         <div class="contatos-table space-single bg-info mb-2">
-            <p class="light pb-0 text-white">
+            <p class="light pb-0 text-white" data-clarity-mask="True">
                 @if($bdo->count() == 0)
                 Não foi encontrada nenhuma oportunidade <strong>em andamento</strong> para o seu segmento - <strong>{{ $segmento }}</strong> e sua seccional - <strong>{{ $seccional }}</strong>
                 @else

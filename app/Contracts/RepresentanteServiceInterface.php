@@ -8,5 +8,5 @@ interface RepresentanteServiceInterface {
 
     public function verificaAtivoAndGerenti($cpfCnpj, GerentiRepositoryInterface $gerenti);
 
-    public function findByCpfCnpj($cpf_cnpj);
+    public function getRepresentanteByCpfCnpj($cpfCnpj);
 }
