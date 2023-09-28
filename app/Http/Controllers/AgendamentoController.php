@@ -22,7 +22,9 @@ class AgendamentoController extends Controller
         $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = $this->service->getService('Agendamento')->listar(auth()->user(), $request, $this->service);
+            $filtro = \Route::is('sala.reuniao.agendados.filtro') ? true : null;
+            $dados = \Route::is('sala.reuniao.*') ? $this->service->getService('SalaReuniao')->agendados()->listar(auth()->user(), $filtro, $request, $this->service) : 
+            $this->service->getService('Agendamento')->listar(auth()->user(), $request, $this->service);
             $temFiltro = $dados['temFiltro'];
             $variaveis = $dados['variaveis'];
             $tabela = $dados['tabela'];
@@ -35,21 +37,24 @@ class AgendamentoController extends Controller
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
     }
 
-    public function updateStatus(AgendamentoRequest $request)
+    public function updateStatus(AgendamentoRequest $request, $id = null, $acao = null)
     {
         $this->authorize('viewAny', auth()->user());
 
         try{
             $validated = $request->validated();
-            $erro = $this->service->getService('Agendamento')->save(auth()->user(), $validated);
-            $id = $validated['idagendamento'];
+            $erro = \Route::is('sala.reuniao.*') ? $this->service->getService('SalaReuniao')->agendados()->update(auth()->user(), $id, $acao, $validated) : 
+            $this->service->getService('Agendamento')->save(auth()->user(), $validated);
+            $id = \Route::is('sala.reuniao.*') ? $id : $validated['idagendamento'];
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [403,400]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao atualizar o status do agendamento.");
         }
 
-        return redirect(session('url') ?? route('agendamentos.lista'))->with([
+        $rota = \Route::is('sala.reuniao.*') ? 'sala.reuniao.agendados.index' : 'agendamentos.lista';
+
+        return redirect(session('url') ?? route($rota))->with([
             'message' => isset($erro['message']) ? $erro['message'] : 
                 '<i class="icon fa fa-check"></i>Status do agendamento com o código '.$id.' foi editado com sucesso!',
             'class' => isset($erro['class']) ? $erro['class'] : 'alert-success'
@@ -62,7 +67,8 @@ class AgendamentoController extends Controller
 
         try{
             $busca = $request->q;
-            $dados = $this->service->getService('Agendamento')->buscar(auth()->user(), $busca);
+            $dados = \Route::is('sala.reuniao.*') ? $this->service->getService('SalaReuniao')->agendados()->buscar(auth()->user(), $busca) : 
+            $this->service->getService('Agendamento')->buscar(auth()->user(), $busca);
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
@@ -72,6 +78,21 @@ class AgendamentoController extends Controller
         }
 
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
+    }
+
+    public function view($id, $anexo = null)
+    {
+        $this->authorize('viewAny', auth()->user());
+        
+        try{
+            $dados = $this->service->getService('SalaReuniao')->agendados()->view(auth()->user(), $id, $anexo);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [403, 404]) ? abort($e->getCode(), $e->getMessage()) : 
+            abort(500, "Erro ao carregar o agendamento.");
+        }
+
+        return isset($anexo) ? response()->file($dados, ["Cache-Control" => "no-cache"]) : view('admin.crud.mostra', $dados);
     }
 
     public function edit($id)

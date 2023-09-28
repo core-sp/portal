@@ -1724,6 +1724,13 @@ footer p {
 	background: none #e61818;
 }
 
+.ui-datepicker td.agendado
+{
+	border-style: solid;
+	border-color: black;
+	border-width: medium;
+}
+
 .ui-widget-content .ui-state-disabled.lotado
 {
 	opacity: 1;

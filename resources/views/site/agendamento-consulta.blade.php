@@ -86,7 +86,7 @@
   <div class="container">
   @if(isset($resultado))
     <div class="row mt-4 mb-2">
-      <div class="col mt-2">
+      <div class="col mt-2" data-clarity-mask="True">
         <strong>Agendamento encontrado!</strong><br /><br/>
         <strong>Protocolo:</strong> {{ $resultado->protocolo }}<br />
         <strong>Nome:</strong> {{ $resultado->nome }}<br />

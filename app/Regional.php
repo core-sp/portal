@@ -38,6 +38,11 @@ class Regional extends Model
         return $this->hasOne('App\PlantaoJuridico', 'idregional');
     }
 
+    public function salaReuniao()
+    {
+        return $this->hasOne('App\SalaReuniao', 'idregional');
+    }
+
     public function horariosAge()
     {
         if(isset($this->horariosage))

@@ -77,7 +77,7 @@
         @if(isset($resultado))
           <div class="mt-3">
             <div>
-              <p class="light"><i>Resultados para a busca do CPF/CNPJ:</i> <strong>{{ Request::input('cpfCnpj') }}</strong></p>
+              <p class="light"><i>Resultados para a busca do CPF/CNPJ:</i> <strong data-clarity-mask="True">{{ Request::input('cpfCnpj') }}</strong></p>
             </div>
             <hr class="mb-4">
             @if(empty($resultado))
@@ -88,7 +88,7 @@
                   <div>
                     <img src="{{ strlen(Request::input('cpfCnpj')) === 11 ? asset('img/icon-rc.png') : asset('img/icon-empresa.png') }}" alt="Avatar Representante Comercial" />
                   </div>
-                  <div class="flex-one align-self-center ml-3">
+                  <div class="flex-one align-self-center ml-3" data-clarity-mask="True">
                     <h5>{{ $resultado['nome'] }}</h5>
                     <p><strong>Registro:</strong> {{ $resultado['registro'] }}</p>
                     <p><strong>{{ strlen(Request::input('cpfCnpj')) === 14 ? 'CNPJ:' : 'CPF:' }}</strong> {{ Request::input('cpfCnpj') }}</p>

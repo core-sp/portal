@@ -22,7 +22,8 @@ class AgendamentoBloqueioController extends Controller
         $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = $this->service->getService('Agendamento')->bloqueio()->listar(auth()->user());
+            $dados = \Route::is('sala.reuniao.*') ? $this->service->getService('SalaReuniao')->bloqueio()->listar(auth()->user()) : 
+            $this->service->getService('Agendamento')->bloqueio()->listar(auth()->user());
             $variaveis = $dados['variaveis'];
             $tabela = $dados['tabela'];
             $resultados = $dados['resultados'];
@@ -39,7 +40,8 @@ class AgendamentoBloqueioController extends Controller
         $this->authorize('create', auth()->user());
 
         try{
-            $dados = $this->service->getService('Agendamento')->bloqueio()->view(null, $this->service);
+            $dados = \Route::is('sala.reuniao.*') ? $this->service->getService('SalaReuniao')->bloqueio()->view(auth()->user(), $this->service) : 
+            $this->service->getService('Agendamento')->bloqueio()->view(null, $this->service);
             $variaveis = $dados['variaveis'];
             $regionais = $dados['regionais'];
         } catch (\Exception $e) {
@@ -47,7 +49,7 @@ class AgendamentoBloqueioController extends Controller
             abort(500, "Erro ao carregar os dados para criar o bloqueio do agendamento.");
         }
 
-        return view('admin.crud.criar', compact('variaveis', 'regionais'));
+        return view('admin.crud.criar', $dados);
     }
 
     public function store(AgendamentoBloqueioRequest $request)
@@ -56,13 +58,16 @@ class AgendamentoBloqueioController extends Controller
 
         try{
             $validated = $request->validated();
+            \Route::is('sala.reuniao.*') ? $this->service->getService('SalaReuniao')->bloqueio()->save(auth()->user(), $validated) : 
             $this->service->getService('Agendamento')->bloqueio()->save(auth()->user(), $validated, $this->service);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao criar o bloqueio do agendamento.");
         }
 
-        return redirect(route('agendamentobloqueios.lista'))->with([
+        $rota = \Route::is('sala.reuniao.*') ? 'sala.reuniao.bloqueio.lista' : 'agendamentobloqueios.lista';
+
+        return redirect(route($rota))->with([
             'message' => '<i class="icon fa fa-check"></i>Bloqueio cadastrado com sucesso!',
             'class' => 'alert-success'
         ]);
@@ -73,7 +78,8 @@ class AgendamentoBloqueioController extends Controller
         $this->authorize('updateOther', auth()->user());
 
         try{
-            $dados = $this->service->getService('Agendamento')->bloqueio()->view($id);
+            $dados = \Route::is('sala.reuniao.*') ? $this->service->getService('SalaReuniao')->bloqueio()->view(auth()->user(), null, $id) : 
+            $this->service->getService('Agendamento')->bloqueio()->view($id);
             $resultado = $dados['resultado'];
             $variaveis = $dados['variaveis'];
         } catch(ModelNotFoundException $e) {
@@ -93,13 +99,16 @@ class AgendamentoBloqueioController extends Controller
 
         try{
             $validated = $request->validated();
+            \Route::is('sala.reuniao.*') ? $this->service->getService('SalaReuniao')->bloqueio()->save(auth()->user(), $validated, $id) : 
             $this->service->getService('Agendamento')->bloqueio()->save(auth()->user(), $validated, $this->service, $id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao atualizar o bloqueio do agendamento.");
         }
 
-        return redirect(route('agendamentobloqueios.lista'))->with([
+        $rota = \Route::is('sala.reuniao.*') ? 'sala.reuniao.bloqueio.lista' : 'agendamentobloqueios.lista';
+
+        return redirect(route($rota))->with([
             'message' => '<i class="icon fa fa-check"></i>Bloqueio com a ID: '.$id.' foi editado com sucesso!',
             'class' => 'alert-success'
         ]);
@@ -110,13 +119,16 @@ class AgendamentoBloqueioController extends Controller
         $this->authorize('delete', auth()->user());
 
         try{
+            \Route::is('sala.reuniao.*') ? $this->service->getService('SalaReuniao')->bloqueio()->destroy($id) : 
             $this->service->getService('Agendamento')->bloqueio()->delete($id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao excluir o bloqueio do agendamento.");
         }
 
-        return redirect(route('agendamentobloqueios.lista'))->with([
+        $rota = \Route::is('sala.reuniao.*') ? 'sala.reuniao.bloqueio.lista' : 'agendamentobloqueios.lista';
+
+        return redirect(route($rota))->with([
             'message' => '<i class="icon fa fa-check"></i>Bloqueio com a ID: '.$id.' foi cancelado com sucesso!',
             'class' => 'alert-success'
         ]);
@@ -128,7 +140,8 @@ class AgendamentoBloqueioController extends Controller
 
         try{
             $busca = $request->q;
-            $dados = $this->service->getService('Agendamento')->bloqueio()->buscar(auth()->user(), $busca);
+            $dados = \Route::is('sala.reuniao.*') ? $this->service->getService('SalaReuniao')->bloqueio()->buscar($busca, auth()->user()) : 
+            $this->service->getService('Agendamento')->bloqueio()->buscar(auth()->user(), $busca);
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
@@ -145,12 +158,15 @@ class AgendamentoBloqueioController extends Controller
         $this->authorize('create', auth()->user());
 
         try{
-            $regional = $this->service->getService('Regional')->getById($request->idregional);
-            $dados = [
-                'horarios' => $regional->horariosAge(),
-                'atendentes' => $regional->ageporhorario
-            ];
-            
+            if(\Route::is('sala.reuniao.*'))
+                $dados = $this->service->getService('SalaReuniao')->getTodasHorasById($request->id);
+            else{
+                $regional = $this->service->getService('Regional')->getById($request->idregional);
+                $dados = [
+                    'horarios' => $regional->horariosAge(),
+                    'atendentes' => $regional->ageporhorario
+                ];
+            }
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar os dados da regional.");

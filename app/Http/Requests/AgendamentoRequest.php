@@ -25,6 +25,9 @@ class AgendamentoRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+        if(\Route::is('sala.reuniao.*'))
+            return;
+
         $service = $this->service->getService('Agendamento');
         $this->completos = $service->getServicosOrStatusOrCompletos('completos');
         $this->chaveStatus = $service->getServicosOrStatusOrCompletos('status');
@@ -90,6 +93,13 @@ class AgendamentoRequest extends FormRequest
 
     public function rules()
     {        
+        if(\Route::is('sala.reuniao.*'))
+        {
+            if($this->acao == 'recusa')
+                return ['justificativa_admin' => 'required|min:10|max:1000'];
+            return array();
+        }
+
         return [
             'antigo' => 'sometimes|boolean',
             'idregional' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo'.$this->regional,

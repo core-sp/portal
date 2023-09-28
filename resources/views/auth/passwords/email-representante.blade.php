@@ -33,10 +33,10 @@
         <div class="row mt-2">
           <div class="col-lg-8 conteudo-txt">
             @if(Session::has('message'))
-              <p class="alert {{ Session::get('class') }}">{{ Session::get('message') }}</p>
+              <p class="alert {{ Session::get('class') }}" data-clarity-mask="True">{{ Session::get('message') }}</p>
             @endif
             @if (session('status'))
-              <div class="alert alert-success" role="alert">
+              <div class="alert alert-success" role="alert" data-clarity-mask="True">
                 {!! session('status') !!}
               </div>
             @endif

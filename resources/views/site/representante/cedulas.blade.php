@@ -25,7 +25,7 @@
             @if ($cedulas->total() > 0)
                 <div class="list-group w-100">
                     @foreach ($cedulas as $item)
-                        <div class="list-group-item light d-block bg-info">
+                        <div class="list-group-item light d-block bg-info" data-clarity-mask="True">
                             <p class="pb-0 branco">Código: <strong>{{ $item->id }}</strong></p>
                             <p class="pb-0 branco">Data de solicitação: <strong>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}</strong></p>
                             <p class="pb-0 branco">Nome: <strong>{{ $item->representante->tipoPessoa() == 'PJ' ? $item->nome : $item->representante->nome }}</strong></p>
@@ -38,7 +38,7 @@
                             @endif
                             <p class="pb-0 branco">Status: <strong class="{{ $item->status === 'Recusado' ? 'text-dark' : 'text-warning' }} text-uppercase">{{ $item->status }}</strong></p>
                             @isset($item->justificativa)
-                                <p class="pb-0 lh-1 cinza-claro"><small class="light">{!! '—————<br>' . $item->justificativa !!}</small></p>
+                                <p class="pb-0 lh-1 cinza-claro" data-clarity-mask="True"><small class="light">{!! '—————<br>' . $item->justificativa !!}</small></p>
                             @endisset
                         </div>
                     @endforeach

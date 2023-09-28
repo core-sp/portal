@@ -62,4 +62,10 @@ class RepresentanteService implements RepresentanteServiceInterface {
             return $ativo;
         return $this->verificaGerentiLogin($cpfCnpj, $gerenti);
     }
+
+    public function getRepresentanteByCpfCnpj($cpfCnpj)
+    {
+        $cpfCnpj = apenasNumeros($cpfCnpj);
+        return Representante::where('cpf_cnpj', $cpfCnpj)->where('ativo', 1)->first();
+    }
 }

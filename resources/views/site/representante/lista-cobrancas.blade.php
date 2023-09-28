@@ -9,7 +9,7 @@
         <p>Verifique abaixo a lista de cobranças vigentes junto ao Core-SP, sendo certo que <strong>só será possível imprimir boletos dentro do prazo de vencimento</strong>. Demais pendências, fora do prazo de vencimento, deverão ser regularizadas na sede ou em uma das Seccionais do Core-SP, pessoalmente, ou pelo email <strong>financeiro@core-sp.org.br</strong></p>
         <h5 class="mt-0 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;ANUIDADES</h5>
         @if (!empty($cobrancas['anuidades']))
-            <table class="table table-bordered bg-white mb-0">
+            <table class="table table-bordered bg-white mb-0" data-clarity-mask="True">
                 <thead>
                     <tr>
                         <th>Descrição</th>
@@ -34,7 +34,7 @@
         @endif
         <h5 class="mt-3 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;OUTRAS COBRANÇAS</h5>
         @if (!empty($cobrancas['outros']))
-            <table class="table table-bordered bg-white mb-0">
+            <table class="table table-bordered bg-white mb-0" data-clarity-mask="True">
                 <thead>
                     <tr>
                         <th>Descrição</th>
