@@ -16,7 +16,7 @@
         @if ($possuiSolicitacaoEnderecos)
             <div class="list-group w-100">
                 @foreach ($solicitacoesEnderecos as $item)
-                    <div class="list-group-item light d-block bg-info">
+                    <div class="list-group-item light d-block bg-info" data-clarity-mask="True">
                         <p class="pb-0 branco">Endereço: <strong>{{ $item->logradouro }}, {{ $item->numero }} {{ isset($item->complemento) ? ' - ' . $item->complemento : '' }}</strong></p>
                         <p class="pb-0 branco">Bairro: <strong>{{ $item->bairro }}</strong></p>
                         <p class="pb-0 branco">Município: <strong>{{ $item->municipio }}</strong></p>
@@ -25,7 +25,7 @@
                         <p class="pb-2 branco"><small><i>(Novo endereço para correspondência)</i></small></p>
                         <p class="pb-0 branco">Status: <strong class="{{ $item->status === 'Recusado' ? 'text-dark' : 'text-warning' }} text-uppercase">{{ $item->status }}</strong></p>
                         @isset($item->observacao)
-                            <p class="pb-0 lh-1 cinza-claro"><small class="light">{!! '—————<br>' . $item->observacao !!}</small></p>
+                            <p class="pb-0 lh-1 cinza-claro" data-clarity-mask="True"><small class="light">{!! '—————<br>' . $item->observacao !!}</small></p>
                         @endisset
                     </div>
                 @endforeach
@@ -42,7 +42,7 @@
         <div class="contatos-table space-single">
             @if($endereco['CEP'] !== null)
                 @foreach ($endereco as $key => $item)
-                    <p class="pb-0">{{ $key }}: <strong class="text-uppercase">{{ !empty($item) ? $item : '-----' }}</strong></p>
+                    <p class="pb-0" data-clarity-mask="True">{{ $key }}: <strong class="text-uppercase">{{ !empty($item) ? $item : '-----' }}</strong></p>
                 @endforeach
             @else
                 <p class="pb-0">Nenhum endereço cadastrado.</p>

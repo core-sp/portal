@@ -135,7 +135,7 @@
                     id="comprovante-residencia"
                     role="button"
                 >
-                <label class="custom-file-label" for="comprovante-residencia">Selecionar arquivo...</label>
+                <label class="custom-file-label" for="comprovante-residencia" data-clarity-mask="True">Selecionar arquivo...</label>
                 @if($errors->has('crimage'))
                     <div class="invalid-feedback">
                         {{ $errors->first('crimage') }}
@@ -153,7 +153,7 @@
                     id="comprovante-residencia-dois"
                     role="button"
                 >
-                <label class="custom-file-label" for="comprovante-residencia">Selecionar outro arquivo... <i>(opcional)</i></label>
+                <label class="custom-file-label" for="comprovante-residencia" data-clarity-mask="True">Selecionar outro arquivo... <i>(opcional)</i></label>
                 @if($errors->has('crimagedois'))
                     <div class="invalid-feedback">
                         {{ $errors->first('crimagedois') }}
