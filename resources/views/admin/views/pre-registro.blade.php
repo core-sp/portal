@@ -107,11 +107,6 @@
                     role="button"
                 >
                 <label class="custom-file-label" for="doc_pre_registro">Selecionar arquivo...</label>
-                @if($errors->has('file'))
-                <div class="invalid-feedback">
-                    {{ $errors->first('file') }}
-                </div>
-                @endif
             </div>
         </div>
 
