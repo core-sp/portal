@@ -6,7 +6,7 @@
     <div class="conteudo-txt-mini light">
         <h4 class="pt-1 pb-1">{!! $titulo !!}</h4>
         <div class="linha-lg-mini mb-3"></div>
-        <p class="pt-2">
+        <p class="pt-2" data-clarity-mask="True">
             {!! $mensagem !!}
         </p>
         @if($emitir)
@@ -22,7 +22,7 @@
         <div class="contatos-table">
             @forelse ($certidoes as $certidao)
             <div class="contato-single {{ $loop->last ? '' : 'b-dashed' }}">
-                <p class="pb-0">
+                <p class="pb-0" data-clarity-mask="True">
                     <b>Nº: </b> {{ $certidao['numeroDocumento']}} - 
                     <b>Data emissão: </b> {{ $certidao['dataEmissao']}} - 
                     <b>Hora emissão: </b> {{ $certidao['horaEmissao']}}

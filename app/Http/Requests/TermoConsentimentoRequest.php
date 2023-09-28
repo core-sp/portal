@@ -8,6 +8,10 @@ class TermoConsentimentoRequest extends FormRequest
 {
     public function rules()
     {
+        if(\Route::is('termo.consentimento.upload'))
+            return [
+                'file' => 'required|mimes:pdf|max:2048'
+            ];
         return [
             'email' => 'required|email|max:191'
         ];
@@ -18,7 +22,9 @@ class TermoConsentimentoRequest extends FormRequest
         return [
             'required' => 'O campo :attribute é obrigatório',
             'max' => 'Excedido limite de :max caracteres',
-            'email' => 'Email no formato inválido'
+            'email' => 'Email no formato inválido',
+            'mimes' => 'Tipo de arquivo não suportado',
+            'file.max' => 'Limite de até 2MB o tamanho do arquivo'
         ];
     }
 }

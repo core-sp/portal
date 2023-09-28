@@ -20,7 +20,7 @@
             <div class="contatos-table">
                 @forelse ($contatos as $contato)
                 <div class="contato-single {{ $loop->last ? '' : 'b-dashed' }}">
-                    <p class="pb-0">
+                    <p class="pb-0" data-clarity-mask="True">
                         {{ $gerentiTiposContatos[$contato['CXP_TIPO']] }}:&nbsp;<strong>{{ $contato['CXP_VALOR'] }}</strong>
                         <small class="light">{{ $contato['CXP_STATUS'] === 1 ? '(Ativo)' : '(Inativo)' }}</small>
                     </p>
