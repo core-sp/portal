@@ -34,7 +34,7 @@
       <div class="col">
         <div class="novo-core-box">
           @if(isset($agradece))
-            <h5 class="light branco">{!! $agradece !!}</h5>
+            <h5 class="light branco" data-clarity-mask="True">{!! $agradece !!}</h5>
           @endif
         </div>
       </div>

@@ -236,6 +236,56 @@ Route::middleware(['block_ip'])->group(function () {
       Route::get('/ajax', 'PlantaoJuridicoBloqueioController@getPlantaoAjax')->name('plantao.juridico.bloqueios.ajax');
     });
 
+    // Salas de Reuniões
+    Route::prefix('salas-reunioes')->group(function(){
+      Route::name('sala.reuniao.')->group(function () {
+        Route::get('/', 'SalaReuniaoController@index')->name('index');
+        Route::get('/editar/{id}', 'SalaReuniaoController@edit')->name('editar.view');
+        Route::put('/editar/{id}', 'SalaReuniaoController@update')->name('editar');
+        Route::get('/regionais-salas-ativas/{tipo}', 'SalaReuniaoController@getRegionaisAtivas')->name('regionais.ativas');
+        Route::get('/sala-dias-horas/{tipo}', 'SalaReuniaoController@getDiasHoras')->name('dias.horas');
+        Route::post('/sala-horario-formatado/{id}', 'SalaReuniaoController@getHorarioFormatado')->name('horario.formatado');
+
+        Route::prefix('agendados')->group(function(){
+          Route::name('agendados.')->group(function () {
+            Route::get('/', 'AgendamentoController@index')->name('index');
+            Route::get('/visualizar/{id}/{anexo?}', 'AgendamentoController@view')->name('view');
+            Route::put('/{id}/{acao}', 'AgendamentoController@updateStatus')->where('acao', 'confirma|aceito|recusa')->name('update');
+            Route::get('/filtro', 'AgendamentoController@index')->name('filtro');
+            Route::get('/busca', 'AgendamentoController@busca')->name('busca');
+          });
+        });
+
+        Route::prefix('bloqueios')->group(function(){
+          Route::name('bloqueio.')->group(function () {
+            Route::get('/', 'AgendamentoBloqueioController@index')->name('lista');
+            Route::get('/busca', 'AgendamentoBloqueioController@busca')->name('busca');
+            Route::get('/criar', 'AgendamentoBloqueioController@create')->name('criar');
+            Route::post('/criar', 'AgendamentoBloqueioController@store')->name('store');
+            Route::get('/editar/{id}', 'AgendamentoBloqueioController@edit')->name('edit');
+            Route::put('/editar/{id}', 'AgendamentoBloqueioController@update')->name('update');
+            Route::delete('/apagar/{id}', 'AgendamentoBloqueioController@destroy')->name('delete');
+            Route::get('/horarios-ajax', 'AgendamentoBloqueioController@getDadosAjax')->name('horariosAjax');
+          });
+        });
+
+        Route::prefix('suspensoes-excecoes')->group(function(){
+          Route::name('suspensao.')->group(function () {
+            Route::get('/', 'SuspensaoExcecaoController@index')->name('lista');
+            Route::get('/visualizar/{id}/', 'SuspensaoExcecaoController@view')->name('view');
+            Route::get('/editar/{id}/{situacao}', 'SuspensaoExcecaoController@edit')->where('situacao', 'suspensao|excecao')->name('edit');
+            Route::put('/editar/{id}/{situacao}', 'SuspensaoExcecaoController@update')->where('situacao', 'suspensao|excecao')->name('update');
+            Route::get('/criar', 'SuspensaoExcecaoController@create')->name('criar');
+            Route::post('/criar', 'SuspensaoExcecaoController@store')->name('store');
+            Route::get('/busca', 'SuspensaoExcecaoController@busca')->name('busca');
+          });
+        });
+      });
+    });
+
+    Route::post('/termo-de-consentimento/upload/{tipo_servico}', 'TermoConsentimentoController@uploadTermo')
+    ->where('tipo_servico', 'sala-reuniao')->name('termo.consentimento.upload')->middleware('auth');
+
     // Rota para Home Imagens
     Route::prefix('textos')->group(function(){
       Route::get('/{tipo_doc}', 'GerarTextoController@view')->where('tipo_doc', 'carta-servicos')->name('textos.view');
@@ -245,7 +295,7 @@ Route::middleware(['block_ip'])->group(function () {
       Route::delete('/{tipo_doc}/{id}', 'GerarTextoController@delete')->where('tipo_doc', 'carta-servicos')->name('textos.delete');
       Route::put('/{tipo_doc}', 'GerarTextoController@update')->where('tipo_doc', 'carta-servicos')->name('textos.update.indice');
     });
-
+    
   });
 
   /*
@@ -337,7 +387,8 @@ Route::middleware(['block_ip'])->group(function () {
     // Página do termo de consentimento com o acesso via email
     Route::get('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimentoView')->name('termo.consentimento.view');
     Route::post('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimento')->name('termo.consentimento.post');
-    Route::get('/termo-consentimento-pdf', 'TermoConsentimentoController@termoConsentimentoPdf')->name('termo.consentimento.pdf');
+    Route::get('/termo-consentimento-pdf/{tipo_servico?}', 'TermoConsentimentoController@termoConsentimentoPdf')
+    ->where('tipo_servico', 'sala-reuniao')->name('termo.consentimento.pdf');
 
     Route::get('/carta-de-servicos-ao-usuario/buscar', 'GerarTextoController@buscar')->name('carta-servicos-buscar');
     Route::get('/carta-de-servicos-ao-usuario/{id?}', 'GerarTextoController@show')->name('carta-servicos');

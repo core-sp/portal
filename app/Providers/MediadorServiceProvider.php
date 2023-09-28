@@ -26,6 +26,11 @@ class MediadorServiceProvider extends ServiceProvider implements DeferrableProvi
         $this->app->singleton('App\Contracts\NoticiaServiceInterface', 'App\Services\NoticiaService');
         $this->app->singleton('App\Contracts\CedulaServiceInterface', 'App\Services\CedulaService');
         $this->app->singleton('App\Contracts\RepresentanteServiceInterface', 'App\Services\RepresentanteService');
+        $this->app->singleton('App\Contracts\SalaReuniaoServiceInterface', 'App\Services\SalaReuniaoService');
+        $this->app->singleton('App\Contracts\SalaReuniaoSiteSubServiceInterface', 'App\Services\SalaReuniaoSiteSubService');
+        $this->app->singleton('App\Contracts\AgendamentoSalaSubServiceInterface', 'App\Services\AgendamentoSalaSubService');
+        $this->app->singleton('App\Contracts\SalaReuniaoBloqSubServiceInterface', 'App\Services\SalaReuniaoBloqSubService');
+        $this->app->singleton('App\Contracts\SuspensaoExcecaoSubServiceInterface', 'App\Services\SuspensaoExcecaoSubService');
         $this->app->singleton('App\Contracts\GerarTextoServiceInterface', 'App\Services\GerarTextoService');
     }
 
@@ -59,6 +64,11 @@ class MediadorServiceProvider extends ServiceProvider implements DeferrableProvi
             'App\Contracts\NoticiaServiceInterface',
             'App\Contracts\CedulaServiceInterface',
             'App\Contracts\RepresentanteServiceInterface',
+            'App\Contracts\SalaReuniaoServiceInterface',
+            'App\Contracts\SalaReuniaoSiteSubServiceInterface',
+            'App\Contracts\AgendamentoSalaSubServiceInterface',
+            'App\Contracts\SalaReuniaoBloqSubServiceInterface',
+            'App\Contracts\SuspensaoExcecaoSubServiceInterface',
             'App\Contracts\GerarTextoServiceInterface',
         ];
     }
