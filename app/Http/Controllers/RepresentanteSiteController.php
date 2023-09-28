@@ -27,7 +27,9 @@ use App\Repositories\RepresentanteEnderecoRepository;
 use App\Repositories\BdoOportunidadeRepository;
 use Illuminate\Support\Facades\View;
 use App\Contracts\MediadorServiceInterface;
+use App\Http\Requests\RepSalaReuniaoRequest;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RepresentanteSiteController extends Controller
 {
@@ -556,5 +558,113 @@ class RepresentanteSiteController extends Controller
             'message' => 'Solicitação enviada com sucesso! Após verificação das informações, será atualizada.',
             'class' => 'alert-success'
         ]);
+    }
+
+    public function agendamentoSala($acao = null, $id = null)
+    {
+        try{
+            $user = auth()->guard('representante')->user();
+            $view = 'inserir-agendamento-sala';
+            $erro = null;
+            switch ($acao) {
+                case 'agendar':
+                    if(trim($this->gerentiRepository->gerentiStatus($user->ass_id)) != 'Situação: Em dia.')
+                        return redirect()->route('representante.agendar.inserir.view')->with([
+                            'message' => '<i class="fas fa-exclamation-triangle"></i>&nbsp;Para liberar o seu agendamento entre em contato com o setor de atendimento da <a href="'.route('regionais.siteGrid').'" target="_blank">seccional</a> de interesse.',
+                            'class' => 'alert-warning'
+                        ]);
+                    $erro = $this->service->getService('SalaReuniao')->site()->verificaPodeAgendar($user, $this->service);
+                    $dados['salas'] = !isset($erro) ? $this->service->getService('SalaReuniao')->salasAtivas() : collect();
+                    if($dados['salas']->count() == 0)
+                        $erro = isset($erro) ? $erro : [
+                            'message' => '<i class="fas fa-info-circle"></i> No momento não há salas disponíveis para novos agendamentos.',
+                            'class' => 'alert-info'
+                        ];
+                    break;
+                case 'editar':
+                    $dados = $this->service->getService('SalaReuniao')->site()->verificaPodeEditar($id, $user);
+                    $erro = isset($dados['message']) ? $dados : $erro;
+                    break;
+                case 'cancelar':
+                    $dados = $this->service->getService('SalaReuniao')->site()->verificaPodeCancelar($id, $user);
+                    $erro = isset($dados['message']) ? $dados : $erro;
+                    break;
+                case 'justificar':
+                    $dados = $this->service->getService('SalaReuniao')->site()->verificaPodeJustificar($id, $user);
+                    $erro = isset($dados['message']) ? $dados : $erro;
+                    break;
+                default:
+                    $dados['salas'] = $user->agendamentosAtivos();
+                    $dados['participando'] = $this->service->getService('SalaReuniao')->site()->getAgendadosParticipante($user);
+                    $view = 'agendamento-sala';
+                    $dados['situacao'] = $this->service->getService('SalaReuniao')->site()->verificaSuspensao($user, $this->service);
+                    $dados['total'] = $this->service->getService('SalaReuniao')->salasAtivas()->count();
+                    break;
+            }
+            $dados['acao'] = isset($acao) ? $acao : '';
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            return redirect()->route('representante.agendar.inserir.view')->with([
+                'message' => '<i class="fas fa-times"></i>&nbsp;&nbsp;Não existe agendamento com a ID inserida para o seu login.',
+                'class' => 'alert-danger'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar as opções de agendamento das salas.");
+        }
+
+        return isset($erro) ? redirect()->route('representante.agendar.inserir.view')->with($erro) : 
+        view('site.representante.'. $view, $dados);
+    }
+
+    public function salvarAgendamentoSala(RepSalaReuniaoRequest $request, $acao, $id = null)
+    {
+        try{
+            $erro = null;
+            $dados = $request->validated();
+            $user = auth()->guard('representante')->user();
+            switch ($acao) {
+                case 'agendar':
+                    if(trim($this->gerentiRepository->gerentiStatus($user->ass_id)) != 'Situação: Em dia.')
+                        return redirect()->route('representante.agendar.inserir.view')->with([
+                            'message' => '<i class="fas fa-exclamation-triangle"></i>&nbsp;Para liberar o seu agendamento entre em contato com o setor de atendimento da <a href="'.route('regionais.siteGrid').'" target="_blank">seccional</a> de interesse.',
+                            'class' => 'alert-warning'
+                        ]);
+                    $dados = $this->service->getService('SalaReuniao')->site()->save($dados, $user, $this->service);
+                    $erro = isset($dados['message']) ? $dados : $erro;
+                    $msg = ['message' => '<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento criado com sucesso! Foi enviado um e-mail com os detalhes.', 
+                    'class' => 'alert-success'];
+                    break;
+                case 'editar':
+                    $dados = $this->service->getService('SalaReuniao')->site()->editarParticipantes($dados, $id, $user);
+                    $erro = isset($dados['message']) ? $dados : $erro;
+                    $msg = ['message' => '<i class="fas fa-check"></i>&nbsp;&nbsp;Participantes foram alterados com sucesso! Foi enviado um e-mail com os detalhes.', 
+                    'class' => 'alert-success'];
+                    break;
+                case 'cancelar':
+                    $dados = $this->service->getService('SalaReuniao')->site()->cancelar($id, $user);
+                    $erro = isset($dados['message']) ? $dados : $erro;
+                    $msg = ['message' => '<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento cancelado com sucesso!', 
+                    'class' => 'alert-success'];
+                    break;
+                case 'justificar':
+                    $dados = $this->service->getService('SalaReuniao')->site()->justificar($dados, $id, $user);
+                    $erro = isset($dados['message']) ? $dados : $erro;
+                    $msg = ['message' => '<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento justificado com sucesso! Está em análise do atendente. Foi enviado um e-mail com a sua justificativa.', 
+                    'class' => 'alert-success'];
+                    break;
+            }
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            return redirect()->route('representante.agendar.inserir.view')->with([
+                'message' => '<i class="fas fa-times"></i>&nbsp;&nbsp;Não existe agendamento com a ID inserida para o seu login.',
+                'class' => 'alert-danger'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao salvar agendamento da sala.");
+        }
+
+        return redirect()->route('representante.agendar.inserir.view')->with(isset($erro) ? $erro : $msg);
     }
 }

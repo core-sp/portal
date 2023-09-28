@@ -44,7 +44,9 @@ $(document).ready(function(){
 			$('.cpfOuCnpj').mask((cpf.length > 14) ? masks[1] : masks[0], op);
 		}
 	}
-	$('.cpfOuCnpj').length > 11 ? $('.cpfOuCnpj').mask('00.000.000/0000-00', options) : $('.cpfOuCnpj').mask('000.000.000-00#', options);
+	$('.cpfOuCnpj').index() > -1 && $('.cpfOuCnpj').val().length > 11 ? 
+	$('.cpfOuCnpj').mask('00.000.000/0000-00', options) : 
+	$('.cpfOuCnpj').mask('000.000.000-00#', options);
   
   // Máscaras para datas
   $('#dataTermino').mask('00/00/0000', {
@@ -294,6 +296,52 @@ $('#plantaoBloqueio').change(function(e){
 });
 // Fim da Funcionalidade Plantão Jurídico
 
+// Funcionalidade Sala Reunião
+
+function setCampoHorariosSala(sala)
+{
+  $('#horariosBloqueio option').show();
+  $('#horariosBloqueio option').each(function(){
+    var valor = $(this).val();
+    if(jQuery.inArray(valor, sala) != -1)
+      $(this).show();
+    else
+      $(this).hide();
+  });
+}
+
+function ajaxSalaBloqueio(valor)
+{
+  $.ajax({
+    method: "GET",
+    data: {
+      "id": valor,
+    },
+    dataType: 'json',
+    url: "/admin/salas-reunioes/bloqueios/horarios-ajax",
+    success: function(response) {
+      sala = response;
+      setCampoHorariosSala(sala);
+    },
+    error: function() {
+      alert('Erro ao carregar os horários. Recarregue a página.');
+    }
+  });
+}
+
+$('#salaBloqueio').ready(function(){
+  var valor = $('#salaBloqueio').val();
+    if(valor > 0)
+      ajaxSalaBloqueio(valor);
+});
+
+$('#salaBloqueio').change(function(){
+  var valor = $('#salaBloqueio').val();
+  if(valor > 0)
+    ajaxSalaBloqueio(valor);
+});
+// Fim da Funcionalidade Sala Reunião
+
 // Funcionalidade Agendamento
 function selectAtendenteByStatus(valor)
 {
@@ -364,7 +412,8 @@ $('#statusAgendamentoAdmin').ready(function(){
   });
 
   $('.cedula_recusada').ready(function(e){
-    $('[name="justificativa"]').val('');
+    if($('.cedula_recusada').length > 0)
+      $('[name="justificativa"]').val('');
   });
 
   $('.anoInput').mask('0000');
@@ -394,4 +443,126 @@ $("#logout-interno").click(function(){
 	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
 	$('body').append(form);
 	$(form).submit();
+});
+
+
+// Funcionalidade Sala de Reunião +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function mesaIgualParticipantesReuniao()
+{
+  var input = $('input[name="participantes_reuniao"]');
+  var com_itens = "Mesa com " + input.val() + " cadeira(s)";
+
+  var adicionado = $('#itens_reuniao option[value^="Mesa com "]');
+  if(adicionado.length > 0)
+    adicionado.val(com_itens).text(com_itens);
+}
+
+$("#itens_reuniao, #itens_coworking").on('dblclick', 'option', function(){
+  var texto = this.text;
+  var valor = this.value;
+  var numero = texto.replace(/[^0-9_,]/ig, '');
+  if(numero.trim().length > 0){
+    $('#sala_reuniao_itens').modal({backdrop: 'static', keyboard: false, show: true});
+    $('#sala_reuniao_itens')
+    .removeClass('itens_reuniao')
+    .removeClass('itens_coworking')
+    .addClass($(this).parent().attr('id'));
+    $('#sala_reuniao_itens .modal-body')
+    .html(texto.substr(0, texto.search(numero)) + ' <input type="text" id="'+ valor +'">' + texto.substr(texto.search(numero) + numero.length, texto.length));
+  }
+});
+
+$('#editar_item').click(function(){
+  var tipo = $('#sala_reuniao_itens').hasClass('itens_reuniao') ? 'itens_reuniao' : 'itens_coworking';
+  var id = $('#sala_reuniao_itens .modal-body input').attr('id');
+  var valor = $('#sala_reuniao_itens .modal-body input').val();
+  var texto = $('#' + tipo + ' option[value="' + id + '"]').text();
+  var numero = texto.replace(/[^0-9_,]/ig, '');
+  texto = texto.replace(numero, valor);
+  $('#sala_reuniao_itens .modal-body input').remove();
+  $('#' + tipo + ' option[value="' + id + '"]').val(texto).text(texto);
+  $('#sala_reuniao_itens').modal('hide');
+});
+
+$('button.addItem, button.removeItem').click(function(){
+  var tipo = (this.id == 'btnAddReuniao') || (this.id == 'btnRemoveReuniao') ? 'reuniao' : 'coworking';
+  var itens = $(this).hasClass('addItem') ? $('#todos_itens_' + tipo + ' option:selected') : $('#itens_' + tipo + ' option:selected');
+  var opcao = $(this).hasClass('addItem') ? 'add' : 'remove';
+  itens.each(function() {
+    if(opcao == 'add')
+      $('#itens_' + tipo).append('<option value="' + this.value + '">' + this.text +'</option>');
+    else{
+      var texto = this.text;
+      var numero = texto.replace(/[^0-9_,]/ig, '');
+      texto = numero.trim().length > 0 ? texto.replace(numero, '_') : texto;
+      $('#todos_itens_' + tipo).append('<option value="' + texto + '">' + texto +'</option>');
+    }
+    $(this).remove();
+  });
+
+  mesaIgualParticipantesReuniao();
+});
+
+$('#form_salaReuniao input[name="participantes_reuniao"]').change(function(){
+  mesaIgualParticipantesReuniao();
+});
+
+$('#form_salaReuniao button[type="submit"]').click(function(){
+  $('#itens_reuniao option').prop('selected', true);
+  $('#itens_coworking option').prop('selected', true);
+});
+
+function hideShowHorasLimitesSala()
+{
+  var hide_proxima_hora = false;
+  $('#horarios_reuniao option, #horarios_coworking option').each(function(){
+    if(this.value == $('#hora_limite_final_manha').val() || hide_proxima_hora){
+      $(this).hide().prop('selected', false);
+      hide_proxima_hora = hide_proxima_hora ? false : true;
+    }else if(this.value >= $('#hora_limite_final_tarde').val())
+      $(this).hide().prop('selected', false);
+    else
+      $(this).show();
+  });
+}
+
+function ajaxHorariosViewSala(id)
+{
+  const selectedValues = Array.from($('#' + id + ' option:selected')).map(
+    option => option.value,
+  );
+
+  $.ajax({
+    type: "POST",
+    data: {
+      _method: "POST",
+      _token: $('meta[name="csrf-token"]').attr('content'),
+      horarios: selectedValues,
+      hora_limite_final_manha: $('#hora_limite_final_manha').val(),
+      hora_limite_final_tarde: $('#hora_limite_final_tarde').val(),
+    },
+    dataType: 'json',
+    url: "/admin/salas-reunioes/sala-horario-formatado/" + $('#valor_id').val(),
+    success: function(response) {
+      $('#' + id + '_rep').html(response);
+    },
+    error: function() {
+      alert('Erro ao carregar os horários formatados. Recarregue a página.');
+    }
+  });
+}
+
+$('#form_salaReuniao #hora_limite_final_manha, #form_salaReuniao #hora_limite_final_tarde').ready(function(){
+    hideShowHorasLimitesSala();
+});
+
+$('#form_salaReuniao #hora_limite_final_manha, #form_salaReuniao #hora_limite_final_tarde').change(function(){
+  hideShowHorasLimitesSala();
+  ajaxHorariosViewSala('horarios_reuniao');
+  ajaxHorariosViewSala('horarios_coworking');
+});
+
+$('#form_salaReuniao #horarios_reuniao, #form_salaReuniao #horarios_coworking').change(function(){
+  ajaxHorariosViewSala(this.id);
 });
