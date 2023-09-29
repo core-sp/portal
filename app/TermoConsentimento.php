@@ -34,6 +34,11 @@ class TermoConsentimento extends Model
     	return $this->belongsTo('App\CursoInscrito', 'idcursoinscrito');
     }
 
+    public function agendamentoSala()
+    {
+    	return $this->belongsTo('App\AgendamentoSala', 'agendamento_sala_id');
+    }
+
     public function message()
     {
         $message = 'foi criado um novo registro no termo de consentimento, com a id: '.$this->id;

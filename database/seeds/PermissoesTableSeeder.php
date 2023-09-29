@@ -278,6 +278,26 @@ class PermissoesTableSeeder extends Seeder
                 'metodo' => 'destroy',
                 'perfis' => '1,'
             ], [
+                'controller' => 'SalaReuniaoController',
+                'metodo' => 'index',
+                'perfis' => '1,'
+            ], [
+                'controller' => 'SalaReuniaoController',
+                'metodo' => 'edit',
+                'perfis' => '1,'
+            ], [
+                'controller' => 'SuspensaoExcecaoController',
+                'metodo' => 'index',
+                'perfis' => '1,'
+            ], [
+                'controller' => 'SuspensaoExcecaoController',
+                'metodo' => 'create',
+                'perfis' => '1,'
+            ], [
+                'controller' => 'SuspensaoExcecaoController',
+                'metodo' => 'edit',
+                'perfis' => '1,'
+            ], [
                 'controller' => 'PreRegistroController',
                 'metodo' => 'index',
                 'perfis' => '1,'

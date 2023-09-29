@@ -13,22 +13,22 @@
         <h4 class="pt-1 pb-1">Dados gerais</h4>
         <div class="linha-lg-mini mb-3"></div>
         <div class="contatos-table">
-            <div class="contato-single b-dashed">
+            <div class="contato-single b-dashed" data-clarity-mask="True">
                 <p class="pb-0">Nome: <strong>{{ $nome }}</strong></p>
             </div>
-            <div class="contato-single b-dashed">
+            <div class="contato-single b-dashed" data-clarity-mask="True">
                 <p class="pb-0">Registro Core: <strong>{{ $registroCore }}</strong></p>
             </div>
-            <div class="contato-single b-dashed">
+            <div class="contato-single b-dashed" data-clarity-mask="True">
                 <p class="pb-0">CPF/CNPJ: <strong>{{ $cpfCnpj }}</strong></p>
             </div>
             @foreach ($dadosGerais as $key => $dado)
                 @if ($tipoPessoa == 'PF')
-                    <div class="contato-single {{ $loop->last ? '' : 'b-dashed' }}">
+                    <div class="contato-single {{ $loop->last ? '' : 'b-dashed' }}" data-clarity-mask="True">
                         <p class="pb-0">{{ $key }}: <strong>{!! empty($dado) ? '----------' : $dado !!}</strong></p>
                     </div>
                 @else
-                    <div class="contato-single {{ $loop->last ? '' : 'b-dashed' }}">
+                    <div class="contato-single {{ $loop->last ? '' : 'b-dashed' }}" data-clarity-mask="True">
                         <p class="pb-0">{{ $key }}: <strong>{!! empty($dado) ? '----------' : $dado !!}</strong></p>
                     </div>
                 @endif

@@ -140,6 +140,33 @@ class Kernel extends ConsoleKernel
 
         /** 
          * =======================================================================================================
+         * ROTINAS SALAS DE REUNIÕES 
+         * =======================================================================================================
+        */ 
+        
+        $schedule->call(function(){
+            // Suspensões com data finalizada serão excluídas como soft delete
+            // Atualizar situação das suspensoes se exceção válida
+            // Atualizar situação das suspensoes se exceção não mais válida
+            // Atualizar relacionamento caso o cpf / cnpj se cadastre no portal
+            $service = resolve('App\Contracts\MediadorServiceInterface');
+            $service->getService('SalaReuniao')->suspensaoExcecao()->executarRotina($service);
+        })->daily();
+
+        $schedule->call(function(){
+            // Agendamentos não justificados ou status não atualizados após 2 dias
+            $service = resolve('App\Contracts\MediadorServiceInterface');
+            $service->getService('SalaReuniao')->agendados()->executarRotina();
+        })->dailyAt('0:30');
+
+        // Agendamentos com anexo finalizados com 1 mês ou mais terão o anexo removido.
+        $schedule->call(function(){
+            $service = resolve('App\Contracts\MediadorServiceInterface');
+            $service->getService('SalaReuniao')->agendados()->executarRotina(true);
+        })->monthlyOn(15, '2:00');
+
+        /** 
+         * =======================================================================================================
          * ROTINAS PRÉ-REGISTRO
          * =======================================================================================================
          */
