@@ -109,7 +109,7 @@ class PreRegistroAdminRequest extends FormRequest
     {
         return \Route::is('preregistro.upload.doc') ? 
             [
-                'file' => 'required|file|mimes:pdf|max:2048',
+                'file' => 'required|file|mimetypes:application/pdf|max:2048',
             ] : [
                 'situacao' => 'required|in:aprovar,negar,corrigir',
                 'status' => 'required',
@@ -122,7 +122,7 @@ class PreRegistroAdminRequest extends FormRequest
             'situacao.required' => 'Obrigatório o status requisitado',
             'situacao.in' => 'Valor do status requisitado inválido',
             'status.required' => $this->msg,
-            'mimes' => 'O arquivo não possui extensão .pdf ou está com erro',
+            'mimetypes' => 'O arquivo não possui extensão .pdf ou está com erro',
             'file' => 'Deve ser um arquivo',
             'uploaded' => 'Falhou o upload por erro no servidor',
             'file.max' => 'O arquivo deve ter um limite de até 2MB',

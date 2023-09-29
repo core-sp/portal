@@ -823,7 +823,7 @@ class SuporteTest extends TestCase
     {
         for($i = 1; $i <= 7; $i++)
         {
-            $this->post(route('externo.login.submit'), ['cpf_cnpj' => '11748345000144', 'password' => 'teste102030']);
+            $this->post(route('externo.login.submit'), ['cpf_cnpj' => '11748345000144', 'password' => 'teste102030', 'tipo_conta' => 'user_externo']);
             session()->regenerateToken();
         }
 
@@ -951,7 +951,7 @@ class SuporteTest extends TestCase
     {
         for($i = 1; $i <= 5; $i++)
         {
-            $this->post(route('externo.login.submit'), ['cpf_cnpj' => '11748345000144', 'password' => 'Teste102030']);
+            $this->post(route('externo.login.submit'), ['cpf_cnpj' => '11748345000144', 'password' => 'Teste102030', 'tipo_conta' => 'user_externo']);
             session()->regenerateToken();
         }
 
@@ -963,7 +963,7 @@ class SuporteTest extends TestCase
 
         $externo = factory('App\UserExterno')->create();
 
-        $this->post(route('externo.login.submit'), ['cpf_cnpj' => $externo['cpf_cnpj'], 'password' => 'Teste102030'])
+        $this->post(route('externo.login.submit'), ['cpf_cnpj' => $externo['cpf_cnpj'], 'password' => 'Teste102030', 'tipo_conta' => 'user_externo'])
         ->assertRedirect(route('externo.dashboard'));
 
         $this->assertEquals(0, SuporteIp::count());

@@ -453,7 +453,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
-    public function downloadAnexo($id, $idPreRegistro, $doc = null, $admin = false)
+    public function downloadAnexo($id, $idPreRegistro, $admin = false, $doc = null)
     {
         $preRegistro = PreRegistro::findOrFail($idPreRegistro);
 
@@ -466,13 +466,14 @@ class PreRegistroService implements PreRegistroServiceInterface {
         if(isset($anexo) && Storage::disk('local')->exists($anexo->path))
         {
             $file = Storage::disk('local')->path($anexo->path);
-            $doc = isset($doc) && isset($file) && ($anexo->nome_original == ('boleto_aprovado_' . $preRegistro->id));
+            if(isset($doc))
+                $doc = isset($file) && ($anexo->nome_original == ('boleto_aprovado_' . $preRegistro->id));
         }
 
-        if(isset($doc) && $doc && !$admin)
-            event(new ExternoEvent('Foi realizado o download do boleto do pré-registro com ID: ' . $preRegistro->id));
+        if(isset($anexo) && isset($doc) && $doc && !$admin)
+            event(new ExternoEvent('Foi realizado o download do boleto com ID ' . $anexo->id .' do pré-registro com ID ' . $preRegistro->id . '.'));
 
-        if(isset($doc) && !$doc && !$admin)
+        if(isset($anexo) && isset($doc) && !$doc && !$admin)
             throw new \Exception('Somente os documentos anexados pelo atendente podem ser acessados após aprovação', 401);
 
         if(isset($file))

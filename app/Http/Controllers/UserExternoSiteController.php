@@ -41,10 +41,6 @@ class UserExternoSiteController extends Controller
 
         return view('site.agradecimento')->with([
             'agradece' => 'Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>',
-            'link_temp' => route('externo.verifica-email', [
-                'tipo' => $this->service->getService('UserExterno')->getDefinicoes($validated['tipo_conta'])['variavel_url'], 
-                'token' => $dados->verify_token
-            ]),
         ]);
     }
 
@@ -58,7 +54,7 @@ class UserExternoSiteController extends Controller
         }
         
         $success = [
-            'message' => 'Email verificado com sucesso. Favor continuar com o login abaixo.',
+            'message' => '<i class="icon fa fa-check"></i>Email verificado com sucesso. Favor continuar com o login abaixo.',
             'class' => 'alert-success'
         ];
 
@@ -101,7 +97,7 @@ class UserExternoSiteController extends Controller
 
         return isset($erro['message']) ? redirect()->route('externo.editar.view')->with($erro)->withInput() : 
             redirect()->route('externo.editar.view')->with([
-                'message' => 'Dados alterados com sucesso.',
+                'message' => '<i class="icon fa fa-check"></i>Dados alterados com sucesso.',
                 'class' => 'alert-success'
             ]);
     }
@@ -145,7 +141,7 @@ class UserExternoSiteController extends Controller
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             return redirect()->route('externo.relacao.preregistros')->with([
-                'message' => 'Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.',
+                'message' => '<i class="icon fas fa-times"></i> Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.',
                 'class' => 'alert-danger'
             ]);
         } catch (\Exception $e) {
@@ -199,7 +195,7 @@ class UserExternoSiteController extends Controller
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             return redirect()->route('externo.relacao.preregistros')->with([
-                'message' => 'Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.',
+                'message' => '<i class="icon fas fa-times"></i> Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.',
                 'class' => 'alert-danger'
             ]);
         } catch (\Exception $e) {
@@ -280,7 +276,7 @@ class UserExternoSiteController extends Controller
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             return redirect()->route('externo.relacao.preregistros')->with([
-                'message' => 'Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.',
+                'message' => '<i class="icon fas fa-times"></i> Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.',
                 'class' => 'alert-danger'
             ]);
         } catch (\Exception $e) {
@@ -312,7 +308,7 @@ class UserExternoSiteController extends Controller
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             return redirect()->route('externo.relacao.preregistros')->with([
-                'message' => 'Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.',
+                'message' => '<i class="icon fas fa-times"></i> Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.',
                 'class' => 'alert-danger'
             ]);
         } catch (\Exception $e) {
@@ -335,10 +331,9 @@ class UserExternoSiteController extends Controller
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
 
-            $contabil = auth()->guard('contabil')->user();
             $preRegistro = isset($externo) ? $externo->load('preRegistro')->preRegistro : null;
             $doc = null;
-            if(!isset($preRegistro)){
+            if(!isset($preRegistro) && isset($externo)){
                 $preRegistro = $externo->load('preRegistroDoc')->preRegistroDoc;
                 $doc = isset($preRegistro) ? true : $doc;
             }

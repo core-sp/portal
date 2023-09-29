@@ -427,7 +427,7 @@ Route::middleware(['block_ip'])->group(function () {
     Route::get('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimentoView')->name('termo.consentimento.view');
     Route::post('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimento')->name('termo.consentimento.post');
     Route::get('/termo-consentimento-pdf/{tipo_servico?}', 'TermoConsentimentoController@termoConsentimentoPdf')
-    ->where('tipo_servico', 'sala-reuniao')->name('termo.consentimento.pdf');
+    ->where('tipo_servico', 'sala-reuniao|user-externo')->name('termo.consentimento.pdf');
 
     // Páginas (deve ser inserido no final do arquivo de rotas)
     Route::get('{slug}', 'PaginaController@show')->name('paginas.site');

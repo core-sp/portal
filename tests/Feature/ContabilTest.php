@@ -2579,11 +2579,11 @@ class ContabilTest extends TestCase
 
         $this->get(route('externo.relacao.preregistros'))
         ->assertOk()
-        ->assertSee('Solicitações de registro gerenciados pela Contabilidade')
+        ->assertSee('Solicitações de registro gerenciadas pela Contabilidade')
         ->assertSee('Listagem das solicitações de registro que os <strong>Representantes Comerciais</strong> relacionaram a sua contabilidade e as solicitações criadas pela própria contabilidade.')
-        ->assertSee('<p class="pb-0">ID: <strong>'.$solicitacao->id.'</strong></p>')
-        ->assertSee('<span class="text-nowrap">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacao->userExterno->cpf_cnpj) .'</strong>&nbsp;&nbsp; | &nbsp;</span>')
-        ->assertSee('<span class="text-nowrap">Nome: <strong>'. $solicitacao->userExterno->nome .'</strong></span>')
+        ->assertSee('<p class="pb-0" data-clarity-mask="True">ID: <strong>'.$solicitacao->id.'</strong></p>')
+        ->assertSee('<span class="text-nowrap" data-clarity-mask="True">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacao->userExterno->cpf_cnpj) .'</strong>&nbsp;&nbsp; | &nbsp;</span>')
+        ->assertSee('<span class="text-nowrap" data-clarity-mask="True">Nome: <strong>'. $solicitacao->userExterno->nome .'</strong></span>')
         ->assertSee('<a class="btn btn-primary btn-sm text-white" href="'. route('externo.preregistro.view', $solicitacao->id) .'">');
 
         $this->post(route('externo.logout'));
@@ -2605,7 +2605,7 @@ class ContabilTest extends TestCase
 
         $this->get(route('externo.relacao.preregistros'))
         ->assertOk()
-        ->assertSee('Solicitações de registro gerenciados pela Contabilidade')
+        ->assertSee('Solicitações de registro gerenciadas pela Contabilidade')
         ->assertSee('Listagem das solicitações de registro que os <strong>Representantes Comerciais</strong> relacionaram a sua contabilidade e as solicitações criadas pela própria contabilidade.')
         ->assertDontSee('<p class="pb-0">ID: <strong>'.$solicitacao->id.'</strong></p>')
         ->assertDontSee('<p class="pb-0">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacao->userExterno->cpf_cnpj) .'</strong></p>')
@@ -3025,19 +3025,19 @@ class ContabilTest extends TestCase
 
         $this->get(route('externo.relacao.preregistros'))
         ->assertOk()
-        ->assertSee('Solicitações de registro gerenciados pela Contabilidade')
+        ->assertSee('Solicitações de registro gerenciadas pela Contabilidade')
         ->assertSee('Listagem das solicitações de registro que os <strong>Representantes Comerciais</strong> relacionaram a sua contabilidade e as solicitações criadas pela própria contabilidade.')
-        ->assertSee('<p class="pb-0">ID: <strong>'.$solicitacoes->get(0)->id.'</strong></p>')
-        ->assertSee('<span class="text-nowrap">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacoes->get(0)->userExterno->cpf_cnpj) .'</strong>&nbsp;&nbsp; | &nbsp;</span>')
-        ->assertSee('<span class="text-nowrap">Nome: <strong>'. $solicitacoes->get(0)->userExterno->nome .'</strong></span>')
+        ->assertSee('<p class="pb-0" data-clarity-mask="True">ID: <strong>'.$solicitacoes->get(0)->id.'</strong></p>')
+        ->assertSee('<span class="text-nowrap" data-clarity-mask="True">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacoes->get(0)->userExterno->cpf_cnpj) .'</strong>&nbsp;&nbsp; | &nbsp;</span>')
+        ->assertSee('<span class="text-nowrap" data-clarity-mask="True">Nome: <strong>'. $solicitacoes->get(0)->userExterno->nome .'</strong></span>')
         ->assertSee('<a class="btn btn-primary btn-sm text-white" href="'. route('externo.preregistro.view', $solicitacoes->get(0)->id) .'">')
-        ->assertSee('<p class="pb-0">ID: <strong>'.$solicitacoes->get(1)->id.'</strong></p>')
-        ->assertSee('<span class="text-nowrap">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacoes->get(1)->userExterno->cpf_cnpj) .'</strong>&nbsp;&nbsp; | &nbsp;</span>')
-        ->assertSee('<span class="text-nowrap">Nome: <strong>'. $solicitacoes->get(1)->userExterno->nome .'</strong></span>')
+        ->assertSee('<p class="pb-0" data-clarity-mask="True">ID: <strong>'.$solicitacoes->get(1)->id.'</strong></p>')
+        ->assertSee('<span class="text-nowrap" data-clarity-mask="True">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacoes->get(1)->userExterno->cpf_cnpj) .'</strong>&nbsp;&nbsp; | &nbsp;</span>')
+        ->assertSee('<span class="text-nowrap" data-clarity-mask="True">Nome: <strong>'. $solicitacoes->get(1)->userExterno->nome .'</strong></span>')
         ->assertSee('<a class="btn btn-primary btn-sm text-white" href="'. route('externo.preregistro.view', $solicitacoes->get(1)->id) .'">')
-        ->assertDontSee('<p class="pb-0">ID: <strong>'.$solicitacoes->get(2)->id.'</strong></p>')
-        ->assertDontSee('<span class="text-nowrap">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacoes->get(2)->userExterno->cpf_cnpj) .'</strong>&nbsp;&nbsp; | &nbsp;</span>')
-        ->assertDontSee('<span class="text-nowrap">Nome: <strong>'. $solicitacoes->get(2)->userExterno->nome .'</strong></span>')
+        ->assertDontSee('<p class="pb-0" data-clarity-mask="True">ID: <strong>'.$solicitacoes->get(2)->id.'</strong></p>')
+        ->assertDontSee('<span class="text-nowrap" data-clarity-mask="True">CPF / CNPJ: <strong>'. formataCpfCnpj($solicitacoes->get(2)->userExterno->cpf_cnpj) .'</strong>&nbsp;&nbsp; | &nbsp;</span>')
+        ->assertDontSee('<span class="text-nowrap" data-clarity-mask="True">Nome: <strong>'. $solicitacoes->get(2)->userExterno->nome .'</strong></span>')
         ->assertDontSee('<a class="btn btn-primary btn-sm text-white" href="'. route('externo.preregistro.view', $solicitacoes->get(2)->id) .'">');
     }
 

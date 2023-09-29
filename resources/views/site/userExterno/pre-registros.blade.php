@@ -3,7 +3,7 @@
 @section('content-user-externo')
 
 @if(Session::has('message'))
-<div class="d-block w-100 alert alert-dismissible {{ Session::get('class') }}">
+<div class="d-block w-100 alert alert-dismissible {{ Session::get('class') }}" data-clarity-mask="True">
     <button type="button" class="close" data-dismiss="alert">&times;</button>
     {!! Session::get('message') !!}
 </div>
@@ -25,10 +25,10 @@
         <div class="list-group w-100">
             @foreach($resultados as $solicitacao)
             <div class="list-group-item light d-block">
-                <p class="pb-0">ID: <strong>{{ $solicitacao->id }}</strong></p>
+                <p class="pb-0" data-clarity-mask="True">ID: <strong>{{ $solicitacao->id }}</strong></p>
                 <p class="pb-0">
-                    <span class="text-nowrap">CPF / CNPJ: <strong>{{ formataCpfCnpj($solicitacao->userExterno->cpf_cnpj) }}</strong>&nbsp;&nbsp; | &nbsp;</span>
-                    <span class="text-nowrap">Nome: <strong>{{ $solicitacao->userExterno->nome }}</strong></span>
+                    <span class="text-nowrap" data-clarity-mask="True">CPF / CNPJ: <strong>{{ formataCpfCnpj($solicitacao->userExterno->cpf_cnpj) }}</strong>&nbsp;&nbsp; | &nbsp;</span>
+                    <span class="text-nowrap" data-clarity-mask="True">Nome: <strong>{{ $solicitacao->userExterno->nome }}</strong></span>
                 </p>
                 
                 <p class="pb-0">Status: {!! $solicitacao->getLabelStatusUser(true) !!}&nbsp;&nbsp; | &nbsp;

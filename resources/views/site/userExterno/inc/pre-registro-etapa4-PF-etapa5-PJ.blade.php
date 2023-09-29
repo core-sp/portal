@@ -51,7 +51,7 @@
     <div class="col-sm mb-2-576">
         <label for="telefone">{{ $codigos[4]['telefone'] }} - Nº de telefone <span class="text-danger">*</span></label>
         <input type="text"
-            class="{{ $classes[4] }} form-control celularInput {{ $errors->has('telefone') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classes[4] }} form-control telefone2Input {{ $errors->has('telefone') ? 'is-invalid' : '' }} obrigatorio"
             name="telefone"
             id="telefone"
             value="{{ empty(old('telefone')) && isset($resultado->getTelefone()[0]) ? $resultado->getTelefone()[0] : old('telefone') }}"
@@ -68,7 +68,7 @@
 <fieldset id="opcoesCelular" {{ isset($resultado->getTelefone()[0]) && ($resultado->getTipoTelefone()[0] == 'CELULAR') ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label>{{ $codigos[4]['opcional_celular'] }} <small class="bold">(opcional)</small> - Opções de comunicação </label><br>
+            <label>{{ $codigos[4]['opcional_celular'] }} <small class="bold">(opcional)</small> - Outras comunicações </label><br>
             @foreach(opcoes_celular() as $key => $tipo)
             <div class="form-check-inline">
                 <label for="{{ 'opcional_celular_' . $key }}" class="form-check-label">
@@ -126,7 +126,7 @@
     <div class="col-sm mb-2-576">
         <label for="telefone_1">{{ $codigos[4]['telefone_1'] }} <small class="bold">(opcional)</small> - Nº de telefone </span></label>
         <input type="text"
-            class="{{ $classes[4] }} form-control celularInput {{ $errors->has('telefone_1') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} form-control telefone2Input {{ $errors->has('telefone_1') ? 'is-invalid' : '' }}"
             name="telefone_1"
             id="telefone_1"
             value="{{ empty(old('telefone_1')) && isset($resultado->getTelefone()[1]) ? $resultado->getTelefone()[1] : old('telefone_1') }}"
@@ -143,7 +143,7 @@
 <fieldset id="opcoesCelular_1" {{ isset($resultado->getTelefone()[1]) && ($resultado->getTipoTelefone()[1] == 'CELULAR') ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="opcional_celular_1">{{ $codigos[4]['opcional_celular_1'] }} <small class="bold">(opcional)</small> - Opções de comunicação </label><br>
+            <label for="opcional_celular_1">{{ $codigos[4]['opcional_celular_1'] }} <small class="bold">(opcional)</small> - Outras comunicações </label><br>
             @foreach(opcoes_celular() as $key => $tipo)
             <div class="form-check-inline">
                 <label for="{{ 'opcional_celular__' . $key }}" class="form-check-label">

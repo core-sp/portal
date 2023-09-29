@@ -14,7 +14,7 @@
 
     <p>
         <i class="fas fa-exclamation-circle text-primary"></i>
-        &nbsp;Após 1 mês com status <span class="badge badge-success">Aprovado</span>, os anexos serão <strong>excluídos</strong> automaticamente do sistema.
+        &nbsp;Após 1 mês da última atualização com status <span class="badge badge-success">Aprovado</span>, os anexos serão <strong>excluídos</strong> automaticamente do sistema.
     </p>
     <p>
         <i class="fas fa-exclamation-circle text-primary"></i>
@@ -73,27 +73,8 @@
             <i class="fas fa-exclamation-circle text-primary"></i>
             &nbsp;<i>Após anexar, o documento ficará disponível para o solicitante realizar download na área restrita.</i>
         </p>
-        @if(isset($boleto))
-            <i class="fas fa-paperclip"></i> <i>Boleto:</i> {{ $boleto->nome_original }}
-            <a href="{{ route('preregistro.anexo.download', ['idPreRegistro' => $resultado->id, 'id' => $boleto->id]) }}" 
-                class="btn btn-sm btn-primary ml-2" 
-                target="_blank" 
-            >
-                Abrir
-            </a>
-            <a href="{{ route('preregistro.anexo.download', ['idPreRegistro' => $resultado->id, 'id' => $boleto->id]) }}" 
-                class="btn btn-sm btn-primary ml-2" 
-                download
-            >
-                <i class="fas fa-download"></i>
-            </a>
-            <br>
-            <span class="mt-2"><small><i>Última atualização:</i> {{ formataData($boleto->updated_at) }}</small></span>
-        @else
-            <p>Sem boleto anexado.</p>
-        @endif
 
-    <form class="ml-1 mt-3" action="{{ route('preregistro.upload.doc', $resultado->id) }}" method="POST" enctype="multipart/form-data">
+    <form class="ml-1" action="{{ route('preregistro.upload.doc', $resultado->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="form-row">
             <label>Anexar novo boleto:</label>
@@ -103,7 +84,7 @@
                     name="file"
                     class="custom-file-input {{ $errors->has('file') ? 'is-invalid' : '' }}"
                     id="doc_pre_registro"
-                    accept=".pdf"
+                    accept="application/pdf"
                     role="button"
                 >
                 <label class="custom-file-label" for="doc_pre_registro">Selecionar arquivo...</label>
@@ -114,6 +95,31 @@
             <button type="submit" class="btn btn-sm btn-primary">Enviar</button>
         </div>
     </form>
+
+    @if(isset($boleto))
+    <div class="mt-3">
+    <span class="font-weight-bolder">Boleto:</span>
+    <p>
+        <i class="fas fa-paperclip"></i>
+        <a href="{{ route('preregistro.anexo.download', ['idPreRegistro' => $resultado->id, 'id' => $boleto->id]) }}" 
+            class="ml-2" 
+            target="_blank" 
+        >
+            <u>{{ $boleto->id }} - {{ $boleto->nome_original }}</u>
+        </a>
+        <a href="{{ route('preregistro.anexo.download', ['idPreRegistro' => $resultado->id, 'id' => $boleto->id]) }}" 
+            class="btn btn-sm btn-primary ml-2" 
+            download
+        >
+            <i class="fas fa-download"></i>
+        </a>
+        <br>
+        <span class="mt-2"><small><i>Última atualização:</i> {{ formataData($boleto->updated_at) }}</small></span>
+    </p>
+    </div>
+    @else
+        <p>Sem boleto anexado.</p>
+    @endif
 
     @else
     <p><i>Pré-registro não está aprovado.</i></p>

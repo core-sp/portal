@@ -35,15 +35,16 @@
     </p>
 
     @foreach($resultado->anexos as $anexo)
+    @if(!$anexo->anexadoPeloAtendente())
     <span class="font-weight-bolder">ID: {{ $anexo->id }} </span>
     <p class="mb-0">
-        <i class="fas fa-paperclip"></i> {{ $anexo->nome_original }} 
+        <i class="fas fa-paperclip"></i> {{ in_array($anexo->extensao, ['jpg', 'jpeg', 'png', 'pdf']) ? '' : $anexo->nome_original }} 
         @if(in_array($anexo->extensao, ['jpg', 'jpeg', 'png', 'pdf']))
         <a href="{{ route('preregistro.anexo.download', ['idPreRegistro' => $resultado->id, 'id' => $anexo->id]) }}" 
-            class="btn btn-sm btn-primary ml-2" 
+            class="ml-2" 
             target="_blank" 
         >
-            Abrir
+            <u>{{ $anexo->nome_original }}</u>
         </a>
         @endif
         <a href="{{ route('preregistro.anexo.download', ['idPreRegistro' => $resultado->id, 'id' => $anexo->id]) }}" 
@@ -56,6 +57,7 @@
         <span class="badge badge-success ml-2">Novo anexo</span>
         @endif
     </p>
+    @endif
     @endforeach
 
     <hr>

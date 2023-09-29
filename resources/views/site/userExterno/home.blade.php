@@ -4,7 +4,7 @@
 
 @if(Session::has('message'))
 <div class="d-block w-100">
-    <p class="alert {{ Session::get('class') }}">{{ Session::get('message') }}</p>
+    <p class="alert {{ Session::get('class') }}" data-clarity-mask="True">{{ Session::get('message') }}</p>
 </div>
 @endif
 

@@ -731,6 +731,68 @@ class AnexoTest extends TestCase
     }
 
     /** @test */
+    public function owner_can_download_boleto()
+    {
+        Storage::fake('local');
+
+        $user = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
+        ]);
+
+        $externo = $this->signInAsUserExterno('user_externo', $preRegistroCpf->preRegistro->userExterno);
+        $this->get(route('externo.preregistro.anexo.download', Anexo::find(1)->id))->assertOk();
+    }
+
+    /** @test */
+    public function owner_cannot_delete_boleto()
+    {
+        Storage::fake('local');
+
+        $user = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
+        ]);
+
+        $externo = $this->signInAsUserExterno('user_externo', $preRegistroCpf->preRegistro->userExterno);
+        $this->delete(route('externo.preregistro.anexo.excluir', 1))->assertStatus(401);
+    }
+
+    /** @test */
+    public function log_is_generated_when_download_boleto()
+    {
+        Storage::fake('local');
+
+        $user = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
+        ]);
+
+        $externo = $this->signInAsUserExterno('user_externo', $preRegistroCpf->preRegistro->userExterno);
+        $this->get(route('externo.preregistro.anexo.download', Anexo::find(1)->id))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Foi realizado o download do boleto com ID 1 do pré-registro com ID 1.';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
     public function not_owner_cannot_delete_file()
     {
         Storage::fake('local');
@@ -797,6 +859,18 @@ class AnexoTest extends TestCase
     {
         $externo = $this->signInAsUserExterno();
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->get(route('externo.preregistro.anexo.download', 1))->assertStatus(401);
+    }
+
+    /** @test */
+    public function owner_cannot_download_file_with_status_approved()
+    {
+        $externo = $this->signInAsUserExterno();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+        factory('App\Anexo')->states('pre_registro')->create();
 
         $this->get(route('externo.preregistro.anexo.download', 1))->assertStatus(401);
     }
@@ -1580,6 +1654,68 @@ class AnexoTest extends TestCase
     }
 
     /** @test */
+    public function owner_can_download_boleto_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $user = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
+        ]);
+
+        $externo = $this->signInAsUserExterno('contabil', $preRegistroCpf->preRegistro->contabil);
+        $this->get(route('externo.preregistro.anexo.download', ['id' => 1, 'preRegistro' => 1]))->assertOk();
+    }
+
+    /** @test */
+    public function owner_cannot_delete_boleto_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $user = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
+        ]);
+
+        $externo = $this->signInAsUserExterno('contabil', $preRegistroCpf->preRegistro->contabil);
+        $this->delete(route('externo.preregistro.anexo.excluir', ['id' => 1, 'preRegistro' => 1]))->assertStatus(401);
+    }
+
+    /** @test */
+    public function log_is_generated_when_download_boleto_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $user = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
+        ]);
+
+        $externo = $this->signInAsUserExterno('contabil', $preRegistroCpf->preRegistro->contabil);
+        $this->get(route('externo.preregistro.anexo.download', ['id' => 1, 'preRegistro' => 1]))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Foi realizado o download do boleto com ID 1 do pré-registro com ID 1.';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
     public function not_owner_cannot_delete_file_by_contabilidade()
     {
         Storage::fake('local');
@@ -1657,6 +1793,18 @@ class AnexoTest extends TestCase
     }
 
     /** @test */
+    public function owner_cannot_download_file_with_status_approved_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+        factory('App\Anexo')->states('pre_registro')->create();
+
+        $this->get(route('externo.preregistro.anexo.download', ['id' => 1, 'preRegistro' => 1]))->assertStatus(401);
+    }
+
+    /** @test */
     public function filled_campos_editados_anexos_when_form_is_submitted_when_status_aguardando_correcao_by_contabilidade()
     {
         Storage::fake('local');
@@ -1707,5 +1855,186 @@ class AnexoTest extends TestCase
         $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
         ->assertSeeText('Novos anexos')
         ->assertSeeText('Novo anexo');
+    }
+
+    /** @test */
+    public function can_upload_file_after_approved()
+    {
+        Storage::fake();
+
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(100)
+        ])
+        ->assertRedirect(route('preregistro.view', $preRegistroCpf->preRegistro->id));
+
+        $this->assertDatabaseHas('anexos', [
+            'nome_original' => 'boleto_aprovado_' . $preRegistroCpf->preRegistro->id,
+            'pre_registro_id' => $preRegistroCpf->preRegistro->id
+        ]);
+
+        $anexos = $preRegistroCpf->preRegistro->anexos;
+        Storage::disk('local')->assertExists($anexos->get(0)->path);
+    }
+
+    /** @test */
+    public function cannot_upload_without_file_after_approved()
+    {
+        Storage::fake();
+
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => null
+        ])
+        ->assertSessionHasErrors([
+            'file'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_upload_file_more_than_2MB_after_approved()
+    {
+        Storage::fake();
+
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(2049)
+        ])
+        ->assertSessionHasErrors([
+            'file'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_upload_file_invalid_extension_after_approved()
+    {
+        Storage::fake();
+
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.png')->size(300)
+        ])
+        ->assertSessionHasErrors([
+            'file'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_upload_file_invalid_type_after_approved()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => 'random2.pdf'
+        ])
+        ->assertSessionHasErrors([
+            'file'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_upload_file_with_status_not_approved()
+    {
+        Storage::fake();
+
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('negado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
+        ])
+        ->assertSessionHas([
+            'message' => '<i class="icon fas fa-times"></i> O pré-registro precisa estar aprovado para anexar documento.',
+            'class' => 'alert-danger'
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_anexo_doc_created()
+    {
+        Storage::fake('local');
+        $user = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
+        ]);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') anexou o documento "random2.pdf" do tipo boleto *pré-registro* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function view_label_anexo_doc()
+    {
+        Storage::fake('local');
+        $user = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
+        ]);
+
+        $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
+        ->assertSee('<span class="font-weight-bolder">Boleto:</span>')
+        ->assertSee('<u>1 - boleto_aprovado_1</u>');
+    }
+
+    /** @test */
+    public function log_is_not_generated_when_download_boleto()
+    {
+        Storage::fake('local');
+
+        $user = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
+        ]);
+
+        $this->get(route('preregistro.anexo.download', ['idPreRegistro' => 1, 'id' => 1]))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Foi realizado o download do boleto com ID 1 do pré-registro com ID 1.';
+        $this->assertStringNotContainsString($txt, $log);
     }
 }

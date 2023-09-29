@@ -15,7 +15,7 @@
     @elseif(auth()->guard('user_externo')->check() || auth()->guard('contabil')->check())
         <p class="cinza-claro p-restrita m-auto-992">
             <small>
-                <a href="{{ route('externo.dashboard') }}">
+                <a href="{{ route('externo.dashboard') }}" data-clarity-mask="True">
                     <i class="fas fa-user"></i>&nbsp;
                    {{ limitRepresentanteName(auth()->guard(getGuardExterno(auth()))->user()->nome) }}
                 </a>

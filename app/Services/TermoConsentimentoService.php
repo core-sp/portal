@@ -66,7 +66,7 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
     {
         $tipo_servico = isset($tipo_servico) ? Str::studly(str_replace('-', '_', $tipo_servico)) : $tipo_servico;
 
-        if(isset($tipo_servico) && ($tipo_servico == 'SalaReuniao'))
+        if(isset($tipo_servico) && (in_array($tipo_servico, ['SalaReuniao', 'UserExterno'])))
             return Storage::disk('public')->exists($this->path_termos_servicos.'/'.Str::snake($tipo_servico) . '_condicoes.pdf') ? 
             Storage::disk('public')->path($this->path_termos_servicos.'/'.Str::snake($tipo_servico) . '_condicoes.pdf') : null;
 

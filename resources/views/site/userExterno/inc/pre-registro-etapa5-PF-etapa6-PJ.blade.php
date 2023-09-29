@@ -56,6 +56,7 @@
     @else
 
         @foreach($resultado->anexos as $anexo)
+        @if(!$anexo->anexadoPeloAtendente())
             @component('components.arquivosBD', [
                 'nome' => 'anexo', 
                 'nome_file' => $anexo->nome_original, 
@@ -68,6 +69,7 @@
                 'extensao' => $anexo->extensao,
             ])
             @endcomponent
+        @endif
         @endforeach
 
     @endif

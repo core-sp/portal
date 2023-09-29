@@ -171,7 +171,7 @@ class Kernel extends ConsoleKernel
          * =======================================================================================================
          */
 
-        // Rotina de exclusão de arquivos do PreRegistro após 1 mês com status 'Aprovado'
+        // Rotina de exclusão de arquivos do PreRegistro após 1 mês da última atualização com status 'Aprovado'
         // Rotina de exclusão de arquivos do PreRegistro após 2 meses sem atualização com status 'Sendo elaborado' e 'Aguardando correção'
         $schedule->call(function(){
             try {

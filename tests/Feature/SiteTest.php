@@ -177,7 +177,8 @@ class SiteTest extends TestCase
         $user_externo = factory('App\UserExterno')->create();
         $dados = [
             'cpf_cnpj' => $user_externo['cpf_cnpj'],
-            'password' => 'Teste102030'
+            'password' => 'Teste102030',
+            'tipo_conta' => 'user_externo'
         ];
         $this->post(route('externo.login.submit'), $dados)
         ->assertRedirect(route('externo.dashboard'));

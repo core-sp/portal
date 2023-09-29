@@ -49,6 +49,8 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
             $cor = $resultado->atendentePodeEditar() ? 'primary' : 'info';
             if($userPodeEditar)
                 $acoes = '<a href="'.route('preregistro.view', $resultado->id).'" class="btn btn-sm btn-' . $cor . '">'. $texto .'</a> ';
+            if($resultado->isAprovado())
+                $acoes .= '<small class="d-block"><i class="fas fa-paperclip">&nbsp;</i><b><i>Pode anexar documentos</i></b></small>';
             $textoUser = '<span class="rounded p-1 bg' . $resultado->getLabelStatus() . ' font-weight-bolder font-italic">' . $resultado->status . '</span>';
             $conteudo = [
                 'corDaLinha' => '<tr class="table' . $resultado->getLabelStatus() . '">',

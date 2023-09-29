@@ -108,6 +108,9 @@ class TermoConsentimentoTest extends TestCase
 
         $this->get(route('representante.agendar.inserir.view', 'agendar'))
         ->assertSee(route('termo.consentimento.pdf', 'sala-reuniao'));
+
+        $this->get(route('externo.cadastro'))
+        ->assertSee(route('termo.consentimento.pdf', 'user-externo'));
     }
 
     /** @test */

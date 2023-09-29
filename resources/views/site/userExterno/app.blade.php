@@ -27,7 +27,7 @@
       <div class="col-xl-3 pb-15-992">
         <div class="menu-representante">
           <div class="p-3 border-one-mr azul-escuro-bg">
-            <h6 class="branco"><strong>{{ auth()->guard(getGuardExterno(auth()))->user()->nome }}</strong></h6>
+            <h6 class="branco" data-clarity-mask="True"><strong>{{ auth()->guard(getGuardExterno(auth()))->user()->nome }}</strong></h6>
             <i class="fas fa-bars show-992" id="bars-representante"></i>
           </div>
           <div id="mobile-menu-representante" class="hide-992">

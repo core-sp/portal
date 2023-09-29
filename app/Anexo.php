@@ -176,4 +176,13 @@ class Anexo extends Model
 
         return $tipos;
     }
+
+    public function anexadoPeloAtendente()
+    {
+        $nomes_doc = [
+            'boleto_aprovado_' . $this->pre_registro_id,
+        ];
+
+        return in_array($this->nome_original, $nomes_doc);
+    }
 }

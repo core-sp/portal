@@ -42,6 +42,8 @@ class PreRegistroTest extends TestCase
         $this->put(route('preregistro.update.status', $preRegistro->id), ['situacao' => 'aprovar'])->assertRedirect(route('login'));
         $this->get(route('preregistro.busca'))->assertRedirect(route('login'));
         $this->get(route('preregistro.filtro'))->assertRedirect(route('login'));
+        $this->post(route('preregistro.upload.doc', $preRegistro->id), ['file' => UploadedFile::fake()->create('random2.pdf')->size(300)])
+        ->assertRedirect(route('login'));
     }
 
     /** @test */
@@ -68,6 +70,8 @@ class PreRegistroTest extends TestCase
         $this->put(route('preregistro.update.status', $preRegistro_negado->id), ['situacao' => 'negar'])->assertForbidden();
         $this->get(route('preregistro.busca'))->assertForbidden();
         $this->get(route('preregistro.filtro'))->assertForbidden();
+        $this->post(route('preregistro.upload.doc', $preRegistro->id), ['file' => UploadedFile::fake()->create('random2.pdf')->size(300)])
+        ->assertForbidden();
     }
 
     /** @test */
@@ -4249,7 +4253,7 @@ class PreRegistroTest extends TestCase
         ->assertSee('data-content="<strong>Solicitante está aguardando o atendente analisar os dados</strong>')
         ->assertSee('data-content="<strong>Atendente está aguardando o solicitante corrigir os dados</strong>')
         ->assertSee('data-content="<strong>Solicitante está aguardando o atendente analisar os dados após correção</strong>')
-        ->assertSee('data-content="<strong>Atendente aprovou a solicitação</strong>')
+        ->assertSee('data-content="<strong>Atendente aprovou a solicitação e pode realizar o anexo do boleto</strong>')
         ->assertSee('data-content="<strong>Atendente negou a solicitação</strong>');
     }
 

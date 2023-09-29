@@ -14,7 +14,7 @@
                         multiple
                     @endif
                 />
-                <label class="custom-file-label ml-0" for="anexos"><span class="text-secondary">Escolher arquivo</span></label>
+                <label class="custom-file-label ml-0" for="anexos" data-clarity-mask="True"><span class="text-secondary">Escolher arquivo</span></label>
             </div>
             <div class="input-group-append">
                 <button class="btn btn-danger limparFile" type="button"><i class="fas fa-trash-alt"></i></button>
@@ -40,7 +40,7 @@
             
             <!-- Modal body -->
             <div class="modal-body">
-                Tem certeza que deseja excluir o anexo: <strong><span id="textoExcluir"></span></strong>?
+                Tem certeza que deseja excluir o anexo: <strong><span id="textoExcluir" data-clarity-mask="True"></span></strong>?
             </div>
             
             <!-- Modal footer -->

@@ -3,7 +3,7 @@
 @section('content-user-externo')
 
 @if(Session::has('message'))
-<div class="d-block w-100 alert alert-dismissible {{ Session::get('class') }}">
+<div class="d-block w-100 alert alert-dismissible {{ Session::get('class') }}" data-clarity-mask="True">
     <button type="button" class="close" data-dismiss="alert">&times;</button>
     {!! Session::get('message') !!}
 </div>
@@ -24,14 +24,14 @@
                     </p>
                     <br>
                     @if(isset($gerenti))
-                    <p>Você já possui registro ativo no Core-SP: <strong>{{ formataRegistro($gerenti) }}</strong></p>
+                    <p>Você já possui registro ativo no Core-SP: <span data-clarity-mask="True"><strong>{{ formataRegistro($gerenti) }}</strong></span></p>
                     @elseif(auth()->guard('user_externo')->check())
                     <hr />
                         @foreach(auth()->guard('user_externo')->user()->load('preRegistros')->preRegistros as $preRegistro)
                             @if(in_array($preRegistro->status, [$preRegistro::STATUS_NEGADO, $preRegistro::STATUS_APROVADO]))
-                                <p><strong>ID da solicitação:</strong> {{ $preRegistro->id }}</p>
-                                <p><strong>Solicitado em:</strong> {{ onlyDate($preRegistro->created_at) }} <strong>e encerrado em:</strong> {{ onlyDate($preRegistro->updated_at) }}</p>
-                                <p>
+                                <p data-clarity-mask="True"><strong>ID da solicitação:</strong> {{ $preRegistro->id }}</p>
+                                <p data-clarity-mask="True"><strong>Solicitado em:</strong> {{ onlyDate($preRegistro->created_at) }} <strong>e encerrado em:</strong> {{ onlyDate($preRegistro->updated_at) }}</p>
+                                <p data-clarity-mask="True">
                                     <strong>Status:</strong> <span class="badge badge{{ $preRegistro->getLabelStatus($preRegistro->status) }}">{{ $preRegistro->status }}</span>
                                     {{ $preRegistro->status == $preRegistro::STATUS_NEGADO ? '- ' . $preRegistro->getJustificativaNegado() : '' }}
                                 </p>
@@ -55,11 +55,11 @@
                     @endif
 
                     @if(isset($resultado->id))
-                        <h5>ID da solicitação: {{ $resultado->id }}</h5>
-                        <h5>Solicitado em: {{ onlyDate($resultado->created_at) }}</h5>
+                        <h5 data-clarity-mask="True">ID da solicitação: {{ $resultado->id }}</h5>
+                        <h5 data-clarity-mask="True">Solicitado em: {{ onlyDate($resultado->created_at) }}</h5>
                         <h4>Status: {!! $resultado->getLabelStatusUser() !!}</h4>
                         @if($resultado->status == $resultado::STATUS_NEGADO)
-                        <h5><span class="text-danger">Justificativa: </span>{{ $resultado->getJustificativaNegado() }}</h5>
+                        <h5 data-clarity-mask="True"><span class="text-danger">Justificativa: </span>{{ $resultado->getJustificativaNegado() }}</h5>
                         @endif
                     @endif
                     <!-- ***************************************************************************************************************** -->
