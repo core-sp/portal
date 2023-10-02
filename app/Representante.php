@@ -135,6 +135,11 @@ class Representante extends Authenticable
     {
         $total = 4;
 
+        // devido poder agendar somente no dia seguinte
+        $dia = Carbon::tomorrow();
+        while($dia->isWeekend())
+            $dia->addDay();
+
         $atual = $this->agendamentosSalas()
         ->when(isset($mes) && !isset($ano), function($query) use($mes){
             $query->whereMonth('dia', $mes)
@@ -148,11 +153,9 @@ class Representante extends Authenticable
             $query->whereMonth('dia', $mes)
             ->whereYear('dia', $ano);
         })
-        ->when(!isset($mes) && !isset($ano), function($query){
-            // devido poder agendar somente no dia seguinte
-            $diaSeguinte = now()->addDay();
-            $query->whereMonth('dia', $diaSeguinte->month)
-            ->whereYear('dia', $diaSeguinte->year);
+        ->when(!isset($mes) && !isset($ano), function($query) use($dia){
+            $query->whereMonth('dia', $dia->month)
+            ->whereYear('dia', $dia->year);
         })
         ->where(function($query){
             $query->whereNull('status')
@@ -161,7 +164,8 @@ class Representante extends Authenticable
         ->count() < $total;
 
         $seguinte = false;
-        $dataSeguinte = now()->addMonth();
+        // Evitar que pule mês. Ex: janeiro para fevereiro.
+        $dataSeguinte = Carbon::parse($dia->format('Y-m') . '-01')->addMonth();
         $mesSeguinte = $dataSeguinte->month;
         $anoSeguinte = $dataSeguinte->year;
         

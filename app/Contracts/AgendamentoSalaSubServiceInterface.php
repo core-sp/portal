@@ -12,5 +12,7 @@ interface AgendamentoSalaSubServiceInterface {
 
     public function buscar($user, $busca);
 
+    public function executarRotinaAgendadosDoDia($users);
+
     public function executarRotina();
 }

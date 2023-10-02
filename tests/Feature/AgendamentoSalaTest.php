@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoSalaMail;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\InternoAgendamentoSalaMail;
 
 class AgendamentoSalaTest extends TestCase
 {
@@ -3699,6 +3700,20 @@ class AgendamentoSalaTest extends TestCase
         return [
             $agendamento, $agendamento1, $agendamento2, $agendamento3, $agendamento4, $agendamento5, $agendamento6, $agendamento7
         ];
+    }
+
+    /** @test */
+    public function rotina_envio_emails_agendados_no_dia_kernel()
+    {
+        Mail::fake();
+        $user = $this->signInAsAdmin();
+        $users = \App\User::select('email','idregional','idperfil')->where('idperfil', 1)->get();
+        $agendamentos = $this->create_agendamentos_rotina();
+
+        $service = resolve('App\Contracts\MediadorServiceInterface');
+        $service->getService('SalaReuniao')->agendados()->executarRotinaAgendadosDoDia($users);
+
+        Mail::assertSent(InternoAgendamentoSalaMail::class);
     }
 
     /** @test */

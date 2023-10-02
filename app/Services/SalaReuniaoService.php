@@ -24,7 +24,7 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
         ];
     }
 
-    private function tabelaCompleta($user, $resultados)
+    private function tabelaCompleta($user, $resultados, $service)
     {
         // Opções de cabeçalho da tabela
         $headers = [
@@ -57,13 +57,16 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
             'table-hover'
         ];
 
+        $data = $service->getService('TermoConsentimento')->dataAtualizacaoTermoStorage('sala-reuniao');
+        $data = isset($data) ? '<strong>Última atualização:</strong> ' . $data : '<strong>Nenhum termo adicionado!</strong>';
         $upload_form = '<p class="text-primary mb-1"><i class="fas fa-info-circle"></i>&nbsp;Para atualizar o arquivo das condições para o aceite do representante ao agendar.</p>';
         $upload_form .= '<div class="d-inline-flex"><form class="form-inline" action="'. route('termo.consentimento.upload', 'sala-reuniao').'" method="POST" enctype="multipart/form-data">';
         $upload_form .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
         $upload_form .= '<label for="enviar-file-sala" class="mr-sm-2"><i class="far fa-file-alt"></i>&nbsp;Atualizar arquivo de aceite</label><input type="file" name="file" ';
         $upload_form .= 'class="form-control pl-0 pb-1 pt-1 mb-2 mr-sm-2" id="enviar-file-sala" accept=".pdf" />';
         $upload_form .= '<button class="btn btn-sm btn-primary mb-2" type="submit">Enviar</button>';
-        $upload_form .= '<span class="ml-3 mb-2"><a class="btn btn-sm btn-success" href="'. route('termo.consentimento.pdf', 'sala-reuniao') .'" target="_blank">Abrir</a></span></form></div><hr />';
+        $upload_form .= '<span class="ml-3 mb-2"><a class="btn btn-sm btn-success" href="'. route('termo.consentimento.pdf', 'sala-reuniao') .'" target="_blank">Abrir</a></span></form>';
+        $upload_form .= '<span class="ml-3 d-flex flex-wrap align-content-center"><small><i>'.$data.'</i></small></span></div><hr />';
 
         $tabela = $userPodeEditar ? $upload_form . montaTabela($headers, $contents, $classes) : montaTabela($headers, $contents, $classes);
         
@@ -91,14 +94,14 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
         }            
     }
 
-    public function listar($user)
+    public function listar($user, $service)
     {
         $salas = SalaReuniao::with('regional')
         ->get()
         ->sortBy('regional.regional');
 
         return [
-            'tabela' => $this->tabelaCompleta($user, $salas),
+            'tabela' => $this->tabelaCompleta($user, $salas, $service),
             'resultados' => $salas,
             'variaveis' => (object) $this->variaveis
         ];

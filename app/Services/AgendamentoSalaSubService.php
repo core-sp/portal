@@ -7,6 +7,7 @@ use App\AgendamentoSala;
 use App\Events\CrudEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoSalaMail;
+use App\Mail\InternoAgendamentoSalaMail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 
@@ -312,6 +313,23 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             'tabela' => $this->tabelaCompleta($resultados, $user), 
             'variaveis' => (object) $this->variaveis
         ];
+    }
+
+    public function executarRotinaAgendadosDoDia($users)
+    {
+        $todos_agendados = AgendamentoSala::with(['sala.regional' => function ($query) {
+            $query->orderBy('regional', 'ASC');
+        }])
+        ->whereDate('dia', date('Y-m-d'))
+        ->whereNull('status')
+        ->get();
+
+        foreach($users as $user)
+        {
+            $resultado = $user->getRelatorioAgendadosPorPerfil($todos_agendados, 'AgendamentoSala');
+            if(isset($resultado))
+                Mail::to($user->email)->send(new InternoAgendamentoSalaMail($user, $resultado['agendados'], $resultado['subject']));
+        }
     }
 
     public function executarRotina($removerAnexos = false)

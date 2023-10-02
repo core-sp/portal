@@ -42,6 +42,7 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
         // Opções de conteúdo da tabela
         $contents = [];
         $userPodeEditar = $user->can('updateOther', $user);
+        $userAdmin = $user->can('onlyAdmin', $user);
         foreach($resultados as $resultado) {
             $acoes = '';
             $acoes .= '<a href="' .route('sala.reuniao.suspensao.view', $resultado->id). '" class="btn btn-sm btn-primary">Ver</a>&nbsp;&nbsp;&nbsp;';
@@ -49,6 +50,14 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
             {
                 $acoes .= '<a href="' .route('sala.reuniao.suspensao.edit', [$resultado->id, 'suspensao']). '" class="btn btn-sm btn-warning">Editar Suspensão</a>&nbsp;&nbsp;&nbsp;';
                 $acoes .= '<a href="' .route('sala.reuniao.suspensao.edit', [$resultado->id, 'excecao']). '" class="btn btn-sm btn-success">Editar Exceção</a>';
+            }
+            if($userAdmin)
+            {
+                $acoes .= '<form method="POST" action="'.route('sala.reuniao.suspensao.delete', $resultado->id).'" class="d-inline">';
+                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+                $acoes .= '<input type="hidden" name="_method" value="delete" />';
+                $acoes .= '<input type="submit" class="btn btn-sm btn-danger ml-2" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a suspensão?\')" />';
+                $acoes .= '</form>';
             }
             $conteudo = [
                 $resultado->id,
@@ -181,6 +190,12 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
             foreach($suspensos as $chave => $val)
                 $suspensos[$chave] = formataCpfCnpj($val);
         return $suspensos;
+    }
+
+    public function destroy($id)
+    {
+        $suspensao = SuspensaoExcecao::findOrFail($id);
+        $suspensao->delete() ? event(new CrudEvent('a suspensão com o CPF/CNPJ: ' . $suspensao->getCpfCnpj(), 'excluiu', $id)) : null;
     }
 
     public function executarRotina($service)
