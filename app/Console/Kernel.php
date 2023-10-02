@@ -36,6 +36,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+    /*
         // Relatório dos agendados no dia de hoje
         $schedule->call(function() {
             $users = User::select('email','idregional','idperfil')
@@ -137,13 +138,13 @@ class Kernel extends ConsoleKernel
                 }
             }
         })->dailyAt('4:15');
-
+    */
         /** 
          * =======================================================================================================
          * ROTINAS SALAS DE REUNIÕES 
          * =======================================================================================================
         */ 
-        
+    /*
         $schedule->call(function(){
             // Suspensões com data finalizada serão excluídas como soft delete
             // Atualizar situação das suspensoes se exceção válida
@@ -164,13 +165,14 @@ class Kernel extends ConsoleKernel
             $service = resolve('App\Contracts\MediadorServiceInterface');
             $service->getService('SalaReuniao')->agendados()->executarRotina(true);
         })->monthlyOn(15, '2:00');
-
+    */
         /** 
          * =======================================================================================================
          * ROTINAS PRÉ-REGISTRO
          * =======================================================================================================
          */
 
+    /*
         // Rotina de exclusão de arquivos do PreRegistro após 1 mês da última atualização com status 'Aprovado'
         // Rotina de exclusão de arquivos do PreRegistro após 2 meses sem atualização com status 'Sendo elaborado' e 'Aguardando correção'
         $schedule->call(function(){
@@ -184,6 +186,12 @@ class Kernel extends ConsoleKernel
         ->weeklyOn(2, '3:00')
         ->weeklyOn(4, '3:00')
         ->weeklyOn(7, '3:00');
+    */
+        // Rotina temporária para testes Pre-registro
+        $schedule->call(function(){
+            \App\Permissao::create(['controller' => 'PreRegistroController', 'metodo' => 'index', "perfis"=> "1,10,13,18,6,21,8,"]);
+            \App\Permissao::create(['controller' => 'PreRegistroController', 'metodo' => 'edit', "perfis"=> "1,10,13,18,6,21,8,"]);
+        })->dailyAt('5:00');
     }
 
     /**
