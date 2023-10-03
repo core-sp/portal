@@ -15,4 +15,6 @@ interface AgendamentoSalaSubServiceInterface {
     public function executarRotinaAgendadosDoDia($users);
 
     public function executarRotina();
+
+    public function executarRotinaRemoveAnexos();
 }

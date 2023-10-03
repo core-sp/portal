@@ -163,7 +163,7 @@ class AgendamentoSala extends Model
         return explode(' - ', $this->periodo)[1];
     }
 
-    public static function participantesVetados($dia, $periodo, $cpfs, $periodoTodo = true, $id = null)
+    public static function participantesVetados($dia, $periodo, $cpfs, $id = null)
     {
         $vetados = array();
         $periodo = explode(' - ', $periodo);
@@ -185,9 +185,6 @@ class AgendamentoSala extends Model
         
         foreach ($agendados as $key => $value) {
             $temp = array();
-            $almoco = $value->sala->horaAlmoco();
-            $tipo_periodo = $periodo[0] <= $almoco ? 'manha' : 'tarde';
-            $tipo_periodo_agendado = $value->inicioDoPeriodo() <= $almoco ? 'manha' : 'tarde';
 
             if($value->representante->tipoPessoa() == 'PF')
                 $temp = array_intersect($cpfs, [apenasNumeros($value->representante->cpf_cnpj)]);
@@ -203,14 +200,9 @@ class AgendamentoSala extends Model
                 $duracao_temp = $periodo_inicio_agendado->diffInMinutes($inicio_temp);
                 $periodo_inicio_agendado->addMinute();
 
-                if($value->periodo_todo && ($tipo_periodo_agendado == $tipo_periodo))
-                    $vetados = array_merge($vetados, $temp);
-                elseif(!$value->periodo_todo && $periodoTodo && ($tipo_periodo_agendado == $tipo_periodo))
-                    $vetados = array_merge($vetados, $temp);
-                elseif(!$value->periodo_todo && !$periodoTodo)
-                    $periodo_inicio_agendado->between($periodo[0], $periodo[1]) || 
-                    ($periodo_inicio_agendado->lt($inicio_temp) && ($duracao_temp < $duracao)) ? 
-                    $vetados = array_merge($vetados, $temp) : null;
+                $periodo_inicio_agendado->between($periodo[0], $periodo[1]) || 
+                ($periodo_inicio_agendado->lt($inicio_temp) && ($duracao_temp < $duracao)) ? 
+                $vetados = array_merge($vetados, $temp) : null;
             }
         }
 

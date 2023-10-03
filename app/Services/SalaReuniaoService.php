@@ -202,8 +202,7 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
                 // verifica agendamentos como participante
                 if($user->tipoPessoa() == 'PF'){
                     foreach($periodos as $chave => $valor){
-                        $periodoTodo = in_array($chave, ['manha', 'tarde']);
-                        if(!empty($this->site()->participantesVetados($dia, $valor, [apenasNumeros($user->cpf_cnpj)], $periodoTodo)))
+                        if(!empty($this->site()->participantesVetados($dia, $valor, [apenasNumeros($user->cpf_cnpj)])))
                             unset($periodos[$chave]);
                     }
                 }

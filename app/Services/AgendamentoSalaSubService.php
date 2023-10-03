@@ -332,35 +332,35 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
         }
     }
 
-    public function executarRotina($removerAnexos = false)
+    public function executarRotina()
     {
-        if(!$removerAnexos)
+        $agendados = AgendamentoSala::whereNull('status')
+        ->whereDate('dia', '<=', now()->subDays(3)->toDateString())
+        ->get();
+    
+        foreach($agendados as $agendado)
         {
-            $agendados = AgendamentoSala::whereNull('status')
-            ->whereDate('dia', '<=', now()->subDays(3)->toDateString())
-            ->get();
+            $texto = $agendado->updateRotina();
+            \Log::channel('interno')->info($texto);
+        }
+    }
+
+    public function executarRotinaRemoveAnexos()
+    {
+        $agendados = AgendamentoSala::whereIn('status', [AgendamentoSala::STATUS_NAO_COMPARECEU, AgendamentoSala::STATUS_JUSTIFICADO])
+        ->whereNotNull('anexo')
+        ->whereDate('updated_at', '<=', now()->subMonth()->toDateString())
+        ->get();
     
-            foreach($agendados as $agendado)
+        foreach($agendados as $agendado)
+        {
+            $removeu = Storage::disk('local')->delete('representantes/agendamento_sala/'.$agendado->anexo);
+            if($removeu)
             {
-                $texto = $agendado->updateRotina();
-                \Log::channel('interno')->info($texto);
-            }
-        }else{
-            $agendados = AgendamentoSala::whereIn('status', [AgendamentoSala::STATUS_NAO_COMPARECEU, AgendamentoSala::STATUS_JUSTIFICADO])
-            ->whereNotNull('anexo')
-            ->whereDate('updated_at', '<=', now()->subMonth()->toDateString())
-            ->get();
-    
-            foreach($agendados as $agendado)
-            {
-                $removeu = Storage::disk('local')->delete('representantes/agendamento_sala/'.$agendado->anexo);
-                if($removeu)
-                {
-                    \Log::channel('interno')->info('[Rotina Portal - Sala de Reunião] - Removido anexo do agendamento de sala com ID ' . $agendado->id.'.');
-                    $agendado->update(['anexo' => $agendado->anexo . ' - [removido]']);
-                }else 
-                    \Log::channel('interno')->info('[Rotina Portal - Sala de Reunião] - Não foi removido anexo do agendamento de sala com ID ' . $agendado->id.'.');
-            }
+                \Log::channel('interno')->info('[Rotina Portal - Sala de Reunião] - Removido anexo do agendamento de sala com ID ' . $agendado->id.'.');
+                $agendado->update(['anexo' => $agendado->anexo . ' - [removido]']);
+            }else 
+                \Log::channel('interno')->info('[Rotina Portal - Sala de Reunião] - Não foi removido anexo do agendamento de sala com ID ' . $agendado->id.'.');
         }
     }
 }

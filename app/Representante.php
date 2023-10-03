@@ -193,28 +193,17 @@ class Representante extends Authenticable
 
         foreach($agendados as $agendado)
         {
-            $manha = $agendado->sala->horaAlmoco();
-            $tipo_periodo = $agendado->inicioDoPeriodo() <= $manha ? 'manha' : 'tarde';
-            $duracao = Carbon::parse($agendado->fimDoPeriodo())->diffInMinutes(Carbon::parse($agendado->fimDoPeriodo()));
+            $duracao = Carbon::parse($agendado->inicioDoPeriodo())->diffInMinutes(Carbon::parse($agendado->fimDoPeriodo()));
             
-            if($agendado->periodo_todo)
-                $periodosDisponiveis = Arr::except($periodosDisponiveis, 
-                    array_values(array_keys(Arr::where($periodosDisponiveis, function ($value, $key) use($tipo_periodo, $manha) {
-                        $temp = explode(' - ', $value);
-                        return $tipo_periodo == 'manha' ? $temp[0] <= $manha : $temp[0] > $manha;
-                    }))));
-            else{
-                $periodosDisponiveis = Arr::except($periodosDisponiveis, 
-                    array_values(array_keys(Arr::where($periodosDisponiveis, function ($value, $key) use($agendado, $duracao) {
-                        $temp = explode(' - ', $value);
-                        $inicio_temp = Carbon::parse($temp[0]);
-                        $inicio = Carbon::parse($agendado->inicioDoPeriodo());
-                        $duracao_temp = $inicio->diffInMinutes($inicio_temp);
-                        $inicio->addMinute();
-                        return $inicio->between($temp[0], $temp[1]) || ($inicio->lt($inicio_temp) && ($duracao_temp < $duracao));
-                    }))));
-                unset($periodosDisponiveis[$tipo_periodo]);
-            }
+            $periodosDisponiveis = Arr::except($periodosDisponiveis, 
+                array_values(array_keys(Arr::where($periodosDisponiveis, function ($value, $key) use($agendado, $duracao) {
+                    $temp = explode(' - ', $value);
+                    $inicio_temp = Carbon::parse($temp[0]);
+                    $inicio = Carbon::parse($agendado->inicioDoPeriodo());
+                    $duracao_temp = $inicio->diffInMinutes($inicio_temp);
+                    $inicio->addMinute();
+                    return $inicio->between($temp[0], $temp[1]) || ($inicio->lt($inicio_temp) && ($duracao_temp < $duracao));
+                }))));
         }
 
         return $periodosDisponiveis;
