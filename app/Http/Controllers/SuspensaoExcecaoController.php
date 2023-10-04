@@ -131,4 +131,20 @@ class SuspensaoExcecaoController extends Controller
 
         return view('admin.crud.home', $dados);
     }
+
+    public function destroy($id)
+    {
+        $this->authorize('onlyAdmin', auth()->user());
+
+        try{
+            $this->service->getService('SalaReuniao')->suspensaoExcecao()->destroy($id);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao excluir a suspensão.");
+        }
+
+        return redirect(route('sala.reuniao.suspensao.lista'))
+            ->with('message', '<i class="icon fa fa-check"></i>Suspensão com a ID: ' . $id . ' foi apagada com sucesso!')
+            ->with('class', 'alert-success');
+    }
 }

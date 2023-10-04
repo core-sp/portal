@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoSalaMail;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\InternoAgendamentoSalaMail;
 
 class AgendamentoSalaTest extends TestCase
 {
@@ -3533,7 +3534,7 @@ class AgendamentoSalaTest extends TestCase
 
         $dia = Carbon::parse($agendamento->dia)->format('d/m/Y');
         $this->get(route('sala.reuniao.dias.horas', [
-            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia, '09:00 - 12:00'
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia
         ]))
         ->assertJsonFragment([
             'horarios' => $horarios,
@@ -3568,7 +3569,7 @@ class AgendamentoSalaTest extends TestCase
 
         $dia = Carbon::parse($agendamento->dia)->format('d/m/Y');
         $this->get(route('sala.reuniao.dias.horas', [
-            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia, '09:00 - 10:00'
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia
         ]))
         ->assertJsonFragment([
             'horarios' => $horarios,
@@ -3597,7 +3598,81 @@ class AgendamentoSalaTest extends TestCase
         $dia = Carbon::parse($agendamento->dia)->format('d/m/Y');
 
         $this->get(route('sala.reuniao.dias.horas', [
-            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia, '09:30 - 10:30'
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios,
+        ]);
+
+        // Periodo todo com 30 minutos de duração e agendado das 9 as 10
+        $sala->update(['horarios_coworking' => '11:30']);
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios,
+        ]);
+
+        // Periodo todo com 1h 30 minutos de duração e agendado das 9 as 10
+        $sala->update(['horarios_coworking' => '10:30,11:30']);
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios,
+        ]);
+
+        // Periodo todo com 2h 30 minutos de duração e agendado das 9 as 10
+        $sala->update(['horarios_coworking' => '09:30']);
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia
+        ]))
+        ->assertJsonMissing([
+            'horarios' => $horarios,
+        ]);
+
+        // Agendado das 9 as 10 e das 14 as 17
+        $sala->update(['horarios_coworking' => '09:00,10:00,11:00,13:00']);
+
+        $agendamento = factory('App\AgendamentoSala')->states('reuniao')->create([
+            'sala_reuniao_id' => $sala->id,
+            'periodo_todo' => 1,
+            'periodo' => '14:00 - 17:00',
+        ]);
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
+        unset($horarios['09:00']);
+        unset($horarios['manha']);
+        unset($horarios['tarde']);
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios,
+        ]);
+
+        AgendamentoSala::find(1)->delete();
+        AgendamentoSala::find(2)->delete();
+
+        // Agendado periodo todo das 11:30 as 12 e horas das 9, 10 livres para agendar
+        $agendamento = factory('App\AgendamentoSala')->states('reuniao')->create([
+            'sala_reuniao_id' => $sala->id,
+            'periodo_todo' => 1,
+            'periodo' => '11:30 - 12:00',
+        ]);
+        $sala->update(['horarios_coworking' => '09:00,10:00,11:30']);
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
+        unset($horarios['11:30']);
+        unset($horarios['manha']);
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia
         ]))
         ->assertJsonFragment([
             'horarios' => $horarios,
@@ -3702,6 +3777,20 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
+    public function rotina_envio_emails_agendados_no_dia_kernel()
+    {
+        Mail::fake();
+        $user = $this->signInAsAdmin();
+        $users = \App\User::select('email','idregional','idperfil')->where('idperfil', 1)->get();
+        $agendamentos = $this->create_agendamentos_rotina();
+
+        $service = resolve('App\Contracts\MediadorServiceInterface');
+        $service->getService('SalaReuniao')->agendados()->executarRotinaAgendadosDoDia($users);
+
+        Mail::assertSent(InternoAgendamentoSalaMail::class);
+    }
+
+    /** @test */
     public function rotina_agendamentos_update_status_kernel()
     {
         $agendamentos = $this->create_agendamentos_rotina();
@@ -3741,7 +3830,7 @@ class AgendamentoSalaTest extends TestCase
         $agendamentos = $this->create_agendamentos_rotina();
 
         $service = resolve('App\Contracts\MediadorServiceInterface');
-        $service->getService('SalaReuniao')->agendados()->executarRotina(true);
+        $service->getService('SalaReuniao')->agendados()->executarRotinaRemoveAnexos();
 
         Storage::disk('local')->assertMissing('representantes/agendamento_sala/'.$agendamentos[4]->anexo);
         $this->assertDatabaseHas('agendamentos_salas', [
@@ -3777,7 +3866,7 @@ class AgendamentoSalaTest extends TestCase
         $agendamentos = $this->create_agendamentos_rotina();
 
         $service = resolve('App\Contracts\MediadorServiceInterface');
-        $service->getService('SalaReuniao')->agendados()->executarRotina(true);
+        $service->getService('SalaReuniao')->agendados()->executarRotinaRemoveAnexos();
 
         // remover o anexo criado no teste que não deve ser removido na rotina
         Storage::disk('local')->delete('representantes/agendamento_sala/'.$agendamentos[6]->anexo);
