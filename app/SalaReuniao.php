@@ -126,34 +126,6 @@ class SalaReuniao extends Model
         return false;
     }
 
-    private function removeHorasPorHora($periodo, $horarios_agendar, $periodo_todo = true)
-    {
-        $periodo = explode(' - ', $periodo);
-        $manha = $this->horaAlmoco();
-        $tipo_periodo = $periodo[0] <= $manha ? 'manha' : 'tarde';
-        $duracao = Carbon::parse($periodo[0])->diffInMinutes(Carbon::parse($periodo[1]));
-        
-        $horarios_agendar = $periodo_todo ? 
-            Arr::except($horarios_agendar, 
-                array_values(array_keys(Arr::where($horarios_agendar, function ($value, $key) use($tipo_periodo, $manha) {
-                    $temp = explode(' - ', $value);
-                    return $tipo_periodo == 'manha' ? $temp[0] <= $manha : $temp[0] > $manha;
-                })))) : 
-            Arr::except($horarios_agendar, 
-                array_values(array_keys(Arr::where($horarios_agendar, function ($value, $key) use($periodo, $duracao) {
-                    $temp = explode(' - ', $value);
-                    $inicio_temp = Carbon::parse($temp[0]);
-                    $periodo_inicio = Carbon::parse($periodo[0]);
-                    $duracao_temp = $periodo_inicio->diffInMinutes($inicio_temp);
-                    $periodo_inicio->addMinute();
-                    return $periodo_inicio->between($temp[0], $temp[1]) || ($periodo_inicio->lt($inicio_temp) && ($duracao_temp < $duracao));
-                }))));
-
-        unset($horarios_agendar[$tipo_periodo]);
-
-        return $horarios_agendar;
-    }
-
     public function regional()
     {
     	return $this->belongsTo('App\Regional', 'idregional');
@@ -469,9 +441,7 @@ class SalaReuniao extends Model
             foreach($agendados as $value)
             {
                 if(($tipo == 'reuniao') || (($tipo == 'coworking') && ($value->total >= $this->participantes_coworking)))
-                    $horarios_agendar = $value->periodo_todo ? 
-                    $this->removeHorasPorHora($value->periodo, $horarios_agendar) : 
-                    $this->removeHorasPorHora($value->periodo, $horarios_agendar, false);
+                    $horarios_agendar = $value->getHorasPermitidas($horarios_agendar);
             }
         }
         

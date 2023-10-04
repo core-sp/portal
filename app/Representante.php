@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticable;
 use App\Notifications\RepresentanteResetPasswordNotification;
 use Carbon\Carbon;
-use Illuminate\Support\Arr;
 
 class Representante extends Authenticable
 {
@@ -144,6 +143,11 @@ class Representante extends Authenticable
     {
         $total = 4;
 
+        // devido poder agendar somente no dia seguinte
+        $dia = Carbon::tomorrow();
+        while($dia->isWeekend())
+            $dia->addDay();
+
         $atual = $this->agendamentosSalas()
         ->when(isset($mes) && !isset($ano), function($query) use($mes){
             $query->whereMonth('dia', $mes)
@@ -157,11 +161,9 @@ class Representante extends Authenticable
             $query->whereMonth('dia', $mes)
             ->whereYear('dia', $ano);
         })
-        ->when(!isset($mes) && !isset($ano), function($query){
-            // devido poder agendar somente no dia seguinte
-            $diaSeguinte = now()->addDay();
-            $query->whereMonth('dia', $diaSeguinte->month)
-            ->whereYear('dia', $diaSeguinte->year);
+        ->when(!isset($mes) && !isset($ano), function($query) use($dia){
+            $query->whereMonth('dia', $dia->month)
+            ->whereYear('dia', $dia->year);
         })
         ->where(function($query){
             $query->whereNull('status')
@@ -170,7 +172,8 @@ class Representante extends Authenticable
         ->count() < $total;
 
         $seguinte = false;
-        $dataSeguinte = now()->addMonth();
+        // Evitar que pule mês. Ex: janeiro para fevereiro.
+        $dataSeguinte = Carbon::parse($dia->format('Y-m') . '-01')->addMonth();
         $mesSeguinte = $dataSeguinte->month;
         $anoSeguinte = $dataSeguinte->year;
         
@@ -197,30 +200,7 @@ class Representante extends Authenticable
         ->get();
 
         foreach($agendados as $agendado)
-        {
-            $manha = $agendado->sala->horaAlmoco();
-            $tipo_periodo = $agendado->inicioDoPeriodo() <= $manha ? 'manha' : 'tarde';
-            $duracao = Carbon::parse($agendado->fimDoPeriodo())->diffInMinutes(Carbon::parse($agendado->fimDoPeriodo()));
-            
-            if($agendado->periodo_todo)
-                $periodosDisponiveis = Arr::except($periodosDisponiveis, 
-                    array_values(array_keys(Arr::where($periodosDisponiveis, function ($value, $key) use($tipo_periodo, $manha) {
-                        $temp = explode(' - ', $value);
-                        return $tipo_periodo == 'manha' ? $temp[0] <= $manha : $temp[0] > $manha;
-                    }))));
-            else{
-                $periodosDisponiveis = Arr::except($periodosDisponiveis, 
-                    array_values(array_keys(Arr::where($periodosDisponiveis, function ($value, $key) use($agendado, $duracao) {
-                        $temp = explode(' - ', $value);
-                        $inicio_temp = Carbon::parse($temp[0]);
-                        $inicio = Carbon::parse($agendado->inicioDoPeriodo());
-                        $duracao_temp = $inicio->diffInMinutes($inicio_temp);
-                        $inicio->addMinute();
-                        return $inicio->between($temp[0], $temp[1]) || ($inicio->lt($inicio_temp) && ($duracao_temp < $duracao));
-                    }))));
-                unset($periodosDisponiveis[$tipo_periodo]);
-            }
-        }
+            $periodosDisponiveis = $agendado->getHorasPermitidas($periodosDisponiveis);
 
         return $periodosDisponiveis;
     }
