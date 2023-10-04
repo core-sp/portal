@@ -10,5 +10,7 @@ interface TermoConsentimentoServiceInterface {
     
     public function caminhoFile($tipo_servico = null);
 
+    public function dataAtualizacaoTermoStorage($tipo_servico = null);
+
     public function download();
 }

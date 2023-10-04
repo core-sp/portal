@@ -280,6 +280,7 @@ Route::middleware(['block_ip'])->group(function () {
             Route::get('/criar', 'SuspensaoExcecaoController@create')->name('criar');
             Route::post('/criar', 'SuspensaoExcecaoController@store')->name('store');
             Route::get('/busca', 'SuspensaoExcecaoController@busca')->name('busca');
+            Route::delete('/apagar/{id}', 'SuspensaoExcecaoController@destroy')->name('delete');
           });
         });
       });
