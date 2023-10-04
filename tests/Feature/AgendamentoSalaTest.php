@@ -3656,6 +3656,27 @@ class AgendamentoSalaTest extends TestCase
         ->assertJsonFragment([
             'horarios' => $horarios,
         ]);
+
+        AgendamentoSala::find(1)->delete();
+        AgendamentoSala::find(2)->delete();
+
+        // Agendado periodo todo das 11:30 as 12 e horas das 9, 10 livres para agendar
+        $agendamento = factory('App\AgendamentoSala')->states('reuniao')->create([
+            'sala_reuniao_id' => $sala->id,
+            'periodo_todo' => 1,
+            'periodo' => '11:30 - 12:00',
+        ]);
+        $sala->update(['horarios_coworking' => '09:00,10:00,11:30']);
+        $horarios = $sala->formatarHorariosAgendamento($sala->getHorarios('coworking'));
+        unset($horarios['11:30']);
+        unset($horarios['manha']);
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios,
+        ]);
     }
 
     /* ROTINAS KERNEL */

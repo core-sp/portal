@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 
 class AgendamentoSala extends Model
 {
@@ -76,6 +77,21 @@ class AgendamentoSala extends Model
         } while($countProtocolo != 0);
 
         return $protocoloGerado;
+    }
+
+    public function getHorasPermitidas($horarios = array())
+    {
+        $duracao = Carbon::parse($this->inicioDoPeriodo())->diffInMinutes(Carbon::parse($this->fimDoPeriodo()));
+
+        return Arr::except($horarios, 
+            array_values(array_keys(Arr::where($horarios, function ($value, $key) use($duracao) {
+                $temp = explode(' - ', $value);
+                $inicio_temp = Carbon::parse($temp[0]);
+                $periodo_inicio = Carbon::parse($this->inicioDoPeriodo());
+                $duracao_temp = $periodo_inicio->diffInMinutes($inicio_temp);
+                $periodo_inicio->addMinute();
+                return $periodo_inicio->between($temp[0], $temp[1]) || ($periodo_inicio->lt($inicio_temp) && ($duracao_temp < $duracao));
+            }))));
     }
 
     public function temAnexo()
@@ -166,7 +182,6 @@ class AgendamentoSala extends Model
     public static function participantesVetados($dia, $periodo, $cpfs, $id = null)
     {
         $vetados = array();
-        $periodo = explode(' - ', $periodo);
 
         $agendados = self::when(isset($id), function($query) use($id){
             return $query->where('id', '!=', $id);
@@ -192,18 +207,8 @@ class AgendamentoSala extends Model
                 $participantes = array_keys(json_decode($value->participantes, true));
                 $temp = array_merge($temp, array_intersect($cpfs, $participantes));
             }
-            if(!empty($temp))
-            {
-                $periodo_inicio_agendado = Carbon::parse($value->inicioDoPeriodo());
-                $inicio_temp = Carbon::parse($periodo[0]);
-                $duracao = Carbon::parse($value->inicioDoPeriodo())->diffInMinutes(Carbon::parse($value->fimDoPeriodo()));
-                $duracao_temp = $periodo_inicio_agendado->diffInMinutes($inicio_temp);
-                $periodo_inicio_agendado->addMinute();
-
-                $periodo_inicio_agendado->between($periodo[0], $periodo[1]) || 
-                ($periodo_inicio_agendado->lt($inicio_temp) && ($duracao_temp < $duracao)) ? 
-                $vetados = array_merge($vetados, $temp) : null;
-            }
+            if(!empty($temp) && empty($value->getHorasPermitidas([$periodo])))
+                $vetados = array_merge($vetados, $temp);
         }
 
         return array_unique($vetados);

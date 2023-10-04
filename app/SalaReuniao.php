@@ -126,24 +126,6 @@ class SalaReuniao extends Model
         return false;
     }
 
-    private function removeHorasPorHora($periodo, $horarios_agendar)
-    {
-        $periodo = explode(' - ', $periodo);
-        $duracao = Carbon::parse($periodo[0])->diffInMinutes(Carbon::parse($periodo[1]));
-        
-        $horarios_agendar = Arr::except($horarios_agendar, 
-            array_values(array_keys(Arr::where($horarios_agendar, function ($value, $key) use($periodo, $duracao) {
-                $temp = explode(' - ', $value);
-                $inicio_temp = Carbon::parse($temp[0]);
-                $periodo_inicio = Carbon::parse($periodo[0]);
-                $duracao_temp = $periodo_inicio->diffInMinutes($inicio_temp);
-                $periodo_inicio->addMinute();
-                return $periodo_inicio->between($temp[0], $temp[1]) || ($periodo_inicio->lt($inicio_temp) && ($duracao_temp < $duracao));
-            }))));
-
-        return $horarios_agendar;
-    }
-
     public function regional()
     {
     	return $this->belongsTo('App\Regional', 'idregional');
@@ -459,7 +441,7 @@ class SalaReuniao extends Model
             foreach($agendados as $value)
             {
                 if(($tipo == 'reuniao') || (($tipo == 'coworking') && ($value->total >= $this->participantes_coworking)))
-                    $horarios_agendar = $this->removeHorasPorHora($value->periodo, $horarios_agendar);
+                    $horarios_agendar = $value->getHorasPermitidas($horarios_agendar);
             }
         }
         

@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticable;
 use App\Notifications\RepresentanteResetPasswordNotification;
 use Carbon\Carbon;
-use Illuminate\Support\Arr;
 
 class Representante extends Authenticable
 {
@@ -192,19 +191,7 @@ class Representante extends Authenticable
         ->get();
 
         foreach($agendados as $agendado)
-        {
-            $duracao = Carbon::parse($agendado->inicioDoPeriodo())->diffInMinutes(Carbon::parse($agendado->fimDoPeriodo()));
-            
-            $periodosDisponiveis = Arr::except($periodosDisponiveis, 
-                array_values(array_keys(Arr::where($periodosDisponiveis, function ($value, $key) use($agendado, $duracao) {
-                    $temp = explode(' - ', $value);
-                    $inicio_temp = Carbon::parse($temp[0]);
-                    $inicio = Carbon::parse($agendado->inicioDoPeriodo());
-                    $duracao_temp = $inicio->diffInMinutes($inicio_temp);
-                    $inicio->addMinute();
-                    return $inicio->between($temp[0], $temp[1]) || ($inicio->lt($inicio_temp) && ($duracao_temp < $duracao));
-                }))));
-        }
+            $periodosDisponiveis = $agendado->getHorasPermitidas($periodosDisponiveis);
 
         return $periodosDisponiveis;
     }
