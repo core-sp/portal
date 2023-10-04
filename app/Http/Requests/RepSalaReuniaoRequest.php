@@ -131,7 +131,7 @@ class RepSalaReuniaoRequest extends FormRequest
 
         if(($this->total_cpfs > 0) && is_array($this->participantes_cpf))
         {
-            $vetados = $this->service->site()->participantesVetados($this->dia, $this->periodo, $this->participantes_cpf, $this->periodo_todo, $this->id);
+            $vetados = $this->service->site()->participantesVetados($this->dia, $this->periodo, $this->participantes_cpf, $this->id);
             if(!isset($vetados))
                 $this->merge(['dia' => '']);
             if(!empty($vetados))

@@ -32,6 +32,7 @@ class SuspensaoExcecaoTest extends TestCase
         $this->get(route('sala.reuniao.suspensao.criar'))->assertRedirect(route('login'));
         $this->post(route('sala.reuniao.suspensao.store'))->assertRedirect(route('login'));
         $this->get(route('sala.reuniao.suspensao.busca'))->assertRedirect(route('login'));
+        $this->delete(route('sala.reuniao.suspensao.delete', $suspenso->id))->assertRedirect(route('login'));
     }
 
     /** @test */
@@ -60,6 +61,7 @@ class SuspensaoExcecaoTest extends TestCase
             'justificativa' => $faker->sentence(100)
         ])->assertForbidden();
         $this->get(route('sala.reuniao.suspensao.busca'))->assertForbidden();
+        $this->delete(route('sala.reuniao.suspensao.delete', $suspenso->id))->assertForbidden();
     }
 
     /** @test */
@@ -655,6 +657,36 @@ class SuspensaoExcecaoTest extends TestCase
         $this->get(route('sala.reuniao.suspensao.lista'))
         ->assertOk()
         ->assertSeeText('Suspenso por 150 dias');
+    }
+
+    /** @test */
+    public function suspensao_can_be_deleted_by_admin()
+    {
+        $user = $this->signInAsAdmin();
+        $suspenso = factory('App\SuspensaoExcecao')->create();
+        
+        $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'suspensao']))->assertOk();
+
+        $this->delete(route('sala.reuniao.suspensao.delete', $suspenso->id))
+        ->assertRedirect(route('sala.reuniao.suspensao.lista'));
+
+        $this->assertSoftDeleted('suspensoes_excecoes', [
+            'id' => 1,
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_suspensao_is_deleted()
+    {
+        $user = $this->signInAsAdmin();
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
+
+        $this->delete(route('sala.reuniao.suspensao.delete', $suspenso->id));
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') excluiu *a suspensão com o CPF/CNPJ: ' . $suspenso->getCpfCnpj(). '* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /* EDITAR EXCEÇÃO */

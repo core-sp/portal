@@ -2,12 +2,15 @@
 
 namespace App\Contracts;
 
+use App\Contracts\MediadorServiceInterface;
+
 interface SalaReuniaoServiceInterface {
+    
     public function getHorasPeriodo($periodo);
 
     public function getItensByTipo($tipo);
 
-    public function listar($user);
+    public function listar($user, MediadorServiceInterface $service);
 
     public function view($id);
 

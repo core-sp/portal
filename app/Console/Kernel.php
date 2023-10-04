@@ -69,6 +69,13 @@ class Kernel extends ConsoleKernel
                     }
                 }
             }
+
+            try{
+                $service = resolve('App\Contracts\MediadorServiceInterface');
+                $service->getService('SalaReuniao')->agendados()->executarRotinaAgendadosDoDia($users);
+            } catch(\Exception $e) {
+                \Log::error($e->getMessage());
+            }
         })->dailyAt('4:00');
 
         // Rotina mensal para 'Cancelar' os agendamentos com 1 mês ou mais e status null
@@ -162,7 +169,7 @@ class Kernel extends ConsoleKernel
         // Agendamentos com anexo finalizados com 1 mês ou mais terão o anexo removido.
         $schedule->call(function(){
             $service = resolve('App\Contracts\MediadorServiceInterface');
-            $service->getService('SalaReuniao')->agendados()->executarRotina(true);
+            $service->getService('SalaReuniao')->agendados()->executarRotinaRemoveAnexos();
         })->monthlyOn(15, '2:00');
     }
 

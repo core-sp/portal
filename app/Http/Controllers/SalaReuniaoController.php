@@ -20,7 +20,7 @@ class SalaReuniaoController extends Controller
     {
         $this->authorize('viewAny', auth()->user());
         try{
-            $dados = $this->service->getService('SalaReuniao')->listar(auth()->user());
+            $dados = $this->service->getService('SalaReuniao')->listar(auth()->user(), $this->service);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar as salas de reuniões.");

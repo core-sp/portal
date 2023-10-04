@@ -8,6 +8,7 @@ use App\Events\ExternoEvent;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use App\Events\CrudEvent;
+use Carbon\Carbon;
 
 class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
 
@@ -72,6 +73,23 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
 
         if(Storage::disk('public')->exists($this->path_termos_servicos.'/CORE-SP_Termo_de_consentimento.pdf'))
             return Storage::disk('public')->path($this->path_termos_servicos.'/CORE-SP_Termo_de_consentimento.pdf');
+        return null;
+    }
+
+    public function dataAtualizacaoTermoStorage($tipo_servico = null)
+    {
+        $tipo_servico = isset($tipo_servico) ? Str::studly(str_replace('-', '_', $tipo_servico)) : $tipo_servico;
+        $data = null;
+
+        if(isset($tipo_servico) && ($tipo_servico == 'SalaReuniao'))
+            $data = Storage::disk('public')->exists($this->path_termos_servicos.'/'.Str::snake($tipo_servico) . '_condicoes.pdf') ? 
+            Storage::disk('public')->lastModified($this->path_termos_servicos.'/'.Str::snake($tipo_servico) . '_condicoes.pdf') : null;
+
+        elseif(!isset($tipo_servico) && Storage::disk('public')->exists($this->path_termos_servicos.'/CORE-SP_Termo_de_consentimento.pdf'))
+            $data = Storage::disk('public')->lastModified($this->path_termos_servicos.'/CORE-SP_Termo_de_consentimento.pdf');
+
+        if(isset($data))
+            return Carbon::parse($data)->setTimezone('America/Sao_Paulo')->format('d/m/Y, \à\s H:i');
         return null;
     }
 

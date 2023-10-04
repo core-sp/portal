@@ -16,5 +16,7 @@ interface SuspensaoExcecaoSubServiceInterface {
 
     public function participantesSuspensos($cpfs);
 
+    public function destroy($id);
+
     public function executarRotina($service);
 }
