@@ -105,12 +105,14 @@ $now = now();
 								@endif
 							</div>
 							<div class="col-md-4 mt-2-768">
-								<label for="registrocore">Nº de registro no CORE</label>
+								<label for="registrocore">Nº de registro no CORE {{ in_array($curso->idcurso, ['64']) ? '*' : '' }}</label>
 								<input type="text"
 									class="form-control {{ $errors->has('registrocore') ? 'is-invalid' : '' }}"
 									name="registrocore"
 									value="{{ old('registrocore') }}"
-									placeholder="Registro no CORE (opcional)" />
+									placeholder="Registro no CORE {{ in_array($curso->idcurso, ['64']) ? '' : '(opcional)' }}"
+									{{ in_array($curso->idcurso, ['64']) ? 'required' : '' }}
+								/>
 								@if($errors->has('registrocore'))
 									<div class="invalid-feedback">
 										{{ $errors->first('registrocore') }}
@@ -135,6 +137,11 @@ $now = now();
 						</div>
 						@endif
 						</div>
+
+						@if(in_array($curso->idcurso, ['64']))
+						<p class="mt-2"><i>Dúvidas ou mais informações:</i> <a href="mailto:comunicacao.adm02@core-sp.org.br">comunicacao.adm02@core-sp.org.br</a></p>
+						@endif
+						
 						<div class="float-right">
 							<a href="/curso/{{ $curso->idcurso }}" class="btn btn-default">Cancelar</a>
 							<button type="submit" class="btn btn-primary">Inscrever-se</button>
