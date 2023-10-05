@@ -247,7 +247,7 @@ class CursoInscritoController extends Controller
             'nome' => 'required|max:191|regex:/^[a-zA-Z ÁáÉéÍíÓóÚúÃãÕõÂâÊêÔô]+$/',
             'telefone' => 'required|max:191|min:14',
             'email' => 'email|max:191',
-            'registrocore' => 'max:191',
+            'registrocore' => in_array($idcurso, ['64']) ? 'required|min:4|max:30' : 'max:191',
             'termo' => 'sometimes|required|accepted'
         ];
         $mensagens = [
@@ -256,6 +256,7 @@ class CursoInscritoController extends Controller
             'nome.regex' => 'Nome inválido',
             'cpf.unique' => 'O CPF informado já está cadastrado neste curso',
             'max' => 'O :attribute excedeu o limite de caracteres permitido',
+            'min' => 'O :attribute deve ter :min ou mais caracteres',
             'telefone.min' => 'Telefone inválido',
             'accepted' => 'Você deve concordar com o Termo de Consentimento',
         ];
