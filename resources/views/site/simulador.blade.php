@@ -237,6 +237,11 @@
             <p class="light">Simulação emitida em: <strong>{{ date('d\/m\/Y') }}</strong></p>
           @endif
         </div>
+
+        @if(Request::input('dataInicio'))
+        <button class="btn btn-sm btn-secondary float-right" id="btnPrintSimulador">Imprimir</button>
+        @endif
+
       </div>
       <div class="col-lg-4">
         @include('site.inc.content-sidebar')

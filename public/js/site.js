@@ -1132,3 +1132,9 @@ $("#logout-representante").click(function(){
 	$('body').append(form);
 	$(form).submit();
 });
+
+$('#btnPrintSimulador').click(function(){
+	var myWindow = window.open();
+	myWindow.document.write($('#simuladorTxt').html());
+	myWindow.print();
+});
