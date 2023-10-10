@@ -3,6 +3,8 @@
     @csrf
     @method('PUT')
     <div class="card-body">
+        <h5><strong>Status:</strong> <span class="{{ $resultado->isAtivado() ? 'text-success' : 'text-danger' }}">{{ $resultado->status }}</span></h5>
+
         @if($resultado->area == $resultado::areas()[1])
         <p><strong><span class="text-danger">ATENÇÃO!</span></strong> Esse aviso <strong>ATIVADO</strong> desabilita o envio de formulário para anunciar vaga!</p>
         @endif
@@ -39,6 +41,34 @@
                     </label>
                 </div>
                 @endforeach
+            </div>
+        </div>
+        <div class="form-row mb-3">
+            <div class="col">
+                <label for="dia_hora_ativar">Dia e hora para <span class="text-success">ativar</span> o aviso <small>(opcional)</small></label>
+                <input type="datetime-local"
+                    class="form-control {{ $errors->has('dia_hora_ativar') ? 'is-invalid' : '' }}"
+                    name="dia_hora_ativar"
+                    value="{{ isset($resultado) ? $resultado->formatDtAtivarToInput() : old('dia_hora_ativar') }}"
+                />
+                @if($errors->has('dia_hora_ativar'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('dia_hora_ativar') }}
+                    </div>
+                @endif
+            </div>
+            <div class="col">
+                <label for="dia_hora_desativar">Dia e hora para <span class="text-danger">desativar</span> o aviso <small>(opcional)</small></label>
+                <input type="datetime-local"
+                    class="form-control {{ $errors->has('dia_hora_desativar') ? 'is-invalid' : '' }}"
+                    name="dia_hora_desativar"
+                    value="{{ isset($resultado) ? $resultado->formatDtDesativarToInput() : old('dia_hora_desativar') }}"
+                />
+                @if($errors->has('dia_hora_desativar'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('dia_hora_desativar') }}
+                    </div>
+                @endif
             </div>
         </div>
         <div class="form-group mt-2">

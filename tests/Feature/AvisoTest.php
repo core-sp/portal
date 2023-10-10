@@ -130,6 +130,62 @@ class AvisoTest extends TestCase
         $this->assertDatabaseHas('avisos', ['status' => $dados['status']]);
     }
 
+    /** @test */
+    public function aviso_can_be_edited_with_dia_hora_ativar()
+    {
+        $user = $this->signInAsAdmin();
+
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_ativar' => now()->addHour()->format('Y-m-d H:i')
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertRedirect(route('avisos.index'));
+
+        $this->assertDatabaseHas('avisos', [
+            'dia_hora_ativar' => $dados['dia_hora_ativar']
+        ]);
+    }
+
+    /** @test */
+    public function aviso_can_be_edited_with_dia_hora_desativar()
+    {
+        $user = $this->signInAsAdmin();
+
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_desativar' => now()->addHour()->format('Y-m-d H:i')
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertRedirect(route('avisos.index'));
+
+        $this->assertDatabaseHas('avisos', [
+            'dia_hora_desativar' => $dados['dia_hora_desativar']
+        ]);
+    }
+
+    /** @test */
+    public function aviso_can_be_edited_with_dia_hora_ativar_and_dia_hora_desativar()
+    {
+        $user = $this->signInAsAdmin();
+
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_ativar' => now()->addHour()->format('Y-m-d H:i'),
+            'dia_hora_desativar' => now()->addDay()->format('Y-m-d H:i')
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertRedirect(route('avisos.index'));
+
+        $this->assertDatabaseHas('avisos', [
+            'dia_hora_ativar' => $dados['dia_hora_ativar'],
+            'dia_hora_desativar' => $dados['dia_hora_desativar']
+        ]);
+    }
+
     /** @test 
      * 
      * Status do aviso não pode ser editado pelo usuario sem permissão.
@@ -217,6 +273,172 @@ class AvisoTest extends TestCase
         $dados = factory('App\Aviso')->raw();
         $this->put(route('avisos.editar', $aviso->id), $dados)->assertRedirect(route('login'));
         $this->assertDatabaseMissing('avisos', ['titulo' => $dados['titulo']]);
+    }
+
+    /** @test */
+    public function cannot_updated_aviso_with_dia_hora_desativar_input_invalid_type()
+    {
+        $user = $this->signInAsAdmin();
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_desativar' => 'abc',
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertSessionHasErrors('dia_hora_desativar');
+    }
+
+    /** @test */
+    public function cannot_updated_aviso_with_dia_hora_desativar_input_invalid_format()
+    {
+        $user = $this->signInAsAdmin();
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_desativar' => now()->format('d/m/Y'),
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertSessionHasErrors('dia_hora_desativar');
+    }
+
+    /** @test */
+    public function cannot_updated_aviso_with_dia_hora_desativar_input_invalid_day()
+    {
+        $user = $this->signInAsAdmin();
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_desativar' => now()->subDay()->format('Y-m-d H:i'),
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertSessionHasErrors('dia_hora_desativar');
+    }
+
+    /** @test */
+    public function cannot_updated_aviso_with_dia_hora_desativar_input_invalid_hour()
+    {
+        $user = $this->signInAsAdmin();
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_desativar' => now()->subHour()->format('Y-m-d H:i'),
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertSessionHasErrors('dia_hora_desativar');
+    }
+
+    /** @test */
+    public function cannot_updated_aviso_with_dia_hora_desativar_input_invalid_minute()
+    {
+        $user = $this->signInAsAdmin();
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_desativar' => now()->format('Y-m-d H:i'),
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertSessionHasErrors('dia_hora_desativar');
+    }
+
+    /** @test */
+    public function cannot_updated_aviso_with_dia_hora_ativar_input_invalid_type()
+    {
+        $user = $this->signInAsAdmin();
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_ativar' => 'abc',
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertSessionHasErrors('dia_hora_ativar');
+    }
+
+    /** @test */
+    public function cannot_updated_aviso_with_dia_hora_ativar_input_invalid_format()
+    {
+        $user = $this->signInAsAdmin();
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_ativar' => now()->format('d/m/Y'),
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertSessionHasErrors('dia_hora_ativar');
+    }
+
+    /** @test */
+    public function cannot_updated_aviso_with_dia_hora_ativar_input_invalid_day()
+    {
+        $user = $this->signInAsAdmin();
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_ativar' => now()->subDay()->format('Y-m-d H:i'),
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertSessionHasErrors('dia_hora_ativar');
+    }
+
+    /** @test */
+    public function cannot_updated_aviso_with_dia_hora_ativar_input_invalid_hour()
+    {
+        $user = $this->signInAsAdmin();
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_ativar' => now()->subHour()->format('Y-m-d H:i'),
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertSessionHasErrors('dia_hora_ativar');
+    }
+
+    /** @test */
+    public function cannot_updated_aviso_with_dia_hora_ativar_input_invalid_minute()
+    {
+        $user = $this->signInAsAdmin();
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_ativar' => now()->format('Y-m-d H:i'),
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertSessionHasErrors('dia_hora_ativar');
+    }
+
+    /** @test */
+    public function cannot_updated_aviso_with_dia_hora_desativar_input_less_than_dia_hora_ativar_input()
+    {
+        $user = $this->signInAsAdmin();
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_ativar' => now()->addHour()->format('Y-m-d H:i'),
+            'dia_hora_desativar' => now()->format('Y-m-d H:i'),
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertSessionHasErrors('dia_hora_desativar');
+
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_ativar' => now()->addHour()->format('Y-m-d H:i'),
+            'dia_hora_desativar' => now()->addHour()->addMinutes(59)->format('Y-m-d H:i'),
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertSessionHasErrors('dia_hora_desativar');
+    }
+
+    /** @test */
+    public function cannot_updated_aviso_with_dia_hora_desativar_input_equal_dia_hora_ativar_input()
+    {
+        $user = $this->signInAsAdmin();
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'dia_hora_ativar' => now()->addHour()->format('Y-m-d H:i'),
+            'dia_hora_desativar' => now()->addHour()->format('Y-m-d H:i'),
+        ]);
+
+        $this->put(route('avisos.editar', $aviso->id), $dados)
+        ->assertSessionHasErrors('dia_hora_desativar');
     }
 
     /** @test 
@@ -685,5 +907,163 @@ class AvisoTest extends TestCase
             'message' => 'Empresa já cadastrada. Favor seguir com o preenchimento da oportunidade abaixo.',
             'class' => 'alert-success'
         ]);
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES AVISO NA PÁGINA DE ANUIDADE
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function view_aviso_anuidade_with_status_ativado()
+    {
+        $aviso = factory('App\Aviso')->states('anuidade')->create([
+            'status' => 'Ativado',
+        ]);
+        $this->get(route('anuidade-ano-vigente'))->assertSee($aviso->conteudo);
+    }
+
+    /** @test */
+    public function cannot_view_aviso_anuidade_with_status_desativado()
+    {
+        $aviso = factory('App\Aviso')->states('anuidade')->create();
+        $this->get(route('anuidade-ano-vigente'))->assertDontSee($aviso->conteudo);
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES AVISO NA PÁGINA DE AGENDAMENTO
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function view_aviso_agendamento_with_status_ativado()
+    {
+        $aviso = factory('App\Aviso')->states('agendamento')->create([
+            'status' => 'Ativado',
+        ]);
+        $this->get(route('agendamentosite.formview'))->assertSee($aviso->conteudo);
+    }
+
+    /** @test */
+    public function cannot_view_aviso_agendamento_with_status_desativado()
+    {
+        $aviso = factory('App\Aviso')->states('agendamento')->create();
+        $this->get(route('agendamentosite.formview'))->assertDontSee($aviso->conteudo);
+    }
+
+    /* ROTINAS KERNEL */
+
+    /** @test */
+    public function kernel_desativar()
+    {
+        $aviso_bdo = factory('App\Aviso')->states(['bdo', 'data_desativar'])->create();
+        $aviso_rep = factory('App\Aviso')->states('data_desativar')->create();
+
+        $this->assertDatabaseHas('avisos', [
+            'titulo' => $aviso_bdo['titulo'],
+            'status' => 'Ativado',
+            'dia_hora_desativar' => $aviso_bdo->dia_hora_desativar
+        ]);
+
+        $this->assertDatabaseHas('avisos', [
+            'titulo' => $aviso_rep['titulo'],
+            'status' => 'Ativado',
+            'dia_hora_desativar' => $aviso_rep->dia_hora_desativar
+        ]);
+
+        $service = resolve('App\Contracts\MediadorServiceInterface');
+        $service->getService('Aviso')->executarRotina();
+
+        $this->assertDatabaseHas('avisos', [
+            'titulo' => $aviso_bdo['titulo'],
+            'status' => 'Desativado',
+            'dia_hora_desativar' => null
+        ]);
+
+        $this->assertDatabaseHas('avisos', [
+            'titulo' => $aviso_rep['titulo'],
+            'status' => 'Desativado',
+            'dia_hora_desativar' => null
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_kernel_desativar()
+    {
+        $aviso_bdo = factory('App\Aviso')->states(['bdo', 'data_desativar'])->create();
+
+        $service = resolve('App\Contracts\MediadorServiceInterface');
+        $service->getService('Aviso')->executarRotina();
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [Rotina Portal - Avisos] - Aviso com ID ';
+        $txt = $inicio . $aviso_bdo->id. ' e da área "' . $aviso_bdo->area. '" foi desativado.';
+        $this->assertStringContainsString($txt, $log);
+
+        $aviso_rep = factory('App\Aviso')->states('data_desativar')->create();
+        $service->getService('Aviso')->executarRotina();
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [Rotina Portal - Avisos] - Aviso com ID ';
+        $txt = $inicio . $aviso_rep->id. ' e da área "' . $aviso_rep->area. '" foi desativado.';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function kernel_ativar()
+    {
+        $aviso_bdo = factory('App\Aviso')->states(['bdo', 'data_ativar'])->create();
+        $aviso_rep = factory('App\Aviso')->states('data_ativar')->create();
+
+        $this->assertDatabaseHas('avisos', [
+            'titulo' => $aviso_bdo['titulo'],
+            'status' => 'Desativado',
+            'dia_hora_ativar' => $aviso_bdo->dia_hora_ativar
+        ]);
+
+        $this->assertDatabaseHas('avisos', [
+            'titulo' => $aviso_rep['titulo'],
+            'status' => 'Desativado',
+            'dia_hora_ativar' => $aviso_rep->dia_hora_ativar
+        ]);
+
+        $service = resolve('App\Contracts\MediadorServiceInterface');
+        $service->getService('Aviso')->executarRotina();
+
+        $this->assertDatabaseHas('avisos', [
+            'titulo' => $aviso_bdo['titulo'],
+            'status' => 'Ativado',
+            'dia_hora_ativar' => null
+        ]);
+
+        $this->assertDatabaseHas('avisos', [
+            'titulo' => $aviso_rep['titulo'],
+            'status' => 'Ativado',
+            'dia_hora_ativar' => null
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_kernel_ativar()
+    {
+        $aviso_bdo = factory('App\Aviso')->states(['bdo', 'data_ativar'])->create();
+
+        $service = resolve('App\Contracts\MediadorServiceInterface');
+        $service->getService('Aviso')->executarRotina();
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [Rotina Portal - Avisos] - Aviso com ID ';
+        $txt = $inicio . $aviso_bdo->id. ' e da área "' . $aviso_bdo->area. '" foi ativado.';
+        $this->assertStringContainsString($txt, $log);
+
+        $aviso_rep = factory('App\Aviso')->states('data_ativar')->create();
+        $service->getService('Aviso')->executarRotina();
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [Rotina Portal - Avisos] - Aviso com ID ';
+        $txt = $inicio . $aviso_rep->id. ' e da área "' . $aviso_rep->area. '" foi ativado.';
+        $this->assertStringContainsString($txt, $log);
     }
 }

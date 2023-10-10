@@ -28,6 +28,8 @@ class AvisoService implements AvisoServiceInterface {
             'Id',
             'Área',
             'Título',
+            'Dia / Hora para <span class="text-success">ativar</span>',
+            'Dia / Hora para <span class="text-danger">desativar</span>',
             'Última Atualização',
             'Ações'
         ];
@@ -53,6 +55,8 @@ class AvisoService implements AvisoServiceInterface {
                 $resultado->id,
                 $resultado->area,
                 $resultado->titulo,
+                isset($resultado->dia_hora_ativar) ? formataData($resultado->dia_hora_ativar) : '-----',
+                isset($resultado->dia_hora_desativar) ? formataData($resultado->dia_hora_desativar) : '-----',
                 formataData($resultado->updated_at). '<br><small>Por: ' .$user. '</small>',
                 $acoes
             ];
@@ -80,7 +84,7 @@ class AvisoService implements AvisoServiceInterface {
 
     public function listar()
     {
-        $resultados = Aviso::with(['user'])->orderBy('id')->paginate(5);
+        $resultados = Aviso::with(['user'])->orderBy('area')->paginate(10);
 
         return [
             'resultados' => $resultados, 
@@ -155,5 +159,28 @@ class AvisoService implements AvisoServiceInterface {
     public function existeAtivado()
     {
         return Aviso::where('status', Aviso::ATIVADO)->exists();
+    }
+
+    public function executarRotina()
+    {
+        // ativar
+        $avisos = Aviso::where('dia_hora_ativar', '<=', now()->format('Y-m-d H:i'))->get();
+
+        foreach($avisos as $aviso)
+        {
+            $aviso->update(['status' => Aviso::ATIVADO, 'dia_hora_ativar' => null]);
+            \Log::channel('interno')->info('[Rotina Portal - Avisos] - Aviso com ID ' . $aviso->id.' e da área "' . $aviso->area. '" foi ativado.');
+        }
+
+        unset($avisos);
+
+        // desativar
+        $avisos = Aviso::where('dia_hora_desativar', '<=', now()->format('Y-m-d H:i'))->get();
+
+        foreach($avisos as $aviso)
+        {
+            $aviso->update(['status' => Aviso::DESATIVADO, 'dia_hora_desativar' => null]);
+            \Log::channel('interno')->info('[Rotina Portal - Avisos] - Aviso com ID ' . $aviso->id.' e da área "' . $aviso->area. '" foi desativado.');
+        }
     }
 }

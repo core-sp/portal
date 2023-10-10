@@ -25,4 +25,6 @@ interface AvisoServiceInterface {
     public function getById($id);
 
     public function existeAtivado();
+
+    public function executarRotina();
 }
