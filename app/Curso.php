@@ -14,7 +14,10 @@ class Curso extends Model
     protected $primaryKey = 'idcurso';
     protected $table = 'cursos';
     protected $fillable = ['tipo', 'tema', 'img', 'datarealizacao', 'datatermino',
-    'endereco', 'nrvagas', 'descricao', 'resumo', 'publicado', 'idregional', 'idusuario'];
+    'endereco', 'nrvagas', 'descricao', 'resumo', 'publicado', 'idregional', 'idusuario', 'acesso'];
+
+    const ACESSO_PRI = 'Privado';
+    const ACESSO_PUB = 'Público';
 
     public function regional()
     {
@@ -53,7 +56,7 @@ class Curso extends Model
 
     private function tabelaHeaders()
     {
-        return ['Turma', 'Tipo / Tema', 'Onde / Quando', 'Vagas', 'Regional', 'Ações'];
+        return ['Turma', 'Tipo / Tema', 'Onde / Quando', 'Vagas', 'Regional', 'Acesso', 'Ações'];
     }
 
     private function tabelaContents($query)
@@ -82,6 +85,7 @@ class Curso extends Model
                 $endereco.'<br />'.formataData($row->datarealizacao),
                 (new CursoRepository())->getCursoContagem($row->idcurso).' / '.$row->nrvagas,
                 $row->regional->regional,
+                $row->acesso,
                 $acoes
             ];
         })->toArray();
@@ -117,5 +121,18 @@ class Curso extends Model
             $contents,
             [ 'table', 'table-hover' ]
         );
+    }
+
+    public function liberarAcesso($rep = false)
+    {
+        return ($this->acesso == self::ACESSO_PUB) || (($this->acesso == self::ACESSO_PRI) && $rep);
+    }
+
+    public function textoAcesso()
+    {
+        if($this->acesso == self::ACESSO_PUB)
+            return 'Aberta ao público';
+        if($this->acesso == self::ACESSO_PRI)
+            return 'Restrita para representantes';
     }
 }

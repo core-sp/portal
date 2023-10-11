@@ -561,6 +561,18 @@ class RepresentanteSiteController extends Controller
         ]);
     }
 
+    public function cursos()
+    {
+        try{
+            $cursos = null;
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os cursos.");
+        }
+
+        return view('site.representante.cursos', ['cursos' => $cursos]);
+    }
+
     public function agendamentoSala($acao = null, $id = null)
     {
         try{

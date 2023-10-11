@@ -123,6 +123,7 @@ class CursoInscritoController extends Controller
         return view('admin.crud.criar', compact('curso', 'variaveis'));
     }
 
+    // inscrição via área admin
     public function store(Request $request)
     {
         $this->authorize('create', auth()->user());
@@ -175,6 +176,7 @@ class CursoInscritoController extends Controller
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
 
+    // atualizar inscrição via área admin
     public function update(Request $request, $id)
     {
         $this->authorize('updateOther', auth()->user());
@@ -229,18 +231,30 @@ class CursoInscritoController extends Controller
     {
         if ($this->permiteInscricao($idcurso)) {
             $curso = Curso::findOrFail($idcurso);
-            if ($curso) 
+            if ($curso && $curso->liberarAcesso(auth()->guard('representante')->check())) 
                 return view('site.curso-inscricao', compact('curso'));
             else
-                abort(500);
+                return redirect()->route('cursos.show', $idcurso)->with([
+                    'message' => '<i class="fas fa-lock"></i>&nbsp;Deve realizar login na área restrita do representante para se inscrever',
+                    'class' => 'alert-info'
+                ]);
         } else {
             abort(500);
         }
     }
 
+    // inscrição via área aberta
     public function inscricao(Request $request)
     {
         $idcurso = $request->input('idcurso');
+
+        $curso = Curso::findOrFail($idcurso);
+        if(!$curso->liberarAcesso(auth()->guard('representante')->check()))
+            return redirect()->route('cursos.show', $idcurso)->with([
+                'message' => '<i class="fas fa-lock"></i>&nbsp;Deve realizar login na área restrita do representante para se inscrever',
+                'class' => 'alert-info'
+            ]);
+
         $unique = in_array($idcurso, ['43', '44', '45']) ? null : 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL';
         $regras = [
             'cpf' => ['required', 'max:191', new Cpf, $unique/*'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL'*/],

@@ -21,7 +21,8 @@ class CursoRequest extends FormRequest
             'datatermino' => 'required',
             'endereco' => 'required_unless:tipo,Live|max:255',
             'nrvagas' => 'required|numeric',
-            'descricao' => 'required'
+            'descricao' => 'required',
+            'acesso' => 'required|in:Privado,Público',
         ];
     }
 
@@ -32,7 +33,8 @@ class CursoRequest extends FormRequest
             'datarealizacao.required' => 'Informe a data de realização do curso',
             'datatermino.required' => 'Informe a data de término do curso',
             'numeric' => 'O :attribute aceita apenas números',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+            'max' => 'O :attribute excedeu o limite de caracteres permitido',
+            'in' => 'Valor inválido',
         ];
     }
 }

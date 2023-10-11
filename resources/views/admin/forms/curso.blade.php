@@ -244,7 +244,20 @@ $tipos = CursoHelper::tipos();
                 @endif
                 </div>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-2">
+                <label for="acesso">Acesso</label>
+                <select name="acesso" class="form-control">
+                @foreach(['Privado', 'Público'] as $acesso)
+                    <option value="{{ $acesso }}" {{ isset($resultado) && ($resultado->acesso == $acesso) ? 'selected' : '' }}>{{ $acesso }}</option>
+                @endforeach
+                </select>
+                @if($errors->has('acesso'))
+                <div class="invalid-feedback">
+                    {{ $errors->first('acesso') }}
+                </div>
+                @endif
+            </div>
+            <div class="col-sm-2">
                 <label for="publicado">Publicar agora?</label>
                 <select name="publicado" class="form-control">
                     @if(isset($resultado))

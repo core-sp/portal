@@ -45,6 +45,9 @@ $now = now();
       </div>
     </div>
     <div class="linha-lg"></div>
+    @if(Session::has('message'))
+      <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
+    @endif
     <div class="row mt-2">
       <div class="col-lg-4 edital-info">
         <table class="table table-bordered mb-4">
@@ -84,6 +87,10 @@ $now = now();
             <tr>
               <td><h6>Nº de vagas</h6></td>
               <td><h6 class="light">{{ $curso->nrvagas }}</h6></td>
+            </tr>
+            <tr>
+              <td><h6>Inscrição</h6></td>
+              <td><h6 class="light">{{ $curso->textoAcesso() }}</h6></td>
             </tr>
           </tbody>
         </table>

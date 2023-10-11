@@ -26,6 +26,7 @@ $factory->define(Curso::class, function (Faker $faker) {
         'nrvagas' => $faker->numberBetween(10, 200),
         'descricao' => $faker->text,
         'resumo' => $faker->sentence,
+        'acesso' => Curso::ACESSO_PRI,
         'publicado' => 'Sim',
         'idregional' => factory('App\Regional'),
         'idusuario' => Auth::id() !== null ? Auth::id() : factory('App\User')

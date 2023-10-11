@@ -57,6 +57,7 @@ class CursoRepository {
             'descricao' => $request->descricao,
             'publicado' => $request->publicado,
             'resumo' => $request->resumo,
+            'acesso' => $request->acesso,
             'idusuario' => $request->idusuario
         ]);
     }
@@ -78,6 +79,7 @@ class CursoRepository {
             'descricao' => $request->descricao,
             'publicado' => $request->publicado,
             'resumo' => $request->resumo,
+            'acesso' => $request->acesso,
             'idusuario' => $request->idusuario
         ]);
     }
