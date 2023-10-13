@@ -55,8 +55,10 @@ $now = now();
 								<input type="text"
 									class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
 									name="nome"
-									value="{{ old('nome') }}"
-									placeholder="Nome" />
+									value="{{ isset($user_rep) ? $user_rep->nome : old('nome') }}"
+									placeholder="Nome"
+									{{ isset($user_rep) ? 'disabled' : '' }}
+								/>
 								@if($errors->has('nome'))
 									<div class="invalid-feedback">
 										{{ $errors->first('nome') }}
@@ -68,8 +70,10 @@ $now = now();
 								<input type="text"
 									class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}""
 									name="email"
-									value="{{ old('email') }}"
-									placeholder="Email" />
+									value="{{ isset($user_rep) ? $user_rep->email : old('email') }}"
+									placeholder="Email" 
+									{{ isset($user_rep) ? 'disabled' : '' }}
+								/>
 								@if($errors->has('email'))
 									<div class="invalid-feedback">
 										{{ $errors->first('email') }}
@@ -79,12 +83,14 @@ $now = now();
 						</div>
 						<div class="form-row mt-2 mb-4">
 							<div class="col-md-4">	
-								<label for="cpf">CPF *</label>
+								<label for="cpf">{{ isset($user_rep) && ($user_rep->tipoPessoa() == 'PJ') ? 'CNPJ' : 'CPF' }} *</label>
 								<input type="text"
-									class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
+									class="form-control {{ isset($user_rep) ? '' : 'cpfInput' }} {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
 									name="cpf"
-									value="{{ old('cpf') }}"
-									placeholder="CPF" />
+									value="{{ isset($user_rep) ? $user_rep->cpf_cnpj : old('cpf') }}"
+									placeholder="{{ isset($user_rep) && ($user_rep->tipoPessoa() == 'PJ') ? 'CNPJ' : 'CPF' }}" 
+									{{ isset($user_rep) ? 'disabled' : '' }}
+								/>
 								@if($errors->has('cpf'))
 									<div class="invalid-feedback">
 										{{ $errors->first('cpf') }}
@@ -96,8 +102,10 @@ $now = now();
 								<input type="text"
 									class="form-control celularInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
 									name="telefone"
-									value="{{ old('telefone') }}"
-									placeholder="Telefone" />
+									value="{{ isset($user_rep) ? $user_rep->telefone : old('telefone') }}"
+									placeholder="Telefone" 
+									{{ isset($user_rep) ? 'disabled' : '' }}
+								/>
 								@if($errors->has('telefone'))
 									<div class="invalid-feedback">
 										{{ $errors->first('telefone') }}
@@ -109,9 +117,9 @@ $now = now();
 								<input type="text"
 									class="form-control {{ $errors->has('registrocore') ? 'is-invalid' : '' }}"
 									name="registrocore"
-									value="{{ old('registrocore') }}"
-									placeholder="Registro no CORE {{ in_array($curso->idcurso, ['64']) ? '' : '(opcional)' }}"
-									{{ in_array($curso->idcurso, ['64']) ? 'required' : '' }}
+									value="{{ isset($user_rep) ? $user_rep->registro_core : old('registrocore') }}"
+									placeholder="Registro no CORE {{ isset($user_rep) ? '' : '(opcional)' }}"
+									{{ isset($user_rep) ? 'disabled' : '' }}
 								/>
 								@if($errors->has('registrocore'))
 									<div class="invalid-feedback">

@@ -564,7 +564,12 @@ class RepresentanteSiteController extends Controller
     public function cursos()
     {
         try{
-            $cursos = null;
+            // Enquanto não refatorar o serviço de cursos
+            $cursos = \App\Curso::select('idcurso','img','idregional','tipo','tema','datarealizacao')
+                ->where('datatermino','>=', now()->format('Y-m-d H:i'))
+                ->where('publicado','Sim')
+                ->where('acesso', \App\Curso::ACESSO_PRI)
+                ->paginate(6);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os cursos.");

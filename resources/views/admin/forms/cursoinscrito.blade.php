@@ -111,6 +111,19 @@
                 </div>
                 @endif
             </div>
+            <div class="col">
+                <label for="tipo_inscrito">Tipo da incrição</label>
+                <select name="tipo_inscrito" class="form-control" required>
+                @foreach($tipos as $tipo)
+                    <option value="{{ $tipo }}" {{ isset($resultado) && ($resultado->tipo_inscrito == $tipo) ? 'selected' : '' }}>{{ $tipo }}</option>
+                @endforeach
+                </select>
+                @if($errors->has('tipo_inscrito'))
+                <div class="invalid-feedback">
+                {{ $errors->first('tipo_inscrito') }}
+                </div>
+                @endif
+            </div>
         </div>
     </div>
     <div class="card-footer">

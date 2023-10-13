@@ -26,7 +26,7 @@ class Curso extends Model
 
     public function cursoinscrito()
     {
-    	return $this->hasMany('App\CursoInscrito', 'idcursoinscrito');
+    	return $this->hasMany('App\CursoInscrito', 'idcurso');
     }
 
     public function user()
@@ -123,9 +123,9 @@ class Curso extends Model
         );
     }
 
-    public function liberarAcesso($rep = false)
+    public function liberarAcesso($rep = false, $situacao = '')
     {
-        return ($this->acesso == self::ACESSO_PUB) || (($this->acesso == self::ACESSO_PRI) && $rep);
+        return ($this->acesso == self::ACESSO_PUB) || (($this->acesso == self::ACESSO_PRI) && $rep && ($situacao == 'Situação: Em dia.'));
     }
 
     public function textoAcesso()

@@ -19,6 +19,7 @@ use Auth;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
+use App\Repositories\GerentiRepositoryInterface;
 
 class CursoInscritoController extends Controller
 {
@@ -32,10 +33,12 @@ class CursoInscritoController extends Controller
         'pluraliza' => 'inscritos',
         'busca' => 'cursos/inscritos'
     ];
+    private $gerentiRepository;
     
-    public function __construct()
+    public function __construct(GerentiRepositoryInterface $gerentiRepository)
     {
         $this->middleware('auth', ['except' => ['inscricao', 'inscricaoView']]);
+        $this->gerentiRepository = $gerentiRepository;
     }
 
     public static function tabelaCompleta($resultados, $idcurso = null)
@@ -46,6 +49,7 @@ class CursoInscritoController extends Controller
             'Nome',
             'Telefone',
             'Email',
+            'Tipo da Inscrição',
             'Ações'
         ];
         // Opções de conteúdo da tabela
@@ -91,6 +95,7 @@ class CursoInscritoController extends Controller
                 $resultado->nome,
                 $resultado->telefone,
                 $resultado->email,
+                $resultado->tipo_inscrito,
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -120,7 +125,8 @@ class CursoInscritoController extends Controller
             'titulo_criar' => 'Adicionar inscrito em '.$curso->tipo.': '.$curso->tema,
         ];
         $variaveis = (object) $variaveis;
-        return view('admin.crud.criar', compact('curso', 'variaveis'));
+        $tipos = CursoInscrito::tiposInscricao();
+        return view('admin.crud.criar', compact('curso', 'variaveis', 'tipos'));
     }
 
     // inscrição via área admin
@@ -132,14 +138,16 @@ class CursoInscritoController extends Controller
             'nome' => 'required|max:191',
             'telefone' => 'required|max:191|min:14',
             'email' => 'required|email|max:191',
-            'registrocore' => 'max:191'
+            'registrocore' => 'max:191',
+            'tipo_inscrito' => 'required|in:' . implode(',', CursoInscrito::tiposInscricao()),
         ];
         $mensagens = [
             'cpf.unique' => 'Este CPF já está cadastrado para o curso',
             'required' => 'O :attribute é obrigatório',
             'max' => 'O :attribute excedeu o limite de caracteres permitido',
             'telefone.min' => 'Telefone inválido',
-            'email' => 'Digite um email válido'
+            'email' => 'Digite um email válido',
+            'in' => 'Valor inválido',
         ];
         $erros = $request->validate($regras, $mensagens);
 
@@ -152,6 +160,7 @@ class CursoInscritoController extends Controller
             'email' => request('email'),
             'registrocore' => request('registrocore'),
             'idcurso' => request('idcurso'),
+            'tipo_inscrito' => request('tipo_inscrito'),
             'idusuario' => request('idusuario')
         ]);
 
@@ -173,7 +182,8 @@ class CursoInscritoController extends Controller
             'singulariza' => 'o inscrito'
         ];
         $variaveis = (object) $variaveis;
-        return view('admin.crud.editar', compact('resultado', 'variaveis'));
+        $tipos = CursoInscrito::tiposInscricao();
+        return view('admin.crud.editar', compact('resultado', 'variaveis', 'tipos'));
     }
 
     // atualizar inscrição via área admin
@@ -186,14 +196,16 @@ class CursoInscritoController extends Controller
             'nome' => 'required|max:191',
             'telefone' => 'required|max:191',
             'email' => 'required|email|max:191|min:14',
-            'registrocore' => 'max:191'
+            'registrocore' => 'max:191',
+            'tipo_inscrito' => 'required|in:' . implode(',', CursoInscrito::tiposInscricao()),
         ];
         $mensagens = [
             'cpf.unique' => 'Este CPF já está cadastrado para o curso',
             'required' => 'O :attribute é obrigatório',
             'max' => 'O :attribute excedeu o limite de caracteres permitido',
             'telefone.min' => 'Telefone inválido',
-            'email' => 'Digite um email válido'
+            'email' => 'Digite um email válido',
+            'in' => 'Valor inválido',
         ];
         $erros = $request->validate($regras, $mensagens);
         $nomeUser = mb_convert_case(mb_strtolower(request('nome')), MB_CASE_TITLE);
@@ -206,6 +218,7 @@ class CursoInscritoController extends Controller
         $inscrito->registrocore = $request->input('registrocore');
         $inscrito->idusuario = $request->input('idusuario');
         $inscrito->idcurso = $idcurso;
+        $inscrito->tipo_inscrito = $request->input('tipo_inscrito');
         $update = $inscrito->update();
         if(!$update)
             abort(500);
@@ -231,12 +244,24 @@ class CursoInscritoController extends Controller
     {
         if ($this->permiteInscricao($idcurso)) {
             $curso = Curso::findOrFail($idcurso);
-            if ($curso && $curso->liberarAcesso(auth()->guard('representante')->check())) 
-                return view('site.curso-inscricao', compact('curso'));
+            $rep = auth()->guard('representante')->check();
+            $user_rep = $rep ? auth()->guard('representante')->user() : null;
+            $situacao = $rep ? trim($this->gerentiRepository->gerentiStatus($user_rep->ass_id)) : '';
+
+            if($rep)
+            {
+                $tel = $user_rep->getContatosTipoTelefone($this->gerentiRepository);
+                $user_rep->telefone = empty($tel) ? '' : $tel[array_keys($tel)[0]]['CXP_VALOR'];
+                $user_rep->registro_core = $this->gerentiRepository->gerentiAtivo(apenasNumeros($user_rep->cpf_cnpj))[0]['REGISTRONUM'];
+            }
+
+            if ($curso && $curso->liberarAcesso($rep, $situacao)) 
+                return view('site.curso-inscricao', compact('curso', 'user_rep'));
             else
                 return redirect()->route('cursos.show', $idcurso)->with([
-                    'message' => '<i class="fas fa-lock"></i>&nbsp;Deve realizar login na área restrita do representante para se inscrever',
-                    'class' => 'alert-info'
+                    'message' => $situacao == '' ? '<i class="fas fa-lock"></i>&nbsp;Deve realizar login na área restrita do representante para se inscrever.' : 
+                    '<i class="fas fa-info-circle"></i>&nbsp;Por gentileza, entre em contato com o atendimento da sua seccional.',
+                    'class' => $situacao == '' ? 'alert-info' : 'alert-warning'
                 ]);
         } else {
             abort(500);
@@ -249,26 +274,41 @@ class CursoInscritoController extends Controller
         $idcurso = $request->input('idcurso');
 
         $curso = Curso::findOrFail($idcurso);
-        if(!$curso->liberarAcesso(auth()->guard('representante')->check()))
+        $rep = auth()->guard('representante')->check();
+        $user_rep = $rep ? auth()->guard('representante')->user() : null;
+        $situacao = $rep ? trim($this->gerentiRepository->gerentiStatus($user_rep->ass_id)) : '';
+
+        if(!$curso->liberarAcesso($rep, $situacao))
             return redirect()->route('cursos.show', $idcurso)->with([
-                'message' => '<i class="fas fa-lock"></i>&nbsp;Deve realizar login na área restrita do representante para se inscrever',
-                'class' => 'alert-info'
+                'message' => $situacao == '' ? '<i class="fas fa-lock"></i>&nbsp;Deve realizar login na área restrita do representante para se inscrever.' : 
+                '<i class="fas fa-info-circle"></i>&nbsp;Por gentileza, entre em contato com o atendimento da sua seccional.',
+                'class' => $situacao == '' ? 'alert-info' : 'alert-warning'
+            ]);
+
+        if($rep)
+            request()->merge([
+                'cpf' => $user_rep->cpf_cnpj,
+                'nome' => $user_rep->nome,
+                'email' => $user_rep->email,
             ]);
 
         $unique = in_array($idcurso, ['43', '44', '45']) ? null : 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL';
-        $regras = [
+        $regras = $rep ? [
+            'cpf' => 'required|' . $unique,
+            'termo' => 'required|accepted'
+            ] : [
             'cpf' => ['required', 'max:191', new Cpf, $unique/*'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL'*/],
             'nome' => 'required|max:191|regex:/^[a-zA-Z ÁáÉéÍíÓóÚúÃãÕõÂâÊêÔô]+$/',
             'telefone' => 'required|max:191|min:14',
             'email' => 'email|max:191',
-            'registrocore' => in_array($idcurso, ['64']) ? 'required|min:4|max:30' : 'max:191',
+            'registrocore' => 'max:191',
             'termo' => 'sometimes|required|accepted'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
             'email' => 'Email inválido',
             'nome.regex' => 'Nome inválido',
-            'cpf.unique' => 'O CPF informado já está cadastrado neste curso',
+            'cpf.unique' => $rep && ($user_rep->tipoPessoa() == 'PJ') ? 'O CNPJ informado já está cadastrado neste curso' : 'O CPF informado já está cadastrado neste curso',
             'max' => 'O :attribute excedeu o limite de caracteres permitido',
             'min' => 'O :attribute deve ter :min ou mais caracteres',
             'telefone.min' => 'Telefone inválido',
@@ -280,6 +320,18 @@ class CursoInscritoController extends Controller
         }
         if(!$this->permiteInscricao($idcurso))
             abort(500, 'As inscrições para este curso estão esgotadas!');
+
+        if($rep)
+        {
+            $tel = $user_rep->getContatosTipoTelefone($this->gerentiRepository);
+            $temp_tel = empty($tel) ? '' : $tel[array_keys($tel)[0]]['CXP_VALOR'];
+            $temp_reg = $this->gerentiRepository->gerentiAtivo(apenasNumeros($user_rep->cpf_cnpj))[0]['REGISTRONUM'];
+            request()->merge([
+                'telefone' => $temp_tel,
+                'registrocore' => $temp_reg,
+            ]);
+        }
+
         $emailUser = $request->input('email');
         $nomeUser = mb_convert_case(mb_strtolower(request('nome')), MB_CASE_TITLE);
         // Inputa dados no Banco de Dados
@@ -395,7 +447,7 @@ class CursoInscritoController extends Controller
             'Expires' => '0',
             'Pragma' => 'public',
         ];
-        $resultado = CursoInscrito::select('email','cpf','nome','telefone','registrocore','created_at')
+        $resultado = CursoInscrito::select('email','cpf','nome','telefone','registrocore','tipo_inscrito','created_at')
             ->where('idcurso', $id)
             ->orderBy('created_at', 'desc')
             ->get();
