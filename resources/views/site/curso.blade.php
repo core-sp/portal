@@ -45,9 +45,6 @@ $now = now();
       </div>
     </div>
     <div class="linha-lg"></div>
-    @if(Session::has('message'))
-      <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
-    @endif
     <div class="row mt-2">
       <div class="col-lg-4 edital-info">
         <table class="table table-bordered mb-4">

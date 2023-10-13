@@ -258,10 +258,12 @@ class CursoInscritoController extends Controller
             if ($curso && $curso->liberarAcesso($rep, $situacao)) 
                 return view('site.curso-inscricao', compact('curso', 'user_rep'));
             else
-                return redirect()->route('cursos.show', $idcurso)->with([
-                    'message' => $situacao == '' ? '<i class="fas fa-lock"></i>&nbsp;Deve realizar login na área restrita do representante para se inscrever.' : 
-                    '<i class="fas fa-info-circle"></i>&nbsp;Por gentileza, entre em contato com o atendimento da sua seccional.',
-                    'class' => $situacao == '' ? 'alert-info' : 'alert-warning'
+                return $situacao == '' ? redirect()->route('representante.login')->with([
+                    'message' => 'Deve realizar login na área restrita do representante para se inscrever.',
+                    'class' => 'alert-danger'
+                ]) : redirect()->route('representante.cursos')->with([
+                    'message' => '<i class="fas fa-info-circle"></i>&nbsp;Para liberar sua inscrição entre em contato com o setor de atendimento da <a href="'.route('regionais.siteGrid').'" target="_blank">seccional</a> de interesse.',
+                    'class' => 'alert-danger'
                 ]);
         } else {
             abort(500);
@@ -279,10 +281,12 @@ class CursoInscritoController extends Controller
         $situacao = $rep ? trim($this->gerentiRepository->gerentiStatus($user_rep->ass_id)) : '';
 
         if(!$curso->liberarAcesso($rep, $situacao))
-            return redirect()->route('cursos.show', $idcurso)->with([
-                'message' => $situacao == '' ? '<i class="fas fa-lock"></i>&nbsp;Deve realizar login na área restrita do representante para se inscrever.' : 
-                '<i class="fas fa-info-circle"></i>&nbsp;Por gentileza, entre em contato com o atendimento da sua seccional.',
-                'class' => $situacao == '' ? 'alert-info' : 'alert-warning'
+            return $situacao == '' ? redirect()->route('representante.login')->with([
+                'message' => 'Deve realizar login na área restrita do representante para se inscrever.',
+                'class' => 'alert-danger'
+            ]) : redirect()->route('representante.cursos')->with([
+                'message' => '<i class="fas fa-info-circle"></i>&nbsp;Para liberar sua inscrição entre em contato com o setor de atendimento da <a href="'.route('regionais.siteGrid').'" target="_blank">seccional</a> de interesse.',
+                'class' => 'alert-danger'
             ]);
 
         if($rep)

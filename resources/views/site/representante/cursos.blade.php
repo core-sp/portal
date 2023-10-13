@@ -7,6 +7,9 @@ use \App\Http\Controllers\CursoInscritoController;
 @endphp
 
 <div class="representante-content w-100">
+    @if(Session::has('message'))
+    <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
+    @endif
     <div class="conteudo-txt-mini light">
         <h4 class="pt-1 pb-1">Cursos com vagas abertas</h4>
         <div class="linha-lg-mini mb-1"></div>
