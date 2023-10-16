@@ -129,7 +129,7 @@
               <div class="col">
                 <button
                   type="submit"
-                  class="btn btn-primary"
+                  class="btn btn-primary btn-sm"
                   id="submitSimulador"
                   onClick="gtag('event', 'calcular', {
                     'event_category': 'simulador',
@@ -138,6 +138,9 @@
                 >
                   Simular {{ Request::input('dataInicio') ? ' novamente' : '' }}
                 </button>
+                @if(Request::input('dataInicio'))
+                <button class="btn btn-sm btn-secondary ml-3" id="btnPrintSimulador">Imprimir</button>
+                @endif
                 <div id="loadingSimulador"><img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading"></div>
               </div>
             </div>
