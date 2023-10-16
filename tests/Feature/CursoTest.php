@@ -3,10 +3,13 @@
 namespace Tests\Feature;
 
 use App\Curso;
+use App\CursoInscrito;
 use App\Permissao;
 use DateInterval;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Mail\CursoInscritoMailGuest;
+use Illuminate\Support\Facades\Mail;
 
 class CursoTest extends TestCase
 {
@@ -39,6 +42,10 @@ class CursoTest extends TestCase
         $this->post('/admin/cursos/adicionar-inscrito/'.$curso->idcurso)->assertRedirect(route('login'));
         $this->get('/admin/cursos/inscritos/download/'.$curso->idcurso)->assertRedirect(route('login'));
         $this->delete('/admin/cursos/cancelar-inscricao/'.$curso->idcurso)->assertRedirect(route('login'));
+
+        // Quando acesso privado
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))->assertRedirect(route('representante.login'));
+        $this->post(route('cursos.inscricao', $curso->idcurso), ['idcurso' => $curso->idcurso])->assertRedirect(route('representante.login'));
     }
 
     /** @test */
@@ -82,7 +89,6 @@ class CursoTest extends TestCase
     /** @test */
     public function curso_can_be_created_by_an_user()
     {
-        $this->withoutExceptionHandling();
         $user = $this->signInAsAdmin();
 
         $attributes = factory('App\Curso')->raw();
@@ -116,6 +122,32 @@ class CursoTest extends TestCase
         $this->get(route('cursos.index'))
             ->assertSee($curso->idcurso)
             ->assertSee($curso->tema);
+    }
+
+    /** @test */
+    public function curso_without_acesso_cannot_be_created()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'acesso' => ''
+        ]);
+
+        $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors('acesso');
+        $this->assertDatabaseMissing('cursos', ['resumo' => $attributes['resumo']]);
+    }
+
+    /** @test */
+    public function curso_with_invalid_value_in_acesso_cannot_be_created()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'acesso' => 'Liberado'
+        ]);
+
+        $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors('acesso');
+        $this->assertDatabaseMissing('cursos', ['resumo' => $attributes['resumo']]);
     }
 
     /** @test */
@@ -270,7 +302,6 @@ class CursoTest extends TestCase
     /** @test */
     public function log_is_generated_when_curso_is_updated()
     {
-        $this->withoutExceptionHandling();
         $user = $this->signInAsAdmin();
 
         $curso = factory('App\Curso')->create();
@@ -337,7 +368,6 @@ class CursoTest extends TestCase
     /** @test */
     public function canceled_cursos_are_shown_in_trash()
     {
-        $this->withoutExceptionHandling();
         $this->signInAsAdmin();
 
         $curso = factory('App\Curso')->create();
@@ -391,7 +421,6 @@ class CursoTest extends TestCase
     /** @test */
     function curso_can_be_searched_on_admin_panel()
     {
-        $this->withoutExceptionHandling();
         $this->signInAsAdmin();
 
         $curso = factory('App\Curso')->create();
@@ -526,5 +555,374 @@ class CursoTest extends TestCase
             ->assertSeeText('Veja como foi')
             ->assertSee('noticia/' . $noticias->get(0)->slug)
             ->assertDontSee('noticia/' . $noticias->get(1)->slug);
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES INSCRITOS ADMIN
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function inscrito_private_can_be_created_by_admin()
+    {
+        $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+
+        $inscrito = factory('App\CursoInscrito')->states('tipo_convidado')->raw([
+            'idcurso' => $curso->idcurso,
+        ]);
+        $this->post('/admin/cursos/adicionar-inscrito/'.$curso->idcurso, $inscrito)
+        ->assertRedirect(route('inscritos.index', $curso->idcurso));
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $inscrito['cpf'], 'tipo_inscrito' => CursoInscrito::INSCRITO_CON]);
+
+        CursoInscrito::find(1)->delete();
+        $inscrito = factory('App\CursoInscrito')->states('tipo_autoridade')->raw([
+            'idcurso' => $curso->idcurso,
+        ]);
+        $this->post('/admin/cursos/adicionar-inscrito/'.$curso->idcurso, $inscrito)
+        ->assertRedirect(route('inscritos.index', $curso->idcurso));
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $inscrito['cpf'], 'tipo_inscrito' => CursoInscrito::INSCRITO_AUT]);
+
+        CursoInscrito::find(2)->delete();
+        $inscrito = factory('App\CursoInscrito')->states('tipo_parceiro')->raw([
+            'idcurso' => $curso->idcurso,
+        ]);
+        $this->post('/admin/cursos/adicionar-inscrito/'.$curso->idcurso, $inscrito)
+        ->assertRedirect(route('inscritos.index', $curso->idcurso));
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $inscrito['cpf'], 'tipo_inscrito' => CursoInscrito::INSCRITO_PAR]);
+
+        CursoInscrito::find(3)->delete();
+        $inscrito = factory('App\CursoInscrito')->states('tipo_funcionario')->raw([
+            'idcurso' => $curso->idcurso,
+        ]);
+        $this->post('/admin/cursos/adicionar-inscrito/'.$curso->idcurso, $inscrito)
+        ->assertRedirect(route('inscritos.index', $curso->idcurso));
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $inscrito['cpf'], 'tipo_inscrito' => CursoInscrito::INSCRITO_FUN]);
+
+        CursoInscrito::find(4)->delete();
+        $inscrito = factory('App\CursoInscrito')->states('tipo_site')->raw([
+            'idcurso' => $curso->idcurso,
+        ]);
+        $this->post('/admin/cursos/adicionar-inscrito/'.$curso->idcurso, $inscrito)
+        ->assertRedirect(route('inscritos.index', $curso->idcurso));
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $inscrito['cpf'], 'tipo_inscrito' => CursoInscrito::INSCRITO_SITE]);
+    }
+
+    /** @test */
+    public function inscrito_public_can_be_created_by_admin()
+    {
+        $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->states('publico')->create();
+
+        $inscrito = factory('App\CursoInscrito')->states('tipo_convidado')->raw([
+            'idcurso' => $curso->idcurso,
+        ]);
+        $this->post('/admin/cursos/adicionar-inscrito/'.$curso->idcurso, $inscrito)
+        ->assertRedirect(route('inscritos.index', $curso->idcurso));
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $inscrito['cpf'], 'tipo_inscrito' => CursoInscrito::INSCRITO_CON]);
+
+        CursoInscrito::find(1)->delete();
+        $inscrito = factory('App\CursoInscrito')->states('tipo_autoridade')->raw([
+            'idcurso' => $curso->idcurso,
+        ]);
+        $this->post('/admin/cursos/adicionar-inscrito/'.$curso->idcurso, $inscrito)
+        ->assertRedirect(route('inscritos.index', $curso->idcurso));
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $inscrito['cpf'], 'tipo_inscrito' => CursoInscrito::INSCRITO_AUT]);
+
+        CursoInscrito::find(2)->delete();
+        $inscrito = factory('App\CursoInscrito')->states('tipo_parceiro')->raw([
+            'idcurso' => $curso->idcurso,
+        ]);
+        $this->post('/admin/cursos/adicionar-inscrito/'.$curso->idcurso, $inscrito)
+        ->assertRedirect(route('inscritos.index', $curso->idcurso));
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $inscrito['cpf'], 'tipo_inscrito' => CursoInscrito::INSCRITO_PAR]);
+
+        CursoInscrito::find(3)->delete();
+        $inscrito = factory('App\CursoInscrito')->states('tipo_funcionario')->raw([
+            'idcurso' => $curso->idcurso,
+        ]);
+        $this->post('/admin/cursos/adicionar-inscrito/'.$curso->idcurso, $inscrito)
+        ->assertRedirect(route('inscritos.index', $curso->idcurso));
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $inscrito['cpf'], 'tipo_inscrito' => CursoInscrito::INSCRITO_FUN]);
+
+        CursoInscrito::find(4)->delete();
+        $inscrito = factory('App\CursoInscrito')->states('tipo_site')->raw([
+            'idcurso' => $curso->idcurso,
+        ]);
+        $this->post('/admin/cursos/adicionar-inscrito/'.$curso->idcurso, $inscrito)
+        ->assertRedirect(route('inscritos.index', $curso->idcurso));
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $inscrito['cpf'], 'tipo_inscrito' => CursoInscrito::INSCRITO_SITE]);
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES INSCRITOS SITE
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function inscrito_private_can_be_created()
+    {
+        Mail::fake();
+
+        $curso = factory('App\Curso')->create();
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertSee('disabled');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), ['idcurso' => $curso->idcurso, 'termo' => 'on'])
+        ->assertViewIs('site.agradecimento');
+
+        Mail::assertQueued(CursoInscritoMailGuest::class);
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $representante->cpf_cnpj]);
+    }
+
+    /** @test */
+    public function inscrito_private_can_be_created_with_cnpj_temp()
+    {
+        Mail::fake();
+
+        $curso = factory('App\Curso')->create();
+
+        $representante = factory('App\Representante')->create([
+            'cpf_cnpj' => '11748345000144'
+        ]);
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertSee('disabled');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), ['idcurso' => $curso->idcurso, 'termo' => 'on'])
+        ->assertViewIs('site.agradecimento');
+
+        Mail::assertQueued(CursoInscritoMailGuest::class);
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $representante->cpf_cnpj]);
+    }
+
+    /** @test */
+    public function inscrito_private_cannot_be_created_exists_cpf()
+    {
+        $curso = factory('App\Curso')->create();
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), ['idcurso' => $curso->idcurso, 'termo' => 'on']);
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $representante->cpf_cnpj]);
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), ['idcurso' => $curso->idcurso, 'termo' => 'on'])
+        ->assertSessionHasErrors('cpf');
+    }
+
+    /** @test */
+    public function inscrito_private_cannot_be_created_gerenti_without_situacao_em_dia()
+    {
+        // Editar GerentiMock gerentiStatus()
+        $curso = factory('App\Curso')->create();
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertRedirect(route('representante.cursos'))
+        ->assertSessionHas('message', '<i class="fas fa-info-circle"></i>&nbsp;Para liberar sua inscrição entre em contato com o setor de atendimento da <a href="'.route('regionais.siteGrid').'" target="_blank">seccional</a> de interesse.');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), ['idcurso' => $curso->idcurso, 'termo' => 'on'])
+        ->assertRedirect(route('representante.cursos'))
+        ->assertSessionHas('message', '<i class="fas fa-info-circle"></i>&nbsp;Para liberar sua inscrição entre em contato com o setor de atendimento da <a href="'.route('regionais.siteGrid').'" target="_blank">seccional</a> de interesse.');
+
+        $this->assertDatabaseMissing('curso_inscritos', ['cpf' => $representante->cpf_cnpj]);
+    }
+
+    /** @test */
+    public function inscrito_public_can_be_created()
+    {
+        Mail::fake();
+
+        $curso = factory('App\Curso')->states('publico')->create();
+        $inscrito = factory('App\CursoInscrito')->raw([
+            'idcurso' => $curso->idcurso,
+            'termo' => 'on'
+        ]);
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertDontSee('disabled');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $inscrito)
+        ->assertViewIs('site.agradecimento');
+
+        Mail::assertQueued(CursoInscritoMailGuest::class);
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $inscrito['cpf']]);
+    }
+
+    /** @test */
+    public function inscrito_private_can_be_created_with_cnpj_temp_if_authenticated()
+    {
+        Mail::fake();
+
+        $curso = factory('App\Curso')->states('publico')->create();
+
+        $representante = factory('App\Representante')->create([
+            'cpf_cnpj' => '11748345000144'
+        ]);
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertSee('disabled');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), ['idcurso' => $curso->idcurso, 'termo' => 'on'])
+        ->assertViewIs('site.agradecimento');
+
+        Mail::assertQueued(CursoInscritoMailGuest::class);
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $representante->cpf_cnpj]);
+    }
+
+    /** @test */
+    public function inscrito_public_cannot_be_created_with_cnpj_temp_without_authenticated()
+    {
+        $curso = factory('App\Curso')->states('publico')->create();
+        $inscrito = factory('App\CursoInscrito')->raw([
+            'idcurso' => $curso->idcurso,
+            'cpf' => '11748345000144',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $inscrito)
+        ->assertSessionHasErrors('cpf');
+    }
+
+    /** @test */
+    public function inscrito_public_cannot_be_created_exists_cpf()
+    {
+        $curso = factory('App\Curso')->states('publico')->create();
+        $inscrito = factory('App\CursoInscrito')->raw([
+            'idcurso' => $curso->idcurso,
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $inscrito);
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $inscrito['cpf']]);
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $inscrito)
+        ->assertSessionHasErrors('cpf');
+    }
+
+    /** @test */
+    public function inscrito_public_can_be_created_by_representante()
+    {
+        Mail::fake();
+
+        $curso = factory('App\Curso')->states('publico')->create();
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertSee('disabled');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), ['idcurso' => $curso->idcurso, 'termo' => 'on'])
+        ->assertViewIs('site.agradecimento');
+
+        Mail::assertQueued(CursoInscritoMailGuest::class);
+
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $representante->cpf_cnpj]);
+    }
+
+    /** @test */
+    public function inscrito_public_cannot_be_created_without_required_input()
+    {
+        $curso = factory('App\Curso')->states('publico')->create();
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertDontSee('disabled');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), ['idcurso' => $curso->idcurso, 'termo' => null])
+        ->assertSessionHasErrors([
+            'cpf',
+            'nome',
+            'telefone',
+            'termo'
+        ]);
+
+        $this->assertDatabaseMissing('curso_inscritos', ['idcursoinscrito' => 1]);
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES INSCRITOS ÁREA DO REPRESENTANTE
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function cannot_view_cards_without_cursos()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.cursos'))
+        ->assertOk()
+        ->assertSee('<p class="light pb-0">No momento não há cursos restritos com vagas abertas para o representante.</p>');
+
+        $curso = factory('App\Curso')->create([
+            'datatermino' => now()->subDay()->format('Y-m-d H:i:s')
+        ]);
+
+        $this->get(route('representante.cursos'))
+        ->assertOk()
+        ->assertSee('<p class="light pb-0">No momento não há cursos restritos com vagas abertas para o representante.</p>');
+    }
+
+    /** @test */
+    public function can_view_cards_with_cursos()
+    {
+        $curso = factory('App\Curso')->create();
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.cursos'))
+        ->assertOk()
+        ->assertSee('<a href="'. route('cursos.show', $curso->idcurso) .'">')
+        ->assertSee('<h6 class="light cinza-claro">'. $curso->regional->regional .' - '. onlyDate($curso->datarealizacao) .'</h6>')
+        ->assertSee('<a href="'. route('cursos.inscricao.website', $curso->idcurso) .'" class="btn btn-sm btn-primary text-white mt-2">Inscrever-se</a>');
+    }
+
+    /** @test */
+    public function can_view_button_inscrito_with_cursos()
+    {
+        $curso = factory('App\Curso')->create();
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), ['idcurso' => $curso->idcurso, 'termo' => 'on']);
+
+        $this->get(route('representante.cursos'))
+        ->assertOk()
+        ->assertSee('<a href="'. route('cursos.show', $curso->idcurso) .'">')
+        ->assertSee('<h6 class="light cinza-claro">'. $curso->regional->regional .' - '. onlyDate($curso->datarealizacao) .'</h6>')
+        ->assertSee('<span class="btn btn-sm btn-secondary text-center mt-2 disabled">Inscrição realizada</span>');
     }
 }

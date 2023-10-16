@@ -289,6 +289,12 @@ class RepresentanteTest extends TestCase
 
         // Checa acesso a aba "Solicitação de Cédula"
         $this->get(route('representante.solicitarCedulaView'))->assertOk();
+
+        // Checa acesso a aba "Agendar Salas"
+        $this->get(route('representante.agendar.inserir.view'))->assertOk();
+
+        // Checa acesso a aba "Cursos"
+        $this->get(route('representante.cursos'))->assertOk();
     }
 
     /** @test 
@@ -560,6 +566,12 @@ class RepresentanteTest extends TestCase
 
         // Checa acesso a aba "Solicitação de Cédula" é bloqueado e redirecionado para tela de login
         $this->get(route('representante.solicitarCedulaView'))->assertRedirect(route('representante.login'));
+
+        // Checa acesso a aba "Agendar Salas" é bloqueado e redirecionado para tela de login
+        $this->get(route('representante.agendar.inserir.view'))->assertRedirect(route('representante.login'));
+
+        // Checa acesso a aba "Cursos" é bloqueado e redirecionado para tela de login
+        $this->get(route('representante.cursos'))->assertRedirect(route('representante.login'));
     }
 
     /** @test 

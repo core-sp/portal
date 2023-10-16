@@ -32,3 +32,9 @@ $factory->define(Curso::class, function (Faker $faker) {
         'idusuario' => Auth::id() !== null ? Auth::id() : factory('App\User')
     ];
 });
+
+$factory->state(Curso::class, 'publico', function (Faker $faker) {
+    return [
+        'acesso' => Curso::ACESSO_PUB,
+    ];
+});
