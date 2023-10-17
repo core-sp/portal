@@ -49,7 +49,7 @@
                 <input type="datetime-local"
                     class="form-control {{ $errors->has('dia_hora_ativar') ? 'is-invalid' : '' }}"
                     name="dia_hora_ativar"
-                    value="{{ isset($resultado) ? $resultado->formatDtAtivarToInput() : old('dia_hora_ativar') }}"
+                    value="{{ isset($resultado->dia_hora_ativar) ? $resultado->formatDtAtivarToInput() : old('dia_hora_ativar') }}"
                 />
                 @if($errors->has('dia_hora_ativar'))
                     <div class="invalid-feedback">
@@ -62,7 +62,7 @@
                 <input type="datetime-local"
                     class="form-control {{ $errors->has('dia_hora_desativar') ? 'is-invalid' : '' }}"
                     name="dia_hora_desativar"
-                    value="{{ isset($resultado) ? $resultado->formatDtDesativarToInput() : old('dia_hora_desativar') }}"
+                    value="{{ isset($resultado->dia_hora_desativar) ? $resultado->formatDtDesativarToInput() : old('dia_hora_desativar') }}"
                 />
                 @if($errors->has('dia_hora_desativar'))
                     <div class="invalid-feedback">
