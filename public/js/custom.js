@@ -49,34 +49,34 @@ $(document).ready(function(){
 	$('.cpfOuCnpj').mask('000.000.000-00#', options);
   
   // Máscaras para datas
-  $('#dataTermino').mask('00/00/0000', {
-    onComplete: function() {
-      var dataInicioPura = $('#dataInicio').val().split('/');
-      var dataInicio = new Date(dataInicioPura[2], dataInicioPura[1] - 1, dataInicioPura[0]);
-      var dataTerminoPura = $('#dataTermino').val().split('/');
-      var dataTermino = new Date(dataTerminoPura[2], dataTerminoPura[1] - 1, dataTerminoPura[0]);
-      if(dataInicio) {
-        if(dataTermino < dataInicio) {
-          alert('A data de término do curso não pode ser menor que a data de início.');
-          $('#dataTermino').val('');
-        }
-      }
-    }
-  });
-  $('#dataInicio').mask('00/00/0000', {
-    onComplete: function() {
-      var dataInicioPura = $('#dataInicio').val().split('/');
-      var dataInicio = new Date(dataInicioPura[2], dataInicioPura[1] - 1, dataInicioPura[0]);
-      var dataTerminoPura = $('#dataTermino').val().split('/');
-      var dataTermino = new Date(dataTerminoPura[2], dataTerminoPura[1] - 1, dataTerminoPura[0]);
-      if(dataTermino) {
-        if(dataInicio > dataTermino) {
-          alert('A data de início do curso não pode ser maior que a data de término.');
-          $('#dataInicio').val('');
-        }
-      }
-    }
-  });
+  // $('#dataTermino').mask('00/00/0000', {
+  //   onComplete: function() {
+  //     var dataInicioPura = $('#dataInicio').val().split('/');
+  //     var dataInicio = new Date(dataInicioPura[2], dataInicioPura[1] - 1, dataInicioPura[0]);
+  //     var dataTerminoPura = $('#dataTermino').val().split('/');
+  //     var dataTermino = new Date(dataTerminoPura[2], dataTerminoPura[1] - 1, dataTerminoPura[0]);
+  //     if(dataInicio) {
+  //       if(dataTermino < dataInicio) {
+  //         alert('A data de término do curso não pode ser menor que a data de início.');
+  //         $('#dataTermino').val('');
+  //       }
+  //     }
+  //   }
+  // });
+  // $('#dataInicio').mask('00/00/0000', {
+  //   onComplete: function() {
+  //     var dataInicioPura = $('#dataInicio').val().split('/');
+  //     var dataInicio = new Date(dataInicioPura[2], dataInicioPura[1] - 1, dataInicioPura[0]);
+  //     var dataTerminoPura = $('#dataTermino').val().split('/');
+  //     var dataTermino = new Date(dataTerminoPura[2], dataTerminoPura[1] - 1, dataTerminoPura[0]);
+  //     if(dataTermino) {
+  //       if(dataInicio > dataTermino) {
+  //         alert('A data de início do curso não pode ser maior que a data de término.');
+  //         $('#dataInicio').val('');
+  //       }
+  //     }
+  //   }
+  // });
   $('#horaTermino').mask('00:00', {
     onComplete: function() {
       var horaInicio = $('#horaInicio').val();

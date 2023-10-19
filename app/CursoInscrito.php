@@ -50,4 +50,19 @@ class CursoInscrito extends Model
     {
         return $this->hasMany('App\TermoConsentimento', 'idcursoinscrito');
     }
+
+    public function possuiPresenca()
+    {
+        return isset($this->presenca);
+    }
+
+    public function compareceu()
+    {
+        return isset($this->presenca) && ($this->presenca == 'Sim');
+    }
+
+    public function podeCancelar()
+    {
+        return $this->curso->termino_inscricao >= now()->format('Y-m-d H:i');
+    }
 }

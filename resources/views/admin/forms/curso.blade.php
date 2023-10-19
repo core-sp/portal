@@ -1,37 +1,18 @@
-@php
-use \App\Http\Controllers\Helpers\CursoHelper;
-use \App\Http\Controllers\Helper;
-$tipos = CursoHelper::tipos();
-@endphp
-
-<form role="form" method="POST" action="{{ !isset($resultado) ? route('cursos.store') : route('cursos.update', Request::route('id')) }}">
+<form role="form" method="POST" action="{{ !isset($resultado) ? route('cursos.store') : route('cursos.update', $resultado->idcurso) }}">
     @csrf
     @if(isset($resultado))
         @method('PATCH')
     @endif
-    <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
     <div class="card-body">
         <div class="form-row">
             <div class="col-sm-3">
                 <label for="tipo">Tipo</label>
-                <select name="tipo" class="form-control">
+                <select name="tipo" class="form-control {{ $errors->has('tipo') ? 'is-invalid' : '' }}" required>
                 @foreach($tipos as $tipo)
-                    @if(!empty(old('tipo')))
-                        @if(old('tipo') === $tipo)
-                            <option value="{{ $tipo }}" selected>{{ $tipo }}</option>
-                        @else
-                            <option value="{{ $tipo }}"">{{ $tipo }}</option>
-                        @endif
+                    @if(old('tipo'))
+                    <option value="{{ $tipo }}" {{ old('tipo') == $tipo ? 'selected' : '' }}>{{ $tipo }}</option>
                     @else
-                        @if(isset($resultado))
-                            @if($tipo == $resultado->tipo)
-                            <option value="{{ $tipo }}" selected>{{ $tipo }}</option>
-                            @else
-                            <option value="{{ $tipo }}">{{ $tipo }}</option>
-                            @endif
-                        @else
-                        <option value="{{ $tipo }}">{{ $tipo }}</option>
-                        @endif
+                    <option value="{{ $tipo }}" {{ isset($resultado->tipo) && ($resultado->tipo == $tipo) ? 'selected' : '' }}>{{ $tipo }}</option>
                     @endif
                 @endforeach
                 </select>
@@ -48,14 +29,9 @@ $tipos = CursoHelper::tipos();
                     placeholder="Tema" 
                     name="tema"
                     maxlength="191"
-                    @if(!empty(old('tema')))
-                        value="{{ old('tema') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->tema }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ isset($resultado->tema) ? $resultado->tema : old('tema') }}"
+                    required
+                />
                 @if($errors->has('tema'))
                 <div class="invalid-feedback">
                 {{ $errors->first('tema') }}
@@ -68,14 +44,9 @@ $tipos = CursoHelper::tipos();
                     name="nrvagas"
                     class="form-control vagasInput {{ $errors->has('nrvagas') ? 'is-invalid' : '' }}"
                     placeholder="00"
-                    @if(!empty(old('nrvagas')))
-                        value="{{ old('nrvagas') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->nrvagas }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ isset($resultado->nrvagas) ? $resultado->nrvagas : old('nrvagas') }}"
+                    required
+                />
                 @if($errors->has('nrvagas'))
                 <div class="invalid-feedback">
                 {{ $errors->first('nrvagas') }}
@@ -86,24 +57,12 @@ $tipos = CursoHelper::tipos();
         <div class="form-row mt-2">
             <div class="col-sm-3">
                 <label for="idregional">Regional</label>
-                <select name="idregional" class="form-control" id="idregional">
+                <select name="idregional" class="form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }}" id="idregional" required>
                 @foreach($regionais as $regional)
-                    @if(!empty(old('idregional')))
-                        @if(old('idregional') == $regional->idregional)
-                            <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
-                        @else
-                            <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
-                        @endif
+                    @if(old('idregional'))
+                    <option value="{{ $regional->idregional }}" {{ old('idregional') == $regional->idregional ? 'selected' : '' }}>{{ $regional->regional }}</option>
                     @else
-                        @if(isset($resultado))
-                            @if($regional->idregional == $resultado->idregional)
-                                <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
-                            @else
-                                <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
-                            @endif
-                        @else
-                            <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
-                        @endif
+                    <option value="{{ $regional->idregional }}" {{ isset($resultado->idregional) && ($resultado->idregional == $regional->idregional) ? 'selected' : '' }}>{{ $regional->regional }}</option>
                     @endif
                 @endforeach
                 </select>
@@ -115,14 +74,8 @@ $tipos = CursoHelper::tipos();
                     class="form-control {{ $errors->has('endereco') ? 'is-invalid' : '' }}"
                     maxlength="191"
                     placeholder="Endereço"
-                    @if(!empty(old('endereco')))
-                        value="{{ old('endereco') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->endereco }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ isset($resultado->endereco) ? $resultado->endereco : old('endereco') }}"
+                />
                 @if($errors->has('endereco'))
                 <div class="invalid-feedback">
                 {{ $errors->first('endereco') }}
@@ -132,20 +85,14 @@ $tipos = CursoHelper::tipos();
         </div>
         <div class="form-row mt-2">
             <div class="col">
-                <label for="datarealizacao">Data de Realização</label>
-                <input type="text" 
+                <label for="datarealizacao">Dia e Hora de Realização</label>
+                <input type="datetime-local" 
                     class="form-control {{ $errors->has('datarealizacao') ? 'is-invalid' : '' }}" 
                     name="datarealizacao" 
-                    placeholder="dd/mm/aaaa"
-                    id="dataInicio"
-                    @if(!empty(old('datarealizacao')))
-                        value="{{ old('datarealizacao') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ Helper::onlyDate($resultado->datarealizacao) }}"
-                        @endif
-                    @endif
-                    />
+                    id="datarealizacao"
+                    value="{{ isset($resultado->datarealizacao) ? $resultado->datarealizacao : old('datarealizacao') }}"
+                    required
+                />
                 @if($errors->has('datarealizacao'))
                 <div class="invalid-feedback">
                 {{ $errors->first('datarealizacao') }}
@@ -153,20 +100,14 @@ $tipos = CursoHelper::tipos();
                 @endif
             </div>
             <div class="col">
-                <label for="datatermino">Data de Término</label>
-                <input type="text" 
+                <label for="datatermino">Dia e Hora de Término</label>
+                <input type="datetime-local" 
                     class="form-control {{ $errors->has('datatermino') ? 'is-invalid' : '' }}" 
                     name="datatermino"
                     id="dataTermino"
-                    placeholder="dd/mm/aaaa"
-                    @if(!empty(old('datatermino')))
-                        value="{{ old('datatermino') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ Helper::onlyDate($resultado->datatermino) }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ isset($resultado->datatermino) ? $resultado->datatermino : old('datatermino') }}"
+                    required
+                />
                 @if($errors->has('datatermino'))
                 <div class="invalid-feedback">
                 {{ $errors->first('datatermino') }}
@@ -174,44 +115,31 @@ $tipos = CursoHelper::tipos();
                 @endif
             </div>
             <div class="col">
-                <label for="horainicio">Horário de Início</label>
-                <input type="text" 
-                    class="form-control {{ $errors->has('horainicio') ? 'is-invalid' : '' }}" 
-                    name="horainicio"
-                    id="horaInicio"
-                    placeholder="00:00"
-                    @if(!empty(old('horainicio')))
-                        value="{{ old('horainicio') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ Helper::onlyHour($resultado->datarealizacao) }}"
-                        @endif
-                    @endif
-                    />
-                @if($errors->has('horainicio'))
+                <label for="inicio_inscricao">Dia e Hora de Início das Inscrições</label>
+                <input type="datetime-local" 
+                    class="form-control {{ $errors->has('inicio_inscricao') ? 'is-invalid' : '' }}" 
+                    name="inicio_inscricao" 
+                    id="inicio_inscricao"
+                    value="{{ isset($resultado->inicio_inscricao) ? $resultado->inicio_inscricao : old('inicio_inscricao') }}"
+                />
+                @if($errors->has('inicio_inscricao'))
                 <div class="invalid-feedback">
-                {{ $errors->first('horainicio') }}
+                {{ $errors->first('inicio_inscricao') }}
                 </div>
                 @endif
             </div>
             <div class="col">
-                <label for="horatermino">Horário de Término</label>
-                <input type="text" 
-                    class="form-control {{ $errors->has('horatermino') ? 'is-invalid' : '' }}"
-                    name="horatermino"
-                    placeholder="00:00"
-                    id="horaTermino"
-                    @if(!empty(old('horatermino')))
-                        value="{{ old('horatermino') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ Helper::onlyHour($resultado->datatermino) }}"
-                        @endif
-                    @endif
-                    />
-                @if($errors->has('horatermino'))
+                <label for="termino_inscricao">Dia e Hora de Término das Inscrições</label>
+                <input type="datetime-local" 
+                    class="form-control {{ $errors->has('termino_inscricao') ? 'is-invalid' : '' }}" 
+                    name="termino_inscricao"
+                    id="termino_inscricao"
+                    value="{{ isset($resultado->termino_inscricao) ? $resultado->termino_inscricao : old('termino_inscricao') }}"
+                />
+                <span><i><small>(limite de até 2 horas antes de começar o curso)</small></i></span>
+                @if($errors->has('termino_inscricao'))
                 <div class="invalid-feedback">
-                {{ $errors->first('horatermino') }}
+                {{ $errors->first('termino_inscricao') }}
                 </div>
                 @endif
             </div>
@@ -222,21 +150,15 @@ $tipos = CursoHelper::tipos();
                 <div class="input-group">
                 <span class="input-group-prepend">
                     <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-default">
-                    <i class="fas fa-picture-o"></i> Inserir imagem
+                        <i class="fas fa-picture-o"></i> Inserir imagem
                     </a>
                 </span>
                 <input id="thumbnail"
                     class="form-control {{ $errors->has('img') ? 'is-invalid' : '' }}"
                     type="text"
                     name="img"
-                    @if(!empty(old('img')))
-                        value="{{ old('img') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->img }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ isset($resultado->img) ? $resultado->img : old('img') }}"
+                />
                 @if($errors->has('img'))
                 <div class="invalid-feedback">
                 {{ $errors->first('img') }}
@@ -246,8 +168,8 @@ $tipos = CursoHelper::tipos();
             </div>
             <div class="col-sm-2">
                 <label for="acesso">Acesso</label>
-                <select name="acesso" class="form-control">
-                @foreach(['Privado', 'Público'] as $acesso)
+                <select name="acesso" class="form-control {{ $errors->has('acesso') ? 'is-invalid' : '' }}" required>
+                @foreach($acessos as $acesso)
                     <option value="{{ $acesso }}" {{ isset($resultado) && ($resultado->acesso == $acesso) ? 'selected' : '' }}>{{ $acesso }}</option>
                 @endforeach
                 </select>
@@ -259,19 +181,14 @@ $tipos = CursoHelper::tipos();
             </div>
             <div class="col-sm-2">
                 <label for="publicado">Publicar agora?</label>
-                <select name="publicado" class="form-control">
-                    @if(isset($resultado))
-                        @if($resultado->publicado == 'Sim')
-                        <option value="Sim" selected>Sim</option>
-                        <option value="Não">Não</option>
-                        @else
-                        <option value="Sim">Sim</option>
-                        <option value="Não" selected>Não</option>
-                        @endif
+                <select name="publicado" class="form-control {{ $errors->has('publicado') ? 'is-invalid' : '' }}" required>
+                @foreach(['Sim', 'Não'] as $opcao)
+                    @if(old('publicado'))
+                    <option value="{{ $opcao }}" {{ old('publicado') == $opcao ? 'selected' : '' }}>{{ $opcao }}</option>
                     @else
-                    <option value="Sim">Sim</option>
-                    <option value="Não">Não</option>
+                    <option value="{{ $opcao }}" {{ isset($resultado->publicado) && ($resultado->publicado == $opcao) ? 'selected' : '' }}>{{ $opcao }}</option>
                     @endif
+                @endforeach
                 </select>
             </div>
         </div>
@@ -281,7 +198,8 @@ $tipos = CursoHelper::tipos();
                 class="form-control {{ $errors->has('resumo') ? 'is-invalid' : '' }}"
                 id="resumo"
                 placeholder="Resumo do curso"
-                rows="3">@if(!empty(old('resumo'))){{ old('resumo') }}@else @if(isset($resultado)) {!! $resultado->resumo !!}@endif @endif</textarea>
+                rows="3"
+            >{!! empty(old('resumo')) && isset($resultado->resumo) ? $resultado->resumo : old('resumo') !!}</textarea>
             @if($errors->has('resumo'))
             <div class="invalid-feedback">
                 {{ $errors->first('resumo') }}
@@ -293,7 +211,8 @@ $tipos = CursoHelper::tipos();
             <textarea name="descricao" 
                 class="form-control my-editor {{ $errors->has('descricao') ? 'is-invalid' : '' }}"
                 id="descricao"
-                rows="10">@if(!empty(old('descricao'))){{ old('descricao') }}@else @if(isset($resultado)){!! $resultado->descricao !!}@endif @endif</textarea>
+                rows="25"
+            >{!! empty(old('descricao')) && isset($resultado->descricao) ? $resultado->descricao : old('descricao') !!}</textarea>
             @if($errors->has('descricao'))
             <div class="invalid-feedback">
                 {{ $errors->first('descricao') }}
@@ -301,15 +220,11 @@ $tipos = CursoHelper::tipos();
             @endif
         </div>
     </div>
-    <div class="card-footer float-right">
+    <div class="card-footer">
         <div class="float-right">
-            <a href="/admin/cursos" class="btn btn-default">Cancelar</a>
+            <a href="{{ route('cursos.index') }}" class="btn btn-default">Cancelar</a>
             <button type="submit" class="btn btn-primary ml-1">
-            @if(isset($resultado))
-                Salvar
-            @else
-                Publicar
-            @endif    
+                {{ isset($resultado) ? 'Salvar' : 'Publicar' }}
             </button>
         </div>
     </div>

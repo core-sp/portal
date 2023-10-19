@@ -12,14 +12,14 @@ Route::prefix('cursos')->group(function(){
     Route::get('/lixeira', 'CursoController@lixeira')->name('cursos.lixeira');
     Route::get('/{id}/restore', 'CursoController@restore')->name('cursos.restore');
     // Lida com a parte de inscritos
-    Route::get('/inscritos/{id}', 'CursoController@inscritos')->name('inscritos.index');
-    Route::get('/inscritos/{id}/busca', 'CursoInscritoController@busca');
-    Route::get('/inscritos/editar/{id}', 'CursoInscritoController@edit');
-    Route::put('/inscritos/editar/{id}', 'CursoInscritoController@update');
+    Route::get('/inscritos/{idcurso}', 'CursoInscritoController@index')->name('inscritos.index');
+    Route::get('/inscritos/{idcurso}/busca', 'CursoInscritoController@busca')->name('inscritos.busca');
+    Route::get('/inscritos/editar/{id}', 'CursoInscritoController@edit')->name('inscritos.edit');
+    Route::put('/inscritos/editar/{id}', 'CursoInscritoController@update')->name('inscritos.update');
     Route::put('/inscritos/confirmar-presenca/{id}', 'CursoInscritoController@confirmarPresenca');
     Route::put('/inscritos/confirmar-falta/{id}', 'CursoInscritoController@confirmarFalta');
-    Route::get('/adicionar-inscrito/{id}', 'CursoInscritoController@create');
-    Route::post('/adicionar-inscrito/{id}', 'CursoInscritoController@store');
-    Route::delete('/cancelar-inscricao/{id}', 'CursoInscritoController@destroy');
+    Route::get('/adicionar-inscrito/{idcurso}', 'CursoInscritoController@create')->name('inscritos.create');
+    Route::post('/adicionar-inscrito/{idcurso}', 'CursoInscritoController@store')->name('inscritos.store');
+    Route::delete('/cancelar-inscricao/{id}', 'CursoInscritoController@destroy')->name('inscritos.destroy');
     Route::get('/inscritos/download/{id}', 'CursoInscritoController@download');
 });
