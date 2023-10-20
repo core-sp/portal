@@ -13,7 +13,7 @@ class CursoController extends Controller
 
     public function __construct(MediadorServiceInterface $service)
     {
-        $this->middleware('auth', ['except' => ['show', 'cursosView']]);
+        $this->middleware('auth', ['except' => ['show', 'cursosView', 'cursosAnterioresView']]);
         $this->service = $service;
     }
 
@@ -185,6 +185,20 @@ class CursoController extends Controller
 
         return response()
             ->view('site.cursos', compact('cursos'))
+            ->header('Cache-Control','no-cache');
+    }
+
+    public function cursosAnterioresView()
+    {        
+        try{
+            $cursos = $this->service->getService('Curso')->cursosAnteriores();
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os cursos anteriores no portal.");
+        }
+
+        return response()
+            ->view('site.cursos-anteriores', compact('cursos'))
             ->header('Cache-Control','no-cache');
     }
 }

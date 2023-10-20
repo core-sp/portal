@@ -205,18 +205,51 @@ class CursoService implements CursoServiceInterface {
         ];
     }
 
+    public function downloadInscricoes($id)
+    {
+        $resultado = Curso::findOrFail($id)->cursoinscrito()
+        ->select('email','cpf','nome','telefone','registrocore','tipo_inscrito','created_at')
+        ->orderBy('created_at', 'desc')
+        ->get();
+        
+        $lista = $resultado->toArray();
+        array_unshift($lista, array_keys($lista[0]));
+        $callback = function() use($lista) {
+            $fh = fopen('php://output','w');
+            fprintf($fh, chr(0xEF).chr(0xBB).chr(0xBF));
+            foreach($lista as $linha) {
+                fputcsv($fh,$linha,';');
+            }
+            fclose($fh);
+        };
+
+        return $callback;
+    }
+
     public function show($id)
     {
         return Curso::findOrFail($id);
     }
 
-    public function siteGrid()
+    public function siteGrid($areaRep = false)
     {
-        return Curso::select('idcurso','img','idregional','tipo','tema','resumo', 'datarealizacao')
-            ->where('inicio_inscricao','<=', now()->format('Y-m-d H:i'))
-            ->where('termino_inscricao','>=', now()->format('Y-m-d H:i'))
+        if($areaRep)
+            return Curso::where('datatermino','>=', now()->format('Y-m-d H:i'))
+            ->where('publicado','Sim')
+            ->where('acesso', Curso::ACESSO_PRI)
+            ->paginate(6);
+            
+        return Curso::where('datatermino','>=', now()->format('Y-m-d H:i'))
             ->where('publicado','Sim')
             ->paginate(9);
+    }
+
+    public function cursosAnteriores()
+    {
+        return Curso::where('datatermino', '<', now()->format('Y-m-d H:i'))
+        ->where('publicado', 'Sim')
+        ->orderBy('created_at', 'DESC')
+        ->paginate(9);
     }
 
     public function inscritos(Curso $curso = null)

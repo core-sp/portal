@@ -65,4 +65,29 @@ class CursoInscrito extends Model
     {
         return $this->curso->termino_inscricao >= now()->format('Y-m-d H:i');
     }
+
+    public function textoAgradece()
+    {
+        $agradece = "Sua inscrição em <strong>".$this->curso->tipo;
+        $agradece .= " - ".$this->curso->tema."</strong>";
+        $agradece .= " (turma ".$this->curso->idcurso.") foi efetuada com sucesso.";
+        $agradece .= "<br><br>";
+        $agradece .= "<strong>Detalhes da inscrição</strong><br>";
+        $agradece .= "Nome: ".$this->nome."<br>";
+        $agradece .= "CPF: ".$this->cpf."<br>";
+        $agradece .= "Telefone: ".$this->telefone;
+        $agradece .= "<br><br>";
+        $agradece .= "<strong>Detalhes do curso</strong><br>";
+        $agradece .= "Nome: ".$this->curso->tipo." - ".$this->curso->tema."<br>";
+        $agradece .= "Nº da turma: ".$this->curso->idcurso."<br>";
+        $agradece .= "Endereço: ".$this->curso->endereco."<br>";
+        $agradece .= "Data de Início: ".onlyDate($this->curso->datarealizacao)."<br>";
+        $agradece .= "Horário: ".onlyHour($this->curso->datarealizacao)."h<br>";
+        $adendo = '<i>* As informações foram enviadas ao email cadastrado no formulário</i>';
+
+        return [
+            'agradece' => $agradece,
+            'adendo' => $adendo
+        ];
+    }
 }

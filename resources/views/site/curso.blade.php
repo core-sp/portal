@@ -6,12 +6,6 @@
 
 @section('content')
 
-@php
-use \App\Http\Controllers\Helper;
-use \App\Http\Controllers\CursoInscritoController;
-$now = now();
-@endphp
-
 <section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     <img src="{{ asset('img/cursos.png') }}" />
@@ -39,7 +33,7 @@ $now = now();
             <h2 class="stronger">{{ $curso->tipo }} - {{ $curso->tema }} ({{ $curso->idcurso }})</h2>
           </div>
           <div class="align-self-center">
-            <a href="/cursos" class="btn-voltar">Voltar</a>
+            <a href="{{ route('cursos.index.website') }}" class="btn-voltar">Voltar</a>
           </div>
         </div>
       </div>
@@ -52,7 +46,7 @@ $now = now();
             <tr>
               <td class="quarenta"><h6>Status</h6></td>
               <td><h6 class="light">
-                {{ CursoInscritoController::btnSituacao($curso->idcurso) }}
+                {!! $curso->btnSituacao() !!}
               </h6></td>
             </tr>
             <tr>
@@ -61,19 +55,19 @@ $now = now();
             </tr>
             <tr>
               <td><h6>Início</h6></td>
-              <td><h6 class="light">{{ Helper::onlyDate($curso->datarealizacao) }}</h6></td>
+              <td><h6 class="light">{{ onlyDate($curso->datarealizacao) }}</h6></td>
             </tr>
             <tr>
               <td><h6>Término</h6></td>
-              <td><h6 class="light">{{ Helper::onlyDate($curso->datatermino) }}</h6></td>
+              <td><h6 class="light">{{ onlyDate($curso->datatermino) }}</h6></td>
             </tr>
             <tr>
               <td><h6>Horário</h6></td>
               <td><h6 class="light">
-                @if(Helper::onlyDate($curso->datarealizacao) == Helper::onlyDate($curso->datatermino))
-                  Das {{ Helper::onlyHour($curso->datarealizacao) }} às {{ Helper::onlyHour($curso->datatermino) }}
+                @if(onlyDate($curso->datarealizacao) == onlyDate($curso->datatermino))
+                  Das {{ onlyHour($curso->datarealizacao) }} às {{ onlyHour($curso->datatermino) }}
                 @else
-                  A partir das {{ Helper::onlyHour($curso->datarealizacao) }}
+                  A partir das {{ onlyHour($curso->datarealizacao) }}
                 @endif
               </h6></td>
             </tr>
@@ -91,17 +85,19 @@ $now = now();
             </tr>
           </tbody>
         </table>
-        @if($curso->datatermino >= $now)
-          @if(CursoInscritoController::permiteInscricao($curso->idcurso))
-            <div class="center-992">
-              <a href="{{ route('cursos.inscricao.website', $curso->idcurso) }}" class="btn-curso-interna">Inscrever-se</a>
-            </div>
-          @endif
+        @if(auth()->guard('representante')->check() && $curso->representanteInscrito(auth()->guard('representante')->user()->cpf_cnpj))
+        <div class="center-992">
+          <span class="{{ $curso::TEXTO_BTN_INSCRITO }} btn-curso-inscrito">Inscrição realizada</span>
+        </div>
+        @elseif($curso->podeInscreverExterno())
+          <div class="center-992">
+            <a href="{{ route('cursos.inscricao.website', $curso->idcurso) }}" class="btn-curso-interna">Inscrever-se</a>
+          </div>
         @endif
       </div>
       <div class="col-lg-8 mt-2-992">
         <div class="curso-img">
-          <img src="{{asset($curso->img)}}" class="bn-img" />
+          <img src="{{ asset($curso->img) }}" class="bn-img" />
         </div>
         <div class="edital-download mt-3 conteudo-txt-mini">
           <h4 class="stronger">Descrição</h4>

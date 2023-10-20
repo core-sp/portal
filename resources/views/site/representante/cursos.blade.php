@@ -2,10 +2,6 @@
 
 @section('content-representante')
 
-@php
-use \App\Http\Controllers\CursoInscritoController;
-@endphp
-
 <div class="representante-content w-100">
     @if(Session::has('message'))
     <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
@@ -16,7 +12,7 @@ use \App\Http\Controllers\CursoInscritoController;
     @if(isset($cursos) && $cursos->isNotEmpty())
         <div class="row mb-3">
         @foreach($cursos as $curso)
-            @if(CursoInscritoController::permiteInscricao($curso->idcurso))
+            @if($curso->podeInscreverExterno())
             <div class="col-lg-4 col-sm-6 mb-2">
                 <div class="h-100 d-flex flex-column">
                     <a href="{{ route('cursos.show', $curso->idcurso) }}">
@@ -28,8 +24,8 @@ use \App\Http\Controllers\CursoInscritoController;
                             </div>
                         </div>
                     </a>
-                    @if($curso->cursoinscrito()->where('cpf', auth()->guard('representante')->user()->cpf_cnpj)->exists())
-                    <span class="btn btn-sm btn-secondary text-center mt-2 disabled">Inscrição realizada</span>
+                    @if($curso->representanteInscrito(auth()->guard('representante')->user()->cpf_cnpj))
+                    <span class="{{ $curso::TEXTO_BTN_INSCRITO }}">Inscrição realizada</span>
                     @else
                     <a href="{{ route('cursos.inscricao.website', $curso->idcurso) }}" class="btn btn-sm btn-primary text-white mt-2">Inscrever-se</a>
                     @endif

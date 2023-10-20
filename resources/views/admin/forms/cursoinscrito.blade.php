@@ -55,11 +55,11 @@
             <div class="col">
                 <label for="cpf">CPF</label>
                 <input type="text"
-                    name="cpf"
+                    name="{{ isset($resultado->cpf) ? '' : 'cpf' }}"
                     class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
                     placeholder="000.000.000-00"
                     value="{{ isset($resultado->cpf) ? $resultado->cpf : old('cpf') }}"
-                    required
+                    {{ isset($resultado->cpf) ? 'disabled' : 'required' }}
                 />
                 @if($errors->has('cpf'))
                 <div class="invalid-feedback">

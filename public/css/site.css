@@ -1621,6 +1621,14 @@ footer p {
 	text-transform: uppercase;
 }
 
+.btn-curso-inscrito {
+	border: 1px solid;
+	border-radius: 0px;
+	display: inline-block;
+	transition: .3s;
+	text-transform: uppercase;
+}
+
 .btn-como-foi {
 	background-color: #13632F;
 	border: 1px solid #13632F;
@@ -1648,11 +1656,12 @@ footer p {
 
 .btn-curso-grid,
 .btn-como-foi,
-.btn-esgotado {
+.btn-esgotado,
+.btn-inscrito-grid {
 	padding: .4rem 1.2rem;
 }
 
-.btn-curso-interna {
+.btn-curso-interna, .btn-curso-inscrito {
 	padding: .5rem 1.6rem;
 	font-size: 1.2rem;
 }

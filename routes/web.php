@@ -72,8 +72,29 @@ Route::middleware(['block_ip'])->group(function () {
 
     // Rotas de concursos
     require('admin/concursos.php');
-    // Rotas de concursos
-    require('admin/cursos.php');
+    
+    // Rotas para cursos
+    Route::prefix('cursos')->group(function(){
+      Route::get('/', 'CursoController@index')->name('cursos.index');
+      Route::get('/busca', 'CursoController@busca')->name('cursos.busca');
+      Route::get('/create', 'CursoController@create')->name('cursos.create');
+      Route::post('/', 'CursoController@store')->name('cursos.store');
+      Route::get('/{id}/edit', 'CursoController@edit')->name('cursos.edit');
+      Route::patch('/{id}', 'CursoController@update')->name('cursos.update');
+      Route::delete('/{id}', 'CursoController@destroy')->name('cursos.destroy');
+      Route::get('/lixeira', 'CursoController@lixeira')->name('cursos.lixeira');
+      Route::get('/{id}/restore', 'CursoController@restore')->name('cursos.restore');
+      // Lida com a parte de inscritos
+      Route::get('/inscritos/{idcurso}', 'CursoInscritoController@index')->name('inscritos.index');
+      Route::get('/inscritos/{idcurso}/busca', 'CursoInscritoController@busca')->name('inscritos.busca');
+      Route::get('/inscritos/editar/{id}', 'CursoInscritoController@edit')->name('inscritos.edit');
+      Route::put('/inscritos/editar/{id}', 'CursoInscritoController@update')->name('inscritos.update');
+      Route::put('/inscritos/atualizar-presenca/{id}', 'CursoInscritoController@updatePresenca')->name('inscritos.update.presenca');
+      Route::get('/adicionar-inscrito/{idcurso}', 'CursoInscritoController@create')->name('inscritos.create');
+      Route::post('/adicionar-inscrito/{idcurso}', 'CursoInscritoController@store')->name('inscritos.store');
+      Route::delete('/cancelar-inscricao/{id}', 'CursoInscritoController@destroy')->name('inscritos.destroy');
+      Route::get('/inscritos/download/{id}', 'CursoInscritoController@download')->name('inscritos.download');
+  });
     
     // Rotas do mapa de fiscalização (possivelmente será removido pois os dados virão do GERENTI)
     Route::prefix('fiscalizacao')->group(function() {
@@ -315,8 +336,18 @@ Route::middleware(['block_ip'])->group(function () {
 
     // Concursos
     require('site/concursos.php');
+
     // Cursos
-    require('site/cursos.php');
+    Route::get('cursos', 'CursoController@cursosView')->name('cursos.index.website');
+    Route::get('cursos/{id}', 'CursoController@show')->name('cursos.show');
+    Route::get('cursos/{idcurso}/inscricao', 'CursoInscritoController@inscricaoView')->name('cursos.inscricao.website');
+    Route::post('cursos/{idcurso}/inscricao', 'CursoInscritoController@inscricao')->name('cursos.inscricao');
+    Route::get('cursos-anteriores', 'CursoController@cursosAnterioresView')->name('cursos.previous.website');
+    // Redirects
+    Route::get('/curso/{id}', function($id){
+        return redirect(route('cursos.show', $id), 301);
+    });
+
     // Representantes
     require('site/representantes.php');
     

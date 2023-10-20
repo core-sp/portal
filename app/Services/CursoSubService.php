@@ -4,7 +4,10 @@ namespace App\Services;
 
 use App\CursoInscrito;
 use App\Events\CrudEvent;
+use App\Events\ExternoEvent;
 use App\Contracts\CursoSubServiceInterface;
+use App\Mail\CursoInscritoMailGuest;
+use Illuminate\Support\Facades\Mail;
 
 class CursoSubService implements CursoSubServiceInterface {
 
@@ -18,7 +21,7 @@ class CursoSubService implements CursoSubServiceInterface {
             'continuacao_titulo' => 'em <strong>'.$curso->tipo.': '.$curso->tema.'</strong>',
             'btn_lixeira' => '<a href="'.route('cursos.index').'" class="btn btn-default"><i class="fas fa-list"></i> Lista de Cursos</a>',
             'busca' => 'cursos/inscritos/'.$curso->idcurso,
-            'addonsHome' => '<a href="/admin/cursos/inscritos/download/'.$curso->idcurso.'" class="btn btn-primary mb-2">Baixar CSV</a>',
+            'addonsHome' => '<a href="'.route('inscritos.download', $curso->idcurso).'" class="btn btn-primary mb-2">Baixar CSV</a>',
             'btn_criar' => '<a href="'.route('inscritos.create', $curso->idcurso).'" class="btn btn-primary mr-1"><i class="fas fa-plus"></i> Adicionar inscrito</a> ',
         ];
     }
@@ -51,14 +54,16 @@ class CursoSubService implements CursoSubServiceInterface {
                 $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar Inscrição" onclick="return confirm(\'Tem certeza que deseja cancelar a inscrição?\')" />';
                 $acoes .= '</form>';
             }elseif(!$resultado->possuiPresenca()){
-                $acoes .= '<form method="POST" action="/admin/cursos/inscritos/confirmar-presenca/'.$resultado->idcursoinscrito.'" class="d-inline">';
+                $acoes .= '<form method="POST" action="'.route('inscritos.update.presenca', $resultado->idcursoinscrito).'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="put" />';
+                $acoes .= '<input type="hidden" name="presenca" value="Sim" />';
                 $acoes .= '<input type="submit" class="btn btn-sm btn-success" value="Confirmar presença" />';
                 $acoes .= '</form> ';
-                $acoes .= '<form method="POST" action="/admin/cursos/inscritos/confirmar-falta/'.$resultado->idcursoinscrito.'" class="d-inline">';
+                $acoes .= '<form method="POST" action="'.route('inscritos.update.presenca', $resultado->idcursoinscrito).'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="put" />';
+                $acoes .= '<input type="hidden" name="presenca" value="Não" />';
                 $acoes .= '<input type="submit" class="btn btn-sm btn-warning" value="Dar falta" />';
                 $acoes .= '</form>';
             }elseif($resultado->possuiPresenca())
@@ -93,6 +98,11 @@ class CursoSubService implements CursoSubServiceInterface {
         return CursoInscrito::tiposInscricao();
     }
 
+    public function getTotalInscritos()
+    {
+        return CursoInscrito::count();
+    }
+
     public function listar($curso, $user)
     {
         $resultados = $curso->cursoinscrito()
@@ -119,7 +129,7 @@ class CursoSubService implements CursoSubServiceInterface {
         $resultado = isset($id) ? CursoInscrito::findOrFail($id) : null;
         $curso = isset($resultado) ? $resultado->curso : $curso;
 
-        if(!$curso->podeInscrever())
+        if(!$curso->podeInscrever() && !isset($id))
             throw new \Exception('Não autorizado a adicionar inscrito fora do período de inscrição no curso com ID '.$curso->idcurso.'.', 403);
 
         $variaveis = $this->variaveis($curso);
@@ -146,7 +156,7 @@ class CursoSubService implements CursoSubServiceInterface {
         $inscrito = isset($id) ? CursoInscrito::findOrFail($id) : null;
         $curso = isset($inscrito) ? $inscrito->curso : $curso;
 
-        if(!$curso->podeInscrever())
+        if(!$curso->podeInscrever() && !isset($id))
             throw new \Exception('Não autorizado a adicionar inscrito fora do período de inscrição no curso com ID '.$curso->idcurso.'.', 403);
 
         if(!isset($inscrito))
@@ -196,5 +206,47 @@ class CursoSubService implements CursoSubServiceInterface {
         return [
             'idcurso' => $inscrito->curso->idcurso
         ];
+    }
+
+    public function updatePresenca($id, $validated)
+    {
+        $inscrito = CursoInscrito::findOrFail($id);
+        $acao = $validated['presenca'] == 'Sim' ? 'presença' : 'falta';
+
+        $inscrito->update(['presenca' => $validated['presenca']]);
+
+        event(new CrudEvent('no curso', 'confirmou '.$acao.' do participante '.$id, $inscrito->idcurso));
+    }
+
+    public function inscricaoExterna($curso, $rep = false, $situacao = '', $validated = null)
+    {
+        if(!$curso->liberarAcesso($rep, $situacao))
+            return $situacao == '' ? [
+                'rota' => 'representante.login',
+                'message' => 'Deve realizar login na área restrita do representante para se inscrever.',
+                'class' => 'alert-danger'
+            ] : [
+                'rota' => 'representante.cursos',
+                'message' => '<i class="fas fa-info-circle"></i>&nbsp;Para liberar sua inscrição entre em contato com o setor de atendimento da <a href="'.route('regionais.siteGrid').'" target="_blank">seccional</a> de interesse.',
+                'class' => 'alert-danger'
+            ];
+
+        if(!isset($validated))
+            return array();
+
+        $validated['nome'] = mb_convert_case(mb_strtolower($validated['nome']), MB_CASE_TITLE);
+        $ip = $validated['ip'];
+        unset($validated['ip']);
+        $inscrito = $curso->cursoinscrito()->create($validated);
+        $termo = $inscrito->termos()->create(['ip' => $ip]);
+
+        $string = $inscrito->nome." (CPF: ".$inscrito->cpf.") *inscreveu-se* no curso *".$inscrito->curso->tipo." - ".$inscrito->curso->tema;
+        $string .= "*, turma *".$inscrito->curso->idcurso."* e " . $termo->message();
+        event(new ExternoEvent($string));
+        
+        $textos = $inscrito->textoAgradece();
+        Mail::to($inscrito->email)->queue(new CursoInscritoMailGuest($textos['agradece']));
+
+        return $textos;
     }
 }

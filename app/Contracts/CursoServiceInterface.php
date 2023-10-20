@@ -24,9 +24,13 @@ interface CursoServiceInterface {
 
     public function buscar($busca, $user);
 
+    public function downloadInscricoes($id);
+
     public function show($id);
 
     public function siteGrid();
+
+    public function cursosAnteriores();
 
     public function inscritos();
 }
