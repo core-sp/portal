@@ -199,11 +199,13 @@ Route::middleware(['block_ip'])->group(function () {
     Route::get('/termo-consentimento/download', 'TermoConsentimentoController@download')->name('termo.consentimento.download');
 
     // Avisos
-    Route::get('/avisos', 'AvisoController@index')->name('avisos.index');
-    Route::get('/avisos/{id}', 'AvisoController@show')->name('avisos.show');
-    Route::get('/avisos/editar/{id}', 'AvisoController@edit')->name('avisos.editar.view');
-    Route::put('/avisos/editar/{id}', 'AvisoController@update')->name('avisos.editar');
-    Route::put('/avisos/status/{id}', 'AvisoController@updateStatus')->name('avisos.editar.status');
+    Route::prefix('avisos')->group(function(){
+      Route::get('/', 'AvisoController@index')->name('avisos.index');
+      Route::get('/{id}', 'AvisoController@show')->name('avisos.show');
+      Route::get('/editar/{id}', 'AvisoController@edit')->name('avisos.editar.view');
+      Route::put('/editar/{id}', 'AvisoController@update')->name('avisos.editar');
+      Route::put('/status/{id}', 'AvisoController@updateStatus')->name('avisos.editar.status');
+    });
 
     // Suporte
     Route::prefix('suporte')->group(function(){
