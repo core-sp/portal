@@ -13,18 +13,29 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\AnunciarVagaMail;
 use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
+use Illuminate\Support\Facades\View;
 
 class BdoSiteController extends Controller
 {
     private $bdoEmpresaRepository;
     private $bdoOportunidadeRepository;
     private $service;
+    private $avisoAtivado;
 
     public function __construct(BdoEmpresaRepository $bdoEmpresaRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, MediadorServiceInterface $service) 
     {
         $this->bdoEmpresaRepository = $bdoEmpresaRepository;
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
         $this->service = $service;
+        $this->avisoAtivado = $this->service->getService('Aviso')->avisoAtivado($this->service->getService('Aviso')->areas()[1]);
+
+        if($this->avisoAtivado)
+        {
+            $aviso = $this->service->getService('Aviso')->getByArea($this->service->getService('Aviso')->areas()[1]);
+            View::share('aviso', $aviso);
+            if(\Route::is('bdosite.anunciarVaga'))
+                request()->merge(['avisoAtivado' => $this->avisoAtivado]);
+        }
     }
 
     public function index()
@@ -64,6 +75,9 @@ class BdoSiteController extends Controller
 
     public function anunciarVagaView()
     {
+        if(request()->session()->exists('errors') && $this->avisoAtivado)
+            request()->session()->forget(['errors', '_old_input']);
+
         $regionais = $this->service->getService('Regional')->getRegionais();
 
         return view('site.anunciar-vaga', compact('regionais'));

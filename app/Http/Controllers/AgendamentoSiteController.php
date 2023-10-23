@@ -18,6 +18,8 @@ class AgendamentoSiteController extends Controller
     public function formView()
     {
         try{
+            $aviso = $this->service->getService('Aviso')->getByArea($this->service->getService('Aviso')->areas()[3]);
+            $aviso = isset($aviso) && $aviso->isAtivado() ? $aviso : null;
             $dados = $this->service->getService('Agendamento')->viewSite($this->service);
             $regionais = $dados['regionais'];
             $pessoas = $dados['pessoas'];
@@ -27,7 +29,7 @@ class AgendamentoSiteController extends Controller
             abort(500, "Erro ao carregar os dados para o agendamento.");
         }
 
-        return view('site.agendamento', compact('regionais', 'pessoas', 'servicos'));
+        return view('site.agendamento', compact('regionais', 'pessoas', 'servicos', 'aviso'));
     }
 
     public function consultaView()

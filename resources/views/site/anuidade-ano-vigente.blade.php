@@ -31,6 +31,16 @@
         <div class="linha-lg"></div>
         <div class="row mt-2">
             <div class="col-lg-8 conteudo-txt pr-4">
+
+                @if(isset($aviso))
+                    @component('components.aviso-simples', [
+                        'cor_fundo_titulo' => $aviso->cor_fundo_titulo,
+                        'titulo' => $aviso->titulo, 
+                        'conteudo' => $aviso->conteudo
+                    ])
+                    @endcomponent
+                @endif
+                
                 <p>Informe o CPF ou CNPJ abaixo para verificar a disponibilidade do boleto de anuidade do ano vigente, e então baixe-o clicando no link.</p>
                 <p>Ou, se preferir, acesse a <a href="/representante/login">Área Restrita do Representante,</a> e confira também outras informações relativas ao seu cadastro junto ao Core-SP, incluindo seu extrato financeiro detalhado.</p>
                 <p class="text-danger"><strong>
