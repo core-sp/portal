@@ -63,32 +63,53 @@ class Curso extends Model
         return $this->hasMany('App\Noticia', 'idcurso');
     }
 
+    private function noPeriodoDeInscricao()
+    {
+        $now = now()->format('Y-m-d H:i');
+        return ($this->inicio_inscricao <= $now) && ($this->termino_inscricao >= $now);
+    }
+
+    private function possuiVagas()
+    {
+        return $this->nrvagas > $this->cursoinscrito->count();
+    }
+
     public function representanteInscrito($cpf)
     {
     	return $this->cursoinscrito()->where('cpf', $cpf)->exists();
     }
 
+    public function publicado()
+    {
+        return $this->publicado == 'Sim';
+    }
+
+    public function acessoPrivado()
+    {
+        return $this->acesso == self::ACESSO_PRI;
+    }
+
     public function liberarAcesso($rep = false, $situacao = '')
     {
-        return ($this->acesso == self::ACESSO_PUB) || (($this->acesso == self::ACESSO_PRI) && $rep && ($situacao == 'Situação: Em dia.'));
+        return !$this->acessoPrivado() || ($this->acessoPrivado() && $rep && ($situacao == 'Situação: Em dia.'));
     }
 
     public function textoAcesso()
     {
-        if($this->acesso == self::ACESSO_PUB)
+        if(!$this->acessoPrivado())
             return 'Aberta ao público';
-        if($this->acesso == self::ACESSO_PRI)
+        if($this->acessoPrivado())
             return 'Restrita para representantes';
     }
 
     public function podeInscrever()
     {
-        return ($this->termino_inscricao >= now()->format('Y-m-d H:i')) && ($this->nrvagas > $this->cursoinscrito->count());
+        return $this->noPeriodoDeInscricao() && $this->possuiVagas();
     }
 
     public function podeInscreverExterno()
     {
-        return ($this->termino_inscricao >= now()->format('Y-m-d H:i')) && ($this->nrvagas > $this->cursoinscrito->count()) && ($this->publicado == 'Sim');
+        return $this->noPeriodoDeInscricao() && $this->possuiVagas() && $this->publicado();
     }
 
     public function encerrado()

@@ -6,13 +6,6 @@ use App\Curso;
 use Faker\Generator as Faker;
 
 $factory->define(Curso::class, function (Faker $faker) {
-    $date = new \DateTime();
-    $date->add(new DateInterval('P30D'));
-    $realizacao = $date->format('Y-m-d\TH:i:s');
-    $new_date = new \DateTime();
-    $new_date->add(new DateInterval('P31D'));
-    $termino = $new_date->format('Y-m-d\TH:i:s');
-
     $tipos = cursoTipos();
     $tiposIndex = array_rand($tipos);
 
@@ -20,8 +13,10 @@ $factory->define(Curso::class, function (Faker $faker) {
         'tipo' => $tipos[$tiposIndex],
         'tema' => $faker->sentence,
         'img' => '/imagens/2019-05/notícias-genérico.jpg',
-        'datarealizacao' => $realizacao,
-        'datatermino' => $termino,
+        'datarealizacao' => now()->addDays(2)->format('Y-m-d H:i'),
+        'datatermino' => now()->addDays(2)->addHours(2)->format('Y-m-d H:i'),
+        'inicio_inscricao' => now()->format('Y-m-d H:i'),
+        'termino_inscricao' => now()->addDay()->addHour()->format('Y-m-d H:i'),
         'endereco' => $faker->address,
         'nrvagas' => $faker->numberBetween(10, 200),
         'descricao' => $faker->text,

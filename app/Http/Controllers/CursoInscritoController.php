@@ -71,6 +71,7 @@ class CursoInscritoController extends Controller
             abort(404, "Curso não encontrado.");
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [403]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao adicionar um inscrito no curso com ID ".$idcurso.".");
         }
 
@@ -87,7 +88,6 @@ class CursoInscritoController extends Controller
             $dados = $this->service->getService('Curso')->inscritos()->view(null, $id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            in_array($e->getCode(), [403]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao carregar a página para editar um inscrito com ID ".$id.".");
         }
 
@@ -104,7 +104,7 @@ class CursoInscritoController extends Controller
             $dados = $this->service->getService('Curso')->inscritos()->save($validated, auth()->user(), null, $id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            abort(500, "Erro ao editar um inscrito no curso com ID ".$dados['idcurso'].".");
+            abort(500, "Erro ao editar um inscrito com ID ".$id.".");
         }
 
         return redirect()->route('inscritos.index', $dados['idcurso'])
@@ -115,22 +115,18 @@ class CursoInscritoController extends Controller
     public function inscricaoView($idcurso)
     {
         try{
-            $curso = $this->service->getService('Curso')->show($idcurso);
+            $curso = $this->service->getService('Curso')->show($idcurso, true);
             $rep = auth()->guard('representante')->check();
             $dados = array();
-
-            if($rep && $curso->representanteInscrito(auth()->guard('representante')->user()->cpf_cnpj))
-                return redirect()->route('representante.cursos')
-                ->with(['message' => 'Já está inscrito neste curso!', 'class' => 'alert-info']);
-
-            if(!$curso->podeInscreverExterno())
-                return redirect()->route($rep ? 'representante.cursos' : 'cursos.index.website')
-                ->with(['message' => 'Não é mais possível realizar inscrição neste curso', 'class' => 'alert-danger']);
 
             if($rep)
                 $dados = $this->service->getService('Representante')->getDadosInscricaoCurso(auth()->guard('representante')->user(), $this->gerentiRepository);
             $situacao = isset($dados['situacao']) ? $dados['situacao'] : '';
-            $retorno = $this->service->getService('Curso')->inscritos()->inscricaoExterna($curso, $rep, $situacao);
+
+            $verifica = $this->service->getService('Curso')->inscritos()->liberarInscricao($curso, auth()->guard('representante')->user(), $situacao);
+            if(!empty($verifica))
+                return redirect()->route($verifica['rota'])->with($verifica);
+
             $dados['curso'] = $curso;
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -140,7 +136,7 @@ class CursoInscritoController extends Controller
             abort(500, "Erro ao carregar página de inscrição no curso com ID ".$idcurso.".");
         }
 
-        return empty($retorno) ? view('site.curso-inscricao', $dados) : redirect()->route($retorno['rota'])->with($retorno);
+        return view('site.curso-inscricao', $dados);
     }
 
     // inscrição via área aberta
@@ -148,21 +144,16 @@ class CursoInscritoController extends Controller
     {
         try{
             $validated = $request->validated();
-            $curso = $this->service->getService('Curso')->show($idcurso);
-            $rep = auth()->guard('representante')->check();
-            $dados = array();
-
-            if($rep && $curso->representanteInscrito(auth()->guard('representante')->user()->cpf_cnpj))
-                return redirect()->route('representante.cursos')
-                ->with(['message' => 'Já está inscrito neste curso!', 'class' => 'alert-info']);
-
-            if(!$curso->podeInscreverExterno())
-                return redirect()->route($rep ? 'representante.cursos' : 'cursos.index.website')
-                ->with(['message' => 'Não é mais possível realizar inscrição neste curso', 'class' => 'alert-danger']);
+            $curso = $this->service->getService('Curso')->show($idcurso, true);
 
             $situacao = isset($validated['situacao']) ? $validated['situacao'] : '';
             unset($validated['situacao']);
-            $retorno = $this->service->getService('Curso')->inscritos()->inscricaoExterna($curso, $rep, $situacao, $validated);
+
+            $verifica = $this->service->getService('Curso')->inscritos()->liberarInscricao($curso, auth()->guard('representante')->user(), $situacao);
+            if(!empty($verifica))
+                return redirect()->route($verifica['rota'])->with($verifica);
+
+            $dados = $this->service->getService('Curso')->inscritos()->inscricaoExterna($curso, $validated);
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(404, "Curso não encontrado.");
@@ -171,7 +162,7 @@ class CursoInscritoController extends Controller
             abort(500, "Erro ao salvar inscrição no curso com ID ".$idcurso.".");
         }
         
-        return view('site.agradecimento')->with($retorno);
+        return view('site.agradecimento')->with($dados);
     }
 
     public function destroy($id)

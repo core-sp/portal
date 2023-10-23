@@ -160,7 +160,8 @@ class CursoController extends Controller
     public function show($id)
     {
         try{
-            $curso = $this->service->getService('Curso')->show($id);
+            // Público externo somente visualiza curso publicado
+            $curso = auth()->guard('web')->check() ? $this->service->getService('Curso')->show($id) : $this->service->getService('Curso')->show($id, true);
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(404, "Curso não encontrado.");

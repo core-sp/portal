@@ -26,7 +26,7 @@ class CursoRequest extends FormRequest
                 $this->merge([$key => str_replace('T', ' ', $this->input($key))]);
         }
 
-        if(Carbon::hasFormat($this->inicio_inscricao, 'Y-m-d H:i'))
+        if(Carbon::hasFormat($this->datarealizacao, 'Y-m-d H:i'))
             $this->hora_final_limite = Carbon::parse($this->datarealizacao)->subHours(2)->format('Y-m-d H:i');
 
         $this->hora_inicial_real_limite = Carbon::hasFormat($this->datarealizacao, 'Y-m-d H:i') ? 
@@ -46,7 +46,7 @@ class CursoRequest extends FormRequest
             'tema' => 'required|max:191',
             'idregional' => 'required|exists:regionais',
             'img' => 'nullable|max:191',
-            'datarealizacao' => 'required|date_format:Y-m-d H:i|after:today',
+            'datarealizacao' => 'required|date_format:Y-m-d H:i|after:'.now()->format('Y-m-d 23:59'),
             'datatermino' => 'required|date_format:Y-m-d H:i|after_or_equal:' . $this->hora_final_real_limite,
             'inicio_inscricao' => 'nullable|date_format:Y-m-d H:i|before_or_equal:' . $this->hora_inicial_real_limite,
             'termino_inscricao' => 'required_with:inicio_inscricao|nullable|date_format:Y-m-d H:i|after:'.$this->hora_inicial_limite.'|before_or_equal:' . $this->hora_final_limite,
@@ -71,9 +71,10 @@ class CursoRequest extends FormRequest
             'datarealizacao.after' => 'O curso deve iniciar após o dia de hoje',
             'datatermino.after_or_equal' => 'O curso deve terminar pelo menos 1h após a data de realização',
             'inicio_inscricao.before_or_equal' => 'A data inicial das inscrições deve ser 24h antes da data de realização do curso',
-            'termino_inscricao.after' => 'A data final das inscrições deve ser de pelo menos 1 dia após a data inicial',
+            'termino_inscricao.after' => 'A data final das inscrições deve ser de pelo menos no dia seguinte após a data inicial',
             'termino_inscricao.before_or_equal' => 'A data final das inscrições deve ser até 2 horas antes da data de realização',
             'endereco.required_unless' => 'Endereço é obrigatório exceto para "Live"',
+            'required_with' => 'A data final das inscrições é obrigatória quando data inicial está preenchida',
         ];
     }
 }

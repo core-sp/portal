@@ -22,5 +22,7 @@ interface CursoSubServiceInterface {
 
     public function updatePresenca($id, $validated);
 
-    public function inscricaoExterna($curso, $rep = false, $situacao = '', $validated = null);
+    public function liberarInscricao($curso, $rep = null, $situacao = '');
+
+    public function inscricaoExterna($curso, $validated = null);
 }

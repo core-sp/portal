@@ -56,7 +56,7 @@ class CursoService implements CursoServiceInterface {
                 $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o curso?\')" />';
                 $acoes .= '</form>';
             }
-            $publicado = $resultado->publicado == 'Sim' ? 'Publicado' : 'Rascunho';
+            $publicado = $resultado->publicado() ? 'Publicado' : 'Rascunho';
             $endereco = isset($resultado->endereco) ? $resultado->endereco : 'Evento online';
             $conteudo = [
                 $resultado->idcurso,
@@ -159,10 +159,10 @@ class CursoService implements CursoServiceInterface {
     public function save($validated, $user, $id = null)
     {
         $validated['idusuario'] = $user->idusuario;
-        $acao = (!isset($id)) ? 'criou' : 'editou';
+        $acao = !isset($id) ? 'criou' : 'editou';
 
         if(!isset($id))
-            $id = Curso::create($validated);
+            $id = Curso::create($validated)->idcurso;
         else
             Curso::findOrFail($id)->update($validated);
         
@@ -187,7 +187,7 @@ class CursoService implements CursoServiceInterface {
 
     public function restore($id)
     {
-        Curso::onlyTrashed()->findOrFail($id)->restore() ? event(new CrudEvent('curso', 'restaurou', $id)) : null;
+        Curso::onlyTrashed()->findOrFail($id)->restore() ? event(new CrudEvent('curso', 'reabriu', $id)) : null;
     }
 
     public function buscar($busca, $user)
@@ -217,8 +217,9 @@ class CursoService implements CursoServiceInterface {
         $callback = function() use($lista) {
             $fh = fopen('php://output','w');
             fprintf($fh, chr(0xEF).chr(0xBB).chr(0xBF));
-            foreach($lista as $linha) {
-                fputcsv($fh,$linha,';');
+            foreach($lista as $key => $linha) {
+                if($key != 'curso')
+                    fputcsv($fh,$linha,';');
             }
             fclose($fh);
         };
@@ -226,20 +227,22 @@ class CursoService implements CursoServiceInterface {
         return $callback;
     }
 
-    public function show($id)
+    public function show($id, $publicado = false)
     {
-        return Curso::findOrFail($id);
+        return $publicado ? Curso::where('idcurso', $id)->where('publicado', 'Sim')->firstOrFail() : Curso::findOrFail($id);
     }
 
     public function siteGrid($areaRep = false)
     {
+        $now = now()->format('Y-m-d H:i');
+
         if($areaRep)
-            return Curso::where('datatermino','>=', now()->format('Y-m-d H:i'))
+            return Curso::where('datatermino','>=', $now)
             ->where('publicado','Sim')
             ->where('acesso', Curso::ACESSO_PRI)
             ->paginate(6);
             
-        return Curso::where('datatermino','>=', now()->format('Y-m-d H:i'))
+        return Curso::where('datatermino','>=', $now)
             ->where('publicado','Sim')
             ->paginate(9);
     }

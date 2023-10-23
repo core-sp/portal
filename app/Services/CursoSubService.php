@@ -26,7 +26,7 @@ class CursoSubService implements CursoSubServiceInterface {
         ];
     }
 
-    private function tabelaCompleta($resultados, $user)
+    private function tabelaCompleta($resultados, $user, $podeCancelar = false)
     {
         // Opções de cabeçalho da tabela
         $headers = [
@@ -47,7 +47,7 @@ class CursoSubService implements CursoSubServiceInterface {
             $acoes = '';
             if($userPodeEdit)
                 $acoes .= ' <a href="'.route('inscritos.edit', $resultado->idcursoinscrito).'" class="btn btn-sm btn-default">Editar</a> ';
-            if($userPodeDestroy && $resultado->podeCancelar()) {
+            if($userPodeDestroy && $podeCancelar) {
                 $acoes .= '<form method="POST" action="'.route('inscritos.destroy', $resultado->idcursoinscrito).'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
@@ -110,13 +110,14 @@ class CursoSubService implements CursoSubServiceInterface {
         ->paginate(10);
 
         $variaveis = $this->variaveis($curso);
+        $podeInscrever = $curso->podeInscrever();
 
-        if($user->cannot('create', $user) || !$curso->podeInscrever())
+        if($user->cannot('create', $user) || !$podeInscrever)
             unset($variaveis['btn_criar']);
 
         return [
             'resultados' => $resultados, 
-            'tabela' => $this->tabelaCompleta($resultados, $user), 
+            'tabela' => $this->tabelaCompleta($resultados, $user, $podeInscrever), 
             'variaveis' => (object) $variaveis
         ];
     }
@@ -149,15 +150,18 @@ class CursoSubService implements CursoSubServiceInterface {
         if(!isset($id) && !isset($curso))
             throw new \Exception('Deve inserir model curso ou id do inscrito', 500);
 
-        $validated['idusuario'] = $user->idusuario;
-        $validated['nome'] = mb_convert_case(mb_strtolower($validated['nome']), MB_CASE_TITLE);
-        $acao = (!isset($id)) ? 'adicionou' : 'editou';
-
         $inscrito = isset($id) ? CursoInscrito::findOrFail($id) : null;
         $curso = isset($inscrito) ? $inscrito->curso : $curso;
 
-        if(!$curso->podeInscrever() && !isset($id))
+        if(!isset($id) && !$curso->podeInscrever())
             throw new \Exception('Não autorizado a adicionar inscrito fora do período de inscrição no curso com ID '.$curso->idcurso.'.', 403);
+
+        $validated['idusuario'] = $user->idusuario;
+        $validated['nome'] = mb_convert_case(mb_strtolower($validated['nome']), MB_CASE_TITLE);
+        if(isset($validated['cpf']))
+            $validated['cpf'] = formataCpfCnpj(apenasNumeros($validated['cpf']));
+
+        $acao = !isset($id) ? 'adicionou' : 'editou';
 
         if(!isset($inscrito))
             $id = $curso->cursoinscrito()->create($validated)->idcursoinscrito;
@@ -183,13 +187,14 @@ class CursoSubService implements CursoSubServiceInterface {
 
         $variaveis = $this->variaveis($curso);
         $variaveis['slug'] = 'cursos/inscritos/'.$curso->idcurso;
+        $podeInscrever = $curso->podeInscrever();
 
-        if(!$curso->podeInscrever())
+        if(!$podeInscrever)
             unset($variaveis['btn_criar']);
 
         return [
             'resultados' => $resultados,
-            'tabela' => $this->tabelaCompleta($resultados, $user), 
+            'tabela' => $this->tabelaCompleta($resultados, $user, $podeInscrever), 
             'variaveis' => (object) $variaveis
         ];
     }
@@ -198,7 +203,7 @@ class CursoSubService implements CursoSubServiceInterface {
     {
         $inscrito = CursoInscrito::findOrFail($id);
 
-        if(!$inscrito->podeCancelar())
+        if(!$inscrito->curso->podeInscrever())
             throw new \Exception('Não autorizado a cancelar inscrição com ID '.$id.' fora do período de inscrição.', 403);
 
         $inscrito->delete() ? event(new CrudEvent('inscrito em curso', 'cancelou inscrição', $id)) : null;
@@ -218,8 +223,23 @@ class CursoSubService implements CursoSubServiceInterface {
         event(new CrudEvent('no curso', 'confirmou '.$acao.' do participante '.$id, $inscrito->idcurso));
     }
 
-    public function inscricaoExterna($curso, $rep = false, $situacao = '', $validated = null)
+    public function liberarInscricao($curso, $rep = null, $situacao = '')
     {
+        if(isset($rep) && $curso->representanteInscrito($rep->cpf_cnpj))
+            return [
+                'rota' => 'representante.cursos',
+                'message' => 'Já está inscrito neste curso!',
+                'class' => 'alert-info',
+            ];
+
+        if(!$curso->podeInscreverExterno())
+            return [
+                'rota' => isset($rep) ? 'representante.cursos' : 'cursos.index.website',
+                'message' => 'Não é mais possível realizar inscrição neste curso',
+                'class' => 'alert-danger',
+            ];
+
+        $rep = isset($rep);
         if(!$curso->liberarAcesso($rep, $situacao))
             return $situacao == '' ? [
                 'rota' => 'representante.login',
@@ -230,13 +250,20 @@ class CursoSubService implements CursoSubServiceInterface {
                 'message' => '<i class="fas fa-info-circle"></i>&nbsp;Para liberar sua inscrição entre em contato com o setor de atendimento da <a href="'.route('regionais.siteGrid').'" target="_blank">seccional</a> de interesse.',
                 'class' => 'alert-danger'
             ];
+        
+        return [];
+    }
 
+    public function inscricaoExterna($curso, $validated = null)
+    {
         if(!isset($validated))
             return array();
 
         $validated['nome'] = mb_convert_case(mb_strtolower($validated['nome']), MB_CASE_TITLE);
+        $validated['cpf'] = formataCpfCnpj(apenasNumeros($validated['cpf']));
         $ip = $validated['ip'];
         unset($validated['ip']);
+        unset($validated['termo']);
         $inscrito = $curso->cursoinscrito()->create($validated);
         $termo = $inscrito->termos()->create(['ip' => $ip]);
 

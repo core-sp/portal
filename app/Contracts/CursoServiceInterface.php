@@ -26,7 +26,7 @@ interface CursoServiceInterface {
 
     public function downloadInscricoes($id);
 
-    public function show($id);
+    public function show($id, $publicado = false);
 
     public function siteGrid();
 

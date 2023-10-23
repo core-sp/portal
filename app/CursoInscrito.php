@@ -11,8 +11,7 @@ class CursoInscrito extends Model
     
     protected $primaryKey = 'idcursoinscrito';
     protected $table = 'curso_inscritos';
-    protected $fillable = ['cpf', 'nome', 'telefone', 'email',
-    'registrocore', 'idcurso', 'presenca', 'tipo_inscrito', 'idusuario'];
+    protected $guarded = [];
     protected $with = ['curso'];
 
     const INSCRITO_FUN = 'Funcionário';
@@ -59,11 +58,6 @@ class CursoInscrito extends Model
     public function compareceu()
     {
         return isset($this->presenca) && ($this->presenca == 'Sim');
-    }
-
-    public function podeCancelar()
-    {
-        return $this->curso->termino_inscricao >= now()->format('Y-m-d H:i');
     }
 
     public function textoAgradece()
