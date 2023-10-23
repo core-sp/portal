@@ -172,6 +172,22 @@ class Kernel extends ConsoleKernel
             $service = resolve('App\Contracts\MediadorServiceInterface');
             $service->getService('SalaReuniao')->agendados()->executarRotinaRemoveAnexos();
         })->monthlyOn(15, '2:00');
+
+        /** 
+         * =======================================================================================================
+         * ROTINA AVISOS 
+         * =======================================================================================================
+        */ 
+        
+        $schedule->call(function(){
+            // Ativar / desativar aviso
+            try {
+                $service = resolve('App\Contracts\MediadorServiceInterface');
+                $service->getService('Aviso')->executarRotina();
+            } catch (\Exception $e) {
+                \Log::error('[Erro ao executar rotina do Portal no serviço: Aviso], [Erro: ' . $e->getMessage() .'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            }
+        })->everyFifteenMinutes();
         
         // Rotina para reenviar pagamentos autorizados pelo portal em caso de erro e necessitam de confirmação a cada hora
         $schedule->call(function(){
