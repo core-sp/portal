@@ -75,7 +75,11 @@ class SiteController extends Controller
             return view('site.consulta');
 
         if(\Route::is('anuidade-ano-vigente'))
-            return view('site.anuidade-ano-vigente');
+        {
+            $aviso = $this->service->getService('Aviso')->getByArea($this->service->getService('Aviso')->areas()[2]);
+            $aviso = isset($aviso) && $aviso->isAtivado() ? $aviso : null;
+            return view('site.anuidade-ano-vigente', ['aviso' => $aviso]);
+        }
 
         if(\Route::is('simulador'))
             return view('site.simulador', ['dados' => $this->service->getService('Geral')->simulador()]);

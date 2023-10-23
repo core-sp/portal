@@ -3,8 +3,14 @@
     @csrf
     @method('PUT')
     <div class="card-body">
-        <div class="form-row">
-            <div class="col-8">
+        <h5><strong>Status:</strong> <span class="{{ $resultado->isAtivado() ? 'text-success' : 'text-danger' }}">{{ $resultado->status }}</span></h5>
+
+        @if($resultado->area == $resultado::areas()[1])
+        <p><strong><span class="text-danger">ATENÇÃO!</span></strong> Esse aviso <strong>ATIVADO</strong> desabilita o envio de formulário para anunciar vaga!</p>
+        @endif
+        <div class="form-row mb-3">
+            @if(!$resultado->isComponenteSimples())
+            <div class="col-8 mt-2">
                 <label for="titulo">Título do aviso na área do {{ $resultado->area }}</label>
                 <input type="text"
                     class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
@@ -18,20 +24,49 @@
                     </div>
                 @endif
             </div>
-            <div class="col">
-                <label for="cor_fundo_titulo">Cor de fundo do Título</label>
+            @endif
+            <div class="col mt-2">
+                <label for="cor_fundo_titulo">Cor de fundo</label>
                 <br>
                 @foreach($cores as $cor)
                 <div class="form-check-inline">
-                    <label class="form-check-label" for="radio1">
-                        <input type="radio" class="form-check-input" name="cor_fundo_titulo" value="{{ $cor }}" {{ $resultado->cor_fundo_titulo == $cor ? 'checked' : '' }}>
-                        <i class="fas fa-square fa-border text-{{ str_replace('bg-', '', $cor) }}"></i>
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input {{ $errors->has('cor_fundo_titulo') ? 'is-invalid' : '' }}" name="cor_fundo_titulo" value="{{ $cor }}" {{ $resultado->cor_fundo_titulo == $cor ? 'checked' : '' }}>
+                        <i class="fas fa-square fa-border text-{{ $cor }}"></i>
+                        @if($errors->has('cor_fundo_titulo'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('cor_fundo_titulo') }}
+                        </div>
+                        @endif
                     </label>
                 </div>
                 @endforeach
-                @if($errors->has('cor_fundo_titulo'))
+            </div>
+        </div>
+        <div class="form-row mb-3">
+            <div class="col">
+                <label for="dia_hora_ativar">Dia e hora para <span class="text-success">ativar</span> o aviso <small>(opcional)</small></label>
+                <input type="datetime-local"
+                    class="form-control {{ $errors->has('dia_hora_ativar') ? 'is-invalid' : '' }}"
+                    name="dia_hora_ativar"
+                    value="{{ isset($resultado->dia_hora_ativar) ? $resultado->formatDtAtivarToInput() : old('dia_hora_ativar') }}"
+                />
+                @if($errors->has('dia_hora_ativar'))
                     <div class="invalid-feedback">
-                        {{ $errors->first('cor_fundo_titulo') }}
+                        {{ $errors->first('dia_hora_ativar') }}
+                    </div>
+                @endif
+            </div>
+            <div class="col">
+                <label for="dia_hora_desativar">Dia e hora para <span class="text-danger">desativar</span> o aviso <small>(opcional)</small></label>
+                <input type="datetime-local"
+                    class="form-control {{ $errors->has('dia_hora_desativar') ? 'is-invalid' : '' }}"
+                    name="dia_hora_desativar"
+                    value="{{ isset($resultado->dia_hora_desativar) ? $resultado->formatDtDesativarToInput() : old('dia_hora_desativar') }}"
+                />
+                @if($errors->has('dia_hora_desativar'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('dia_hora_desativar') }}
                     </div>
                 @endif
             </div>
@@ -41,7 +76,7 @@
             <textarea name="conteudo"
                 class="form-control my-editor {{ $errors->has('conteudo') ? 'is-invalid' : '' }}"
                 id="conteudo"
-                rows="10"
+                rows="25"
             >{!! isset($resultado) ? $resultado->conteudo : old('conteudo') !!}</textarea>
             @if($errors->has('conteudo'))
                 <div class="invalid-feedback">
@@ -52,7 +87,7 @@
     </div>
     <div class="card-footer">
         <div class="float-right">
-            <a href="{{ route('avisos.index') }}" class="btn btn-default">Cancelar</a>
+            <a href="{{ route('avisos.index') }}" class="btn btn-default">Voltar</a>
             <button type="submit" class="btn btn-primary ml-1">
                 Salvar
             </button>
