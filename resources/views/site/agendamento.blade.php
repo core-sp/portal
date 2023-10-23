@@ -37,6 +37,16 @@
           <p><strong>Importante:</strong> O atendimento presencial está suspenso temporariamente, neste período os serviços deverão ser solicitados via email. O prazo para análise e resposta do email depende do tipo de serviço solicitado.</p>
           <p>Para mais informações, acesse <a href="/servicos-atendimento-ao-rc">este link</a>.</p>
           -->
+
+          @if(isset($aviso))
+            @component('components.aviso-simples', [
+              'cor_fundo_titulo' => $aviso->cor_fundo_titulo,
+              'titulo' => $aviso->titulo, 
+              'conteudo' => $aviso->conteudo
+            ])
+            @endcomponent
+          @endif
+
           <p class="pb-0 text-justify mb-3">
             <strong>Representante Comercial</strong>, o Core-SP alterou o protocolo do Setor de Atendimento. A partir de agora, não é preciso realizar o agendamento pelo portal. Basta se dirigir à Sede ou ao Escritório Seccional que atende sua região entre as 9h e às 16 horas, de segunda a sexta-feira. É importante dizer: as demandas serão atendidas por ordem de chegada. Solicitamos que verifique previamente a documentação necessária para dar andamento ao processo. Acesse o link abaixo, veja as modalidades de serviço e clique sobre aquela que deseja requisitar.
             </br>
