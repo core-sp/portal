@@ -5,19 +5,24 @@ namespace App\Http\Controllers;
 use App\Rules\CpfCnpj;
 use Illuminate\Http\Request;
 use App\Repositories\GerentiRepositoryInterface;
+use App\Contracts\MediadorServiceInterface;
 
 class AnoVigenteSiteController extends Controller
 {
     private $gerentiRepository;
+    private $service;
 
-    public function __construct(GerentiRepositoryInterface $gerentiRepository)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, MediadorServiceInterface $service)
     {
         $this->gerentiRepository = $gerentiRepository;
+        $this->service = $service;
     }
 
     public function anoVigenteView()
     {
-        return view('site.anuidade-ano-vigente');
+        $aviso = $this->service->getService('Aviso')->getByArea($this->service->getService('Aviso')->areas()[2]);
+        $aviso = isset($aviso) && $aviso->isAtivado() ? $aviso : null;
+        return view('site.anuidade-ano-vigente', ['aviso' => $aviso]);
     }
 
     public function anoVigente(Request $request)

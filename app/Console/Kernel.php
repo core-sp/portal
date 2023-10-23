@@ -174,6 +174,22 @@ class Kernel extends ConsoleKernel
     
         /** 
          * =======================================================================================================
+         * ROTINA AVISOS 
+         * =======================================================================================================
+        */ 
+        
+        $schedule->call(function(){
+            // Ativar / desativar aviso
+            try {
+                $service = resolve('App\Contracts\MediadorServiceInterface');
+                $service->getService('Aviso')->executarRotina();
+            } catch (\Exception $e) {
+                \Log::error('[Erro ao executar rotina do Portal no serviço: Aviso], [Erro: ' . $e->getMessage() .'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            }
+        })->everyFifteenMinutes();
+        
+        /** 
+         * =======================================================================================================
          * ROTINAS PRÉ-REGISTRO
          * =======================================================================================================
          */
