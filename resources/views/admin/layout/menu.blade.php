@@ -272,10 +272,14 @@
         @endif
 
         @if($aviso)
+        @php
+            $service = resolve('App\Contracts\MediadorServiceInterface');
+            $ativado = $service->getService('Aviso')->existeAtivado() ? '<span class="badge badge-pill badge-warning">Ativo</span>' : '';
+        @endphp
         <li class="nav-item">
             <a href="{{ route('avisos.index') }}" class="nav-link">
                 <i class="nav-icon fas fa-info-circle"></i>
-                <p>Avisos</p>
+                <p>Avisos &nbsp;&nbsp;{!! $ativado !!}</p>
             </a>
         </li>
         @endif

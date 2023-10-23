@@ -8,6 +8,12 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class AnunciarVagaRequest extends FormRequest
 {
+    protected function prepareForValidation()
+    {
+        if($this->filled('avisoAtivado') && $this->avisoAtivado)
+            $this->replace([]);
+    }
+
     public function rules()
     {
         return [
