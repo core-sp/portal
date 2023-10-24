@@ -36,6 +36,7 @@ class CursoSubService implements CursoSubServiceInterface {
             'Telefone',
             'Email',
             'Tipo da Inscrição',
+            'Campo adicional',
             'Ações'
         ];
         // Opções de conteúdo da tabela
@@ -80,6 +81,7 @@ class CursoSubService implements CursoSubServiceInterface {
                 $resultado->telefone,
                 $resultado->email,
                 $resultado->tipo_inscrito,
+                $resultado->campo_adicional,
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -102,6 +104,11 @@ class CursoSubService implements CursoSubServiceInterface {
     public function getTotalInscritos()
     {
         return CursoInscrito::count();
+    }
+
+    public function getRegrasCampoAdicional($id)
+    {
+        return CursoInscrito::findOrFail($id)->curso->getRegras();
     }
 
     public function listar($curso, $user)
@@ -139,7 +146,7 @@ class CursoSubService implements CursoSubServiceInterface {
 
         return [
             'resultado' => $resultado,
-            'idcurso' => $curso->idcurso,
+            'curso' => $curso,
             'variaveis' => (object) $variaveis,
             'tipos' => CursoInscrito::tiposInscricao(),
         ];
@@ -158,8 +165,15 @@ class CursoSubService implements CursoSubServiceInterface {
 
         $validated['idusuario'] = $user->idusuario;
         $validated['nome'] = mb_convert_case(mb_strtolower($validated['nome']), MB_CASE_TITLE);
+
         if(isset($validated['cpf']))
             $validated['cpf'] = formataCpfCnpj(apenasNumeros($validated['cpf']));
+
+        if($curso->add_campo)
+        {
+            $validated['campo_adicional'] = $curso->nomeRotulo() . ': ' . $validated[$curso->campo_rotulo];
+            unset($validated[$curso->campo_rotulo]);
+        }
 
         $acao = !isset($id) ? 'adicionou' : 'editou';
 
@@ -263,6 +277,13 @@ class CursoSubService implements CursoSubServiceInterface {
         $ip = $validated['ip'];
         unset($validated['ip']);
         unset($validated['termo']);
+
+        if($curso->add_campo)
+        {
+            $validated['campo_adicional'] = $curso->nomeRotulo() . ': ' . $validated[$curso->campo_rotulo];
+            unset($validated[$curso->campo_rotulo]);
+        }
+        
         $inscrito = $curso->cursoinscrito()->create($validated);
         $termo = $inscrito->termos()->create(['ip' => $ip]);
 

@@ -5,6 +5,21 @@
     @endif
     <div class="card-body">
         <div class="form-row">
+            <div class="col-2">
+                <label for="cpf">CPF</label>
+                <input type="text"
+                    name="{{ isset($resultado->cpf) ? '' : 'cpf' }}"
+                    class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
+                    placeholder="000.000.000-00"
+                    value="{{ isset($resultado->cpf) ? $resultado->cpf : old('cpf') }}"
+                    {{ isset($resultado->cpf) ? 'disabled' : 'required' }}
+                />
+                @if($errors->has('cpf'))
+                <div class="invalid-feedback">
+                {{ $errors->first('cpf') }}
+                </div>
+                @endif
+            </div>
             <div class="col">
                 <label for="nome">Nome</label>
                 <input type="text"
@@ -53,21 +68,6 @@
                 @endif
             </div>
             <div class="col">
-                <label for="cpf">CPF</label>
-                <input type="text"
-                    name="{{ isset($resultado->cpf) ? '' : 'cpf' }}"
-                    class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
-                    placeholder="000.000.000-00"
-                    value="{{ isset($resultado->cpf) ? $resultado->cpf : old('cpf') }}"
-                    {{ isset($resultado->cpf) ? 'disabled' : 'required' }}
-                />
-                @if($errors->has('cpf'))
-                <div class="invalid-feedback">
-                {{ $errors->first('cpf') }}
-                </div>
-                @endif
-            </div>
-            <div class="col">
                 <label for="registrocore">Registro no CORE</label>
                 <input type="text"
                     name="registrocore"
@@ -81,6 +81,22 @@
                 </div>
                 @endif
             </div>
+                        
+            @if($curso->add_campo)
+            @php
+                $valorCA = isset($resultado) ? $resultado->valorCampoAdicional() : old($curso->campo_rotulo);
+            @endphp
+            <div class="col">
+                <label for="{{ $curso->campo_rotulo }}">{{ $curso->nomeRotulo() }}</label>
+                {!! $curso::inputs($valorCA, $errors->has($curso->campo_rotulo))[$curso->campo_rotulo] !!}
+                @if($errors->has($curso->campo_rotulo))
+                <div class="invalid-feedback">
+                {{ $errors->first($curso->campo_rotulo) }}
+                </div>
+                @endif
+            </div>
+            @endif
+
             <div class="col">
                 <label for="tipo_inscrito">Tipo da incrição</label>
                 <select name="tipo_inscrito" class="form-control {{ $errors->has('tipo_inscrito') ? 'is-invalid' : '' }}" required>
@@ -98,7 +114,7 @@
     </div>
     <div class="card-footer">
         <div class="float-right">
-            <a href="{{ route('inscritos.index', $idcurso) }}" class="btn btn-default">Cancelar</a>
+            <a href="{{ route('inscritos.index', $curso->idcurso) }}" class="btn btn-default">Cancelar</a>
             <button type="submit" class="btn btn-primary ml-1">
                 {{ isset($resultado) ? 'Salvar' : 'Publicar' }}
             </button>

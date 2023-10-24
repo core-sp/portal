@@ -10,6 +10,8 @@ interface CursoSubServiceInterface {
 
     public function getTotalInscritos();
 
+    public function getRegrasCampoAdicional($id);
+
     public function listar($curso, $user);
 
     public function view($curso = null, $id = null);

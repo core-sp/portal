@@ -24,6 +24,13 @@ class Curso extends Model
 
     const TEXTO_BTN_INSCRITO = "btn btn-sm btn-dark text-center text-uppercase text-white mt-2 disabled";
     
+    private static function inputText($rotulo, $value, $possuiErro = false, $classes = '')
+    {
+        $textoErro = $possuiErro ? 'is-invalid' : '';
+
+        return '<input type="text" name="' . $rotulo . '" class="form-control '.$textoErro. ' ' .$classes.'" value="'.$value.'" />';
+    }
+
     public static function tipos()
     {
         return [
@@ -40,6 +47,27 @@ class Curso extends Model
         return [
             self::ACESSO_PRI,
             self::ACESSO_PUB,
+        ];
+    }
+
+    public static function rotulos()
+    {
+        return [
+            'placa_veiculo' => 'Placa do veículo'
+        ];
+    }
+
+    public static function inputs($value, $possuiErro = false)
+    {
+        return [
+            'placa_veiculo' => self::inputText('placa_veiculo', $value, $possuiErro, 'placaVeiculo'),
+        ];
+    }
+
+    public static function regras()
+    {
+        return [
+            'placa_veiculo' => 'size:8',
         ];
     }
 
@@ -135,5 +163,24 @@ class Curso extends Model
     {
         $noticia = $this->noticia->first();
         return isset($noticia) ? $noticia->slug : null;
+    }
+
+    public function getRegras()
+    {
+        if(!isset($this->campo_rotulo))
+            return [];
+
+        $regras = self::regras()[$this->campo_rotulo];
+        $required = $this->campo_required ? 'required|' : 'nullable|';
+
+        return [$this->campo_rotulo => $required . $regras];
+    }
+
+    public function nomeRotulo()
+    {
+        if(!isset($this->campo_rotulo))
+            return '';
+
+        return self::rotulos()[$this->campo_rotulo];
     }
 }

@@ -10,6 +10,10 @@ interface CursoServiceInterface {
 
     public function acessos();
 
+    public function rotulos();
+
+    public function getRegrasCampoAdicional($id);
+
     public function listar($user);
 
     public function view($id = null);

@@ -84,6 +84,50 @@
             </div>
         </div>
         <div class="form-row mt-2">
+            <div class="col-sm-3">
+                <label for="add_campo">Adicionar campo para inscrição?</label>
+                <select name="add_campo" class="form-control {{ $errors->has('add_campo') ? 'is-invalid' : '' }}" required>
+                    <option value="1" {{ (old('add_campo') == '1') || ($resultado->add_campo == '1') ? 'selected' : '' }}>Sim</option>
+                    <option value="0" {{ (old('add_campo') == '0') || ($resultado->add_campo == '0') ? 'selected' : '' }}>Não</option>
+                </select>
+                @if($errors->has('add_campo'))
+                <div class="invalid-feedback">
+                {{ $errors->first('add_campo') }}
+                </div>
+                @endif
+            </div>
+            <div class="col">
+                <label for="campo_rotulo">Tipo de campo</label>
+                <select name="campo_rotulo" class="form-control {{ $errors->has('campo_rotulo') ? 'is-invalid' : '' }}">
+                    <option value="">Selecione a validação do campo...</option>
+                @foreach($rotulos as $chave => $rotulo)
+                    @if(old('campo_rotulo'))
+                    <option value="{{ $chave }}" {{ old('campo_rotulo') == $chave ? 'selected' : '' }}>{{ $rotulo }}</option>
+                    @else
+                    <option value="{{ $chave }}" {{ isset($resultado->campo_rotulo) && ($resultado->campo_rotulo == $chave) ? 'selected' : '' }}>{{ $rotulo }}</option>
+                    @endif
+                @endforeach
+                </select>
+                @if($errors->has('campo_rotulo'))
+                <div class="invalid-feedback">
+                {{ $errors->first('campo_rotulo') }}
+                </div>
+                @endif
+            </div>
+            <div class="col">
+                <label for="campo_required">Campo na inscrição é obrigatório?</label>
+                <select name="campo_required" class="form-control {{ $errors->has('campo_required') ? 'is-invalid' : '' }}" required>
+                    <option value="1" {{ (old('campo_required') == '1') || ($resultado->campo_required == '1') ? 'selected' : '' }}>Sim</option>
+                    <option value="0" {{ (old('campo_required') == '0') || ($resultado->campo_required == '0') ? 'selected' : '' }}>Não</option>
+                </select>
+                @if($errors->has('campo_required'))
+                <div class="invalid-feedback">
+                {{ $errors->first('campo_required') }}
+                </div>
+                @endif
+            </div>
+        </div>
+        <div class="form-row mt-2">
             <div class="col">
                 <label for="datarealizacao">Dia e Hora de Realização</label>
                 <input type="datetime-local" 

@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\CursoInscrito;
 
-class AddTipoInscritoOnCursoInscritosTable extends Migration
+class AddTipoInscritoAndCampoAdicionalOnCursoInscritosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,7 +15,8 @@ class AddTipoInscritoOnCursoInscritosTable extends Migration
     public function up()
     {
         Schema::table('curso_inscritos', function (Blueprint $table) {
-            $table->string('tipo_inscrito')->default(CursoInscrito::INSCRITO_SITE)->after('registrocore');
+            $table->string('campo_adicional', 255)->nullable()->after('registrocore');
+            $table->string('tipo_inscrito')->default(CursoInscrito::INSCRITO_SITE)->after('campo_adicional');
         });
     }
 
@@ -27,7 +28,7 @@ class AddTipoInscritoOnCursoInscritosTable extends Migration
     public function down()
     {
         Schema::table('curso_inscritos', function (Blueprint $table) {
-            $table->dropColumn('tipo_inscrito');
+            $table->dropColumn(['tipo_inscrito', 'campo_adicional']);
         });
     }
 }

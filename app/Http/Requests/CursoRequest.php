@@ -37,6 +37,9 @@ class CursoRequest extends FormRequest
 
         $this->hora_final_real_limite = Carbon::hasFormat($this->datarealizacao, 'Y-m-d H:i') ? 
         Carbon::parse($this->datarealizacao)->addHour()->format('Y-m-d H:i') : now()->format('Y-m-d 00:00');
+
+        if($this->add_campo == '0')
+            $this->merge(['campo_rotulo' => null, 'campo_required' => '0']);
     }
 
     public function rules()
@@ -56,6 +59,9 @@ class CursoRequest extends FormRequest
             'acesso' => 'required|in:' . implode(',', $this->service->acessos()),
             'publicado' => 'required|in:Sim,Não',
             'resumo' => 'required',
+            'add_campo' => 'required|boolean',
+            'campo_rotulo' => 'required_if:add_campo,1|nullable|in:' . implode(',', array_keys($this->service->rotulos())),
+            'campo_required' => 'required|boolean'
         ];
     }
 
@@ -75,6 +81,7 @@ class CursoRequest extends FormRequest
             'termino_inscricao.before_or_equal' => 'A data final das inscrições deve ser até 2 horas antes da data de realização',
             'endereco.required_unless' => 'Endereço é obrigatório exceto para "Live"',
             'required_with' => 'A data final das inscrições é obrigatória quando data inicial está preenchida',
+            'boolean' => 'Campo deve ser Sim ou Não',
         ];
     }
 }

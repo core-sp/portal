@@ -11,6 +11,7 @@ class CursoInscricaoRequest extends FormRequest
 {
     private $service;
     private $gerentiRepository;
+    private $campo_adicional;
 
     public function __construct(MediadorServiceInterface $service, GerentiRepositoryInterface $gerentiRepository)
     {
@@ -55,6 +56,10 @@ class CursoInscricaoRequest extends FormRequest
             'tipo_inscrito' => 'required|in:' . implode(',', $this->service->getService('Curso')->inscritos()->tiposInscricao()),
         ];
 
+        $this->campo_adicional = isset($this->idcurso) ? $this->service->getService('Curso')->getRegrasCampoAdicional($this->idcurso) : 
+        $this->service->getService('Curso')->inscritos()->getRegrasCampoAdicional($this->id);
+        $regras = array_merge($regras, $this->campo_adicional);
+
         if(\Route::is('inscritos.update.presenca'))
             return [
                 'presenca' => 'required|in:Sim,Não',
@@ -74,8 +79,11 @@ class CursoInscricaoRequest extends FormRequest
         if(isset($this->idcurso))
             return $regras;
 
-        // Não pode editar CPF
+        // Não pode editar CPF e campo adicional sempre opcional no admin
         unset($regras['cpf']);
+        if(!empty($this->campo_adicional))
+            $regras[array_keys($this->campo_adicional)[0]] = str_replace('required', 'nullable', array_values($this->campo_adicional)[0]);
+
         return $regras;
         
     }
@@ -84,7 +92,7 @@ class CursoInscricaoRequest extends FormRequest
     {
         return [
             'cpf.unique' => 'Este CPF já está cadastrado para o curso',
-            'required' => 'O :attribute é obrigatório',
+            'required' => 'O campo :attribute é obrigatório',
             'max' => 'O :attribute excedeu o limite de caracteres permitido',
             'telefone.regex' => 'Telefone no formato inválido',
             'email' => 'Digite um email válido',
@@ -92,6 +100,8 @@ class CursoInscricaoRequest extends FormRequest
             'accepted' => 'Você deve concordar com o Termo de Consentimento',
             'nome.regex' => 'Nome inválido',
             'min' => 'O :attribute tem menos que o mínimo de :min caracteres',
+            'size' => 'Deve ter :size caracteres',
+            'regex' => 'Formato inválido',
         ];
     }
 }

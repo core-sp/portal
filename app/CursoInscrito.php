@@ -89,4 +89,12 @@ class CursoInscrito extends Model
             'adendo' => $adendo
         ];
     }
+
+    public function valorCampoAdicional()
+    {
+        if(!isset($this->campo_adicional))
+            return '';
+
+        return explode(': ', $this->campo_adicional)[1];
+    }
 }

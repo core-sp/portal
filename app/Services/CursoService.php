@@ -126,6 +126,16 @@ class CursoService implements CursoServiceInterface {
         return Curso::acessos();
     }
 
+    public function rotulos()
+    {
+        return Curso::rotulos();
+    }
+
+    public function getRegrasCampoAdicional($id)
+    {
+        return Curso::findOrFail($id)->getRegras();
+    }
+
     public function listar($user)
     {
         $resultados = Curso::withCount('cursoinscrito')
@@ -153,6 +163,7 @@ class CursoService implements CursoServiceInterface {
             'variaveis' => (object) $this->variaveis,
             'tipos' => Curso::tipos(),
             'acessos' => Curso::acessos(),
+            'rotulos' => Curso::rotulos(),
         ];
     }
 
@@ -208,7 +219,7 @@ class CursoService implements CursoServiceInterface {
     public function downloadInscricoes($id)
     {
         $resultado = Curso::findOrFail($id)->cursoinscrito()
-        ->select('email','cpf','nome','telefone','registrocore','tipo_inscrito','created_at')
+        ->select('email','cpf','nome','telefone','registrocore','tipo_inscrito','campo_adicional','created_at')
         ->orderBy('created_at', 'desc')
         ->get();
         

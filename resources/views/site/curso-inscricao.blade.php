@@ -72,7 +72,7 @@
 						</div>
 					</div>
 					<div class="form-row mt-2 mb-4">
-						<div class="col-md-4">	
+						<div class="col-md-{{ $curso->add_campo ? '3' : '4' }} mt-2-768">	
 							<label for="cpf">{{ isset($user_rep) && ($user_rep->tipoPessoa() == 'PJ') ? 'CNPJ' : 'CPF' }} *</label>
 							<input type="text"
 								class="form-control {{ isset($user_rep) ? '' : 'cpfInput' }} {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
@@ -87,7 +87,7 @@
 							</div>
 							@endif
 						</div>
-						<div class="col-md-4 mt-2-768">
+						<div class="col-md-{{ $curso->add_campo ? '3' : '4' }} mt-2-768">
 							<label for="telefone">Telefone *</label>
 							<input type="text"
 								class="form-control celularInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
@@ -102,13 +102,13 @@
 							</div>
 							@endif
 						</div>
-						<div class="col-md-4 mt-2-768">
-							<label for="registrocore">Nº de registro no CORE {{ in_array($curso->idcurso, ['64']) ? '*' : '' }}</label>
+						<div class="col-md-{{ $curso->add_campo ? '3' : '4' }} mt-2-768">
+							<label for="registrocore">Nº de registro no CORE <small><i>(opcional)</i></small></label>
 							<input type="text"
 								class="form-control {{ $errors->has('registrocore') ? 'is-invalid' : '' }}"
 								name="registrocore"
 								value="{{ isset($user_rep) ? $user_rep->registro_core : old('registrocore') }}"
-								placeholder="Registro no CORE {{ isset($user_rep) ? '' : '(opcional)' }}"
+								placeholder="Registro no CORE"
 								{{ isset($user_rep) ? 'disabled' : '' }}
 							/>
 							@if($errors->has('registrocore'))
@@ -117,6 +117,19 @@
 							</div>
 							@endif
 						</div>
+
+						@if($curso->add_campo)
+						<div class="col-md-3 mt-2-768">
+							<label for="{{ $curso->campo_rotulo }}">{{ $curso->nomeRotulo() }} {{ $curso->campo_required ? '*' : '' }}</label>
+							{!! $curso::inputs(old($curso->campo_rotulo), $errors->has($curso->campo_rotulo))[$curso->campo_rotulo] !!}
+							@if($errors->has($curso->campo_rotulo))
+							<div class="invalid-feedback">
+							{{ $errors->first($curso->campo_rotulo) }}
+							</div>
+							@endif
+						</div>
+						@endif
+
 					</div>
 					<div class="form-check mt-3">
 						<input type="checkbox"
