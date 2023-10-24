@@ -63,15 +63,15 @@ class Curso extends Model
         return $this->hasMany('App\Noticia', 'idcurso');
     }
 
-    private function noPeriodoDeInscricao()
+    private function possuiVagas()
+    {
+        return $this->nrvagas > $this->loadCount('cursoinscrito')->cursoinscrito_count;
+    }
+
+    public function noPeriodoDeInscricao()
     {
         $now = now()->format('Y-m-d H:i');
         return ($this->inicio_inscricao <= $now) && ($this->termino_inscricao >= $now);
-    }
-
-    private function possuiVagas()
-    {
-        return $this->nrvagas > $this->cursoinscrito->count();
     }
 
     public function representanteInscrito($cpf)
@@ -104,12 +104,12 @@ class Curso extends Model
 
     public function podeInscrever()
     {
-        return $this->noPeriodoDeInscricao() && $this->possuiVagas();
+        return !$this->encerrado() && $this->noPeriodoDeInscricao() && $this->possuiVagas();
     }
 
     public function podeInscreverExterno()
     {
-        return $this->noPeriodoDeInscricao() && $this->possuiVagas() && $this->publicado();
+        return !$this->encerrado() && $this->noPeriodoDeInscricao() && $this->possuiVagas() && $this->publicado();
     }
 
     public function encerrado()

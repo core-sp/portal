@@ -26,7 +26,7 @@ class CursoSubService implements CursoSubServiceInterface {
         ];
     }
 
-    private function tabelaCompleta($resultados, $user, $podeCancelar = false)
+    private function tabelaCompleta($resultados, $user)
     {
         // Opções de cabeçalho da tabela
         $headers = [
@@ -42,6 +42,7 @@ class CursoSubService implements CursoSubServiceInterface {
         $contents = [];
         $userPodeEdit = $user->can('updateOther', $user);
         $userPodeDestroy = $user->can('delete', $user);
+        $podeCancelar = $resultados->isNotEmpty() ? $resultados->get(0)->podeCancelar() : false;
         foreach($resultados as $resultado) 
         {
             $acoes = '';
@@ -110,14 +111,13 @@ class CursoSubService implements CursoSubServiceInterface {
         ->paginate(10);
 
         $variaveis = $this->variaveis($curso);
-        $podeInscrever = $curso->podeInscrever();
 
-        if($user->cannot('create', $user) || !$podeInscrever)
+        if($user->cannot('create', $user) || !$curso->podeInscrever())
             unset($variaveis['btn_criar']);
 
         return [
             'resultados' => $resultados, 
-            'tabela' => $this->tabelaCompleta($resultados, $user, $podeInscrever), 
+            'tabela' => $this->tabelaCompleta($resultados, $user), 
             'variaveis' => (object) $variaveis
         ];
     }
@@ -187,14 +187,13 @@ class CursoSubService implements CursoSubServiceInterface {
 
         $variaveis = $this->variaveis($curso);
         $variaveis['slug'] = 'cursos/inscritos/'.$curso->idcurso;
-        $podeInscrever = $curso->podeInscrever();
 
-        if(!$podeInscrever)
+        if(!$curso->podeInscrever())
             unset($variaveis['btn_criar']);
 
         return [
             'resultados' => $resultados,
-            'tabela' => $this->tabelaCompleta($resultados, $user, $podeInscrever), 
+            'tabela' => $this->tabelaCompleta($resultados, $user), 
             'variaveis' => (object) $variaveis
         ];
     }
@@ -203,7 +202,7 @@ class CursoSubService implements CursoSubServiceInterface {
     {
         $inscrito = CursoInscrito::findOrFail($id);
 
-        if(!$inscrito->curso->podeInscrever())
+        if(!$inscrito->podeCancelar())
             throw new \Exception('Não autorizado a cancelar inscrição com ID '.$id.' fora do período de inscrição.', 403);
 
         $inscrito->delete() ? event(new CrudEvent('inscrito em curso', 'cancelou inscrição', $id)) : null;

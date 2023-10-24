@@ -60,6 +60,11 @@ class CursoInscrito extends Model
         return isset($this->presenca) && ($this->presenca == 'Sim');
     }
 
+    public function podeCancelar()
+    {
+        return !$this->curso->encerrado() && $this->curso->noPeriodoDeInscricao();
+    }
+
     public function textoAgradece()
     {
         $agradece = "Sua inscrição em <strong>".$this->curso->tipo;

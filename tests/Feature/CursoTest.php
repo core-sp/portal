@@ -1157,6 +1157,23 @@ class CursoTest extends TestCase
     }
 
     /** @test */
+    public function inscrito_cannot_be_deleted_after_datatermino()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create();
+        $inscrito->curso->update(['datatermino' => now()->subDay()->format('Y-m-d H:i')]);
+
+        $this->delete(route('inscritos.destroy', $inscrito->idcursoinscrito))
+        ->assertForbidden();
+
+        $this->assertDatabaseHas('curso_inscritos', [
+            'cpf' => $inscrito->cpf,
+            'deleted_at' => null,
+        ]);
+    }
+
+    /** @test */
     public function inscrito_cannot_be_created_after_termino_inscricao()
     {
         $user = $this->signInAsAdmin();
@@ -1195,6 +1212,24 @@ class CursoTest extends TestCase
         Mail::assertQueued(CursoInscritoMailGuest::class);
 
         $this->assertDatabaseHas('curso_inscritos', ['cpf' => $representante->cpf_cnpj]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_inscrito_private_is_created()
+    {
+        $curso = factory('App\Curso')->create();
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), ['termo' => 'on']);
+        $inscrito = CursoInscrito::find(1);
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $string = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $string .= $inscrito->nome." (CPF: ".$inscrito->cpf.") *inscreveu-se* no curso *".$inscrito->curso->tipo." - ".$inscrito->curso->tema;
+        $string .= "*, turma *".$inscrito->curso->idcurso."* e foi criado um novo registro no termo de consentimento, com a id: 1";
+        $this->assertStringContainsString($string, $log);
     }
 
     /** @test */
@@ -1276,6 +1311,25 @@ class CursoTest extends TestCase
         Mail::assertQueued(CursoInscritoMailGuest::class);
 
         $this->assertDatabaseHas('curso_inscritos', ['cpf' => $inscrito['cpf']]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_inscrito_public_is_created()
+    {
+        $curso = factory('App\Curso')->states('publico')->create();
+        $inscrito = factory('App\CursoInscrito')->raw([
+            'idcurso' => $curso->idcurso,
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $inscrito);
+        $inscrito = CursoInscrito::find(1);
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $string = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $string .= $inscrito->nome." (CPF: ".$inscrito->cpf.") *inscreveu-se* no curso *".$inscrito->curso->tipo." - ".$inscrito->curso->tema;
+        $string .= "*, turma *".$inscrito->curso->idcurso."* e foi criado um novo registro no termo de consentimento, com a id: 1";
+        $this->assertStringContainsString($string, $log);
     }
 
     /** @test */
@@ -1372,7 +1426,268 @@ class CursoTest extends TestCase
         $this->assertDatabaseMissing('curso_inscritos', ['idcursoinscrito' => 1]);
     }
 
-    // Falta testes de verificação se pode se inscrever e de validação dos campos quando acesso público.
+    /** @test */
+    public function inscrito_site_without_nome_cannot_be_created()
+    {
+        $curso = factory('App\Curso')->states('publico')->create();
+        $attributes = factory('App\CursoInscrito')->raw([
+            'nome' => ''
+        ]);
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
+        ->assertSessionHasErrors('nome');
+    }
+
+    /** @test */
+    public function inscrito_site_with_nome_less_than_5_chars_cannot_be_created()
+    {
+        $curso = factory('App\Curso')->states('publico')->create();
+        $attributes = factory('App\CursoInscrito')->raw([
+            'nome' => 'Abcd'
+        ]);
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
+        ->assertSessionHasErrors('nome');
+    }
+
+    /** @test */
+    public function inscrito_site_without_telefone_cannot_be_created()
+    {
+        $curso = factory('App\Curso')->states('publico')->create();
+        $attributes = factory('App\CursoInscrito')->raw([
+            'telefone' => ''
+        ]);
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
+        ->assertSessionHasErrors('telefone');
+    }
+
+    /** @test */
+    public function inscrito_site_with_telefone_invalid_format_cannot_be_created()
+    {
+        $curso = factory('App\Curso')->states('publico')->create();
+        $attributes = factory('App\CursoInscrito')->raw([
+            'telefone' => '11 9998558-96'
+        ]);
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
+        ->assertSessionHasErrors('telefone');
+    }
+
+    /** @test */
+    public function inscrito_site_without_email_cannot_be_created()
+    {
+        $curso = factory('App\Curso')->states('publico')->create();
+        $attributes = factory('App\CursoInscrito')->raw([
+            'email' => ''
+        ]);
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
+        ->assertSessionHasErrors('email');
+    }
+
+    /** @test */
+    public function inscrito_site_with_email_invalid_format_cannot_be_created()
+    {
+        $curso = factory('App\Curso')->states('publico')->create();
+        $attributes = factory('App\CursoInscrito')->raw([
+            'email' => 'teste.com'
+        ]);
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
+        ->assertSessionHasErrors('email');
+    }
+
+    /** @test */
+    public function inscrito_site_without_termo_cannot_be_created()
+    {
+        $curso = factory('App\Curso')->states('publico')->create();
+        $attributes = factory('App\CursoInscrito')->raw([
+            'termo' => ''
+        ]);
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
+        ->assertSessionHasErrors('termo');
+    }
+
+    /** @test */
+    public function inscrito_site_cannot_be_created_if_representante_exists_in_idcurso()
+    {
+        $inscrito = factory('App\CursoInscrito')->states('representante')->create();
+        $this->actingAs(\App\Representante::find(1), 'representante');
+
+        $dados = $inscrito->toArray();
+        $dados['termo'] = 'on';
+
+        $this->get(route('cursos.inscricao.website', $inscrito->idcurso))
+        ->assertRedirect(route('representante.cursos'))
+        ->assertSessionHas('message', 'Já está inscrito neste curso!');
+
+        $this->post(route('cursos.inscricao', $inscrito->idcurso), $dados)
+        ->assertSessionHasErrors('cpf');
+    }
+
+    /** @test */
+    public function inscrito_site_cannot_be_created_if_finished_and_representante()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $curso = factory('App\Curso')->create([
+            'datatermino' => now()->subDay()->format('Y-m-d H:i'),
+        ]);
+        $attributes = factory('App\CursoInscrito')->raw([
+            'termo' => 'on'
+        ]);
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertRedirect(route('representante.cursos'))
+        ->assertSessionHas('message', 'Não é mais possível realizar inscrição neste curso');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
+        ->assertRedirect(route('representante.cursos'))
+        ->assertSessionHas('message', 'Não é mais possível realizar inscrição neste curso');
+    }
+
+    /** @test */
+    public function inscrito_site_cannot_be_created_if_finished()
+    {
+        $curso = factory('App\Curso')->states('publico')->create([
+            'datatermino' => now()->subDay()->format('Y-m-d H:i'),
+        ]);
+        $attributes = factory('App\CursoInscrito')->raw([
+            'termo' => 'on'
+        ]);
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertRedirect(route('cursos.index.website'))
+        ->assertSessionHas('message', 'Não é mais possível realizar inscrição neste curso');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
+        ->assertRedirect(route('cursos.index.website'))
+        ->assertSessionHas('message', 'Não é mais possível realizar inscrição neste curso');
+    }
+
+    /** @test */
+    public function inscrito_site_cannot_be_created_if_not_in_inicio_inscricao_and_termino_inscricao_and_representante()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $curso = factory('App\Curso')->create([
+            'inicio_inscricao' => null,
+            'termino_inscricao' => null
+        ]);
+        $attributes = factory('App\CursoInscrito')->raw([
+            'termo' => 'on'
+        ]);
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertRedirect(route('representante.cursos'))
+        ->assertSessionHas('message', 'Não é mais possível realizar inscrição neste curso');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
+        ->assertRedirect(route('representante.cursos'))
+        ->assertSessionHas('message', 'Não é mais possível realizar inscrição neste curso');
+    }
+
+    /** @test */
+    public function inscrito_site_cannot_be_created_if_not_in_inicio_inscricao_and_termino_inscricao()
+    {
+        $curso = factory('App\Curso')->states('publico')->create([
+            'inicio_inscricao' => null,
+            'termino_inscricao' => null
+        ]);
+        $attributes = factory('App\CursoInscrito')->raw([
+            'termo' => 'on'
+        ]);
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertRedirect(route('cursos.index.website'))
+        ->assertSessionHas('message', 'Não é mais possível realizar inscrição neste curso');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
+        ->assertRedirect(route('cursos.index.website'))
+        ->assertSessionHas('message', 'Não é mais possível realizar inscrição neste curso');
+    }
+
+    /** @test */
+    public function inscrito_site_cannot_be_created_without_nrvagas_and_representante()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $curso = factory('App\Curso')->create([
+            'nrvagas' => 0,
+        ]);
+        $attributes = factory('App\CursoInscrito')->raw([
+            'termo' => 'on'
+        ]);
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertRedirect(route('representante.cursos'))
+        ->assertSessionHas('message', 'Não é mais possível realizar inscrição neste curso');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
+        ->assertRedirect(route('representante.cursos'))
+        ->assertSessionHas('message', 'Não é mais possível realizar inscrição neste curso');
+    }
+
+    /** @test */
+    public function inscrito_site_cannot_be_created_without_nrvagas()
+    {
+        $curso = factory('App\Curso')->states('publico')->create([
+            'nrvagas' => 0,
+        ]);
+        $attributes = factory('App\CursoInscrito')->raw([
+            'termo' => 'on'
+        ]);
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertRedirect(route('cursos.index.website'))
+        ->assertSessionHas('message', 'Não é mais possível realizar inscrição neste curso');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
+        ->assertRedirect(route('cursos.index.website'))
+        ->assertSessionHas('message', 'Não é mais possível realizar inscrição neste curso');
+    }
+
+    /** @test */
+    public function inscrito_site_cannot_be_created_with_publicado_nao_and_representante()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $curso = factory('App\Curso')->create([
+            'publicado' => 'Não',
+        ]);
+        $attributes = factory('App\CursoInscrito')->raw([
+            'termo' => 'on'
+        ]);
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertNotFound();
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
+        ->assertNotFound();
+    }
+
+    /** @test */
+    public function inscrito_site_cannot_be_created_with_publicado_nao()
+    {
+        $curso = factory('App\Curso')->states('publico')->create([
+            'publicado' => 'Não',
+        ]);
+        $attributes = factory('App\CursoInscrito')->raw([
+            'termo' => 'on'
+        ]);
+
+        $this->get(route('cursos.inscricao.website', $curso->idcurso))
+        ->assertNotFound();
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
+        ->assertNotFound();
+    }
 
     /** 
      * =======================================================================================================
