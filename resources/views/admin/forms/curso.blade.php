@@ -87,8 +87,8 @@
             <div class="col-sm-3">
                 <label for="add_campo">Adicionar campo para inscrição?</label>
                 <select name="add_campo" class="form-control {{ $errors->has('add_campo') ? 'is-invalid' : '' }}" required>
-                    <option value="1" {{ (old('add_campo') == '1') || ($resultado->add_campo == '1') ? 'selected' : '' }}>Sim</option>
-                    <option value="0" {{ (old('add_campo') == '0') || ($resultado->add_campo == '0') ? 'selected' : '' }}>Não</option>
+                    <option value="1" {{ (old('add_campo') == '1') || (isset($resultado) && ($resultado->add_campo == '1')) ? 'selected' : '' }}>Sim</option>
+                    <option value="0" {{ (old('add_campo') == '0') || (isset($resultado) && ($resultado->add_campo == '0')) ? 'selected' : '' }}>Não</option>
                 </select>
                 @if($errors->has('add_campo'))
                 <div class="invalid-feedback">
@@ -117,8 +117,8 @@
             <div class="col">
                 <label for="campo_required">Campo na inscrição é obrigatório?</label>
                 <select name="campo_required" class="form-control {{ $errors->has('campo_required') ? 'is-invalid' : '' }}" required>
-                    <option value="1" {{ (old('campo_required') == '1') || ($resultado->campo_required == '1') ? 'selected' : '' }}>Sim</option>
-                    <option value="0" {{ (old('campo_required') == '0') || ($resultado->campo_required == '0') ? 'selected' : '' }}>Não</option>
+                    <option value="1" {{ (old('campo_required') == '1') || (isset($resultado) && ($resultado->campo_required == '1')) ? 'selected' : '' }}>Sim</option>
+                    <option value="0" {{ (old('campo_required') == '0') || (isset($resultado) && ($resultado->campo_required == '0')) ? 'selected' : '' }}>Não</option>
                 </select>
                 @if($errors->has('campo_required'))
                 <div class="invalid-feedback">
