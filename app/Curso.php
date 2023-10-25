@@ -24,11 +24,12 @@ class Curso extends Model
 
     const TEXTO_BTN_INSCRITO = "btn btn-sm btn-dark text-center text-uppercase text-white mt-2 disabled";
     
-    private static function inputText($rotulo, $value, $possuiErro = false, $classes = '')
+    private static function inputText($rotulo, $value, $required = false, $possuiErro = false, $classes = '')
     {
         $textoErro = $possuiErro ? 'is-invalid' : '';
+        $textoRequired = $required ? 'required' : '';
 
-        return '<input type="text" name="' . $rotulo . '" class="form-control '.$textoErro. ' ' .$classes.'" value="'.$value.'" />';
+        return '<input type="text" name="' . $rotulo . '" class="form-control '.$textoErro. ' ' .$classes.'" value="'.$value.'" '.$textoRequired.' />';
     }
 
     public static function tipos()
@@ -57,17 +58,17 @@ class Curso extends Model
         ];
     }
 
-    public static function inputs($value, $possuiErro = false)
+    public static function inputs($value, $required = false, $possuiErro = false)
     {
         return [
-            'placa_veiculo' => self::inputText('placa_veiculo', $value, $possuiErro, 'placaVeiculo'),
+            'placa_veiculo' => self::inputText('placa_veiculo', $value, $required, $possuiErro, 'placaVeiculo'),
         ];
     }
 
     public static function regras()
     {
         return [
-            'placa_veiculo' => 'size:8',
+            'placa_veiculo' => 'size:8|regex:/([A-Z]{3})([\s\-]{1})([0-9]{1})([A-Z0-9]{1})([0-9]{2})/',
         ];
     }
 
@@ -145,12 +146,28 @@ class Curso extends Model
         return $this->datatermino <= now()->format('Y-m-d H:i');
     }
 
+    public function semPeriodoInscricao()
+    {
+        return !isset($this->inicio_inscricao) && !isset($this->termino_inscricao);
+    }
+
+    public function aguardandoAbrirInscricao()
+    {
+        return !$this->encerrado() && ($this->semPeriodoInscricao() || ($this->inicio_inscricao > now()->format('Y-m-d H:i')));
+    }
+
     public function btnSituacao()
     {
         if($this->encerrado())
             return '<div class="sit-btn sit-vermelho">Já realizado</div>';
 
-        return $this->podeInscreverExterno() ? '<div class="sit-btn sit-verde">Vagas Abertas</div>' : '<div class="sit-btn sit-vermelho">Vagas esgotadas</div>';
+        if($this->podeInscreverExterno())
+            return '<div class="sit-btn sit-verde">Vagas Abertas</div>';
+
+        if(!$this->aguardandoAbrirInscricao())
+            return '<div class="sit-btn sit-vermelho">Vagas esgotadas</div>';
+
+        return '<div class="sit-btn sit-azul">Divulgação</div>';
     }
 
     public function possuiNoticia()
@@ -182,5 +199,15 @@ class Curso extends Model
             return '';
 
         return self::rotulos()[$this->campo_rotulo];
+    }
+
+    public function getInputHTML($old, $errors = false)
+    {        
+        return !$this->add_campo ? '' : self::inputs($old, $this->campo_required, $errors)[$this->campo_rotulo];
+    }
+
+    public function getInputHTMLInterno($old, $errors = false)
+    {
+        return !$this->add_campo ? '' : self::inputs($old, false, $errors)[$this->campo_rotulo];
     }
 }

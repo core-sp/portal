@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Curso;
 use App\Events\CrudEvent;
 use App\Contracts\CursoServiceInterface;
+use Carbon\Carbon;
 
 class CursoService implements CursoServiceInterface {
 
@@ -171,6 +172,12 @@ class CursoService implements CursoServiceInterface {
     {
         $validated['idusuario'] = $user->idusuario;
         $acao = !isset($id) ? 'criou' : 'editou';
+
+        if(!Carbon::hasFormat($validated['inicio_inscricao'], 'Y-m-d H:i'))
+            $validated['inicio_inscricao'] = null;
+
+        if(!Carbon::hasFormat($validated['termino_inscricao'], 'Y-m-d H:i'))
+            $validated['termino_inscricao'] = null;
 
         if(!isset($id))
             $id = Curso::create($validated)->idcurso;

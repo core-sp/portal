@@ -18,8 +18,10 @@
         </div>
         @elseif($curso->podeInscreverExterno())
           <a href="{{ route('cursos.inscricao.website', $curso->idcurso) }}" class="btn-curso-grid mt-3">Inscrever-se</a>
-        @else
+        @elseif(!$curso->aguardandoAbrirInscricao())
           <button class="btn-esgotado mt-3">Vagas esgotadas</button>
+        @else
+          <button class="btn-divulgacao mt-3">Divulgação</button>
         @endif
       @elseif($curso->possuiNoticia())
         <a href="{{ route('noticias.show', $curso->getNoticia()) }}" class="btn-como-foi mt-3">Veja como foi</a>

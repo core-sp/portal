@@ -66,24 +66,25 @@ class CursoInscricaoRequest extends FormRequest
             ];
             
         if(\Route::is('cursos.inscricao') && auth()->guard('representante')->check())
-            return [
+            return array_merge([
                 'nome' => '', 'telefone' => '', 'email'=> '', 'registrocore' => '', 'ip' => '',
                 'cpf' => 'required|' . $unique,
                 'termo' => 'required|accepted',
                 'situacao' => '',
-            ];
+            ], $this->campo_adicional);
 
         if(\Route::is('cursos.inscricao'))
             return array_merge($regras, ['termo' => 'required|accepted', 'ip' => '']);
 
-        if(isset($this->idcurso))
-            return $regras;
-
-        // Não pode editar CPF e campo adicional sempre opcional no admin
-        unset($regras['cpf']);
+        // Campo adicional sempre opcional no admin
         if(!empty($this->campo_adicional))
             $regras[array_keys($this->campo_adicional)[0]] = str_replace('required', 'nullable', array_values($this->campo_adicional)[0]);
 
+        if(isset($this->idcurso))
+            return $regras;
+
+        // Não pode editar CPF
+        unset($regras['cpf']);
         return $regras;
         
     }

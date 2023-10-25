@@ -248,7 +248,7 @@ class CursoSubService implements CursoSubServiceInterface {
         if(!$curso->podeInscreverExterno())
             return [
                 'rota' => isset($rep) ? 'representante.cursos' : 'cursos.index.website',
-                'message' => 'Não é mais possível realizar inscrição neste curso',
+                'message' => 'Não é possível realizar inscrição neste curso no momento',
                 'class' => 'alert-danger',
             ];
 

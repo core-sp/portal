@@ -41,7 +41,7 @@
 					@csrf
 					<div class="form-row">
 						<div class="col-md-6">
-							<label for="nome">Nome *</label>
+							<label for="nome">Nome <span class="text-danger">*</span></label>
 							<input type="text"
 								class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
 								name="nome"
@@ -56,7 +56,7 @@
 							@endif
 						</div>
 						<div class="col-md-6 mt-2-768">
-							<label for="email">Email *</label>
+							<label for="email">Email <span class="text-danger">*</span></label>
 							<input type="text"
 								class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}""
 								name="email"
@@ -73,7 +73,7 @@
 					</div>
 					<div class="form-row mt-2 mb-4">
 						<div class="col-md-{{ $curso->add_campo ? '3' : '4' }} mt-2-768">	
-							<label for="cpf">{{ isset($user_rep) && ($user_rep->tipoPessoa() == 'PJ') ? 'CNPJ' : 'CPF' }} *</label>
+							<label for="cpf">{{ isset($user_rep) && ($user_rep->tipoPessoa() == 'PJ') ? 'CNPJ' : 'CPF' }} <span class="text-danger">*</span></label>
 							<input type="text"
 								class="form-control {{ isset($user_rep) ? '' : 'cpfInput' }} {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
 								name="cpf"
@@ -88,7 +88,7 @@
 							@endif
 						</div>
 						<div class="col-md-{{ $curso->add_campo ? '3' : '4' }} mt-2-768">
-							<label for="telefone">Telefone *</label>
+							<label for="telefone">Telefone <span class="text-danger">*</span></label>
 							<input type="text"
 								class="form-control celularInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
 								name="telefone"
@@ -120,8 +120,8 @@
 
 						@if($curso->add_campo)
 						<div class="col-md-3 mt-2-768">
-							<label for="{{ $curso->campo_rotulo }}">{{ $curso->nomeRotulo() }} {{ $curso->campo_required ? '*' : '' }}</label>
-							{!! $curso::inputs(old($curso->campo_rotulo), $errors->has($curso->campo_rotulo))[$curso->campo_rotulo] !!}
+							<label for="{{ $curso->campo_rotulo }}">{{ $curso->nomeRotulo() }} {!! $curso->campo_required ? '<span class="text-danger">*</span>' : '<small><i>(opcional)</i></small>' !!}</label>
+							{!! $curso->getInputHTML(old($curso->campo_rotulo), $errors->has($curso->campo_rotulo)) !!}
 							@if($errors->has($curso->campo_rotulo))
 							<div class="invalid-feedback">
 							{{ $errors->first($curso->campo_rotulo) }}

@@ -1418,6 +1418,11 @@ footer p {
 	border-color: crimson;
 }
 
+.sit-azul {
+	background-color: #15AAE2;
+	border-color: #15AAE2;
+}
+
 .sit-default {
 	background-color: #a2a0a0;
 	border-color: #565656;
@@ -1643,6 +1648,16 @@ footer p {
 	background-color: transparent;
 	border: 1px solid transparent;
 	color: #FF0000;
+	border-radius: 0px;
+	display: inline-block;
+	font-weight: 900;
+	text-transform: uppercase;
+}
+
+.btn-divulgacao {
+	background-color: transparent;
+	border: 1px solid transparent;
+	color: #15AAE2;
 	border-radius: 0px;
 	display: inline-block;
 	font-weight: 900;

@@ -81,7 +81,17 @@ class CursoRequest extends FormRequest
             'termino_inscricao.before_or_equal' => 'A data final das inscrições deve ser até 2 horas antes da data de realização',
             'endereco.required_unless' => 'Endereço é obrigatório exceto para "Live"',
             'required_with' => 'A data final das inscrições é obrigatória quando data inicial está preenchida',
-            'boolean' => 'Campo deve ser Sim ou Não',
+            'boolean' => 'Campo com valor inválido',
+            'campo_rotulo.required_if' => 'Campo obrigatório se for adicionar campo',
+        ];
+    }
+
+    public function attributes()
+    {
+        return [
+            'add_campo' => 'adicionar campo',
+            'campo_rotulo' => 'tipo do campo adicional',
+            'campo_required' => 'campo adicional obrigatório',
         ];
     }
 }

@@ -12,6 +12,7 @@ $factory->define(CursoInscrito::class, function (Faker $faker) {
         'telefone' => '(11) 99999-9999',
         'email' => $faker->email,
         'registrocore' => null,
+        'campo_adicional' => null,
         'tipo_inscrito' => CursoInscrito::INSCRITO_SITE,
         'presenca' => null,
         'idcurso' => factory('App\Curso'),

@@ -367,10 +367,9 @@ class TermoConsentimentoTest extends TestCase
     /** @test */
     public function created_new_record_when_new_course_registration_portal()
     {
-        $curso = factory('App\Curso')->create();
+        $curso = factory('App\Curso')->states('publico')->create();
 
         $cursoInscrito = [
-            'idcurso' => $curso->idcurso,
             'cpf' => '862.943.730-85',
             'nome' => 'Testando Termo',
             'telefone' => '(11) 99999-9999',
@@ -399,10 +398,9 @@ class TermoConsentimentoTest extends TestCase
     /** @test */
     public function id_termo_in_log_when_new_course_registration_portal()
     {
-        $curso = factory('App\Curso')->create();
+        $curso = factory('App\Curso')->states('publico')->create();
 
         $cursoInscrito = [
-            'idcurso' => $curso->idcurso,
             'cpf' => '862.943.730-85',
             'nome' => 'Testando Termo',
             'telefone' => '(11) 99999-9999',

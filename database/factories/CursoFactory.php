@@ -6,7 +6,7 @@ use App\Curso;
 use Faker\Generator as Faker;
 
 $factory->define(Curso::class, function (Faker $faker) {
-    $tipos = cursoTipos();
+    $tipos = Curso::tipos();
     $tiposIndex = array_rand($tipos);
 
     return [
@@ -23,6 +23,9 @@ $factory->define(Curso::class, function (Faker $faker) {
         'resumo' => $faker->sentence,
         'acesso' => Curso::ACESSO_PRI,
         'publicado' => 'Sim',
+        'add_campo' => 0,
+        'campo_rotulo' => null,
+        'campo_required' => 0,
         'idregional' => factory('App\Regional'),
         'idusuario' => Auth::id() !== null ? Auth::id() : factory('App\User')
     ];
@@ -31,5 +34,20 @@ $factory->define(Curso::class, function (Faker $faker) {
 $factory->state(Curso::class, 'publico', function (Faker $faker) {
     return [
         'acesso' => Curso::ACESSO_PUB,
+    ];
+});
+
+$factory->state(Curso::class, 'campo_adicional_required', function (Faker $faker) {
+    return [
+        'add_campo' => 1,
+        'campo_rotulo' => array_keys(Curso::rotulos())[0],
+        'campo_required' => 1,
+    ];
+});
+
+$factory->state(Curso::class, 'campo_adicional', function (Faker $faker) {
+    return [
+        'add_campo' => 1,
+        'campo_rotulo' => array_keys(Curso::rotulos())[0],
     ];
 });

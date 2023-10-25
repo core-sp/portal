@@ -87,13 +87,13 @@
                 $valorCA = isset($resultado) ? $resultado->valorCampoAdicional() : old($curso->campo_rotulo);
             @endphp
             <div class="col">
-                <label for="{{ $curso->campo_rotulo }}">{{ $curso->nomeRotulo() }}</label>
-                {!! $curso::inputs($valorCA, $errors->has($curso->campo_rotulo))[$curso->campo_rotulo] !!}
+                <label for="{{ $curso->campo_rotulo }}">{{ $curso->nomeRotulo() }} <small><i>(sempre opcional)</i></small></label>
+                {!! $curso->getInputHTMLInterno($valorCA, $errors->has($curso->campo_rotulo)) !!}
                 @if($errors->has($curso->campo_rotulo))
-                <div class="invalid-feedback">
-                {{ $errors->first($curso->campo_rotulo) }}
-                </div>
-                @endif
+			    <div class="invalid-feedback">
+				    {{ $errors->first($curso->campo_rotulo) }}
+				</div>
+				@endif
             </div>
             @endif
 
