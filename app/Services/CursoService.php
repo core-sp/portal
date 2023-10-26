@@ -36,6 +36,7 @@ class CursoService implements CursoServiceInterface {
             'Vagas',
             'Regional',
             'Acesso',
+            '<span class="text-nowrap">Campo adicional?</span>',
             'Ações'
         ];
         // Opções de conteúdo da tabela
@@ -59,6 +60,7 @@ class CursoService implements CursoServiceInterface {
             }
             $publicado = $resultado->publicado() ? 'Publicado' : 'Rascunho';
             $endereco = isset($resultado->endereco) ? $resultado->endereco : 'Evento online';
+            $required = $resultado->campo_required ? 'Obrigatório' : 'Opcional';
             $conteudo = [
                 $resultado->idcurso,
                 $resultado->tipo.'<br>'.$resultado->tema.'<br /><small><em>'.$publicado.'</em></small>',
@@ -66,6 +68,7 @@ class CursoService implements CursoServiceInterface {
                 $resultado->cursoinscrito_count.' / '.$resultado->nrvagas,
                 $resultado->regional->regional,
                 $resultado->acesso,
+                $resultado->add_campo ? 'Sim<br /><small><em><span class="text-nowrap">'.$resultado->nomeRotulo().'</span><br />'.$required.'</em></small>' : 'Não',
                 $acoes
             ];
             array_push($contents, $conteudo);

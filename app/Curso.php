@@ -210,4 +210,9 @@ class Curso extends Model
     {
         return !$this->add_campo ? '' : self::inputs($old, false, $errors)[$this->campo_rotulo];
     }
+
+    public function getFormatCampoAdicional($valor)
+    {
+        return $this->nomeRotulo() . ': ' . $valor;
+    }
 }

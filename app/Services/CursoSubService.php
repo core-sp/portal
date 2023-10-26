@@ -171,7 +171,7 @@ class CursoSubService implements CursoSubServiceInterface {
 
         if($curso->add_campo)
         {
-            $validated['campo_adicional'] = $curso->nomeRotulo() . ': ' . $validated[$curso->campo_rotulo];
+            $validated['campo_adicional'] = $curso->getFormatCampoAdicional($validated[$curso->campo_rotulo]);
             unset($validated[$curso->campo_rotulo]);
         }
 
@@ -280,7 +280,7 @@ class CursoSubService implements CursoSubServiceInterface {
 
         if($curso->add_campo)
         {
-            $validated['campo_adicional'] = $curso->nomeRotulo() . ': ' . $validated[$curso->campo_rotulo];
+            $validated['campo_adicional'] = $curso->getFormatCampoAdicional($validated[$curso->campo_rotulo]);
             unset($validated[$curso->campo_rotulo]);
         }
         

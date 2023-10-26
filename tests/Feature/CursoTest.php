@@ -108,6 +108,7 @@ class CursoTest extends TestCase
 
         $attributes = factory('App\Curso')->raw();
 
+        $this->get(route('cursos.create'))->assertOk();
         $this->post(route('cursos.store'), $attributes);
         $this->assertDatabaseHas('cursos', [
             'tema' => $attributes['tema'],
@@ -121,6 +122,7 @@ class CursoTest extends TestCase
         $user = $this->signInAsAdmin();
         $attributes = factory('App\Curso')->raw();
 
+        $this->get(route('cursos.create'))->assertOk();
         $this->post(route('cursos.store'), $attributes);
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
@@ -130,14 +132,36 @@ class CursoTest extends TestCase
     }
 
     /** @test */
+    public function curso_without_inicio_inscricao_and_termino_inscricao_can_be_created_by_an_user()
+    {
+        $user = $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'inicio_inscricao' => '',
+            'termino_inscricao' => ''
+        ]);
+
+        $this->get(route('cursos.create'))->assertOk();
+        $this->post(route('cursos.store'), $attributes);
+
+        $this->assertDatabaseHas('cursos', [
+            'tema' => $attributes['tema'],
+            'idusuario' => $user->idusuario,
+            'inicio_inscricao' => null,
+            'termino_inscricao' => null
+        ]);
+    }
+
+    /** @test */
     public function curso_is_shown_on_admin_panel_after_its_creation()
     {
         $this->signInAsAdmin();
-        $curso = factory('App\Curso')->create();
+        $curso = factory('App\Curso')->states('campo_adicional')->create();
         
         $this->get(route('cursos.index'))
             ->assertSee($curso->idcurso)
-            ->assertSee($curso->tema);
+            ->assertSee($curso->tema)
+            ->assertSee('<span class="text-nowrap">'.$curso->nomeRotulo().'</span>');
     }
 
     /** @test */
@@ -625,6 +649,7 @@ class CursoTest extends TestCase
         $curso = factory('App\Curso')->create();
         $attributes = factory('App\Curso')->raw();
 
+        $this->get(route('cursos.edit', $curso->idcurso))->assertOk();
         $this->patch(route('cursos.update', $curso->idcurso), $attributes);
 
         $cur = Curso::find($curso->idcurso);
@@ -1088,6 +1113,9 @@ class CursoTest extends TestCase
         $attributes = factory('App\CursoInscrito')->raw([
             'cpf' => '54384875290'
         ]);
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.create', $curso->idcurso))->assertOk();
 
         $this->post(route('inscritos.store', $curso->idcurso), $attributes);
         $this->assertDatabaseHas('curso_inscritos', [
@@ -1104,6 +1132,7 @@ class CursoTest extends TestCase
         $attributes = factory('App\CursoInscrito')->raw([
             'cpf' => '54384875290'
         ]);
+        unset($attributes['idcurso']);
 
         $this->post(route('inscritos.store', $curso->idcurso), $attributes);
 
@@ -1144,6 +1173,7 @@ class CursoTest extends TestCase
         $attributes = factory('App\CursoInscrito')->raw([
             'nome' => ''
         ]);
+        unset($attributes['idcurso']);
 
         $this->post(route('inscritos.store', $curso->idcurso), $attributes)
         ->assertSessionHasErrors('nome');
@@ -1158,6 +1188,7 @@ class CursoTest extends TestCase
         $attributes = factory('App\CursoInscrito')->raw([
             'nome' => 'Abcd'
         ]);
+        unset($attributes['idcurso']);
 
         $this->post(route('inscritos.store', $curso->idcurso), $attributes)
         ->assertSessionHasErrors('nome');
@@ -1172,6 +1203,7 @@ class CursoTest extends TestCase
         $attributes = factory('App\CursoInscrito')->raw([
             'telefone' => ''
         ]);
+        unset($attributes['idcurso']);
 
         $this->post(route('inscritos.store', $curso->idcurso), $attributes)
         ->assertSessionHasErrors('telefone');
@@ -1186,6 +1218,7 @@ class CursoTest extends TestCase
         $attributes = factory('App\CursoInscrito')->raw([
             'telefone' => '11 9998558-96'
         ]);
+        unset($attributes['idcurso']);
 
         $this->post(route('inscritos.store', $curso->idcurso), $attributes)
         ->assertSessionHasErrors('telefone');
@@ -1200,6 +1233,7 @@ class CursoTest extends TestCase
         $attributes = factory('App\CursoInscrito')->raw([
             'email' => ''
         ]);
+        unset($attributes['idcurso']);
 
         $this->post(route('inscritos.store', $curso->idcurso), $attributes)
         ->assertSessionHasErrors('email');
@@ -1214,6 +1248,7 @@ class CursoTest extends TestCase
         $attributes = factory('App\CursoInscrito')->raw([
             'email' => 'teste.com'
         ]);
+        unset($attributes['idcurso']);
 
         $this->post(route('inscritos.store', $curso->idcurso), $attributes)
         ->assertSessionHasErrors('email');
@@ -1228,6 +1263,7 @@ class CursoTest extends TestCase
         $attributes = factory('App\CursoInscrito')->raw([
             'tipo_inscrito' => ''
         ]);
+        unset($attributes['idcurso']);
 
         $this->post(route('inscritos.store', $curso->idcurso), $attributes)
         ->assertSessionHasErrors('tipo_inscrito');
@@ -1242,6 +1278,7 @@ class CursoTest extends TestCase
         $attributes = factory('App\CursoInscrito')->raw([
             'tipo_inscrito' => 'Novo Tipo'
         ]);
+        unset($attributes['idcurso']);
 
         $this->post(route('inscritos.store', $curso->idcurso), $attributes)
         ->assertSessionHasErrors('tipo_inscrito');
@@ -1354,6 +1391,8 @@ class CursoTest extends TestCase
         $attributes = $inscrito->attributesToArray();
         $attributes['nome'] = "Novo nome de teste";
         unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.edit', $inscrito->idcursoinscrito))->assertOk();
 
         $this->put(route('inscritos.update', $inscrito->idcursoinscrito), $attributes)
         ->assertRedirect(route('inscritos.index', $inscrito->idcurso));
