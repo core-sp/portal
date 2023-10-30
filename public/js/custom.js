@@ -593,3 +593,24 @@ $('#form_salaReuniao #hora_limite_final_manha, #form_salaReuniao #hora_limite_fi
 $('#form_salaReuniao #horarios_reuniao, #form_salaReuniao #horarios_coworking').change(function(){
   ajaxHorariosViewSala(this.id);
 });
+
+// Funcionalidade Curso +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function desabilitaHabilitaCampoAdd(valor){
+  var desabilita = valor == '0';
+  var obr = !desabilita;
+  if(desabilita)
+      $('select[name="campo_rotulo"] option[value=""]').prop('selected', true);
+  $('select[name="campo_rotulo"], select[name="campo_required"]').prop('disabled', desabilita).prop('required', obr);
+}
+
+$('select[name="add_campo"]').ready(function(){
+  if($('select[name="add_campo"]').length > 0)
+    desabilitaHabilitaCampoAdd($('select[name="add_campo"]').val());
+});
+
+$('select[name="add_campo"]').change(function(){
+  desabilitaHabilitaCampoAdd($(this).val());
+});
+
+// Fim Funcionalidade Curso +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

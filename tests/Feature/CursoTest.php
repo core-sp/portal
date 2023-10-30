@@ -153,6 +153,28 @@ class CursoTest extends TestCase
     }
 
     /** @test */
+    public function curso_with_add_campo_0_can_be_created_by_an_user()
+    {
+        $user = $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'add_campo' => '0',
+            'campo_rotulo' => 'placa_veiculo',
+            'campo_required' => '1'
+        ]);
+
+        $this->get(route('cursos.create'))->assertOk();
+        $this->post(route('cursos.store'), $attributes);
+
+        $this->assertDatabaseHas('cursos', [
+            'tema' => $attributes['tema'],
+            'idusuario' => $user->idusuario,
+            'campo_rotulo' => null,
+            'campo_required' => '0'
+        ]);
+    }
+
+    /** @test */
     public function curso_is_shown_on_admin_panel_after_its_creation()
     {
         $this->signInAsAdmin();

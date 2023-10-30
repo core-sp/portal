@@ -32,6 +32,38 @@ class Curso extends Model
         return '<input type="text" name="' . $rotulo . '" class="form-control '.$textoErro. ' ' .$classes.'" value="'.$value.'" '.$textoRequired.' />';
     }
 
+    private static function inputDate($rotulo, $value, $required = false, $possuiErro = false, $classes = '')
+    {
+        $textoErro = $possuiErro ? 'is-invalid' : '';
+        $textoRequired = $required ? 'required' : '';
+
+        return '<input type="date" name="' . $rotulo . '" class="form-control '.$textoErro. ' ' .$classes.'" value="'.$value.'" '.$textoRequired.' />';
+    }
+
+    private static function inputSelect($rotulo, $options = [], $value, $required = false, $possuiErro = false, $classes = '')
+    {
+        $textoErro = $possuiErro ? 'is-invalid' : '';
+        $textoRequired = $required ? 'required' : '';
+
+        $select = '<select name="' . $rotulo . '" class="form-control '.$textoErro. ' ' .$classes.'" '.$textoRequired.'>';
+        $option = '<option value="">Selecione...</option>';
+
+        foreach($options as $key => $valor)
+        {
+            $selected = $value == $key ? 'selected' : '' ;
+            $option .= '<option value="'.$key.'" '.$selected.'>'.$valor.'</option>';
+        }
+
+        return $select . $option . '</select>';
+    }
+
+    private static function optionsPorRotulo()
+    {
+        return [
+            'exemplo_select' => ['exemplo_1' => 'Exemplo Um', 'exemplo_2' => 'Exemplo Dois'],
+        ];
+    }
+
     public static function tipos()
     {
         return [
@@ -54,7 +86,8 @@ class Curso extends Model
     public static function rotulos()
     {
         return [
-            'placa_veiculo' => 'Placa do veículo'
+            'placa_veiculo' => 'Placa do veículo',
+            // 'exemplo_select' => 'Exemplo Select',
         ];
     }
 
@@ -62,6 +95,7 @@ class Curso extends Model
     {
         return [
             'placa_veiculo' => self::inputText('placa_veiculo', $value, $required, $possuiErro, 'placaVeiculo'),
+            // 'exemplo_select' => self::inputSelect('exemplo_select', self::optionsPorRotulo()['exemplo_select'], $value, $required, $possuiErro),
         ];
     }
 
@@ -69,6 +103,7 @@ class Curso extends Model
     {
         return [
             'placa_veiculo' => 'size:8|regex:/([A-Z]{3})([\s\-]{1})([0-9]{1})([A-Z0-9]{1})([0-9]{2})/',
+            // 'exemplo_select' => 'in:' . implode(',', array_keys(self::optionsPorRotulo()['exemplo_select'])),
         ];
     }
 
