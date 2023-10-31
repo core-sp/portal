@@ -25,6 +25,9 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             'slug' => 'salas-reunioes/agendados',
             'busca' => 'salas-reunioes/agendados',
             'mostra' => 'agendamento-sala',
+            'btn_criar' => '<a href="'.route('sala.reuniao.agendados.create').'" class="btn btn-primary mr-1"><i class="fas fa-plus"></i> Novo Agendamento</a>',
+            'titulo_criar' => 'Criar agendamento de sala',
+            'form' => 'agendamento_sala',
         ];
     }
 
@@ -190,6 +193,10 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
         {
             $dados = $this->validacaoFiltroAtivo($request, $user);
             $resultados = $this->getResultadosFiltro($dados);
+
+            // if($user->cannot('create', $user))
+            //     unset($this->variaveis['btn_criar']);
+
             $this->variaveis['mostraFiltros'] = true;
     
             return [
@@ -201,8 +208,13 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
         }
     }
 
-    public function view($user, $id, $anexo = null)
+    public function view($user = null, $id = null, $anexo = null)
     {
+        if(!isset($user) && !isset($id))
+            return [
+                'variaveis' => (object) $this->variaveis,
+            ];
+
         $agendado = AgendamentoSala::with(['sala', 'representante'])->findOrFail($id);
 
         $atendOrGere = $user->can('atendenteOrGerSeccionais', $user);
@@ -220,6 +232,35 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
         return [
             'resultado' => $agendado,
             'variaveis' => (object) $this->variaveis,
+        ];
+    }
+
+    public function save($dados, $user)
+    {
+        $participantes = null;
+        if($dados['tipo_sala'] == 'reuniao')
+            $participantes = json_encode(
+                array_combine($dados['participantes_cpf'], $dados['participantes_nome']), JSON_FORCE_OBJECT
+            );
+        $rep = ['cpf_cnpj' => $dados['cpf_cnpj'], 'nome' => $dados['nome'], 'registro_core' => $dados['registro_core'], 'email' => $dados['email'], 'ass_id' => $dados['ass_id']];
+        $protocolo = AgendamentoSala::getProtocolo();
+
+        $agendamento = $user->agendamentosSala()->create([
+            'rep_presencial' => json_encode($rep, JSON_FORCE_OBJECT),
+            'sala_reuniao_id' => $dados['sala_reuniao_id'],
+            'participantes' => $participantes,
+            'dia' => $dados['dia'],
+            'periodo' => $dados['periodo_entrada'] . ' - ' . $dados['periodo_saida'],
+            'tipo_sala' => $dados['tipo_sala'],
+            'protocolo' => $protocolo,
+            'status' => AgendamentoSala::STATUS_COMPARECEU,
+        ]);
+
+        event(new CrudEvent('agendamento da sala de reunião', 'criou com representante presencial', $agendamento->id));
+
+        return [
+            'message' => '<i class="icon fa fa-check"></i> Agendamento com ID ' . $agendamento->id . ' com presença confirmada criado com sucesso!',
+            'class' => 'alert-success'
         ];
     }
 

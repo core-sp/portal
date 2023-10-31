@@ -566,3 +566,98 @@ $('#form_salaReuniao #hora_limite_final_manha, #form_salaReuniao #hora_limite_fi
 $('#form_salaReuniao #horarios_reuniao, #form_salaReuniao #horarios_coworking').change(function(){
   ajaxHorariosViewSala(this.id);
 });
+
+// Funcionalidade Sala Reunião / Agendados / Criar agendamento
+
+function verificarDadosCriarAgendaSala(nome_campo){
+  var valor_campo;
+  switch(nome_campo) {
+    case "cpf_cnpj":
+      valor_campo = '"' + $('#criarAgendaSala input[name="cpf_cnpj"]').val() + '"';
+      break;
+    case "sala_reuniao_id":
+      valor_campo = '"' + $('#criarAgendaSala select[name="sala_reuniao_id"]').val() + '"';
+      break;
+    default:
+      var cpfs = [$('#criarAgendaSala input[name="cpf_cnpj"]').val()];
+      $('#criarAgendaSala :input[name="participantes_cpf[]"]').each(function() {
+        if($(this).val().length == 14)
+          cpfs.push(this.value);
+      });
+      valor_campo = JSON.stringify(cpfs);
+  }
+
+  var json = JSON.parse('{"_method":"POST", "_token":"' + $('meta[name="csrf-token"]').attr('content') + '", "' + nome_campo + '":' + valor_campo + '}');
+  
+  $.ajax({
+    method: "POST",
+    dataType: 'json',
+    url: '/admin/salas-reunioes/agendados/verifica',
+    data: json,
+    success: function(response) {
+      switch(nome_campo) {
+        case "cpf_cnpj":
+          $.each(response, function(i, valor) {
+            $('#' + i).text(valor);
+          });
+          $('#area_gerenti').show();
+          $('#cpfResponsavel').val($('#criarAgendaSala input[name="cpf_cnpj"]').val());
+          $('#nomeResponsavel').val(response['nomeGerenti']);
+          break;
+        case "sala_reuniao_id":
+          $(".participante:gt(0)").remove();
+          if(response.total_participantes > 0)
+            for (let i = 1; i < response.total_participantes; i++)
+              $('#area_participantes').append($('.participante:last').clone());
+          $('.participante :input[name="participantes_cpf[]"]').val('').unmask().mask('999.999.999-99');
+          $('.participante :input[name="participantes_nome[]"]').val('');
+          $('#area_participantes').show();
+          break;
+        default:
+          if(response.suspenso == ''){
+            $('#criarAgendaSala').submit();
+            return;
+          }
+          $('#modal-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
+          $('#modal-criar_agenda .modal-body')
+          .html(response.suspenso + '<br><br><strong>Confirmar esse agendamento?</strong>');
+      }
+    }
+  });
+}
+
+$('#criarAgendaSala').ready(function(){
+  var tam = $('#criarAgendaSala input[name="cpf_cnpj"]').length > 0 ? $('#criarAgendaSala input[name="cpf_cnpj"]').val().length : 0;
+  if((tam == 14) || (tam == 18))
+      verificarDadosCriarAgendaSala("cpf_cnpj");
+
+  $('input[name="cpf_cnpj"]').change(function(){
+    var tamanho = $('#criarAgendaSala input[name="cpf_cnpj"]').val().length;
+    if((tamanho == 14) || (tamanho == 18))
+      verificarDadosCriarAgendaSala("cpf_cnpj");
+  });
+  
+  $('select[name="sala_reuniao_id"]').change(function(){
+    if(this.value == "")
+      $(".participante:gt(0)").remove();
+    else if($('select[name="tipo_sala"]').val() == 'reuniao')
+      verificarDadosCriarAgendaSala("sala_reuniao_id");
+  });
+
+  $('select[name="tipo_sala"]').change(function(){
+    if(this.value != 'reuniao')
+      $('#area_participantes').hide();
+    else
+      verificarDadosCriarAgendaSala("sala_reuniao_id");
+  });
+
+  $('#verificaSuspensos').click(function(){
+    verificarDadosCriarAgendaSala("participantes_cpf[]");
+  });
+});
+
+$('#enviarCriarAgenda').click(function(){
+  $('#criarAgendaSala').submit();
+});
+
+// FIM Funcionalidade Sala Reunião / Agendados / Criar agendamento
