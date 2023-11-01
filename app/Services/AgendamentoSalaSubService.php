@@ -47,6 +47,7 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
+            $resultado->representante = $resultado->getRepresentante();
             $cor = $resultado->justificativaEnviada() ? 'warning' : 'primary';
             $acoes = '<a href="' .route('sala.reuniao.agendados.view', $resultado->id). '" class="btn btn-sm btn-'.$cor.'">Ver</a>&nbsp;&nbsp;&nbsp;';
             $acoes .= $resultado->getBtnStatusCompareceu();
@@ -54,7 +55,7 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             $conteudo = [
                 $resultado->id,
                 $resultado->protocolo,
-                $resultado->representante->cpf_cnpj,
+                $resultado->representante->cpf_cnpj.'<br><small><strong>Agendado: </strong> <i>' . $resultado->formaAgendamento() . '</i></small>',
                 $resultado->getTipoSalaHTML().'<br><small><strong>Dia:</strong> '. onlyDate($resultado->dia) .' | <strong>Período:</strong> '.$resultado->getPeriodo(),
                 $resultado->sala->regional->regional,
                 $resultado->getStatusHTML() . $recusado,
@@ -229,6 +230,8 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             throw new \Exception('Arquivo anexo do agendamento da sala com ID '.$id.' não encontrado!', 404);
         }
         
+        $agendado->representante = $agendado->getRepresentante();
+
         return [
             'resultado' => $agendado,
             'variaveis' => (object) $this->variaveis,
@@ -260,7 +263,8 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
 
         return [
             'message' => '<i class="icon fa fa-check"></i> Agendamento com ID ' . $agendamento->id . ' com presença confirmada criado com sucesso!',
-            'class' => 'alert-success'
+            'class' => 'alert-success',
+            'protocolo' => $agendamento->protocolo,
         ];
     }
 
@@ -326,6 +330,8 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
                         $q1->whereHas('representante', function ($q2) use ($busca){
                             $q2->where('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%');
                         })
+                        ->orWhere('rep_presencial', 'LIKE', '%"'.apenasNumeros($busca).'"%')
+                        ->orWhere('participantes', 'LIKE', '%"'.apenasNumeros($busca).'"%')
                         ->orWhere('id', apenasNumeros($busca))
                         ->orWhere('periodo', 'LIKE', $busca . ' - %')
                         ->orWhere('periodo', 'LIKE', '% - ' . $busca);
@@ -338,6 +344,8 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
                     $q1->whereHas('representante', function ($q2) use ($busca){
                         $q2->where('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%');
                     })
+                    ->orWhere('rep_presencial', 'LIKE', '%"'.apenasNumeros($busca).'"%')
+                    ->orWhere('participantes', 'LIKE', '%"'.apenasNumeros($busca).'"%')
                     ->orWhere('id', apenasNumeros($busca))
                     ->orWhere('periodo', 'LIKE', $busca . ' - %')
                     ->orWhere('periodo', 'LIKE', '% - ' . $busca);

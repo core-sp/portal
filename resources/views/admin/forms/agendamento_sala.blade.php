@@ -1,17 +1,19 @@
 <form role="form" method="POST" id="criarAgendaSala" action="{{ route('sala.reuniao.agendados.store') }}">
     @csrf    
     <div class="card-body">
+        <h5 class="text-primary">Formulário para registrar o uso da sala pelo representante quando atendido presencialmente</h5>
+        <p><strong>Status: <span class="text-success">Presença Confirmada</span></strong></p>
 
-        @if($errors->has('participantes_cpf') || $errors->has('participantes_cpf.*') || $errors->has('participantes_nome') || $errors->has('participantes_nome.*'))
+    @foreach(['registro_core', 'nome', 'email', 'participantes_cpf.*', 'participantes_cpf', 'participantes_nome.*', 'participantes_nome'] as $error)
+        @if($errors->has($error))
         <p class="alert alert-danger">
-            <i class="fas fa-times"></i>&nbsp;&nbsp;Erro encontrado em participantes da reunião:&nbsp;&nbsp;
-            @if($errors->has('participantes_cpf.*') || $errors->has('participantes_nome.*'))
-            {{ $errors->has('participantes_cpf.*') ? $errors->first('participantes_cpf.*') : $errors->first('participantes_nome.*') }}
-            @else
-            {{ $errors->has('participantes_cpf') ? $errors->first('participantes_cpf') : $errors->first('participantes_nome') }}
-            @endif
+            <i class="fas fa-times"></i>&nbsp;&nbsp;Erro encontrado em 
+            {{ !in_array($error, ['registro_core', 'nome', 'email']) ? 'participantes da reunião' : 'dados do Gerenti' }}:&nbsp;&nbsp;
+            {{ $errors->first($error) }}
+            @break
         </p>
         @endif
+    @endforeach
 
         <div class="form-row mt-2">
             <div class="col">
@@ -55,7 +57,7 @@
                     required
                 >
                     @foreach(['reuniao' => 'Reunião', 'coworking' => 'Coworking'] as $chave => $tipo)
-                    <option value="{{ $chave }}" {{ old('tipo_sala') == $chave ? 'selected' : '' }}>{{ $tipo }}</option>
+                    <option value="{{ $chave }}" {{ $chave == 'reuniao' ? 'selected' : '' }}>{{ $tipo }}</option>
                     @endforeach
                 </select>
                 @if($errors->has('tipo_sala'))

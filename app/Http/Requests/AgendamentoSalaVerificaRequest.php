@@ -104,8 +104,8 @@ class AgendamentoSalaVerificaRequest extends FormRequest
                 'participantes_nome.*' => 'distinct|regex:/^\D*$/|min:5|max:191',
                 'nome' => 'required',
                 'registro_core' => 'required',
-                'email' => '',
-                'ass_id' => 'required',
+                'email' => 'required',
+                'ass_id' => '',
             ];
 
         if($this->filled('cpf_cnpj'))
@@ -147,6 +147,9 @@ class AgendamentoSalaVerificaRequest extends FormRequest
             'periodo_entrada.before' => 'Deve ser até as 17:30',
             'periodo_saida.after' => 'Deve ser depois do horário da entrada',
             'periodo_saida.before' => 'Deve ser até as 18:00',
+            'nome.required' => 'Nome não existe no Gerenti',
+            'registro_core.required' => 'Registro Core não existe no Gerenti',
+            'email.required' => 'E-mail não existe no Gerenti',
         ];
     }
 }

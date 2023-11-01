@@ -303,4 +303,26 @@ class AgendamentoSala extends Model
 
         return $texto;
     }
+
+    public function formaAgendamento()
+    {
+        return !isset($this->rep_presencial) ? 'Online' : 'Presencial';
+    }
+
+    private function getRepresentantePresencial()
+    {
+    	if(!isset($this->rep_presencial))
+            return null;
+
+        $rep = (object) json_decode($this->rep_presencial, true);
+        $rep->cpf_cnpj = formataCpfCnpj($rep->cpf_cnpj);
+        $rep->registro_core = formataRegistro($rep->registro_core);
+
+        return $rep;
+    }
+
+    public function getRepresentante()
+    {
+    	return !isset($this->rep_presencial) ? $this->representante : $this->getRepresentantePresencial();
+    }
 }

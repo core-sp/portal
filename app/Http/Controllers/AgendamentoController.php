@@ -129,7 +129,7 @@ class AgendamentoController extends Controller
             abort(500, "Erro ao criar agendamento de sala.");
         }
 
-        return redirect()->route('sala.reuniao.agendados.index')->with($dados);
+        return redirect()->route('sala.reuniao.agendados.busca', ['q' => $dados['protocolo']])->with($dados);
     }
 
     public function view($id, $anexo = null)
