@@ -120,7 +120,7 @@
                         </div>
                         <input 
                             type="text" 
-                            class="form-control col-3" 
+                            class="form-control col-3 cpfInput" 
                             name="participantes_cpf[]" 
                             placeholder="CPF"
                         />

@@ -83,7 +83,7 @@ class AgendamentoController extends Controller
     public function create()
     {
         $user = auth()->user();
-        // $this->authorize('create', $user);
+        $this->authorize('create', $user);
         
         try{
             $dados = $this->service->getService('SalaReuniao')->agendados()->view();
@@ -105,7 +105,7 @@ class AgendamentoController extends Controller
 
     public function verificar(AgendamentoSalaVerificaRequest $request)
     {
-        // $this->authorize('create', auth()->user());
+        $this->authorize('create', auth()->user());
 
         try{
             $dados = $request->validated();
@@ -119,7 +119,7 @@ class AgendamentoController extends Controller
 
     public function store(AgendamentoSalaVerificaRequest $request)
     {
-        // $this->authorize('create', auth()->user());
+        $this->authorize('create', auth()->user());
 
         try{
             $validated = $request->validated();

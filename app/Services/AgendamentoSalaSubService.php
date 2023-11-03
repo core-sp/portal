@@ -25,7 +25,7 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             'slug' => 'salas-reunioes/agendados',
             'busca' => 'salas-reunioes/agendados',
             'mostra' => 'agendamento-sala',
-            'btn_criar' => '<a href="'.route('sala.reuniao.agendados.create').'" class="btn btn-primary mr-1"><i class="fas fa-plus"></i> Novo Agendamento</a>',
+            'btn_criar' => '<a href="'.route('sala.reuniao.agendados.create').'" class="btn btn-primary mr-1"><i class="fas fa-plus"></i> Novo Agendamento Presencial</a>',
             'titulo_criar' => 'Criar agendamento de sala',
             'form' => 'agendamento_sala',
         ];
@@ -55,7 +55,7 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             $conteudo = [
                 $resultado->id,
                 $resultado->protocolo,
-                $resultado->representante->cpf_cnpj.'<br><small><strong>Agendado: </strong> <i>' . $resultado->formaAgendamento() . '</i></small>',
+                $resultado->representante->cpf_cnpj.'<br><small><strong>Agendado via: </strong> <i>' . $resultado->formaAgendamento() . '</i></small>',
                 $resultado->getTipoSalaHTML().'<br><small><strong>Dia:</strong> '. onlyDate($resultado->dia) .' | <strong>Período:</strong> '.$resultado->getPeriodo(),
                 $resultado->sala->regional->regional,
                 $resultado->getStatusHTML() . $recusado,
@@ -195,8 +195,8 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             $dados = $this->validacaoFiltroAtivo($request, $user);
             $resultados = $this->getResultadosFiltro($dados);
 
-            // if($user->cannot('create', $user))
-            //     unset($this->variaveis['btn_criar']);
+            if($user->cannot('create', $user))
+                unset($this->variaveis['btn_criar']);
 
             $this->variaveis['mostraFiltros'] = true;
     

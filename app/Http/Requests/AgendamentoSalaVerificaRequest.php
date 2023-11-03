@@ -6,6 +6,7 @@ use App\Contracts\MediadorServiceInterface;
 use App\Rules\CpfCnpj;
 use App\Rules\Cpf;
 use Illuminate\Foundation\Http\FormRequest;
+use Carbon\Carbon;
 use App\Repositories\GerentiRepositoryInterface;
 
 class AgendamentoSalaVerificaRequest extends FormRequest
@@ -42,9 +43,11 @@ class AgendamentoSalaVerificaRequest extends FormRequest
             }
         }
 
+        if($this->filled('sala_reuniao_id') || !\Route::is('sala.reuniao.agendados.verifica.criar'))
+            $this->salas = $this->service->getService('SalaReuniao')->salasAtivas();
+
         if($this->filled('sala_reuniao_id')){
             $this->merge(['sala_reuniao_id' => in_array(auth()->user()->idperfil, [8, 21]) ? auth()->user()->idregional : $this->sala_reuniao_id]);
-            $this->salas = $this->service->getService('SalaReuniao')->salasAtivas();
             $sala = $this->salas->where('id', $this->sala_reuniao_id)->first();
             $total = isset($sala) ? $sala->participantes_reuniao - 1 : 0;
             $this->merge(['total_participantes' => $total]);
@@ -85,6 +88,12 @@ class AgendamentoSalaVerificaRequest extends FormRequest
                     'total_participantes' => count($cpfs),
                 ]);
             }
+
+            if(Carbon::hasFormat($this->dia, 'Y-m-d'))
+            {
+                if(Carbon::parse($this->dia)->isWeekend())
+                    $this->merge(['dia' => null]);
+            }
         }
     }
 
@@ -96,8 +105,8 @@ class AgendamentoSalaVerificaRequest extends FormRequest
                 'tipo_sala' => 'required|in:reuniao,coworking',
                 'sala_reuniao_id' => 'required|in:'.implode(',', $this->salas->pluck('id')->all()),
                 'dia' => 'required|date_format:Y-m-d|before_or_equal:'.date('Y-m-d'),
-                'periodo_entrada' => 'required|date_format:H:i|after:08:59|before:17:31',
-                'periodo_saida' => 'required|date_format:H:i|after:periodo_entrada|before:18:01',
+                'periodo_entrada' => 'required|date_format:H:i|before:17:31|in:'.implode(',', todasHoras()),
+                'periodo_saida' => 'required|date_format:H:i|after:periodo_entrada|in:'.implode(',', todasHoras()),
                 'participantes_cpf' => 'exclude_unless:tipo_sala,reuniao|required_if:tipo_sala,reuniao|array',
                 'participantes_cpf.*' => ['distinct', new Cpf, 'not_in:'.$this->cpf_cnpj],
                 'participantes_nome' => 'exclude_unless:tipo_sala,reuniao|required_if:tipo_sala,reuniao|array|size:'.$this->total_participantes,
@@ -143,13 +152,12 @@ class AgendamentoSalaVerificaRequest extends FormRequest
             'participantes_cpf.*.distinct' => 'Existe CPF repetido',
             'participantes_nome.*.distinct' => 'Existe nome repetido',
             'size' => 'Total de nomes difere do total de CPFs',
-            'periodo_entrada.after' => 'Deve ser a partir das 09:00',
             'periodo_entrada.before' => 'Deve ser até as 17:30',
-            'periodo_saida.after' => 'Deve ser depois do horário da entrada',
-            'periodo_saida.before' => 'Deve ser até as 18:00',
+            'periodo_saida.after' => 'Deve ser depois do período de entrada',
             'nome.required' => 'Nome não existe no Gerenti',
             'registro_core.required' => 'Registro Core não existe no Gerenti',
             'email.required' => 'E-mail não existe no Gerenti',
+            'dia.required' => 'Dia não está preenchido ou o dia escolhido é fim de semana',
         ];
     }
 }

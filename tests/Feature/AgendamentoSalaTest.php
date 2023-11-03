@@ -39,6 +39,9 @@ class AgendamentoSalaTest extends TestCase
         ])->assertRedirect(route('login'));
         $this->get(route('sala.reuniao.agendados.filtro'))->assertRedirect(route('login'));
         $this->get(route('sala.reuniao.agendados.busca'))->assertRedirect(route('login'));
+        $this->get(route('sala.reuniao.agendados.create'))->assertRedirect(route('login'));
+        $this->post(route('sala.reuniao.agendados.verifica.criar'))->assertRedirect(route('login'));
+        $this->post(route('sala.reuniao.agendados.store'))->assertRedirect(route('login'));
     }
 
     /** @test */
@@ -58,6 +61,283 @@ class AgendamentoSalaTest extends TestCase
         ])->assertForbidden();
         $this->get(route('sala.reuniao.agendados.filtro'))->assertForbidden();
         $this->get(route('sala.reuniao.agendados.busca'))->assertForbidden();
+        $this->get(route('sala.reuniao.agendados.create'))->assertForbidden();
+        $this->post(route('sala.reuniao.agendados.verifica.criar'), ['sala_reuniao_id' => 1])->assertForbidden();
+        $criar = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'sala_reuniao_id' => 1
+        ]);
+        $this->post(route('sala.reuniao.agendados.store'), $criar)->assertForbidden();
+    }
+
+    /** @test */
+    public function can_create_presencial()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw();
+
+        $this->get(route('sala.reuniao.agendados.create'))->assertOk();
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertRedirect(route('sala.reuniao.agendados.busca', ['q' => AgendamentoSala::find(1)->protocolo]))
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i> Agendamento com ID 1 com presença confirmada criado com sucesso!');
+
+        $this->get(route('sala.reuniao.agendados.busca', ['q' => AgendamentoSala::find(1)->protocolo]))
+        ->assertOk()
+        ->assertSee('<br><small><strong>Agendado via: </strong> <i>Presencial</i></small>');
+    }
+
+    /** @test */
+    public function cannot_create_presencial_without_sala()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $sala = factory('App\SalaReuniao')->states('desativa_ambos')->create();
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'sala_reuniao_id' => 1
+        ]);
+
+        $this->get(route('sala.reuniao.agendados.create'))
+        ->assertRedirect(route('sala.reuniao.agendados.index'))
+        ->assertSessionHas('message', 'Não possui salas ativas para criar agendamento!');
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors('sala_reuniao_id');
+    }
+
+    /** @test */
+    public function cannot_create_presencial_without_cpf_cnpj_gerenti()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'cpf_cnpj' => formataCpfCnpj('76797171768')
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['nome', 'registro_core', 'email']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_without_tipo_sala()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'tipo_sala' => ''
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['tipo_sala']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_invalid_value_tipo_sala()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'tipo_sala' => 'reunião'
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['tipo_sala']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_without_dia()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'dia' => ''
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['dia']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_dia_after_today()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'dia' => now()->addDay()->format('Y-m-d')
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['dia']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_dia_weekend()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $hj = Carbon::today();
+        while(!$hj->isWeekend())
+            $hj->subDay();
+
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'dia' => $hj->format('Y-m-d')
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['dia']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_without_periodo_entrada()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'periodo_entrada' => ''
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['periodo_entrada']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_invalid_format_periodo_entrada()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'periodo_entrada' => '09::00'
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['periodo_entrada']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_invalid_value_periodo_entrada()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'periodo_entrada' => '17:10'
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['periodo_entrada']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_periodo_entrada_after_17_30()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'periodo_entrada' => '18:00'
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['periodo_entrada']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_without_periodo_saida()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'periodo_saida' => ''
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['periodo_saida']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_invalid_format_periodo_saida()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'periodo_saida' => '09::00'
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['periodo_saida']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_invalid_value_periodo_saida()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'periodo_saida' => '19:00'
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['periodo_saida']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_invalid_value_periodo_saida_before_or_equal_periodo_entrada()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'periodo_saida' => '09:00'
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['periodo_saida']);
+
+        $agenda['periodo_saida'] = $agenda['periodo_entrada'];
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['periodo_saida']);
+    }
+
+    /** @test */
+    public function can_verify_when_create_presencial()
+    {
+        $user = $this->signInAsAdmin();
+        $sala = factory('App\SalaReuniao')->create();
+        $suspenso = factory('App\SuspensaoExcecao')->create();
+
+        $this->get(route('sala.reuniao.agendados.create'))->assertOk();
+
+        $this->post(route('sala.reuniao.agendados.verifica.criar'), ['cpf_cnpj' => formataCpfCnpj('11748345000144')])
+        ->assertJson([
+            "nomeGerenti" => "RC Teste 2",
+            "registroGerenti" => "0000000002",
+            "emailGerenti" => "desenvolvimento@core-sp.org.br",
+            "situacaoGerenti" => "Ativo, Em dia.",
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.verifica.criar'), ['cpf_cnpj' => formataCpfCnpj('76797171768')])
+        ->assertJson([
+            "nomeGerenti" => "",
+            "registroGerenti" => "",
+            "emailGerenti" => "",
+            "situacaoGerenti" => "",
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.verifica.criar'), ['sala_reuniao_id' => 1])
+        ->assertJson([
+            "total_participantes" => 2,
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.verifica.criar'), ['sala_reuniao_id' => 10])
+        ->assertJson([
+            "total_participantes" => 0,
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.verifica.criar'), ['participantes_cpf' => [$suspenso->fresh()->representante->cpf_cnpj]])
+        ->assertJson([
+            "suspenso" => "O seguinte participante está suspenso para novos agendamentos na área restrita do representante:<br><strong>862.943.730-85</strong>",
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.verifica.criar'), ['participantes_cpf' => [formataCpfCnpj('11748345000144')]])
+        ->assertJson([
+            "suspenso" => "",
+        ]);
     }
 
     /** @test */
@@ -72,8 +352,30 @@ class AgendamentoSalaTest extends TestCase
         ->assertOk()
         ->assertSeeText($agenda->representante->nome)
         ->assertSeeText($agenda->representante->cpf_cnpj)
-        ->assertSeeText($agenda->representante->registro)
+        ->assertSeeText($agenda->representante->registro_core)
         ->assertSeeText($agenda->representante->email)
+        ->assertSee('<p class="mb-0">Agendamento criado via: <strong>Online</strong></p>')
+        ->assertSeeText($agenda->getTipoSala())
+        ->assertSeeText(onlyDate($agenda->dia))
+        ->assertSeeText($agenda->sala->regional->regional);
+    }
+
+    /** @test */
+    public function can_view_agendado_presencial()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('presencial')->create();
+        $agenda->representante = $agenda->getRepresentante();
+
+        $this->get(route('sala.reuniao.agendados.index'))->assertOk();
+
+        $this->get(route('sala.reuniao.agendados.view', $agenda->id))
+        ->assertOk()
+        ->assertSeeText($agenda->representante->nome)
+        ->assertSeeText($agenda->representante->cpf_cnpj)
+        ->assertSeeText($agenda->representante->registro_core)
+        ->assertSeeText($agenda->representante->email)
+        ->assertSee('<p class="mb-0">Agendamento criado via: <strong>Presencial</strong></p>')
         ->assertSeeText($agenda->getTipoSala())
         ->assertSeeText(onlyDate($agenda->dia))
         ->assertSeeText($agenda->sala->regional->regional);
@@ -168,8 +470,41 @@ class AgendamentoSalaTest extends TestCase
         ->assertOk()
         ->assertSeeText($reuniao->protocolo)
         ->assertSeeText($coworking->protocolo)
-        ->assertSeeText($reuniao->representante->cpf_cnpj)
-        ->assertSeeText($coworking->representante->cpf_cnpj)
+        ->assertSee($reuniao->representante->cpf_cnpj.'<br><small><strong>Agendado via: </strong> <i>Online</i></small>')
+        ->assertSee($coworking->representante->cpf_cnpj.'<br><small><strong>Agendado via: </strong> <i>Online</i></small>')
+        ->assertSee($reuniao->getTipoSalaHTML())
+        ->assertSee($coworking->getTipoSalaHTML())
+        ->assertSeeText($reuniao->sala->regional->regional)
+        ->assertSeeText($coworking->sala->regional->regional)
+        ->assertSeeText(formataData($reuniao->updated_at));
+    }
+
+    /** @test */
+    public function can_view_list_with_presencial()
+    {
+        $user = $this->signInAsAdmin();
+        $reuniao = factory('App\AgendamentoSala')->states('reuniao', 'presencial')->create([
+            'dia' => now()->format('Y-m-d'),
+            'sala_reuniao_id' => factory('App\SalaReuniao')->create([
+                'idregional' => $user->idregional
+            ])
+        ]);
+        $reuniao->representante = $reuniao->getRepresentante();
+
+        $coworking = factory('App\AgendamentoSala')->states('presencial')->create([
+            'dia' => now()->format('Y-m-d'),
+            'idrepresentante' => $reuniao->idrepresentante,
+            'sala_reuniao_id' => $reuniao->sala_reuniao_id,
+            'periodo' => 'tarde'
+        ]);
+        $coworking->representante = $coworking->getRepresentante();
+
+        $this->get(route('sala.reuniao.agendados.index'))
+        ->assertOk()
+        ->assertSeeText($reuniao->protocolo)
+        ->assertSeeText($coworking->protocolo)
+        ->assertSee($reuniao->representante->cpf_cnpj.'<br><small><strong>Agendado via: </strong> <i>Presencial</i></small>')
+        ->assertSee($coworking->representante->cpf_cnpj.'<br><small><strong>Agendado via: </strong> <i>Presencial</i></small>')
         ->assertSee($reuniao->getTipoSalaHTML())
         ->assertSee($coworking->getTipoSalaHTML())
         ->assertSeeText($reuniao->sala->regional->regional)
@@ -788,10 +1123,17 @@ class AgendamentoSalaTest extends TestCase
             ])
         ]);
 
+        $agendamento1 = factory('App\AgendamentoSala')->states('presencial')->create([
+            'sala_reuniao_id' => 1
+        ]);
+
         $this->get(route('sala.reuniao.agendados.busca', ['q' => $agendamento->id]))
             ->assertSeeText($agendamento->protocolo); 
 
         $this->get(route('sala.reuniao.agendados.busca', ['q' => $agendamento->representante->cpf_cnpj]))
+            ->assertSee($agendamento1->getRepresentante()->cpf_cnpj.'<br><small><strong>Agendado via: </strong> <i>Presencial</i></small>')
+            ->assertSee($agendamento->getRepresentante()->cpf_cnpj.'<br><small><strong>Agendado via: </strong> <i>Online</i></small>')
+            ->assertSeeText($agendamento1->protocolo)
             ->assertSeeText($agendamento->protocolo); 
 
         $this->get(route('sala.reuniao.agendados.busca', ['q' => $agendamento->protocolo]))
@@ -1986,6 +2328,29 @@ class AgendamentoSalaTest extends TestCase
         $this->actingAs($representante, 'representante');
 
         $agendas = factory('App\AgendamentoSala', 4)->create();
+
+        $dia = Carbon::parse($agendas->get(0)->dia)->addMonth();
+        while($dia->isWeekend())
+            $dia->addDay();
+
+        factory('App\AgendamentoSala', 4)->create([
+            'dia' => $dia->format('Y-m-d')
+        ]);
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'agendar']))
+        ->assertRedirect(route('representante.agendar.inserir.view'));
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-times"></i>&nbsp;&nbsp;Já possui o limite de 4 agendamentos confirmados ou com presença a confirmar no mês atual e/ou seguinte.');
+    }
+
+    /** @test */
+    public function cannot_view_agendar_sala_after_created_4_by_month_presencial_and_next_month_online()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $agendas = factory('App\AgendamentoSala', 4)->states('presencial')->create();
 
         $dia = Carbon::parse($agendas->get(0)->dia)->addMonth();
         while($dia->isWeekend())

@@ -79,6 +79,62 @@ class AgendamentoSala extends Model
         return $protocoloGerado;
     }
 
+    public static function podeAgendar($cpf_cnpj, $mes = null, $ano = null)
+    {
+        $total = 4;
+
+        // devido poder agendar somente no dia seguinte
+        $dia = Carbon::tomorrow();
+        while($dia->isWeekend())
+            $dia->addDay();
+
+        $atual = self::where(function($query) use ($cpf_cnpj){
+            // em caso de agendamento presencial e/ou online
+            $query->where('rep_presencial', 'LIKE', '%"'.apenasNumeros($cpf_cnpj).'"%')
+            ->orWhereHas('representante', function ($q) use ($cpf_cnpj){
+                $q->where('cpf_cnpj', apenasNumeros($cpf_cnpj));
+            });
+        })
+        ->when(isset($mes) && !isset($ano), function($query) use($mes){
+            $query->whereMonth('dia', $mes)
+            ->whereYear('dia', now()->year);
+        })
+        ->when(isset($ano) && !isset($mes), function($query) use($ano){
+            $query->whereMonth('dia', now()->month)
+            ->whereYear('dia', $ano);
+        })
+        ->when(isset($mes) && isset($ano), function($query) use($mes, $ano){
+            $query->whereMonth('dia', $mes)
+            ->whereYear('dia', $ano);
+        })
+        ->when(!isset($mes) && !isset($ano), function($query) use($dia){
+            $query->whereMonth('dia', $dia->month)
+            ->whereYear('dia', $dia->year);
+        })
+        ->where(function($query){
+            $query->whereNull('status')
+            ->orWhere('status', 'Compareceu');
+        })
+        ->count() < $total;
+
+        $seguinte = false;
+        // Evitar que pule mês. Ex: janeiro para fevereiro.
+        $dataSeguinte = Carbon::parse($dia->format('Y-m') . '-01')->addMonth();
+        $mesSeguinte = $dataSeguinte->month;
+        $anoSeguinte = $dataSeguinte->year;
+        
+        if(!isset($mes) && !isset($ano))
+            $seguinte = self::whereHas('representante', function ($q) use ($cpf_cnpj){
+                $q->where('cpf_cnpj', apenasNumeros($cpf_cnpj));
+            })
+            ->whereMonth('dia', $mesSeguinte)
+            ->whereYear('dia', $anoSeguinte)
+            ->whereNull('status')
+            ->count() < $total;
+
+        return $atual || $seguinte;
+    }
+
     public function getHorasPermitidas($horarios = array())
     {
         $duracao = Carbon::parse($this->inicioDoPeriodo())->diffInMinutes(Carbon::parse($this->fimDoPeriodo()));

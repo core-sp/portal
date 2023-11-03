@@ -395,6 +395,8 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
                 "EMAILS" => "desenvolvimento@core-sp.org.br"
             ];
         }
+        elseif($cpfCnpj == "76797171768")
+            $resultado = array();
 
         return $resultado;
     }

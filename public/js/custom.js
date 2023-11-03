@@ -606,6 +606,10 @@ function verificarDadosCriarAgendaSala(nome_campo){
           break;
         case "sala_reuniao_id":
           $(".participante:gt(0)").remove();
+          if(response.total_participantes < 0){
+            $('#area_participantes').hide();
+            return;
+          }
           if(response.total_participantes > 0)
             for (let i = 1; i < response.total_participantes; i++)
               $('#area_participantes').append($('.participante:last').clone());
