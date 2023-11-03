@@ -36,12 +36,13 @@
     <div class="linha-lg"></div>
     <div class="row mt-2" id="conteudo-principal">
       <div class="col-lg-8 consulta-linha">
-        <div class="row nomargin mb-3">
+        <div class="row nomargin mb-4">
           <p class="mb-2 light">A consulta de situação, novo serviço oferecido pelo Core-SP, é uma solução informatizada que permite verificar a situação do Representante Comercial junto ao Conselho.</p>
           <p class="light">Um recurso simples, ágil e moderno que visa contribuir para uma melhor administração do tempo de Representantes Comerciais e de seus contadores.</p>
           <p class="light mt-2">Ao consultar, os seus dados serão apenas utilizados para consulta, não sendo utilizados para outros fins além do serviço solicitado. Para mais informações, verifique a nossa <a href="/politica-de-privacidade"  target="_blank"><strong><u>Política de Privacidade</u></strong></a>.
         </p>
         </div>
+        {{--
         <div class="row nomargin consulta">
           <form method="post" class="d-flex w-100">
             @csrf
@@ -99,6 +100,12 @@
             @endif
           </div>
         @endif
+        --}}
+
+        <div class="embed-responsive embed-responsive-4by3">
+          <iframe class="embed-responsive-item" src="https://consultarep.confere.org.br"></iframe>
+        </div>
+
         <hr class="mt-4">
         <div class="row nomargin mt-4">
           <div class="alert alert-warning consulta-alert" role="alert">

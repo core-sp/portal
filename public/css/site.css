@@ -754,7 +754,11 @@ figure.align-left {
 	transform: rotateY(180deg);
 }
 
-.icon-title {
+.home-title h5:hover .icon-title-prox {
+	transform: rotateY(360deg);
+}
+
+.icon-title, .icon-title-prox {
 	font-size: 1rem;
 	margin-right: 0.2rem;
 	color: #15AAE2;

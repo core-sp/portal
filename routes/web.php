@@ -391,7 +391,7 @@ Route::middleware(['block_ip'])->group(function () {
 
     // Consulta de Situação
     Route::get('consulta-de-situacao', 'ConsultaSituacaoController@consultaView');
-    Route::post('consulta-de-situacao', 'ConsultaSituacaoController@consulta');
+    // Route::post('consulta-de-situacao', 'ConsultaSituacaoController@consulta');
 
     // Blog
     Route::get('blog', 'PostsController@blogPage')->name('site.blog');
