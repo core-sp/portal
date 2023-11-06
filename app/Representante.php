@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticable;
 use App\Notifications\RepresentanteResetPasswordNotification;
 use Carbon\Carbon;
+use App\Repositories\GerentiRepositoryInterface;
 
 class Representante extends Authenticable
 {
@@ -227,6 +228,18 @@ class Representante extends Authenticable
         }
 
         return $diasAgendado;
+    }
+
+    public function getContatosTipoTelefone(GerentiRepositoryInterface $gerenti)
+    {
+        $contatos = $gerenti->gerentiContatos($this->ass_id);
+        foreach($contatos as $chave => $contato)
+        {
+            if(!in_array($contato['CXP_TIPO'], ['1', '2', '4', '6', '7', '8', '51', '52', '53']) || ($contato['CXP_STATUS'] != 1))
+                unset($contatos[$chave]);
+        }
+
+        return $contatos;
     }
 
     public function getPagamento($cobranca_id, $pagamento_id)

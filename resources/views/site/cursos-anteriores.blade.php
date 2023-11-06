@@ -2,11 +2,6 @@
 
 @section('content')
 
-@php
-use \App\Http\Controllers\Helper;
-use \App\Http\Controllers\CursoInscritoController;
-@endphp
-
 <section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     <img src="{{ asset('img/cursos.png') }}" />
@@ -30,7 +25,7 @@ use \App\Http\Controllers\CursoInscritoController;
             <h2 class="pr-3 ml-1">Cursos Anteriores</h2>
           </blockquote>
           <h5 class="float-right cinza-claro-bg">
-            <a href="/cursos"><i class="fas fa-history icon-title"></i> Próximos cursos</a>
+            <a href="{{ route('cursos.index.website') }}"><i class="fas fa-history fa-flip-horizontal icon-title-prox"></i> Próximos cursos</a>
           </h5>
         </div>
       </div>

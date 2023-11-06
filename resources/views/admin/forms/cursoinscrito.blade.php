@@ -2,27 +2,33 @@
     @csrf
     @if(isset($resultado))
         @method('PUT')
-        <input type="hidden" name="idcurso" value="{{ $resultado->idcurso }}" />
-    @else
-        <input type="hidden" name="idcurso" value="{{ $curso->idcurso }}" />
     @endif
-    <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
     <div class="card-body">
         <div class="form-row">
+            <div class="col-2">
+                <label for="cpf">CPF</label>
+                <input type="text"
+                    name="{{ isset($resultado->cpf) ? '' : 'cpf' }}"
+                    class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
+                    placeholder="000.000.000-00"
+                    value="{{ isset($resultado->cpf) ? $resultado->cpf : old('cpf') }}"
+                    {{ isset($resultado->cpf) ? 'disabled' : 'required' }}
+                />
+                @if($errors->has('cpf'))
+                <div class="invalid-feedback">
+                {{ $errors->first('cpf') }}
+                </div>
+                @endif
+            </div>
             <div class="col">
                 <label for="nome">Nome</label>
                 <input type="text"
                     name="nome"
                     class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
                     placeholder="Nome"
-                    @if(!empty(old('nome')))
-                        value="{{ old('nome') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->nome }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ isset($resultado->nome) ? $resultado->nome : old('nome') }}"
+                    required
+                />
                 @if($errors->has('nome'))
                 <div class="invalid-feedback">
                 {{ $errors->first('nome') }}
@@ -35,14 +41,9 @@
                     name="email"
                     class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                     placeholder="Email"
-                    @if(!empty(old('email')))
-                        value="{{ old('email') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->email }}" 
-                        @endif
-                    @endif
-                    />
+                    value="{{ isset($resultado->email) ? $resultado->email : old('email') }}"
+                    required
+                />
                 @if($errors->has('email'))
                 <div class="invalid-feedback">
                 {{ $errors->first('email') }}
@@ -57,37 +58,12 @@
                     name="telefone"
                     class="form-control celularInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
                     placeholder="(00) 00000-0000"
-                    @if(!empty(old('telefone')))
-                        value="{{ old('telefone') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->telefone }}" 
-                        @endif
-                    @endif
-                    />
+                    value="{{ isset($resultado->telefone) ? $resultado->telefone : old('telefone') }}"
+                    required
+                />
                 @if($errors->has('telefone'))
                 <div class="invalid-feedback">
                 {{ $errors->first('telefone') }}
-                </div>
-                @endif
-            </div>
-            <div class="col">
-                <label for="cpf">CPF</label>
-                <input type="text"
-                    name="cpf"
-                    class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
-                    placeholder="000.000.000-00"
-                    @if(!empty(old('cpf')))
-                        value="{{ old('cpf') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->cpf }}" 
-                        @endif
-                    @endif
-                    />
-                @if($errors->has('cpf'))
-                <div class="invalid-feedback">
-                {{ $errors->first('cpf') }}
                 </div>
                 @endif
             </div>
@@ -97,17 +73,40 @@
                     name="registrocore"
                     class="form-control {{ $errors->has('registrocore') ? 'is-invalid' : '' }}"
                     placeholder="Nº do registro no CORE (opcional)"
-                    @if(!empty(old('registrocore')))
-                        value="{{ old('registrocore') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->registrocore }}" 
-                        @endif
-                    @endif
-                    />
+                    value="{{ isset($resultado->registrocore) ? $resultado->registrocore : old('registrocore') }}"
+                />
                 @if($errors->has('registrocore'))
                 <div class="invalid-feedback">
                 {{ $errors->first('registrocore') }}
+                </div>
+                @endif
+            </div>
+                        
+            @if($curso->add_campo)
+            @php
+                $valorCA = isset($resultado) ? $resultado->valorCampoAdicional() : old($curso->campo_rotulo);
+            @endphp
+            <div class="col">
+                <label for="{{ $curso->campo_rotulo }}">{{ $curso->nomeRotulo() }} <small><i>(sempre opcional)</i></small></label>
+                {!! $curso->getInputHTMLInterno($valorCA, $errors->has($curso->campo_rotulo)) !!}
+                @if($errors->has($curso->campo_rotulo))
+			    <div class="invalid-feedback">
+				    {{ $errors->first($curso->campo_rotulo) }}
+				</div>
+				@endif
+            </div>
+            @endif
+
+            <div class="col">
+                <label for="tipo_inscrito">Tipo da incrição</label>
+                <select name="tipo_inscrito" class="form-control {{ $errors->has('tipo_inscrito') ? 'is-invalid' : '' }}" required>
+                @foreach($tipos as $tipo)
+                    <option value="{{ $tipo }}" {{ isset($resultado) && ($resultado->tipo_inscrito == $tipo) ? 'selected' : '' }}>{{ $tipo }}</option>
+                @endforeach
+                </select>
+                @if($errors->has('tipo_inscrito'))
+                <div class="invalid-feedback">
+                {{ $errors->first('tipo_inscrito') }}
                 </div>
                 @endif
             </div>
@@ -115,17 +114,9 @@
     </div>
     <div class="card-footer">
         <div class="float-right">
-            @if(isset($resultado))
-            <a href="/admin/cursos/inscritos/{{ $resultado->idcurso }}" class="btn btn-default">Cancelar</a>
-            @else
-            <a href="/admin/cursos/inscritos/{{ $curso->idcurso }}" class="btn btn-default">Cancelar</a>
-            @endif
+            <a href="{{ route('inscritos.index', $curso->idcurso) }}" class="btn btn-default">Cancelar</a>
             <button type="submit" class="btn btn-primary ml-1">
-            @if(isset($resultado))
-                Salvar
-            @else
-                Publicar
-            @endif    
+                {{ isset($resultado) ? 'Salvar' : 'Publicar' }}
             </button>
         </div>
     </div>

@@ -112,7 +112,7 @@
           <div class="box text-center azul-bg">
             <div class="inside-box">
               <img src="{{ asset('img/file.png') }}" class="inside-img alt="Consulta de Ativos | Core-SP">
-              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Consulta<br class="hide-992" /> de situação</h3>
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Consulta<br class="hide-992" /> Pública</h3>
               <button class="btn-box azul">Consultar</button>
             </div>
           </div>

@@ -202,7 +202,7 @@
                         </div>
                       </div>
                       <a href="/carta-de-servicos-ao-usuario" class="dropdown-item">Carta de Serviços ao Usuário</a>
-                      <a href="/consulta-de-situacao" class="dropdown-item">Consulta de Situação</a>
+                      <a href="/consulta-de-situacao" class="dropdown-item">Consulta Pública</a>
                       <a href="/cursos" class="dropdown-item">Cursos</a>
                       <a href="/downloads" class="dropdown-item">Downloads</a>
                       <a href="/programa-de-incentivos" class="dropdown-item">Programa de Incentivos</a>
@@ -332,7 +332,7 @@
               <p class="branco"><a href="/servicos-atendimento-ao-rc">Atendimento</a></p>
               <p class="branco"><a href="/balcao-de-oportunidades">Balcão de Oportunidades</a></p>
               <p class="branco"><a href="/carta-de-servicos-ao-usuario">Carta de Serviços ao Usuário</a></p>
-              <p class="branco"><a href="/consulta-de-situacao">Consulta de Situação</a></p>
+              <p class="branco"><a href="/consulta-de-situacao">Consulta Pública</a></p>
               <p class="branco"><a href="/cursos">Cursos</a></p>
               <p class="branco"><a href="/downloads">Downloads</a></p>
               <p class="branco"><a href="/politica-de-privacidade">Política de Privacidade</a></p>

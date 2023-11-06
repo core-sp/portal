@@ -29,6 +29,7 @@ class SystemTest extends TestCase
             'Representante' => new \App\Services\RepresentanteService(),
             'SalaReuniao' => new \App\Services\SalaReuniaoService(),
             'Aviso' => new \App\Services\AvisoService(),
+            'Curso' => new \App\Services\CursoService(),
             'Pagamento' => new \App\Services\PagamentoGetnetService(),
             'Gerenti' => new \App\Services\GerentiService(new \App\Repositories\GerentiRepositoryMock),
         ];
@@ -66,6 +67,7 @@ class SystemTest extends TestCase
             'Representante' => 'App\Contracts\RepresentanteServiceInterface',
             'SalaReuniao' => 'App\Contracts\SalaReuniaoServiceInterface',
             'Aviso' => 'App\Contracts\AvisoServiceInterface',
+            'Curso' => 'App\Contracts\CursoServiceInterface',
         ];
 
         $this->get('/simulador')->assertOk();
@@ -226,6 +228,13 @@ class SystemTest extends TestCase
         $servico = new \App\Services\AvisoService();
         $mediador = $this->app->make(MediadorServiceInterface::class);
         $this->assertEquals($mediador->getService('Aviso'), $servico);
+    }
+
+    public function mediador_interface_get_instace_curso_service()
+    {
+        $servico = new \App\Services\CursoService();
+        $mediador = $this->app->make(MediadorServiceInterface::class);
+        $this->assertEquals($mediador->getService('Curso'), $servico);
     }
 
     /** @test */
