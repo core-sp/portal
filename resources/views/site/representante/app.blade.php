@@ -109,6 +109,14 @@
               </a>
             </div>
 
+            <div class="mr-item bt-unset {{ Route::is('representante.cursos')  ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('representante.cursos') }}" onclick="showLoading()">
+                <h6 class="brancar">
+                  <i class="nav-icon fas fa-graduation-cap"></i>&nbsp;&nbsp;Cursos&nbsp;&nbsp;&nbsp;
+                </h6>
+              </a>
+            </div>
+
           </div>
         </div>
       </div>

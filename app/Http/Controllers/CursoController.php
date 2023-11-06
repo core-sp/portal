@@ -3,64 +3,61 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Curso;
-use App\CursoInscrito;
-use App\Http\Controllers\Helper;
-use App\Http\Controllers\CrudController;
-use App\Http\Controllers\CursoInscritoController;
-use App\Events\CrudEvent;
 use App\Http\Requests\CursoRequest;
-use App\Repositories\CursoRepository;
 use App\Contracts\MediadorServiceInterface;
-use Illuminate\Support\Facades\Request as IlluminateRequest;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CursoController extends Controller
 {
-    private $class = 'CursoController';
-    private $cursoModel;
-    private $cursoRepository;
     private $service;
-    private $variaveis;
 
-    public function __construct(Curso $curso, CursoRepository $cursoRepository, MediadorServiceInterface $service)
+    public function __construct(MediadorServiceInterface $service)
     {
-        $this->middleware('auth', ['except' => ['show', 'cursosView']]);
-        $this->cursoModel = $curso;
-        $this->cursoRepository = $cursoRepository;
+        $this->middleware('auth', ['except' => ['show', 'cursosView', 'cursosAnterioresView']]);
         $this->service = $service;
-        $this->variaveis = $curso->variaveis();
     }
 
     public function index()
     {
         $this->authorize('viewAny', auth()->user());
-        $resultados = $this->cursoRepository->getToTable();
-        $tabela = $this->cursoModel->tabelaCompleta($resultados);
-        if(auth()->user()->cannot('create', auth()->user()))
-            unset($this->variaveis['btn_criar']);
-        $variaveis = (object) $this->variaveis;
-        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
+
+        try{
+            $dados = $this->service->getService('Curso')->listar(auth()->user());
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os cursos.");
+        }
+
+        return view('admin.crud.home', $dados);
     }
 
     public function create()
     {
         $this->authorize('create', auth()->user());
-        $variaveis = (object) $this->variaveis;
-        $regionais = $this->service->getService('Regional')->getRegionais();
-        return view('admin.crud.criar', compact('variaveis', 'regionais'));
+        
+        try{
+            $dados = $this->service->getService('Curso')->view();
+            $dados['regionais'] = $this->service->getService('Regional')->getRegionais(); 
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar a página para criar o curso.");
+        }
+
+        return view('admin.crud.criar', $dados);
     }
 
     public function store(CursoRequest $request)
     {
         $this->authorize('create', auth()->user());
 
-        $request->validated();
-        
-        $save = $this->cursoRepository->store($request);
-        if(!$save)
-            abort(500);
+        try{
+            $validated = $request->validated();
+            $this->service->getService('Curso')->save($validated, auth()->user());
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao criar o curso.");
+        }
 
-        event(new CrudEvent('curso', 'criou', $save->idcurso));
         return redirect()->route('cursos.index')
             ->with('message', '<i class="icon fa fa-check"></i>Curso criado com sucesso!')
             ->with('class', 'alert-success');
@@ -69,116 +66,110 @@ class CursoController extends Controller
     public function edit($id)
     {
         $this->authorize('updateOther', auth()->user());
-        $resultado = Curso::with('regional','user')->findOrFail($id);
-        $regionais = $this->service->getService('Regional')->getRegionais();
-        $variaveis = (object) $this->variaveis;
-        return view('admin.crud.editar', compact('resultado', 'regionais', 'variaveis'));
+        
+        try{
+            $dados = $this->service->getService('Curso')->view($id);
+            $dados['regionais'] = $this->service->getService('Regional')->getRegionais(); 
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar a página para editar o curso.");
+        }
+
+        return view('admin.crud.editar', $dados);
     }
 
     public function update(CursoRequest $request, $id)
     {
         $this->authorize('updateOther', auth()->user());
 
-        $request->validated();
+        try{
+            $validated = $request->validated();
+            $this->service->getService('Curso')->save($validated, auth()->user(), $id);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao atualizar o curso.");
+        }
 
-        $update = $this->cursoRepository->update($id, $request);
-        if(!$update)
-            abort(500);
-
-        event(new CrudEvent('curso', 'editou', $id));
         return redirect()->route('cursos.index')
-            ->with('message', '<i class="icon fa fa-check"></i>Curso editado com sucesso!')
+            ->with('message', '<i class="icon fa fa-check"></i>Curso com ID '.$id.' foi atualizado com sucesso!')
             ->with('class', 'alert-success');
     }
 
     public function destroy($id)
     {
         $this->authorize('delete', auth()->user());
-        $curso = $this->cursoRepository->getById($id);
+        
+        try{
+            $this->service->getService('Curso')->destroy($id);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao cancelar o curso.");
+        }
 
-        $delete = $curso->delete();
-        if(!$delete)
-            abort(500);
-
-        event(new CrudEvent('curso', 'cancelou', $curso->idcurso));
         return redirect()->route('cursos.index')
-            ->with('message', '<i class="icon fa fa-ban"></i>Curso cancelado com sucesso!')
-            ->with('class', 'alert-danger');
+            ->with('message', '<i class="icon fa fa-check"></i>Curso com ID '.$id.' foi cancelado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function lixeira()
     {
         $this->authorize('onlyAdmin', auth()->user());
-        $resultados = $this->cursoRepository->getTrashed();
-        $variaveis = (object) $this->variaveis; 
-        $tabela = $this->cursoModel->tabelaTrashed($resultados);
-        return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
+        
+        try{
+            $dados = $this->service->getService('Curso')->lixeira();
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os cursos cancelados.");
+        }
+
+        return view('admin.crud.lixeira', $dados);
     }
 
     public function restore($id)
     {
         $this->authorize('onlyAdmin', auth()->user());
-        $curso = $this->cursoRepository->getTrashedById($id);
         
-        $restore = $curso->restore();
-        if(!$restore)
-            abort(500);
-        
-        event(new CrudEvent('curso', 'reabriu', $curso->idcurso));
+        try{
+            $this->service->getService('Curso')->restore($id);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao restaurar o curso.");
+        }
+
         return redirect()->route('cursos.index')
-            ->with('message', '<i class="icon fa fa-check"></i>Curso restaurado com sucesso!')
+            ->with('message', '<i class="icon fa fa-check"></i>Curso com ID '.$id.' foi restaurado com sucesso!')
             ->with('class', 'alert-success');
     }
 
-    public function inscritos($id)
-    {
-        if(perfisPermitidos('CursoInscritoController', 'index'))
-        {
-            $resultados = CursoInscrito::where('idcurso', $id)
-                ->orderBy('created_at', 'desc')
-                ->paginate(10);
-            $curso = $this->cursoRepository->getById($id);
-            $now = date('Y-m-d H:i:s');
-            if(!$curso)
-                abort(500);
-            $variaveis = [
-                'pluraliza' => 'inscritos',
-                'plural' => 'inscritos',
-                'singular' => 'inscrito',
-                'singulariza' => 'o inscrito',
-                'continuacao_titulo' => 'em <strong>'.$curso->tipo.': '.$curso->tema.'</strong>',
-                'btn_lixeira' => '<a href="/admin/cursos" class="btn btn-default">Lista de Cursos</a>',
-                'busca' => 'cursos/inscritos/'.$id,
-                'addonsHome' => '<a href="/admin/cursos/inscritos/download/'.$id.'" class="btn btn-primary mb-2">Baixar CSV</a>'
-            ];
-            if($curso->datatermino >= $now) 
-                $variaveis['btn_criar'] = '<a href="/admin/cursos/adicionar-inscrito/'.$curso->idcurso.'" class="btn btn-primary mr-1">Adicionar inscrito</a> ';
-            if(auth()->user()->cannot('create', auth()->user()))
-                unset($variaveis['btn_criar']);
-            $tabela = CursoInscritoController::tabelaCompleta($resultados, $curso->idcurso);
-            $variaveis = (object) $variaveis;
-            return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
-        } else
-            abort(403);
-        
-    }
-
-    public function busca()
+    public function busca(Request $request)
     {
         $this->authorize('viewAny', auth()->user());
-        $busca = IlluminateRequest::input('q');
-        $resultados = Curso::where('tipo','LIKE','%'.$busca.'%')
-            ->orWhere('tema','LIKE','%'.$busca.'%')
-            ->orWhere('descricao','LIKE','%'.$busca.'%')
-            ->paginate(10);
-        $variaveis = (object) $this->variaveis;
-        $tabela = $this->cursoModel->tabelaCompleta($resultados);
-        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
+        
+        try{
+            $busca = $request->q;
+            $dados = $this->service->getService('Curso')->buscar($busca, auth()->user());
+            $dados['busca'] = $busca;
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao buscar o texto em cursos.");
+        }
+
+        return view('admin.crud.home', $dados);
     }
 
     public function show($id)
     {
-        $curso = $this->cursoRepository->getById($id);
+        try{
+            // Público externo somente visualiza curso publicado
+            $curso = auth()->guard('web')->check() ? $this->service->getService('Curso')->show($id) : $this->service->getService('Curso')->show($id, true);
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Curso não encontrado.");
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar a página do curso no portal.");
+        }
+
         return response()
             ->view('site.curso', compact('curso'))
             ->header('Cache-Control','no-cache');
@@ -186,9 +177,29 @@ class CursoController extends Controller
 
     public function cursosView()
     {
-        $cursos = $this->cursoRepository->getSiteGrid();
+        try{
+            $cursos = $this->service->getService('Curso')->siteGrid();
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os cursos no portal.");
+        }
+
         return response()
             ->view('site.cursos', compact('cursos'))
+            ->header('Cache-Control','no-cache');
+    }
+
+    public function cursosAnterioresView()
+    {        
+        try{
+            $cursos = $this->service->getService('Curso')->cursosAnteriores();
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os cursos anteriores no portal.");
+        }
+
+        return response()
+            ->view('site.cursos-anteriores', compact('cursos'))
             ->header('Cache-Control','no-cache');
     }
 }

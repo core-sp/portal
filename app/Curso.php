@@ -2,19 +2,110 @@
 
 namespace App;
 
-use App\Repositories\CursoRepository;
-use App\Traits\TabelaAdmin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Curso extends Model
 {
-    use SoftDeletes, TabelaAdmin;
+    use SoftDeletes;
 
     protected $primaryKey = 'idcurso';
     protected $table = 'cursos';
-    protected $fillable = ['tipo', 'tema', 'img', 'datarealizacao', 'datatermino',
-    'endereco', 'nrvagas', 'descricao', 'resumo', 'publicado', 'idregional', 'idusuario'];
+    protected $guarded = [];
+
+    const ACESSO_PRI = 'Privado';
+    const ACESSO_PUB = 'Público';
+
+    const TIPO_CURSO = 'Curso';
+    const TIPO_EVENTO = 'Evento Comemorativo';
+    const TIPO_LIVE = 'Live';
+    const TIPO_PALESTRA = 'Palestra';
+    const TIPO_WORK = 'Workshop';
+
+    const TEXTO_BTN_INSCRITO = "btn btn-sm btn-dark text-center text-uppercase text-white mt-2 disabled";
+    
+    private static function inputText($rotulo, $value, $required = false, $possuiErro = false, $classes = '')
+    {
+        $textoErro = $possuiErro ? 'is-invalid' : '';
+        $textoRequired = $required ? 'required' : '';
+
+        return '<input type="text" name="' . $rotulo . '" class="form-control '.$textoErro. ' ' .$classes.'" value="'.$value.'" '.$textoRequired.' />';
+    }
+
+    private static function inputDate($rotulo, $value, $required = false, $possuiErro = false, $classes = '')
+    {
+        $textoErro = $possuiErro ? 'is-invalid' : '';
+        $textoRequired = $required ? 'required' : '';
+
+        return '<input type="date" name="' . $rotulo . '" class="form-control '.$textoErro. ' ' .$classes.'" value="'.$value.'" '.$textoRequired.' />';
+    }
+
+    private static function inputSelect($rotulo, $options = [], $value, $required = false, $possuiErro = false, $classes = '')
+    {
+        $textoErro = $possuiErro ? 'is-invalid' : '';
+        $textoRequired = $required ? 'required' : '';
+
+        $select = '<select name="' . $rotulo . '" class="form-control '.$textoErro. ' ' .$classes.'" '.$textoRequired.'>';
+        $option = '<option value="">Selecione...</option>';
+
+        foreach($options as $key => $valor)
+        {
+            $selected = $value == $key ? 'selected' : '' ;
+            $option .= '<option value="'.$key.'" '.$selected.'>'.$valor.'</option>';
+        }
+
+        return $select . $option . '</select>';
+    }
+
+    private static function optionsPorRotulo()
+    {
+        return [
+            'exemplo_select' => ['exemplo_1' => 'Exemplo Um', 'exemplo_2' => 'Exemplo Dois'],
+        ];
+    }
+
+    public static function tipos()
+    {
+        return [
+            self::TIPO_CURSO,
+            self::TIPO_EVENTO,
+            self::TIPO_LIVE,
+            self::TIPO_PALESTRA,
+            self::TIPO_WORK,
+        ];
+    }
+
+    public static function acessos()
+    {
+        return [
+            self::ACESSO_PRI,
+            self::ACESSO_PUB,
+        ];
+    }
+
+    public static function rotulos()
+    {
+        return [
+            'placa_veiculo' => 'Placa do veículo',
+            // 'exemplo_select' => 'Exemplo Select',
+        ];
+    }
+
+    public static function inputs($value, $required = false, $possuiErro = false)
+    {
+        return [
+            'placa_veiculo' => self::inputText('placa_veiculo', $value, $required, $possuiErro, 'placaVeiculo'),
+            // 'exemplo_select' => self::inputSelect('exemplo_select', self::optionsPorRotulo()['exemplo_select'], $value, $required, $possuiErro),
+        ];
+    }
+
+    public static function regras()
+    {
+        return [
+            'placa_veiculo' => 'size:8|regex:/([A-Z]{3})([\s\-]{1})([0-9]{1})([A-Z0-9]{1})([0-9]{2})/',
+            // 'exemplo_select' => 'in:' . implode(',', array_keys(self::optionsPorRotulo()['exemplo_select'])),
+        ];
+    }
 
     public function regional()
     {
@@ -23,7 +114,7 @@ class Curso extends Model
 
     public function cursoinscrito()
     {
-    	return $this->hasMany('App\CursoInscrito', 'idcursoinscrito');
+    	return $this->hasMany('App\CursoInscrito', 'idcurso');
     }
 
     public function user()
@@ -36,86 +127,127 @@ class Curso extends Model
         return $this->hasMany('App\Noticia', 'idcurso');
     }
 
-    public function variaveis()
+    private function possuiVagas()
     {
-        return [
-            'singular' => 'curso',
-            'singulariza' => 'o curso',
-            'plural' => 'cursos',
-            'pluraliza' => 'cursos',
-            'titulo_criar' => 'Cadastrar curso',
-            'btn_criar' => '<a href="'.route('cursos.create').'" class="btn btn-primary mr-1">Novo Curso</a>',
-            'btn_lixeira' => '<a href="'.route('cursos.lixeira').'" class="btn btn-warning">Cursos Cancelados</a>',
-            'btn_lista' => '<a href="'.route('cursos.index').'" class="btn btn-primary mr-1">Lista de Cursos</a>',
-            'titulo' => 'Cursos cancelados',
-        ];
+        return $this->nrvagas > $this->loadCount('cursoinscrito')->cursoinscrito_count;
     }
 
-    private function tabelaHeaders()
+    public function noPeriodoDeInscricao()
     {
-        return ['Turma', 'Tipo / Tema', 'Onde / Quando', 'Vagas', 'Regional', 'Ações'];
+        $now = now()->format('Y-m-d H:i');
+        return ($this->inicio_inscricao <= $now) && ($this->termino_inscricao >= $now);
     }
 
-    private function tabelaContents($query)
+    public function representanteInscrito($cpf)
     {
-        return $query->map(function($row){
-            $acoes = '<a href="'.route('cursos.show', $row->idcurso).'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
-            if(perfisPermitidos('CursoInscritoController', 'index'))
-                $acoes .= '<a href="'.route('inscritos.index', $row->idcurso).'" class="btn btn-sm btn-secondary">Inscritos</a> ';
-            if(perfisPermitidos('CursoController', 'edit'))
-                $acoes .= '<a href="'.route('cursos.edit', $row->idcurso).'" class="btn btn-sm btn-primary">Editar</a> ';
-            if(perfisPermitidos('CursoController', 'destroy')) {
-                $acoes .= '<form method="POST" action="'.route('cursos.destroy', $row->idcurso).'" class="d-inline">';
-                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-                $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o curso?\')" />';
-                $acoes .= '</form>';
-            }
-            if($row->publicado == 'Sim')
-                $publicado = 'Publicado';
-            else
-                $publicado = 'Rascunho';
-            isset($row->endereco) ? $endereco = $row->endereco : $endereco = 'Evento online';
-            return [
-                $row->idcurso,
-                $row->tipo.'<br>'.$row->tema.'<br /><small><em>'.$publicado.'</em></small>',
-                $endereco.'<br />'.formataData($row->datarealizacao),
-                (new CursoRepository())->getCursoContagem($row->idcurso).' / '.$row->nrvagas,
-                $row->regional->regional,
-                $acoes
-            ];
-        })->toArray();
+    	return $this->cursoinscrito()->where('cpf', $cpf)->exists();
     }
 
-    public function tabelaCompleta($query)
+    public function publicado()
     {
-        return $this->montaTabela(
-            $this->tabelaHeaders(), 
-            $this->tabelaContents($query),
-            [ 'table', 'table-hover' ]
-        );
+        return $this->publicado == 'Sim';
     }
 
-    public function tabelaTrashed($query)
+    public function acessoPrivado()
     {
-        $headers = ['Turma', 'Tipo / Tema', 'Onde / Quando', 'Regional', 'Cancelado em:', 'Ações'];
-        $contents = $query->map(function($row){
-            $acoes = '<a href="'.route('cursos.restore', $row->idcurso).'" class="btn btn-sm btn-primary">Restaurar</a> ';
-            isset($row->endereco) ? $endereco = $row->endereco : $endereco = 'Evento online';
-            return [
-                $row->idcurso,
-                $row->tipo.'<br>'.$row->tema,
-                $endereco.'<br />'.formataData($row->datarealizacao),
-                $row->regional->regional,
-                formataData($row->deleted_at),
-                $acoes
-            ];
-        })->toArray();
+        return $this->acesso == self::ACESSO_PRI;
+    }
 
-        return $this->montaTabela(
-            $headers, 
-            $contents,
-            [ 'table', 'table-hover' ]
-        );
+    public function liberarAcesso($rep = false, $situacao = '')
+    {
+        return !$this->acessoPrivado() || ($this->acessoPrivado() && $rep && ($situacao == 'Situação: Em dia.'));
+    }
+
+    public function textoAcesso()
+    {
+        if(!$this->acessoPrivado())
+            return 'Aberta ao público';
+        if($this->acessoPrivado())
+            return 'Restrita para representantes';
+    }
+
+    public function podeInscrever()
+    {
+        return !$this->encerrado() && $this->noPeriodoDeInscricao() && $this->possuiVagas();
+    }
+
+    public function podeInscreverExterno()
+    {
+        return !$this->encerrado() && $this->noPeriodoDeInscricao() && $this->possuiVagas() && $this->publicado();
+    }
+
+    public function encerrado()
+    {
+        return $this->datatermino <= now()->format('Y-m-d H:i');
+    }
+
+    public function semPeriodoInscricao()
+    {
+        return !isset($this->inicio_inscricao) && !isset($this->termino_inscricao);
+    }
+
+    public function aguardandoAbrirInscricao()
+    {
+        return !$this->encerrado() && ($this->semPeriodoInscricao() || ($this->inicio_inscricao > now()->format('Y-m-d H:i')));
+    }
+
+    public function btnSituacao()
+    {
+        if($this->encerrado())
+            return '<div class="sit-btn sit-vermelho">Já realizado</div>';
+
+        if($this->podeInscreverExterno())
+            return '<div class="sit-btn sit-verde">Vagas Abertas</div>';
+
+        if(!$this->aguardandoAbrirInscricao())
+            return '<div class="sit-btn sit-vermelho">Vagas esgotadas</div>';
+
+        return '<div class="sit-btn sit-azul">Divulgação</div>';
+    }
+
+    public function possuiNoticia()
+    {
+        $noticia = $this->noticia->first();
+        return isset($noticia);
+    }
+
+    public function getNoticia()
+    {
+        $noticia = $this->noticia->first();
+        return isset($noticia) ? $noticia->slug : null;
+    }
+
+    public function getRegras()
+    {
+        if(!isset($this->campo_rotulo))
+            return [];
+
+        $regras = self::regras()[$this->campo_rotulo];
+        $required = $this->campo_required ? 'required|' : 'nullable|';
+
+        return [$this->campo_rotulo => $required . $regras];
+    }
+
+    public function nomeRotulo()
+    {
+        if(!isset($this->campo_rotulo))
+            return '';
+
+        return self::rotulos()[$this->campo_rotulo];
+    }
+
+    public function getInputHTML($old, $errors = false)
+    {        
+        return !$this->add_campo ? '' : self::inputs($old, $this->campo_required, $errors)[$this->campo_rotulo];
+    }
+
+    public function getInputHTMLInterno($old, $errors = false)
+    {
+        return !$this->add_campo ? '' : self::inputs($old, false, $errors)[$this->campo_rotulo];
+    }
+
+    public function getFormatCampoAdicional($valor)
+    {
+        return $this->nomeRotulo() . ': ' . $valor;
     }
 }
