@@ -2,10 +2,6 @@
 
 @section('content')
 
-@php
-use \App\Http\Controllers\Helper;
-use \App\Http\Controllers\CursoInscritoController;
-@endphp
 
 <section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
@@ -37,6 +33,11 @@ use \App\Http\Controllers\CursoInscritoController;
     </div>
   </div>
   <div class="container">
+    
+  @if(Session::has('message'))
+    <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
+  @endif
+
     <div class="row mb-3">
       @if($cursos->isNotEmpty())
         @foreach($cursos as $curso)

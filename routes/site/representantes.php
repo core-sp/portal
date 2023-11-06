@@ -52,4 +52,7 @@ Route::prefix('representante')->group(function(){
     ->where('acao', 'agendar')->name('representante.agendar.inserir.post');
     Route::put('/agendamento-sala/{acao}/{id}', 'RepresentanteSiteController@salvarAgendamentoSala')
     ->where('acao', 'editar|cancelar|justificar')->name('representante.agendar.inserir.put');
+
+    // Atalho para cursos
+    Route::get('/cursos', 'RepresentanteSiteController@cursos')->name('representante.cursos');
 });

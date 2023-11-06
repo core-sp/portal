@@ -3,161 +3,79 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
-use App\Curso;
-use App\CursoInscrito;
-use App\Http\Controllers\Helper;
-use App\Http\Controllers\CrudController;
-use App\Events\CrudEvent;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\CursoInscritoMailGuest;
-use App\Rules\Cpf;
-use Illuminate\Support\Facades\Input;
-use App\Events\ExternoEvent;
-use Response;
-use Auth;
-use Illuminate\Support\Facades\Request as IlluminateRequest;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Validator;
+use App\Repositories\GerentiRepositoryInterface;
+use App\Contracts\MediadorServiceInterface;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Http\Requests\CursoInscricaoRequest;
 
 class CursoInscritoController extends Controller
 {
-    // Noma da classe pai (em relação à controle)
-    private $class = 'CursoInscritoController';
-    // Variáveis
-    public $variaveis = [
-        'singular' => 'inscrito',
-        'singulariza' => 'o inscrito',
-        'plural' => 'inscritos',
-        'pluraliza' => 'inscritos',
-        'busca' => 'cursos/inscritos'
-    ];
+    private $gerentiRepository;
+    private $service;
     
-    public function __construct()
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, MediadorServiceInterface $service)
     {
         $this->middleware('auth', ['except' => ['inscricao', 'inscricaoView']]);
+        $this->gerentiRepository = $gerentiRepository;
+        $this->service = $service;
     }
 
-    public static function tabelaCompleta($resultados, $idcurso = null)
+    public function index($idcurso)
     {
-        // Opções de cabeçalho da tabela
-        $headers = [
-            'CPF',
-            'Nome',
-            'Telefone',
-            'Email',
-            'Ações'
-        ];
-        // Opções de conteúdo da tabela
-        $contents = [];
-        $now = date('Y-m-d H:i:s');
-        $curso = Curso::select('datatermino')->findOrFail($idcurso);
-        foreach($resultados as $resultado) {
-            $acoes = '';
-            if($curso->datatermino >= $now) {
-                if(auth()->user()->can('delete', auth()->user())) {
-                    $acoes .= '<form method="POST" action="/admin/cursos/cancelar-inscricao/'.$resultado->idcursoinscrito.'" class="d-inline">';
-                    $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-                    $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                    $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar Inscrição" onclick="return confirm(\'Tem certeza que deseja cancelar a inscrição?\')" />';
-                    $acoes .= '</form>';
-                }
-            } else {
-                if($resultado->presenca === null) {
-                    $acoes .= '<form method="POST" action="/admin/cursos/inscritos/confirmar-presenca/'.$resultado->idcursoinscrito.'" class="d-inline">';
-                    $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-                    $acoes .= '<input type="hidden" name="_method" value="put" />';
-                    $acoes .= '<input type="submit" class="btn btn-sm btn-success" value="Confirmar presença" />';
-                    $acoes .= '</form> ';
-                    $acoes .= '<form method="POST" action="/admin/cursos/inscritos/confirmar-falta/'.$resultado->idcursoinscrito.'" class="d-inline">';
-                    $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-                    $acoes .= '<input type="hidden" name="_method" value="put" />';
-                    $acoes .= '<input type="submit" class="btn btn-sm btn-warning" value="Dar falta" />';
-                    $acoes .= '</form>';
-                } elseif ($resultado->presenca === 'Sim') {
-                    $acoes .= "<p class='d-inline text-success'><strong><i class='fas fa-check checkIcone'></i> Compareceu&nbsp;</strong></p>";
-                } else {
-                    $acoes .= "<p class='d-inline text-danger'><strong><i class='fas fa-ban checkIcone'></i> Não Compareceu&nbsp;</strong></p>";
-                }
-            }
-            if(auth()->user()->can('updateOther', auth()->user()))
-                $acoes .= ' <a href="/admin/cursos/inscritos/editar/'.$resultado->idcursoinscrito.'" class="btn btn-sm btn-default">Editar</a> ';
-            else
-                $acoes .= '';
-            if(empty($acoes))
-                $acoes = '<i class="fas fa-lock text-muted"></i>';
-            $conteudo = [
-                $resultado->cpf,
-                $resultado->nome,
-                $resultado->telefone,
-                $resultado->email,
-                $acoes
-            ];
-            array_push($contents, $conteudo);
+        $this->authorize('viewAny', auth()->user());
+
+        try{
+            $curso = $this->service->getService('Curso')->show($idcurso);
+            $dados = $this->service->getService('Curso')->inscritos()->listar($curso, auth()->user());
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Curso não encontrado.");
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar as inscrições do curso com ID ".$idcurso.".");
         }
-        // Classes da tabela
-        $classes = [
-            'table',
-            'table-hover'
-        ];
-        // Monta e retorna tabela        
-        $tabela = CrudController::montaTabela($headers, $contents, $classes);
-        return $tabela;
+
+        return view('admin.crud.home', $dados);
     }
 
     public function create($idcurso)
     {
         $this->authorize('create', auth()->user());
-        $now = date('Y-m-d H:i:s');
-        $curso = Curso::findOrFail($idcurso);
-        if(!$curso)
-            abort(500);
-        if($curso->datatermino <= $now)
-            abort(401);
-        $variaveis = [
-            'form' => 'cursoinscrito',
-            'singulariza' => 'o inscrito',
-            'titulo_criar' => 'Adicionar inscrito em '.$curso->tipo.': '.$curso->tema,
-        ];
-        $variaveis = (object) $variaveis;
-        return view('admin.crud.criar', compact('curso', 'variaveis'));
+        
+        try{
+            $curso = $this->service->getService('Curso')->show($idcurso);
+            $dados = $this->service->getService('Curso')->inscritos()->view($curso);
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Curso não encontrado.");
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [403]) ? abort($e->getCode(), $e->getMessage()) : 
+            abort(500, "Erro ao carregar a página para adicionar um inscrito no curso com ID ".$idcurso.".");
+        }
+
+        return view('admin.crud.criar', $dados);
     }
 
-    public function store(Request $request)
+    // inscrição via área admin
+    public function store(CursoInscricaoRequest $request, $idcurso)
     {
         $this->authorize('create', auth()->user());
-        $regras = [
-            'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$request->input('idcurso').',deleted_at,NULL', new Cpf],
-            'nome' => 'required|max:191',
-            'telefone' => 'required|max:191|min:14',
-            'email' => 'required|email|max:191',
-            'registrocore' => 'max:191'
-        ];
-        $mensagens = [
-            'cpf.unique' => 'Este CPF já está cadastrado para o curso',
-            'required' => 'O :attribute é obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido',
-            'telefone.min' => 'Telefone inválido',
-            'email' => 'Digite um email válido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
+        
+        try{
+            $validated = $request->validated();
+            $curso = $this->service->getService('Curso')->show($idcurso);
+            $dados = $this->service->getService('Curso')->inscritos()->save($validated, auth()->user(), $curso);
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Curso não encontrado.");
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [403]) ? abort($e->getCode(), $e->getMessage()) : 
+            abort(500, "Erro ao adicionar um inscrito no curso com ID ".$idcurso.".");
+        }
 
-        $nomeUser = mb_convert_case(mb_strtolower(request('nome')), MB_CASE_TITLE);
-
-        $save = CursoInscrito::create([
-            'cpf' => request('cpf'),
-            'nome' => $nomeUser,
-            'telefone' => request('telefone'),
-            'email' => request('email'),
-            'registrocore' => request('registrocore'),
-            'idcurso' => request('idcurso'),
-            'idusuario' => request('idusuario')
-        ]);
-
-        if(!$save)
-            abort(500);
-        event(new CrudEvent('inscrito em curso', 'adicionou', request('idcurso')));
-        return Redirect::route('inscritos.index', array('id' => request('idcurso')))
+        return redirect()->route('inscritos.index', $idcurso)
             ->with('message', '<i class="icon fa fa-check"></i>Participante inscrito com sucesso!')
             ->with('class', 'alert-success');
     }
@@ -165,215 +83,133 @@ class CursoInscritoController extends Controller
     public function edit($id)
     {
         $this->authorize('updateOther', auth()->user());
-        $resultado = CursoInscrito::findOrFail($id);
-        $variaveis = [
-            'form' => 'cursoinscrito',
-            'singular' => 'inscrito',
-            'singulariza' => 'o inscrito'
-        ];
-        $variaveis = (object) $variaveis;
-        return view('admin.crud.editar', compact('resultado', 'variaveis'));
+        
+        try{
+            $dados = $this->service->getService('Curso')->inscritos()->view(null, $id);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar a página para editar um inscrito com ID ".$id.".");
+        }
+
+        return view('admin.crud.editar', $dados);
     }
 
-    public function update(Request $request, $id)
+    // atualizar inscrição via área admin
+    public function update(CursoInscricaoRequest $request, $id)
     {
         $this->authorize('updateOther', auth()->user());
-        $idcurso = $request->input('idcurso');
-        $regras = [
-            'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,'.$id.',idcursoinscrito,idcurso,'.$idcurso.',deleted_at,NULL', new Cpf],
-            'nome' => 'required|max:191',
-            'telefone' => 'required|max:191',
-            'email' => 'required|email|max:191|min:14',
-            'registrocore' => 'max:191'
-        ];
-        $mensagens = [
-            'cpf.unique' => 'Este CPF já está cadastrado para o curso',
-            'required' => 'O :attribute é obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido',
-            'telefone.min' => 'Telefone inválido',
-            'email' => 'Digite um email válido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
-        $nomeUser = mb_convert_case(mb_strtolower(request('nome')), MB_CASE_TITLE);
-
-        $inscrito = CursoInscrito::findOrFail($id);
-        $inscrito->cpf = $request->input('cpf');
-        $inscrito->nome = $nomeUser;
-        $inscrito->telefone = $request->input('telefone');
-        $inscrito->email = $request->input('email');
-        $inscrito->registrocore = $request->input('registrocore');
-        $inscrito->idusuario = $request->input('idusuario');
-        $inscrito->idcurso = $idcurso;
-        $update = $inscrito->update();
-        if(!$update)
-            abort(500);
-        event(new CrudEvent('inscrito em curso', 'editou', $inscrito->idcurso));
-        return Redirect::route('inscritos.index', array('id' => $idcurso))
-            ->with('message', '<i class="icon fa fa-check"></i>Participante editado com sucesso!')
-            ->with('class', 'alert-success');
-    }
-
-    public static function permiteInscricao($idcurso)
-    {
-        $contaInscritos = CursoInscrito::where('idcurso', $idcurso)->count();
-        $curso = Curso::select('nrvagas')->findOrFail($idcurso);
-        if(isset($curso)) {
-            if ($contaInscritos < $curso->nrvagas) 
-                return true;
-            else
-                return false;
+        
+        try{
+            $validated = $request->validated();
+            $dados = $this->service->getService('Curso')->inscritos()->save($validated, auth()->user(), null, $id);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao editar um inscrito com ID ".$id.".");
         }
+
+        return redirect()->route('inscritos.index', $dados['idcurso'])
+            ->with('message', '<i class="icon fa fa-check"></i>Participante com ID '.$id.' foi editado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function inscricaoView($idcurso)
     {
-        if ($this->permiteInscricao($idcurso)) {
-            $curso = Curso::findOrFail($idcurso);
-            if ($curso) 
-                return view('site.curso-inscricao', compact('curso'));
-            else
-                abort(500);
-        } else {
-            abort(500);
+        try{
+            $curso = $this->service->getService('Curso')->show($idcurso, true);
+            $rep = auth()->guard('representante')->check();
+            $dados = array();
+
+            if($rep)
+                $dados = $this->service->getService('Representante')->getDadosInscricaoCurso(auth()->guard('representante')->user(), $this->gerentiRepository);
+            $situacao = isset($dados['situacao']) ? $dados['situacao'] : '';
+
+            $verifica = $this->service->getService('Curso')->inscritos()->liberarInscricao($curso, auth()->guard('representante')->user(), $situacao);
+            if(!empty($verifica))
+                return redirect()->route($verifica['rota'])->with($verifica);
+
+            $dados['curso'] = $curso;
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Curso não encontrado.");
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar página de inscrição no curso com ID ".$idcurso.".");
         }
+
+        return view('site.curso-inscricao', $dados);
     }
 
-    public function inscricao(Request $request)
+    // inscrição via área aberta
+    public function inscricao(CursoInscricaoRequest $request, $idcurso)
     {
-        $idcurso = $request->input('idcurso');
-        $unique = in_array($idcurso, ['43', '44', '45']) ? null : 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL';
-        $regras = [
-            'cpf' => ['required', 'max:191', new Cpf, $unique/*'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL'*/],
-            'nome' => 'required|max:191|regex:/^[a-zA-Z ÁáÉéÍíÓóÚúÃãÕõÂâÊêÔô]+$/',
-            'telefone' => 'required|max:191|min:14',
-            'email' => 'email|max:191',
-            'registrocore' => in_array($idcurso, ['64']) ? 'required|min:4|max:30' : 'max:191',
-            'termo' => 'sometimes|required|accepted'
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'email' => 'Email inválido',
-            'nome.regex' => 'Nome inválido',
-            'cpf.unique' => 'O CPF informado já está cadastrado neste curso',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido',
-            'min' => 'O :attribute deve ter :min ou mais caracteres',
-            'telefone.min' => 'Telefone inválido',
-            'accepted' => 'Você deve concordar com o Termo de Consentimento',
-        ];
-        $validation = Validator::make($request->all(), $regras, $mensagens);
-        if($validation->fails()) {
-            return Redirect::back()->withErrors($validation)->withInput($request->all());
+        try{
+            $validated = $request->validated();
+            $curso = $this->service->getService('Curso')->show($idcurso, true);
+
+            $situacao = isset($validated['situacao']) ? $validated['situacao'] : '';
+            unset($validated['situacao']);
+
+            $verifica = $this->service->getService('Curso')->inscritos()->liberarInscricao($curso, auth()->guard('representante')->user(), $situacao);
+            if(!empty($verifica))
+                return redirect()->route($verifica['rota'])->with($verifica);
+
+            $dados = $this->service->getService('Curso')->inscritos()->inscricaoExterna($curso, $validated);
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Curso não encontrado.");
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao salvar inscrição no curso com ID ".$idcurso.".");
         }
-        if(!$this->permiteInscricao($idcurso))
-            abort(500, 'As inscrições para este curso estão esgotadas!');
-        $emailUser = $request->input('email');
-        $nomeUser = mb_convert_case(mb_strtolower(request('nome')), MB_CASE_TITLE);
-        // Inputa dados no Banco de Dados
-        $inscrito = new CursoInscrito();
-        $inscrito->cpf = $request->input('cpf');
-        $inscrito->nome = $nomeUser;
-        $inscrito->telefone = $request->input('telefone');
-        $inscrito->email = $emailUser;
-        $inscrito->registrocore = $request->input('registrocore');
-        $inscrito->idcurso = $idcurso;
-        $save = $inscrito->save();
-        if(!$save)
-            abort(500);
-
-        $termo = $inscrito->termos()->create([
-            'ip' => request()->ip()
-        ]);
-
-        // Gera evento de inscrição no Curso
-        $string = $inscrito->nome." (CPF: ".$inscrito->cpf.")";
-        $string .= " *inscreveu-se* no curso *".$inscrito->curso->tipo." - ".$inscrito->curso->tema;
-        $string .= "*, turma *".$inscrito->curso->idcurso."*";
-        $string .= " e " . $termo->message();
-
-        event(new ExternoEvent($string));
-        // Gera mensagem de agradecimento
-        $agradece = "Sua inscrição em <strong>".$inscrito->curso->tipo;
-        $agradece .= " - ".$inscrito->curso->tema."</strong>";
-        $agradece .= " (turma ".$inscrito->curso->idcurso.") foi efetuada com sucesso.";
-        $agradece .= "<br><br>";
-        $agradece .= "<strong>Detalhes da inscrição</strong><br>";
-        $agradece .= "Nome: ".$inscrito->nome."<br>";
-        $agradece .= "CPF: ".$inscrito->cpf."<br>";
-        $agradece .= "Telefone: ".$inscrito->telefone;
-        $agradece .= "<br><br>";
-        $agradece .= "<strong>Detalhes do curso</strong><br>";
-        $agradece .= "Nome: ".$inscrito->curso->tipo." - ".$inscrito->curso->tema."<br>";
-        $agradece .= "Nº da turma: ".$inscrito->curso->idcurso."<br>";
-        $agradece .= "Endereço: ".$inscrito->curso->endereco."<br>";
-        $agradece .= "Data de Início: ".Helper::onlyDate($inscrito->curso->datarealizacao)."<br>";
-        $agradece .= "Horário: ".Helper::onlyHour($inscrito->curso->datarealizacao)."h<br>";
-        $adendo = '<i>* As informações foram enviadas ao email cadastrado no formulário</i>';
-        Mail::to($emailUser)->queue(new CursoInscritoMailGuest($agradece));
-
-        // Retorna view de agradecimento
-        return view('site.agradecimento')->with([
-            'agradece' => $agradece,
-            'adendo' => $adendo
-        ]);
-    }
-
-    public static function btnSituacao($idcurso)
-    {
-        $now = date('Y-m-d H:i:s');
-        $curso = Curso::select('datatermino')->findOrFail($idcurso);
-        if($curso->datatermino <= $now) {
-            echo "<div class='sit-btn sit-vermelho'>Já realizado</div>";
-        } else {
-            if(CursoInscritoController::permiteInscricao($idcurso)) {
-                echo "<div class='sit-btn sit-verde'>Vagas Abertas</div>";
-            } else {
-                echo "<div class='sit-btn sit-vermelho'>Vagas esgotadas</div>";
-            }
-        }
+        
+        return view('site.agradecimento')->with($dados);
     }
 
     public function destroy($id)
     {
         $this->authorize('delete', auth()->user());
-        $curso = CursoInscrito::findOrFail($id);
-        $now = date('Y-m-d H:i:s');
-        if($curso->datatermino >= $now)
-            abort(401);
-        $delete = $curso->delete();
-        if(!$delete)
-            abort(500);
-        event(new CrudEvent('inscrito em curso', 'cancelou inscrição', $curso->idcurso));
-        return Redirect::route('inscritos.index', array('id' => $curso->idcurso))
-            ->with('message', '<i class="icon fa fa-ban"></i>Inscrição cancelada com sucesso!')
-            ->with('class', 'alert-danger');;
+        
+        try{
+            $dados = $this->service->getService('Curso')->inscritos()->destroy($id);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [403]) ? abort($e->getCode(), $e->getMessage()) : 
+            abort(500, "Erro ao cancelar a inscrição com ID ".$id.".");
+        }
+
+        return redirect()->route('inscritos.index', $dados['idcurso'])
+            ->with('message', '<i class="icon fa fa-check"></i>Inscrição com ID '.$id.' foi cancelada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
-    public function busca($id)
+    public function busca(Request $request, $id)
     {
         $this->authorize('viewAny', auth()->user());
-        $busca = IlluminateRequest::input('q');
-        $curso = Curso::findOrFail($id);
-        $now = date('Y-m-d H:i:s');
-        $resultados = CursoInscrito::where('idcurso',$id)
-            ->where(function($query) use($busca){
-                $query->where('cpf','LIKE','%'.$busca.'%')
-                ->orWhere('nome','LIKE','%'.$busca.'%')
-                ->orWhere('email','LIKE','%'.$busca.'%');
-            })->paginate(10);
-        $this->variaveis['continuacao_titulo'] = 'em '.$curso->tipo.': '.$curso->tema;
-        if($curso->datatermino >= $now) 
-            $this->variaveis['btn_criar'] = '<a href="/admin/cursos/adicionar-inscrito/'.$curso->idcurso.'" class="btn btn-primary mr-1">Adicionar inscrito</a> ';
-        $this->variaveis['btn_lixeira'] = '<a href="/admin/cursos" class="btn btn-default">Lista de Cursos</a>';
-        $this->variaveis['busca'] = 'cursos/inscritos/'.$id;
-        $this->variaveis['slug'] = 'cursos/inscritos/'.$id;
-        $variaveis = (object) $this->variaveis;
-        $tabela = $this->tabelaCompleta($resultados, $id);
-        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
+        
+        try{
+            $busca = $request->q;
+            $curso = $this->service->getService('Curso')->show($id);
+            $dados = $this->service->getService('Curso')->inscritos()->buscar($curso, $busca, auth()->user());
+            $dados['busca'] = $busca;
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao buscar o texto em inscritos no curso com ID ".$id.".");
+        }
+
+        return view('admin.crud.home', $dados);
     }
 
     public function download($id)
     {
         $this->authorize('viewAny', auth()->user());
+        
+        try{
+            $callback = $this->service->getService('Curso')->downloadInscricoes($id);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao realizar download dos inscritos no curso com ID ".$id.".");
+        }
+
         $headers = [
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Content-type' => 'text/csv',
@@ -381,51 +217,24 @@ class CursoInscritoController extends Controller
             'Expires' => '0',
             'Pragma' => 'public',
         ];
-        $resultado = CursoInscrito::select('email','cpf','nome','telefone','registrocore','created_at')
-            ->where('idcurso', $id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-        $lista = $resultado->toArray();
-        array_unshift($lista, array_keys($lista[0]));
-        $callback = function() use($lista) {
-            $fh = fopen('php://output','w');
-            fprintf($fh, chr(0xEF).chr(0xBB).chr(0xBF));
-            foreach($lista as $linha) {
-                fputcsv($fh,$linha,';');
-            }
-            fclose($fh);
-        };
-        return Response::stream($callback, 200, $headers);
+
+        return response()->stream($callback, 200, $headers);
     }
 
-    public function confirmarPresenca(Request $request, $id)
+    public function updatePresenca(CursoInscricaoRequest $request, $id)
     {
         $this->authorize('updateOther', auth()->user());
-        $idusuario = Auth::user()->idusuario;
-        $inscrito = CursoInscrito::findOrFail($id);
-        $inscrito->presenca = 'Sim';
-        $update = $inscrito->update();
-        if(!$update)
-            abort(500);
-            event(new CrudEvent('no curso', 'confirmou presença do participante '.$id, $inscrito->idcurso));
-        return Redirect::back()
-            ->with('message', '<i class="icon fa fa-check"></i>Presença confirmada!')
+        
+        try{
+            $validated = $request->validated();
+            $this->service->getService('Curso')->inscritos()->updatePresenca($id, $validated);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao atualizar a presença da inscrição com ID ".$id.".");
+        }
+
+        return redirect()->back()
+            ->with('message', '<i class="icon fa fa-check"></i>Inscrição com ID '.$id.' teve a presença atualizada com sucesso!')
             ->with('class', 'alert-success');
     }
-
-    public function confirmarFalta(Request $request, $id)
-    {
-        $this->authorize('updateOther', auth()->user());
-        $idusuario = Auth::user()->idusuario;
-        $inscrito = CursoInscrito::findOrFail($id);
-        $inscrito->presenca = 'Não';
-        $update = $inscrito->update();
-        if(!$update)
-            abort(500);
-        event(new CrudEvent('no curso', 'confirmou falta do participante '.$id, $inscrito->idcurso));
-        return Redirect::back()
-            ->with('message', '<i class="icon fa fa-ban"></i>Falta confirmada!')
-            ->with('class', 'alert-warning');
-    }
-
 }
