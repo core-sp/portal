@@ -1794,13 +1794,13 @@ class PreRegistroTest extends TestCase
     }
 
     /** @test */
-    public function cannot_submit_pre_registro_with_telefone_more_than_15_chars_and_value_wrong()
+    public function cannot_submit_pre_registro_with_telefone_more_than_17_chars_and_value_wrong()
     {
         // PF
         $externo = $this->signInAsUserExterno();
 
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-        $dados['telefone'] = '(11) 123456-7456';
+        $dados['telefone'] = '(112) 123456-745656';
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
@@ -1811,7 +1811,7 @@ class PreRegistroTest extends TestCase
         $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-        $dados['telefone'] = '(11) 123456-7456';
+        $dados['telefone'] = '(112) 123456-745656';
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
@@ -3716,7 +3716,7 @@ class PreRegistroTest extends TestCase
     }
 
     /** @test */
-    public function cannot_submit_pre_registro_with_telefone_more_than_15_chars_and_value_wrong_by_contabilidade()
+    public function cannot_submit_pre_registro_with_telefone_more_than_17_chars_and_value_wrong_by_contabilidade()
     {
         $externo = $this->signInAsUserExterno('contabil');
 
@@ -3726,7 +3726,7 @@ class PreRegistroTest extends TestCase
 
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         PreRegistro::find(2)->update(['contabil_id' => null]);
-        $dados['telefone'] = '(11) 123456-7456';
+        $dados['telefone'] = '(112) 123456-745656';
         
         $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('telefone');
@@ -3736,7 +3736,7 @@ class PreRegistroTest extends TestCase
         $this->post(route('externo.contabil.inserir.preregistro'), $dados);
 
         $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
-        $dados['telefone'] = '(11) 123456-7456';
+        $dados['telefone'] = '(112) 123456-745656';
         
         $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
         ->assertSessionHasErrors('telefone');

@@ -61,6 +61,34 @@ $(document).ready(function(){
 	$('.cpfOuCnpj').index() > -1 && $('.cpfOuCnpj').val().length > 11 ? 
 	$('.cpfOuCnpj').mask('00.000.000/0000-00', options) : 
 	$('.cpfOuCnpj').mask('000.000.000-00#', options);
+
+	// copiado
+	$('.placaVeiculo').mask('AAA 0U00', {
+		translation: {
+			'A': {
+				pattern: /[A-Za-z]/
+			},
+			'U': {
+				pattern: /[A-Za-z0-9]/
+			},
+		},
+		onKeyPress: function (value, e, field, options) {
+			// Convert to uppercase
+			e.currentTarget.value = value.toUpperCase();
+	
+			// Get only valid characters
+			let val = value.replace(/[^\w]/g, '');
+	
+			// Detect plate format
+			let isNumeric = !isNaN(parseFloat(val[4])) && isFinite(val[4]);
+			let mask = 'AAA 0U00';
+			if(val.length > 4 && isNumeric) {
+				mask = 'AAA-0000';
+			}
+			$(field).mask(mask, options);
+		}
+	});
+
 	// Menu responsivo
 	var first = document.getElementById('menu-principal');
 	var second = document.getElementById('sidebarContent');
@@ -1157,6 +1185,29 @@ $("#logout-externo").click(function(){
 	$(form).submit();
 });
 
+$('#btnPrintSimulador').click(function(){
+	var myWindow = window.open();
+	var data = $('#dataInicio').val();
+	data = data.slice(8,10) + '/' + data.slice(5,7) + '/' + data.slice(0,4);
+	data = '<b>Data início das atividades:</b> ' + data + '</br>';
+	var selectTipoPessoa = $('select[name="tipoPessoa"] option:selected').text();
+	var tipoPessoa = '<b>Tipo Pessoa:</b> ' + selectTipoPessoa + '</br>';
+	var capital = '<b>Capital social:</b> ' + $('#capitalSocial').val() + '</br>';
+	var filial = $('#filialCheck:checked').length > 0 ? 'Com filial | ' + $('select[name="filial"] option:selected').text() + '</br>' : null;
+	var empresa = $('#empresaIndividual:checked').length > 0 ? 'Empresa individual</br>' : null;
+	var titulo = '<h4>RESULTADO DO SIMULADOR DE VALORES</h4><hr>';
+	var final = titulo + tipoPessoa + data;
+	if(selectTipoPessoa == 'Jurídica'){
+		final = final + capital;
+		if(filial != null)
+			final = final + filial;
+		if(empresa != null)
+			final = final + empresa;
+	}
+	myWindow.document.write(final + $('#simuladorTxt').html());
+	myWindow.print();
+});
+
 // Logout Externo
 $('[name="tipo_conta"]').change(function(){
 	var valor = $(this).val();
@@ -1794,26 +1845,3 @@ $('#btnVerificaPend').click(function(){
 
 //	--------------------------------------------------------------------------------------------------------
 // FIM da Funcionalidade Solicitação de Registro (Pré-registro)
-
-$('#btnPrintSimulador').click(function(){
-	var myWindow = window.open();
-	var data = $('#dataInicio').val();
-	data = data.slice(8,10) + '/' + data.slice(5,7) + '/' + data.slice(0,4);
-	data = '<b>Data início das atividades:</b> ' + data + '</br>';
-	var selectTipoPessoa = $('select[name="tipoPessoa"] option:selected').text();
-	var tipoPessoa = '<b>Tipo Pessoa:</b> ' + selectTipoPessoa + '</br>';
-	var capital = '<b>Capital social:</b> ' + $('#capitalSocial').val() + '</br>';
-	var filial = $('#filialCheck:checked').length > 0 ? 'Com filial | ' + $('select[name="filial"] option:selected').text() + '</br>' : null;
-	var empresa = $('#empresaIndividual:checked').length > 0 ? 'Empresa individual</br>' : null;
-	var titulo = '<h4>RESULTADO DO SIMULADOR DE VALORES</h4><hr>';
-	var final = titulo + tipoPessoa + data;
-	if(selectTipoPessoa == 'Jurídica'){
-		final = final + capital;
-		if(filial != null)
-			final = final + filial;
-		if(empresa != null)
-			final = final + empresa;
-	}
-	myWindow.document.write(final + $('#simuladorTxt').html());
-	myWindow.print();
-});

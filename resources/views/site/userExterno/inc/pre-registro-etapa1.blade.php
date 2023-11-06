@@ -23,7 +23,7 @@
         <small class="text-muted text-left ml-2">
             <em>
                 {{ auth()->guard('contabil')->check() ? 
-                    'Somente o representante pode alterar / remover o CNPJ da contabilidade' : 'Após inserir um CNPJ válido aguarde 24h para trocar' }}
+                    'Somente o representante pode alterar / remover o CNPJ da contabilidade' : 'Após inserir um CNPJ válido aguarde 24h caso queira trocar' }}
             </em>
         </small>
         <input

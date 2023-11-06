@@ -41,7 +41,7 @@
             <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'externo.editar.view') || 
               (Route::currentRouteName() === 'externo.editar.senha.view') ? 'mr-item-selected' : '' }}">
               <a href="{{ route('externo.editar.view') }}" onclick="showLoading()">
-                <h6 class="brancar"><i class="fas fa-edit"></i>&nbsp;&nbsp;Alterar dados</h6>
+                <h6 class="brancar"><i class="fas fa-edit"></i>&nbsp;&nbsp;Alterar dados do cadastro</h6>
               </a>
             </div>
 

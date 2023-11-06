@@ -48,6 +48,7 @@ class UserExternoRequest extends FormRequest
 
     public function rules()
     {
+        $valor = auth()->guard('contabil')->check() ? auth()->guard('contabil')->user()->cnpj : apenasNumeros($this->cpf_cnpj);
         $this->regrasPassword = class_basename(\Route::current()->controller) == 'UserExternoLoginController' ? '|max:191' : 
             '|confirmed|min:8|max:191|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u';
         
@@ -57,11 +58,12 @@ class UserExternoRequest extends FormRequest
                 'sometimes',
                 'required',
                 $this->tipo_conta == 'contabil' ? new Cnpj : new CpfCnpj,
+                'unique:representantes,cpf_cnpj,NULL,id,deleted_at,NULL',
                 isset($this->regrasUnique[0]) ? $this->regrasUnique[0] : null,
                 isset($this->regrasUnique[1]) ? $this->regrasUnique[1] : null,
             ],
             'nome' => 'sometimes|required|min:5|max:191|string',
-            'email' => 'sometimes|required|email:rfc,filter|max:191',
+            'email' => 'sometimes|required|email:rfc,filter|max:191|unique:contabeis,email,'.$valor.',cnpj',
             'password' => 'sometimes|required'.$this->regrasPassword,
             'password_confirmation' => 'sometimes|required|same:password|max:191',
             'password_atual' => 'sometimes|required',
@@ -84,6 +86,7 @@ class UserExternoRequest extends FormRequest
             'string' => 'Deve ser no formato texto',
             'password_confirmation.same' => 'As senhas precisam ser idênticas entre si.',
             'email' => 'Deve ser um email válido',
+            'email.unique' => 'E-mail já existe como Contabilidade',
             'sometimes' => 'Campo obrigatório',
             'cpf_cnpj.unique' => 'Esse CPF / CNPJ já está cadastrado',
             'g-recaptcha-response.recaptcha' => 'ReCAPTCHA inválido',

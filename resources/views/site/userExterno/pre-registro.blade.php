@@ -31,10 +31,15 @@
                             @if(in_array($preRegistro->status, [$preRegistro::STATUS_NEGADO, $preRegistro::STATUS_APROVADO]))
                                 <p data-clarity-mask="True"><strong>ID da solicitação:</strong> {{ $preRegistro->id }}</p>
                                 <p data-clarity-mask="True"><strong>Solicitado em:</strong> {{ onlyDate($preRegistro->created_at) }} <strong>e encerrado em:</strong> {{ onlyDate($preRegistro->updated_at) }}</p>
-                                <p data-clarity-mask="True">
-                                    <strong>Status:</strong> <span class="badge badge{{ $preRegistro->getLabelStatus($preRegistro->status) }}">{{ $preRegistro->status }}</span>
-                                    {{ $preRegistro->status == $preRegistro::STATUS_NEGADO ? '- ' . $preRegistro->getJustificativaNegado() : '' }}
-                                </p>
+                                <h5 data-clarity-mask="True">
+                                    <strong>Status:</strong> {!! $preRegistro->getLabelStatusUser() !!}
+                                </h5>
+                                @if($preRegistro->status == $preRegistro::STATUS_NEGADO)
+                                <h5 data-clarity-mask="True">
+                                    <span class="text-danger">Justificativa: </span>{{ $preRegistro->getJustificativaNegado() }}
+                                </h5>
+                                @endif
+
                                 @if($preRegistro->isAprovado())
                                     @if($preRegistro->temBoleto())
                                     <a 

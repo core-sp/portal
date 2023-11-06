@@ -339,14 +339,32 @@ class ContabilTest extends TestCase
         ]);
     }
 
+    /** @test **/
+    public function cannot_register_if_exists_cpfcnpj_in_representantes_table()
+    {
+        $pre = factory('App\Representante')->create([
+            'cpf_cnpj' => '09361260000167',
+        ]);
+        $dados = factory('App\Contabil')->states('cadastro')->raw([
+            'cpf_cnpj' => apenasNumeros($pre->cpf_cnpj),
+        ]);
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
+        $this->assertDatabaseMissing('users_externo', [
+            'nome' => $dados['nome']
+        ]);
+        $this->assertDatabaseHas('representantes', [
+            'cpf_cnpj' => apenasNumeros($pre->cpf_cnpj)
+        ]);
+    }
+
     /** @test */
-    public function cannot_register_if_exist_more_than_two_email_equals()
+    public function cannot_register_if_exist_email_contabeis_table()
     {
         $pre = factory('App\Contabil')->create();
-        $pre2 = factory('App\Contabil')->create([
-            'cnpj' => '49931920000112',
-            'email' => $pre->email
-        ]);
         $dados = factory('App\Contabil')->states('cadastro')->raw([
             'cpf_cnpj' => '09361260000167',
             'email' => $pre->email
@@ -354,10 +372,9 @@ class ContabilTest extends TestCase
         $this->get(route('externo.cadastro'))->assertOk();
 
         $this->post(route('externo.cadastro.submit'), $dados)
-        ->assertRedirect(route('externo.cadastro'));
-
-        $this->get(route('externo.cadastro'))
-        ->assertSeeText('Este email já alcançou o limite de cadastro, por favor insira outro.');
+        ->assertSessionHasErrors([
+            'email'
+        ]);
 
         $this->assertDatabaseMissing('contabeis', [
             'nome' => $dados['nome']
@@ -1396,33 +1413,6 @@ class ContabilTest extends TestCase
     }
 
     /** @test */
-    public function cannot_after_login_update_email_with_more_than_2_mails_equal()
-    {
-        factory('App\Contabil')->create([
-            'cnpj' => '89878398000177',
-            'email' => 'teste@email.com.br'
-        ]);
-        factory('App\Contabil')->create([
-            'cnpj' => '49931920000112',
-            'email' => 'teste@email.com.br'
-        ]);
-
-        $user_externo = $this->signInAsUserExterno('contabil');
-
-        $this->get(route('externo.editar.view'))->assertOk();
-        $this->put(route('externo.editar', [
-            'email' => 'teste@email.com.br'
-        ]));
-        $this->get(route('externo.editar.view'))
-        ->assertSee('Este email já alcançou o limite de cadastro, por favor insira outro.');
-
-        $this->assertDatabaseHas('contabeis', [
-            'cnpj' => $user_externo['cnpj'],
-            'email' => $user_externo['email']
-        ]);
-    }
-
-    /** @test */
     public function log_is_generated_when_update_data()
     {
         $user_externo = $this->signInAsUserExterno('contabil');
@@ -2442,13 +2432,13 @@ class ContabilTest extends TestCase
     }
 
     /** @test */
-    public function cannot_submit_pre_registro_if_has_cnpj_contabil_and_with_telefone_contabil_more_than_15_chars()
+    public function cannot_submit_pre_registro_if_has_cnpj_contabil_and_with_telefone_contabil_more_than_17_chars()
     {
         $externo = $this->signInAsUserExterno();
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
         
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-        $dados['telefone_contabil'] = '(11) 98889-86265';
+        $dados['telefone_contabil'] = '(11) 98889-8626577';
                 
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('telefone_contabil');
@@ -2948,6 +2938,29 @@ class ContabilTest extends TestCase
 
         $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make([
             'email' => $faker->text(500)
+        ])->toArray();
+
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('email');
+    }
+
+    /** @test */
+    public function cannot_to_create_pre_registro_by_contabilidade_with_email_in_contabeis_table()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make([
+            'email' => $externo->email
+        ])->toArray();
+
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('email');
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make([
+            'cpf_cnpj' => '11748345000144',
+            'email' => $externo->email
         ])->toArray();
 
         $this->post(route('externo.contabil.inserir.preregistro'), $dados)

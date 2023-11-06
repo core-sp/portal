@@ -22,7 +22,7 @@ class PreRegistroRequest extends FormRequest
         $contabilCriarPR = [
             'cpf_cnpj' => ['required', new CpfCnpj, 'unique:contabeis,cnpj'],
             'nome' => 'required|min:5|max:191',
-            'email' => 'required|email:rfc,filter|min:10|max:191',
+            'email' => 'required|email:rfc,filter|min:10|max:191|unique:contabeis,email',
         ];
 
         $rules = [
@@ -31,10 +31,10 @@ class PreRegistroRequest extends FormRequest
             'nome_contabil' => 'required_with:cnpj_contabil|nullable|min:5|max:191',
             'email_contabil' => 'required_with:cnpj_contabil|nullable|email:rfc,filter|min:10|max:191',
             'nome_contato_contabil' => 'required_with:cnpj_contabil|nullable|min:5|max:191|regex:/^\D*$/',
-            'telefone_contabil' => 'required_with:cnpj_contabil|nullable|min:14|max:15|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})$/',
+            'telefone_contabil' => 'required_with:cnpj_contabil|nullable|min:14|max:17|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})$/',
             'segmento' => 'nullable|in:'.implode(',', segmentos()),
             'idregional' => 'required|exists:regionais,idregional',
-            'cep' => 'required|size:9|regex:/([0-9]{5})\-([0-9]{3})/',
+            'cep' => 'required|size:9|regex:/([0-9]{5})\-([0-9]{3})$/',
             'bairro' => 'required|min:4|max:191',
             'logradouro' => 'required|min:4|max:191',
             'numero' => 'required|min:1|max:10',
@@ -42,11 +42,11 @@ class PreRegistroRequest extends FormRequest
             'cidade' => 'required|min:4|max:191|regex:/^\D*$/',
             'uf' => 'required|in:'.implode(',', array_keys(estados())),
             'tipo_telefone' => 'required|in:'.implode(',', tipos_contatos()),
-            'telefone' => 'required|min:14|max:15|regex:/(\([0-9]{2}\))\s([0-9]{5})\-([0-9]{3,4})/',
+            'telefone' => 'required|min:14|max:17|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})$/',
             'opcional_celular' => 'nullable|array|in:'.implode(',', opcoes_celular()),
             'opcional_celular.*' => 'distinct',
             'tipo_telefone_1' => 'required_with:telefone_1|nullable|in:'.implode(',', tipos_contatos()),
-            'telefone_1' => 'required_with:tipo_telefone_1|nullable|min:14|max:15|regex:/(\([0-9]{2}\))\s([0-9]{5})\-([0-9]{3,4})/',
+            'telefone_1' => 'required_with:tipo_telefone_1|nullable|min:14|max:17|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})$/',
             'opcional_celular_1' => 'nullable|array|in:'.implode(',', opcoes_celular()),
             'opcional_celular_1.*' => 'distinct',
             'pergunta' => 'required|min:2|max:191'
@@ -87,7 +87,7 @@ class PreRegistroRequest extends FormRequest
             'dt_inicio_atividade' => 'required|date_format:Y-m-d|before_or_equal:today',
             'nome_fantasia' => 'required|min:5|max:191',
             'checkEndEmpresa' => 'present',
-            'cep_empresa' => 'required_if:checkEndEmpresa,off|nullable|size:9|regex:/([0-9]{5})\-([0-9]{3})/',
+            'cep_empresa' => 'required_if:checkEndEmpresa,off|nullable|size:9|regex:/([0-9]{5})\-([0-9]{3})$/',
             'bairro_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191',
             'logradouro_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191',
             'numero_empresa' => 'required_if:checkEndEmpresa,off|nullable|max:10',
@@ -103,7 +103,7 @@ class PreRegistroRequest extends FormRequest
             'identidade_rt' => 'required|min:4|max:30',
             'orgao_emissor_rt' => 'required|min:3|max:191',
             'dt_expedicao_rt' => 'required|date_format:Y-m-d|before_or_equal:today',
-            'cep_rt' => 'required|size:9|regex:/([0-9]{5})\-([0-9]{3})/',
+            'cep_rt' => 'required|size:9|regex:/([0-9]{5})\-([0-9]{3})$/',
             'bairro_rt' => 'required|min:4|max:191',
             'logradouro_rt' => 'required|min:4|max:191',
             'numero_rt' => 'required|min:1|max:10',
@@ -255,6 +255,7 @@ class PreRegistroRequest extends FormRequest
             'array' => 'Formato inválido' . $attr,
             'cpf_cnpj.unique' => 'Não pode solicitar pré-registro com o CNPJ fornecido devido constar no Portal como Contabilidade',
             'cnpj_contabil.unique' => 'O CNPJ fornecido já consta no Portal com outro tipo de conta',
+            'email.unique' => 'E-mail já existe como Contabilidade',
         ];
     }
 

@@ -54,7 +54,7 @@ class UserExternoSiteController extends Controller
         }
         
         $success = [
-            'message' => '<i class="icon fa fa-check"></i>Email verificado com sucesso. Favor continuar com o login abaixo.',
+            'message' => 'Email verificado com sucesso. Favor continuar com o login abaixo.',
             'class' => 'alert-success'
         ];
 
@@ -97,7 +97,7 @@ class UserExternoSiteController extends Controller
 
         return isset($erro['message']) ? redirect()->route('externo.editar.view')->with($erro)->withInput() : 
             redirect()->route('externo.editar.view')->with([
-                'message' => '<i class="icon fa fa-check"></i>Dados alterados com sucesso.',
+                'message' => 'Dados alterados com sucesso.',
                 'class' => 'alert-success'
             ]);
     }
@@ -300,6 +300,13 @@ class UserExternoSiteController extends Controller
             $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
+
+            $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
+            
+            if(isset($dados['gerenti']))
+                return isset($preRegistro) ? 
+                redirect()->route('externo.preregistro.view', $preRegistro)->with(['resultado' => null, 'gerenti' => $dados['gerenti']]) : 
+                redirect()->route('externo.preregistro.view')->with(['resultado' => null, 'gerenti' => $dados['gerenti']]);
 
             $contabil = auth()->guard('contabil')->user();
 

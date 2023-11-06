@@ -232,6 +232,26 @@ class UserExternoTest extends TestCase
         ]);
     }
 
+    /** @test **/
+    public function cannot_register_if_exists_cpfcnpj_in_representantes_table()
+    {
+        $pre = factory('App\Representante')->create();
+        $dados = factory('App\UserExterno')->states('cadastro')->raw([
+            'cpf_cnpj' => apenasNumeros($pre->cpf_cnpj),
+        ]);
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
+        $this->assertDatabaseMissing('users_externo', [
+            'nome' => $dados['nome']
+        ]);
+        $this->assertDatabaseHas('representantes', [
+            'cpf_cnpj' => apenasNumeros($pre->cpf_cnpj)
+        ]);
+    }
+
     /** @test 
      * 
      * Não pode criar um registro se o cpf/cnpj já existirem no banco dos Usuário Externo.
@@ -356,6 +376,27 @@ class UserExternoTest extends TestCase
         ->assertSessionHasErrors([
             'cpf_cnpj'
         ]);
+        $this->assertDatabaseMissing('users_externo', [
+            'nome' => $dados['nome']
+        ]);
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_register_if_exist_email_contabeis_table()
+    {
+        $pre = factory('App\Contabil')->create();
+        $dados = factory('App\UserExterno')->states('cadastro')->raw([
+            'email' => $pre->email
+        ]);
+        $this->get(route('externo.cadastro'))->assertOk();
+
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertSessionHasErrors([
+            'email'
+        ]);
+
         $this->assertDatabaseMissing('users_externo', [
             'nome' => $dados['nome']
         ]);
