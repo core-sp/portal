@@ -68,4 +68,17 @@ class RepresentanteService implements RepresentanteServiceInterface {
         $cpfCnpj = apenasNumeros($cpfCnpj);
         return Representante::where('cpf_cnpj', $cpfCnpj)->where('ativo', 1)->first();
     }
+
+    public function getDadosInscricaoCurso($rep, GerentiRepositoryInterface $gerenti)
+    {
+        $situacao = trim($gerenti->gerentiStatus($rep->ass_id));
+        $tel = $rep->getContatosTipoTelefone($gerenti);
+        $rep->telefone = empty($tel) ? '' : $tel[array_keys($tel)[0]]['CXP_VALOR'];
+        $rep->registro_core = $gerenti->gerentiAtivo(apenasNumeros($rep->cpf_cnpj))[0]['REGISTRONUM'];
+
+        return [
+            'situacao' => $situacao,
+            'user_rep' => $rep,
+        ];
+    }
 }

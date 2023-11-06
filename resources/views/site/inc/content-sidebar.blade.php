@@ -54,7 +54,7 @@
           <img src="{{ asset('img/file.png') }}" class="inside-img" alt="Consulta de Ativos | Core-SP">
         </div>
         <div class="flex-one align-self-center pl-4">
-          <h5 class="text-uppercase normal branco">consulta de situação</h5>
+          <h5 class="text-uppercase normal branco">consulta pública</h5>
         </div>
       </div>
     </div>
