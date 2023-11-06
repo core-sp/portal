@@ -48,35 +48,62 @@ $(document).ready(function(){
 	$('.cpfOuCnpj').mask('00.000.000/0000-00', options) : 
 	$('.cpfOuCnpj').mask('000.000.000-00#', options);
   
+  // copiado
+	$('.placaVeiculo').mask('AAA 0U00', {
+		translation: {
+			'A': {
+				pattern: /[A-Za-z]/
+			},
+			'U': {
+				pattern: /[A-Za-z0-9]/
+			},
+		},
+		onKeyPress: function (value, e, field, options) {
+			// Convert to uppercase
+			e.currentTarget.value = value.toUpperCase();
+	
+			// Get only valid characters
+			let val = value.replace(/[^\w]/g, '');
+	
+			// Detect plate format
+			let isNumeric = !isNaN(parseFloat(val[4])) && isFinite(val[4]);
+			let mask = 'AAA 0U00';
+			if(val.length > 4 && isNumeric) {
+				mask = 'AAA-0000';
+			}
+			$(field).mask(mask, options);
+		}
+	});
+
   // Máscaras para datas
-  $('#dataTermino').mask('00/00/0000', {
-    onComplete: function() {
-      var dataInicioPura = $('#dataInicio').val().split('/');
-      var dataInicio = new Date(dataInicioPura[2], dataInicioPura[1] - 1, dataInicioPura[0]);
-      var dataTerminoPura = $('#dataTermino').val().split('/');
-      var dataTermino = new Date(dataTerminoPura[2], dataTerminoPura[1] - 1, dataTerminoPura[0]);
-      if(dataInicio) {
-        if(dataTermino < dataInicio) {
-          alert('A data de término do curso não pode ser menor que a data de início.');
-          $('#dataTermino').val('');
-        }
-      }
-    }
-  });
-  $('#dataInicio').mask('00/00/0000', {
-    onComplete: function() {
-      var dataInicioPura = $('#dataInicio').val().split('/');
-      var dataInicio = new Date(dataInicioPura[2], dataInicioPura[1] - 1, dataInicioPura[0]);
-      var dataTerminoPura = $('#dataTermino').val().split('/');
-      var dataTermino = new Date(dataTerminoPura[2], dataTerminoPura[1] - 1, dataTerminoPura[0]);
-      if(dataTermino) {
-        if(dataInicio > dataTermino) {
-          alert('A data de início do curso não pode ser maior que a data de término.');
-          $('#dataInicio').val('');
-        }
-      }
-    }
-  });
+  // $('#dataTermino').mask('00/00/0000', {
+  //   onComplete: function() {
+  //     var dataInicioPura = $('#dataInicio').val().split('/');
+  //     var dataInicio = new Date(dataInicioPura[2], dataInicioPura[1] - 1, dataInicioPura[0]);
+  //     var dataTerminoPura = $('#dataTermino').val().split('/');
+  //     var dataTermino = new Date(dataTerminoPura[2], dataTerminoPura[1] - 1, dataTerminoPura[0]);
+  //     if(dataInicio) {
+  //       if(dataTermino < dataInicio) {
+  //         alert('A data de término do curso não pode ser menor que a data de início.');
+  //         $('#dataTermino').val('');
+  //       }
+  //     }
+  //   }
+  // });
+  // $('#dataInicio').mask('00/00/0000', {
+  //   onComplete: function() {
+  //     var dataInicioPura = $('#dataInicio').val().split('/');
+  //     var dataInicio = new Date(dataInicioPura[2], dataInicioPura[1] - 1, dataInicioPura[0]);
+  //     var dataTerminoPura = $('#dataTermino').val().split('/');
+  //     var dataTermino = new Date(dataTerminoPura[2], dataTerminoPura[1] - 1, dataTerminoPura[0]);
+  //     if(dataTermino) {
+  //       if(dataInicio > dataTermino) {
+  //         alert('A data de início do curso não pode ser maior que a data de término.');
+  //         $('#dataInicio').val('');
+  //       }
+  //     }
+  //   }
+  // });
   $('#horaTermino').mask('00:00', {
     onComplete: function() {
       var horaInicio = $('#horaInicio').val();
@@ -593,6 +620,27 @@ $('#form_salaReuniao #horarios_reuniao, #form_salaReuniao #horarios_coworking').
 });
 
 // FIM da Funcionalidade Sala de Reunião ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Funcionalidade Curso +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function desabilitaHabilitaCampoAdd(valor){
+  var desabilita = valor == '0';
+  var obr = !desabilita;
+  if(desabilita)
+      $('select[name="campo_rotulo"] option[value=""]').prop('selected', true);
+  $('select[name="campo_rotulo"], select[name="campo_required"]').prop('disabled', desabilita).prop('required', obr);
+}
+
+$('select[name="add_campo"]').ready(function(){
+  if($('select[name="add_campo"]').length > 0)
+    desabilitaHabilitaCampoAdd($('select[name="add_campo"]').val());
+});
+
+$('select[name="add_campo"]').change(function(){
+  desabilitaHabilitaCampoAdd($(this).val());
+});
+
+// Fim Funcionalidade Curso +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 // Funcionalidade GerarTexto ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
