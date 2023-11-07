@@ -35,7 +35,6 @@ $factory->define(AgendamentoSala::class, function (Faker $faker) {
 
 $factory->state(AgendamentoSala::class, 'reuniao', function ($faker) {
     return [
-        'protocolo' => mb_strtoupper($faker->bothify('RC-AGE-##??##??'), 'UTF-8'),
         'participantes' => json_encode(['56983238010' => 'NOME PARTICIPANTE UM', '81921923008' => 'NOME PARTICIPANTE DOIS'], JSON_FORCE_OBJECT),
         'tipo_sala' => 'reuniao',
     ];
@@ -108,6 +107,30 @@ $factory->state(AgendamentoSala::class, 'presencial_request_coworking', function
         'dia' => $hj->format('Y-m-d'),
         'periodo_entrada' => '10:00',
         'periodo_saida' => '11:00',
+        'nome' => $rep['nome'],
+        'registro_core' => $rep['registro_core'],
+        'email' => $rep['email'],
+        'ass_id' => $rep['ass_id'],
+    ];
+});
+
+$factory->state(AgendamentoSala::class, 'presencial_request_reuniao', function ($faker) {
+    $hj = Carbon::today();
+    while($hj->isWeekend())
+        $hj->subDay();
+
+    $rep = factory('App\Representante')->raw();
+    $rep = ['cpf_cnpj' => $rep['cpf_cnpj'], 'nome' => $rep['nome'], 'registro_core' => $rep['registro_core'], 'email' => $rep['email'], 'ass_id' => $rep['ass_id']];
+
+    return [
+        'idrepresentante' => null,
+        'cpf_cnpj' => formataCpfCnpj($rep['cpf_cnpj']),
+        'tipo_sala' => 'reuniao',
+        'dia' => $hj->format('Y-m-d'),
+        'periodo_entrada' => '10:00',
+        'periodo_saida' => '11:00',
+        'participantes_cpf' => ['56983238010', '81921923008'],
+        'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
         'nome' => $rep['nome'],
         'registro_core' => $rep['registro_core'],
         'email' => $rep['email'],

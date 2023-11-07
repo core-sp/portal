@@ -87,6 +87,23 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_created_presencial()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw();
+
+        $this->get(route('sala.reuniao.agendados.create'))->assertOk();
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertRedirect(route('sala.reuniao.agendados.busca', ['q' => AgendamentoSala::find(1)->protocolo]));
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') criou com representante presencial *agendamento da sala de reunião / coworking* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
     public function cannot_create_presencial_without_sala()
     {
         $user = $this->signInAsAdmin();
@@ -292,6 +309,142 @@ class AgendamentoSalaTest extends TestCase
         $agenda['periodo_saida'] = $agenda['periodo_entrada'];
         $this->post(route('sala.reuniao.agendados.store'), $agenda)
         ->assertSessionHasErrors(['periodo_saida']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_tipo_sala_reuniao_disabled()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_reuniao')->raw([
+            'sala_reuniao_id' => factory('App\SalaReuniao')->states('desativa_reuniao')->create()
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['participantes_cpf']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_without_participantes_cpf_with_tipo_sala_reuniao()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_reuniao')->raw([
+            'participantes_cpf' => []
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['participantes_cpf']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_invalid_cpf_participantes_cpf_with_tipo_sala_reuniao()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_reuniao')->raw();
+        $agenda['participantes_cpf'][0] = '11111111111';
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['participantes_cpf.*']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_not_distinct_participantes_cpf_with_tipo_sala_reuniao()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_reuniao')->raw();
+        $agenda['participantes_cpf'][0] = $agenda['participantes_cpf'][1];
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['participantes_cpf.*']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_cpf_cnpj_in_participantes_cpf_with_tipo_sala_reuniao()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_reuniao')->raw();
+        $agenda['participantes_cpf'][0] = apenasNumeros($agenda['cpf_cnpj']);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['participantes_cpf.*']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_without_participantes_nome_with_tipo_sala_reuniao()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_reuniao')->raw([
+            'participantes_nome' => []
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['participantes_nome']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_participantes_nome_not_same_size_participantes_cpf_with_tipo_sala_reuniao()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_reuniao')->raw();
+        unset($agenda['participantes_cpf'][1]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['participantes_nome']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_not_distinct_participantes_nome_with_tipo_sala_reuniao()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_reuniao')->raw();
+        $agenda['participantes_nome'][0] = $agenda['participantes_nome'][1];
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['participantes_nome.*']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_invalid_format_participantes_nome_with_tipo_sala_reuniao()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_reuniao')->raw();
+        $agenda['participantes_nome'][0] = 'Nome com núm3ro';
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['participantes_nome.*']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_participantes_nome_less_than_5_chars_with_tipo_sala_reuniao()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_reuniao')->raw();
+        $agenda['participantes_nome'][0] = 'Test';
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['participantes_nome.*']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_participantes_nome_greater_than_191_chars_with_tipo_sala_reuniao()
+    {
+        $faker = \Faker\Factory::create();
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_reuniao')->raw();
+        $agenda['participantes_nome'][0] = $faker->sentence(300);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['participantes_nome.*']);
     }
 
     /** @test */
@@ -544,7 +697,7 @@ class AgendamentoSalaTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
-        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') atualizou status para '. AgendamentoSala::STATUS_COMPARECEU .' *agendamento da sala de reunião* (id: 1)';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') atualizou status para '. AgendamentoSala::STATUS_COMPARECEU .' *agendamento da sala de reunião / coworking* (id: 1)';
         $this->assertStringContainsString($txt, $log);
     }
 
@@ -638,7 +791,7 @@ class AgendamentoSalaTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
-        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') atualizou status para '. AgendamentoSala::STATUS_JUSTIFICADO .' *agendamento da sala de reunião* (id: 1)';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') atualizou status para '. AgendamentoSala::STATUS_JUSTIFICADO .' *agendamento da sala de reunião / coworking* (id: 1)';
         $this->assertStringContainsString($txt, $log);
     }
 
@@ -718,7 +871,7 @@ class AgendamentoSalaTest extends TestCase
 
         $log = explode(PHP_EOL, tailCustom(storage_path($this->pathLogInterno()), 2));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
-        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') atualizou status para '. AgendamentoSala::STATUS_NAO_COMPARECEU .' *agendamento da sala de reunião* (id: 1)';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') atualizou status para '. AgendamentoSala::STATUS_NAO_COMPARECEU .' *agendamento da sala de reunião / coworking* (id: 1)';
         $this->assertStringContainsString($txt, $log[0]);
     }
 

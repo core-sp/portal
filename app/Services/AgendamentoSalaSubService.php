@@ -259,7 +259,7 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             'status' => AgendamentoSala::STATUS_COMPARECEU,
         ]);
 
-        event(new CrudEvent('agendamento da sala de reunião', 'criou com representante presencial', $agendamento->id));
+        event(new CrudEvent('agendamento da sala de reunião / coworking', 'criou com representante presencial', $agendamento->id));
 
         return [
             'message' => '<i class="icon fa fa-check"></i> Agendamento com ID ' . $agendamento->id . ' com presença confirmada criado com sucesso!',
@@ -297,7 +297,7 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
                 'idusuario' => $user->idusuario
             ]);
 
-            event(new CrudEvent('agendamento da sala de reunião', 'atualizou status para '.$status, $id));
+            event(new CrudEvent('agendamento da sala de reunião / coworking', 'atualizou status para '.$status, $id));
 
             if(in_array($status, [AgendamentoSala::STATUS_NAO_COMPARECEU, AgendamentoSala::STATUS_JUSTIFICADO]))
                 Mail::to($agendado->representante->email)->queue(new AgendamentoSalaMail($agendado->fresh(), $status != AgendamentoSala::STATUS_NAO_COMPARECEU ? 'aceito' : 'recusa'));

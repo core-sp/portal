@@ -651,11 +651,21 @@ function verificarDadosCriarAgendaSala(nome_campo){
           $('#area_gerenti').show();
           $('#cpfResponsavel').val($('#criarAgendaSala input[name="cpf_cnpj"]').val());
           $('#nomeResponsavel').val(response['nomeGerenti']);
+          if(response.registroGerenti == null){
+            $('#modal-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
+            $('.modal-footer').hide();
+            $('#modal-criar_agenda .modal-body')
+            .html('<strong>Sem registro no Gerenti! Não pode criar o agendamento.</strong>');
+          }
           break;
         case "sala_reuniao_id":
           $(".participante:gt(0)").remove();
-          if(response.total_participantes < 0){
+          if(response.total_participantes <= 0){
             $('#area_participantes').hide();
+            $('#modal-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
+            $('.modal-footer').hide();
+            $('#modal-criar_agenda .modal-body')
+            .html('<strong>A regional não está com a Sala de Reunião habilitada!</strong>');
             return;
           }
           if(response.total_participantes > 0)
@@ -671,6 +681,7 @@ function verificarDadosCriarAgendaSala(nome_campo){
             return;
           }
           $('#modal-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
+          $('.modal-footer').show();
           $('#modal-criar_agenda .modal-body')
           .html(response.suspenso + '<br><br><strong>Confirmar esse agendamento?</strong>');
       }

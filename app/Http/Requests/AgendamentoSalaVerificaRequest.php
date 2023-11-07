@@ -158,6 +158,7 @@ class AgendamentoSalaVerificaRequest extends FormRequest
             'registro_core.required' => 'Registro Core não existe no Gerenti',
             'email.required' => 'E-mail não existe no Gerenti',
             'dia.required' => 'Dia não está preenchido ou o dia escolhido é fim de semana',
+            'participantes_cpf.*.not_in' => 'Não pode inserir o CPF do responsável novamente como participante',
         ];
     }
 }
