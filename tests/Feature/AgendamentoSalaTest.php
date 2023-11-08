@@ -321,7 +321,20 @@ class AgendamentoSalaTest extends TestCase
         ]);
 
         $this->post(route('sala.reuniao.agendados.store'), $agenda)
-        ->assertSessionHasErrors(['participantes_cpf']);
+        ->assertSessionHasErrors(['tipo_sala']);
+    }
+
+    /** @test */
+    public function cannot_create_presencial_with_tipo_sala_coworking_disabled()
+    {
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'sala_reuniao_id' => factory('App\SalaReuniao')->states('desativa_coworking')->create()
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['tipo_sala']);
     }
 
     /** @test */
@@ -472,12 +485,22 @@ class AgendamentoSalaTest extends TestCase
             "situacaoGerenti" => "",
         ]);
 
-        $this->post(route('sala.reuniao.agendados.verifica.criar'), ['sala_reuniao_id' => 1])
+        $this->post(route('sala.reuniao.agendados.verifica.criar'), ['sala_reuniao_id' => 1, 'tipo_sala' => 'reuniao'])
         ->assertJson([
             "total_participantes" => 2,
         ]);
 
-        $this->post(route('sala.reuniao.agendados.verifica.criar'), ['sala_reuniao_id' => 10])
+        $this->post(route('sala.reuniao.agendados.verifica.criar'), ['sala_reuniao_id' => 1, 'tipo_sala' => 'coworking'])
+        ->assertJson([
+            "total_participantes" => 2,
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.verifica.criar'), ['sala_reuniao_id' => 10, 'tipo_sala' => 'reuniao'])
+        ->assertJson([
+            "total_participantes" => 0,
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.verifica.criar'), ['sala_reuniao_id' => 10, 'tipo_sala' => 'coworking'])
         ->assertJson([
             "total_participantes" => 0,
         ]);

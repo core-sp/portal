@@ -46,11 +46,15 @@ class AgendamentoSalaVerificaRequest extends FormRequest
         if($this->filled('sala_reuniao_id') || !\Route::is('sala.reuniao.agendados.verifica.criar'))
             $this->salas = $this->service->getService('SalaReuniao')->salasAtivas();
 
-        if($this->filled('sala_reuniao_id')){
+        if($this->filled('sala_reuniao_id') && $this->filled('tipo_sala')){
             $this->merge(['sala_reuniao_id' => in_array(auth()->user()->idperfil, [8, 21]) ? auth()->user()->idregional : $this->sala_reuniao_id]);
             $sala = $this->salas->where('id', $this->sala_reuniao_id)->first();
-            $total = isset($sala) ? $sala->participantes_reuniao - 1 : 0;
-            $this->merge(['total_participantes' => $total]);
+            if(!isset($sala))
+                $this->merge(['total_participantes' => 0]);
+            else{
+                $total = isset($sala) && ($this->tipo_sala == 'reuniao') ? $sala->participantes_reuniao - 1 : $sala->participantes_coworking;
+                $this->merge(['total_participantes' => $total]);
+            }
         }
 
         if(\Route::is('sala.reuniao.agendados.verifica.criar') && isset($this->participantes_cpf) && is_array($this->participantes_cpf))
@@ -72,6 +76,9 @@ class AgendamentoSalaVerificaRequest extends FormRequest
             $campos = ["NOME" => 'nome', "REGISTRONUM" => 'registro_core', "EMAILS" => 'email', "ASS_ID" => 'ass_id'];
             foreach($campos as $key => $value)
                 isset($dados[0][$key]) ? $this->merge([$value => $dados[0][$key]]) : $this->merge([$value => null]);
+
+            if($this->total_participantes <= 0)
+                $this->merge(['tipo_sala' => "não disponível"]);
 
             if(is_array($this->participantes_cpf) && is_array($this->participantes_nome))
             {
