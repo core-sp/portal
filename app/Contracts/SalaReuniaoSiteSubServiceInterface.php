@@ -25,4 +25,10 @@ interface SalaReuniaoSiteSubServiceInterface {
     public function participantesVetados($dia, $periodo, $array_cpfs, $id = null);
 
     public function getAgendadosParticipante($user);
+
+    public function participanteIrregularConselho($sessao_request, $cpf, $gerenti, $cpfs_excecoes = array());
+
+    public function participantesLiberadosConselho($sessao_request, $cpfs = array(), $cpfs_excecoes = array());
+
+    public function limparVerificadosConselho($sessao_request);
 }

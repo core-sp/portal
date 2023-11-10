@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Contracts\MediadorServiceInterface;
 use App\Rules\Cpf;
 use Carbon\Carbon;
+use App\Repositories\GerentiRepositoryInterface;
 
 class RepSalaReuniaoRequest extends FormRequest
 {
@@ -15,10 +16,12 @@ class RepSalaReuniaoRequest extends FormRequest
     private $proprio_cpf;
     private $salas_ids;
     private $horas;
+    private $gerentiRepository;
 
-    public function __construct(MediadorServiceInterface $service)
+    public function __construct(MediadorServiceInterface $service, GerentiRepositoryInterface $gerentiRepository)
     {
         $this->service = $service->getService('SalaReuniao');
+        $this->gerentiRepository = $gerentiRepository;
     }
 
     private function regras()
@@ -51,6 +54,10 @@ class RepSalaReuniaoRequest extends FormRequest
             'anexo_sala' => 'nullable|mimes:jpeg,jpg,png,pdf|max:2048'
         ];
 
+        $verificar = [
+            'participante_irregular' => '',
+        ];
+
         if($this->acao == 'agendar')
             return array_merge($agendar, $participantes);
         if($this->acao == 'editar')
@@ -59,6 +66,8 @@ class RepSalaReuniaoRequest extends FormRequest
             return array();
         if($this->acao == 'justificar')
             return $justificar;
+        if($this->acao == 'verificar')
+            return $verificar;
     }
 
     protected function prepareForValidation()
@@ -68,6 +77,21 @@ class RepSalaReuniaoRequest extends FormRequest
             return;
 
         $user = auth()->guard('representante')->user();
+
+        if($this->acao == 'verificar')
+        {
+            if($user->cpf_cnpj == $this->participantes_cpf)
+            {
+                $this->merge(['participante_irregular' => '<strong>Não pode inserir o próprio CPF!</strong>']);
+                return;
+            }
+
+            $cpfs_excecoes = isset($this->id) ? array_keys($user->agendamentosSalas()->findOrFail($this->id)->getParticipantes()) : array();
+            $texto = $this->service->site()->participanteIrregularConselho($this->session(), $this->participantes_cpf, $this->gerentiRepository, $cpfs_excecoes);
+            $this->merge(['participante_irregular' => $texto]);
+            return;
+        }
+
         $this->proprio_cpf = $user->tipoPessoa() == 'PF' ? apenasNumeros($user->cpf_cnpj) : '';
         $this->total_cpfs = 0;
         $this->salas_ids = isset($this->id) ? $this->id : implode(',', $this->service->salasAtivas()->pluck('id')->all());
@@ -102,6 +126,7 @@ class RepSalaReuniaoRequest extends FormRequest
             $this->merge(['ip' => request()->ip()]);
         }
 
+        $temp = null;
         if($this->acao == 'editar'){
             $temp = $user->agendamentosSalas()->findOrFail($this->id);
             $this->total_cpfs = $temp->sala->isAtivo('reuniao') ? $temp->sala->getParticipantesAgendar('reuniao') : count($temp->getParticipantes());
@@ -117,11 +142,12 @@ class RepSalaReuniaoRequest extends FormRequest
         {
             $nomes = array_filter($this->participantes_nome);
             $cpfs = array_filter($this->participantes_cpf);
-            foreach($cpfs as $key => $cpf){
-                $cpfs[$key] = apenasNumeros($cpf);
+            $cpfs_excecoes = isset($temp) ? array_keys($temp->getParticipantes()) : array();
+            $cpfs = $this->service->site()->participantesLiberadosConselho($this->session(), $cpfs, $cpfs_excecoes);
+            foreach($cpfs as $key => $cpf)
                 if(isset($nomes[$key]))
                     $nomes[$key] = mb_strtoupper($nomes[$key], 'UTF-8');
-            }
+
             $this->merge([
                 'participantes_cpf' => $this->total_cpfs < count($cpfs) ? array() : $cpfs,
                 'participantes_nome' => $this->total_cpfs < count($cpfs) ? array() : $nomes,
@@ -180,7 +206,7 @@ class RepSalaReuniaoRequest extends FormRequest
             'regex' => 'Não pode conter número no nome',
             'participantes_cpf.*.distinct' => 'Existe CPF repetido',
             'participantes_nome.*.distinct' => 'Existe nome repetido',
-            'size' => 'Total de nomes difere do total de CPFs',
+            'size' => 'Total de nomes difere do total de CPFs ou encontrado CPF irregular junto ao Conselho',
             'mimes' => 'Tipo de arquivo não suportado',
             'anexo_sala.max' => 'O anexo não pode ultrapassar 2MB',
             'justificativa.max' => 'A justificativa deve ter :max caracteres ou menos',

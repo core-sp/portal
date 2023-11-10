@@ -727,8 +727,8 @@ $('#ano-mapa').on({
 				var cont = $('.participante').length;
 				if(cont < response.total)
 					for (let i = cont; i < response.total; i++)
-						$('#area_participantes').append($('.participante:last').clone());
-				$('.participante :input[name="participantes_cpf[]"]').val('').unmask().mask('999.999.999-99');
+						$('#area_participantes').append($('.participante:last').clone(true));
+				$('.participante :input[name="participantes_cpf[]"]').val('').mask('999.999.999-99');
 				$('.participante :input[name="participantes_nome[]"]').val('');
 				$('#area_participantes').show();
 			}
@@ -845,6 +845,63 @@ $('#ano-mapa').on({
 
 	$('#agendamentoSala #datepicker').change(function(){
 		getDadosSalas('getDias', $("#tipo_sala").val(), $("#sala_reuniao_id").val(), $('#datepicker').val());
+	});
+
+	// verifica a situação do participante junto ao conselho
+	const idAgendaSala = $('#tempIdSala').length > 0 ? $('#tempIdSala').val() : null;
+
+	$('input[name="participantes_cpf[]"]').change(function(){
+		if(this.value.length == 14){
+			if(this.value == $('#partResp').val()){
+				$('#verificaSala').modal({backdrop: 'static', keyboard: false, show: true});
+				$('#verificaSala .modal-body #cpfIrregular').after('<div id="texto"><br><strong>Não pode inserir o próprio CPF!</strong></div>');
+				this.value = "";
+				return;
+			}
+		
+			var final = '"participantes_cpf":' + '"' + this.value + '"';
+			final = idAgendaSala != null ? final + ', "id":'+ '"' + idAgendaSala + '"' : final;
+			$.ajax({
+				method: "POST",
+				dataType: 'json',
+				url: '/representante/agendamento-sala/verificar',
+				data: JSON.parse('{"_method":"POST", "_token":"' + $('meta[name="csrf-token"]').attr('content') + '", ' + final + '}'),
+				beforeSend: function(){
+					$('#loadingSala').modal({backdrop: 'static', keyboard: false, show: true});
+					$('#loadingSala .modal-body')
+					.html('<div class="spinner-border text-danger"></div><br>Conferindo situação do participante junto ao Conselho...');
+				},
+				complete: function(){
+					$('#loadingSala').modal('hide');
+				},
+				success: function(response) {
+					$('#loadingSala').modal('hide');
+					if(response.participante_irregular != null){
+						$('#verificaSala').modal({backdrop: 'static', keyboard: false, show: true});
+						$('#verificaSala .modal-body #cpfIrregular').html(response.participante_irregular);
+						$('#verificaSala .modal-body #cpfIrregular').after('<div id="texto"><br><strong>Não será possível criar / editar o agendamento com este participante devido a situação junto ao Conselho.</strong></div>');
+					}
+				},
+				error: function() {
+					$("#dialog_agendamento")
+						.empty()
+						.append("Falha. Recarregue a página ou tente mais tarde.");
+					$("#dialog_agendamento").dialog({
+						draggable: false,
+						buttons: [{
+							text: "Recarregar",
+							click: function() {
+								location.reload(true);
+							}
+						}]
+					});
+				}
+			});
+		}
+	});
+
+	$("#verificaSala").on('hidden.bs.modal', function(){
+		$('#verificaSala .modal-body #texto').remove();
 	});
 
 	// FIM Funcionalidade Agendamentos Salas Area Restrita RC++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

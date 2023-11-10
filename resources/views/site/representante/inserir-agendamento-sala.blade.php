@@ -47,6 +47,11 @@
   @endif
 
       @csrf
+
+      @if(isset($agendamento))
+      <input type="hidden" value="{{ $agendamento->id }}" id="tempIdSala">
+      @endif
+
       <p>
         <span class="text-danger"><strong>*</strong></span><small><em> Preenchimento obrigatório</em></small>
       </p>
@@ -182,7 +187,8 @@
               </div>
               <input 
                 type="text" 
-                class="form-control col-3" 
+                class="form-control col-3"
+                id="partResp"
                 value="{{ auth()->guard('representante')->user()->cpf_cnpj }}"
                 disabled
                 readonly
@@ -350,6 +356,37 @@
     @endif
   </div>
 </div>
+
+  <!-- The Modal -->
+  <div class="modal fade" id="verificaSala">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h5 class="modal-title">Atenção, Representante Comercial!</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body text-center">
+          <div id="cpfIrregular" data-clarity-mask="True"></div>
+        </div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-dismiss="modal">Fechar</button>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- The Modal -->
+  <div class="modal" id="loadingSala">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- Modal body -->
+        <div class="modal-body text-center"></div>
+      </div>
+    </div>
+  </div>
 
   <div id="dialog_agendamento" title="Atenção"></div>
 </section>

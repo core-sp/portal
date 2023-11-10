@@ -606,6 +606,7 @@ class RepresentanteSiteController extends Controller
                     $erro = isset($dados['message']) ? $dados : $erro;
                     break;
                 default:
+                    $this->service->getService('SalaReuniao')->site()->limparVerificadosConselho(request()->session());
                     $dados['salas'] = $user->agendamentosAtivos();
                     $dados['participando'] = $this->service->getService('SalaReuniao')->site()->getAgendadosParticipante($user);
                     $view = 'agendamento-sala';
@@ -665,6 +666,9 @@ class RepresentanteSiteController extends Controller
                     $msg = ['message' => '<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento justificado com sucesso! Está em análise do atendente. Foi enviado um e-mail com a sua justificativa.', 
                     'class' => 'alert-success'];
                     break;
+                case 'verificar':
+                    return response()->json($dados);
+                    break;
             }
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -676,6 +680,8 @@ class RepresentanteSiteController extends Controller
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao salvar agendamento da sala.");
         }
+
+        $this->service->getService('SalaReuniao')->site()->limparVerificadosConselho(request()->session());
 
         return redirect()->route('representante.agendar.inserir.view')->with(isset($erro) ? $erro : $msg);
     }

@@ -246,4 +246,77 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
             return AgendamentoSala::getAgendadoParticipanteByCpf($user->cpf_cnpj);
         return collect();
     }
+
+    public function participanteIrregularConselho($sessao_request, $cpf, $gerenti, $cpfs_excecoes = array())
+    {
+        $texto = '<strong>CPF:</strong> ' . $cpf;
+        $sessao = $sessao_request->exists('participantes_verificados.cpfs') ? $sessao_request->get('participantes_verificados.cpfs') : array();
+        $sessao_request->push('participantes_verificados.cpfs', encrypt($cpf));
+        $verificados = array();
+
+        foreach($sessao as $chave => $valor)
+        {
+            $dec = decrypt($valor);
+            in_array($dec, $verificados) ? $sessao_request->forget('participantes_verificados.cpfs.'.$chave) : array_push($verificados, $dec);
+        }
+
+        // quando editar participantes, não verificar o que já foi salvo
+        $participante_excecao = in_array(apenasNumeros($cpf), $cpfs_excecoes);
+        if($participante_excecao)
+            return null;
+
+        $dados = !in_array($cpf, $verificados) ? $gerenti->gerentiAtivo(apenasNumeros($cpf)) : array();
+
+        if(isset($dados[0]))
+        {
+            $dados[0]["STATUS"] = isset($dados[0]["ASS_ID"]) && isset($dados[0]["SITUACAO"]) && ($dados[0]["SITUACAO"] == 'Ativo') ? 
+            trim(explode(':', $gerenti->gerentiStatus($dados[0]["ASS_ID"]))[1]) : "";
+
+            if($dados[0]["STATUS"] != 'Em dia.'){
+                $sessao_request->push('participantes_invalidos.cpfs', encrypt($cpf));
+                return $texto;
+            }
+
+            return null;
+        }
+
+        $sessao = $sessao_request->exists('participantes_invalidos.cpfs') ? $sessao_request->get('participantes_invalidos.cpfs') : array();
+        $invalidos = array();
+        foreach($sessao as $chave => $valor)
+            array_push($invalidos, decrypt($valor));
+        if(in_array($cpf, $invalidos))
+            return $texto;
+
+        return null;
+    }
+
+    public function participantesLiberadosConselho($sessao_request, $cpfs = array(), $cpfs_excecoes = array())
+    {
+        $sessao_v = $sessao_request->exists('participantes_verificados.cpfs') ? $sessao_request->get('participantes_verificados.cpfs') : array();
+        $sessao_i = $sessao_request->exists('participantes_invalidos.cpfs') ? $sessao_request->get('participantes_invalidos.cpfs') : array();
+        $verificados = array();
+        $invalidos = array();
+
+        foreach($sessao_v as $valor_v)
+            array_push($verificados, decrypt($valor_v));
+
+        foreach($sessao_i as $valor_i)
+            array_push($invalidos, decrypt($valor_i));
+
+        foreach($cpfs as $key => $cpf)
+        {
+            // garantir que deve passar somente os cpfs verificados anteriormente
+            if(in_array($cpf, $invalidos) || (!in_array($cpf, $verificados) && !in_array(apenasNumeros($cpf), $cpfs_excecoes)))
+                unset($cpfs[$key]);
+            else
+                $cpfs[$key] = apenasNumeros($cpf);
+        }
+
+        return $cpfs;
+    }
+
+    public function limparVerificadosConselho($sessao_request)
+    {
+        $sessao_request->forget(['participantes_verificados', 'participantes_invalidos']);
+    }
 }
