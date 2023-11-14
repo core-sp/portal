@@ -496,7 +496,7 @@ class AgendamentoSalaTest extends TestCase
             "nomeGerenti" => "",
             "registroGerenti" => "",
             "emailGerenti" => "",
-            "situacaoGerenti" => "",
+            "situacaoGerenti" => "Não encontrado",
         ]);
 
         $this->post(route('sala.reuniao.agendados.verifica.criar'), ['sala_reuniao_id' => 1, 'tipo_sala' => 'reuniao'])

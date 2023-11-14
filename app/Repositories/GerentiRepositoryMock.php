@@ -396,7 +396,13 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
             ];
         }
         else
-            $resultado = [];
+            $resultado[0] = [
+                "SITUACAO" => "Não encontrado", 
+                "REGISTRONUM" => null, 
+                "ASS_ID" => null, 
+                "NOME" => null, 
+                "EMAILS" => null
+            ];
 
         return $resultado;
     }

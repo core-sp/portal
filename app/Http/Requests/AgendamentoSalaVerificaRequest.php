@@ -27,7 +27,7 @@ class AgendamentoSalaVerificaRequest extends FormRequest
         $campos = ["NOME" => 'nomeGerenti', "REGISTRONUM" => 'registroGerenti', "EMAILS" => 'emailGerenti', "SITUACAO" => 'situacaoGerenti'];
 
         if($this->filled('cpf_cnpj') && ((strlen($this->cpf_cnpj) == 14) || (strlen($this->cpf_cnpj) == 18))){
-            $dados = $this->gerentiRepository->gerentiAtivo(apenasNumeros($this->cpf_cnpj));
+            $dados = utf8_converter($this->gerentiRepository->gerentiAtivo(apenasNumeros($this->cpf_cnpj)));
 
             foreach($campos as $key => $value){
                 if(!isset($dados[0][$key]))
