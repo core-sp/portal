@@ -41,6 +41,8 @@ class AgendamentoSalaVerificaRequest extends FormRequest
                 $status = trim(explode(':', $this->gerentiRepository->gerentiStatus($dados[0]["ASS_ID"]))[1]);
                 $this->merge(['situacaoGerenti' => $this->situacaoGerenti . ', ' . $status]);
             }
+            if(isset($dados[0]["REGISTRONUM"]))
+                $this->merge(['registroGerenti' => formataRegistro($this->registroGerenti)]);
         }
 
         if($this->filled('sala_reuniao_id') || !\Route::is('sala.reuniao.agendados.verifica.criar'))
@@ -74,6 +76,7 @@ class AgendamentoSalaVerificaRequest extends FormRequest
             $this->merge(['total_participantes' => isset($this->total_participantes) ? $this->total_participantes : 0]);
             $this->merge(['cpf_cnpj' => apenasNumeros($this->cpf_cnpj)]);
             $campos = ["NOME" => 'nome', "REGISTRONUM" => 'registro_core', "EMAILS" => 'email', "ASS_ID" => 'ass_id'];
+            $dados[0]["EMAILS"] = isset($dados[0]["EMAILS"]) ? explode(';', $dados[0]["EMAILS"])[0] : null;
             foreach($campos as $key => $value)
                 isset($dados[0][$key]) ? $this->merge([$value => $dados[0][$key]]) : $this->merge([$value => null]);
 

@@ -486,7 +486,7 @@ class AgendamentoSalaTest extends TestCase
         $this->post(route('sala.reuniao.agendados.verifica.criar'), ['cpf_cnpj' => formataCpfCnpj('11748345000144')])
         ->assertJson([
             "nomeGerenti" => "RC Teste 2",
-            "registroGerenti" => "0000000002",
+            "registroGerenti" => formataRegistro("0000000002"),
             "emailGerenti" => "desenvolvimento@core-sp.org.br",
             "situacaoGerenti" => "Ativo, Em dia.",
         ]);
