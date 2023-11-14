@@ -646,6 +646,7 @@ function verificarDadosCriarAgendaSala(nome_campo){
     success: function(response) {
       switch(nome_campo) {
         case "cpf_cnpj":
+          var situacao = response.registroGerenti != null ? response.registroGerenti.substring(0, response.registroGerenti.indexOf(',')) : 'Ativo';
           $.each(response, function(i, valor) {
             $('#' + i).text(valor);
           });
@@ -657,6 +658,11 @@ function verificarDadosCriarAgendaSala(nome_campo){
             $('.modal-footer').hide();
             $('#modal-criar_agenda .modal-body')
             .html('<strong>Sem registro no Gerenti! Não pode criar o agendamento.</strong>');
+          }else if(situacao != 'Ativo'){
+            $('#modal-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
+            $('.modal-footer').hide();
+            $('#modal-criar_agenda .modal-body')
+            .html('<strong>Sem registro Ativo no Gerenti! Não pode criar o agendamento.</strong>');
           }
           break;
         case "sala_reuniao_id":

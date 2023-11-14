@@ -135,6 +135,20 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
+    public function cannot_create_presencial_without_ativo_gerenti()
+    {
+        // editar gerentiStatus() em GerentiRepositoryMock
+        $user = $this->signInAsAdmin();
+        
+        $agenda = factory('App\AgendamentoSala')->states('presencial_request_coworking')->raw([
+            'cpf_cnpj' => formataCpfCnpj('86294373085')
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.store'), $agenda)
+        ->assertSessionHasErrors(['registro_core']);
+    }
+
+    /** @test */
     public function cannot_create_presencial_without_tipo_sala()
     {
         $user = $this->signInAsAdmin();

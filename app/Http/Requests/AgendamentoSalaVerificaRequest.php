@@ -77,6 +77,9 @@ class AgendamentoSalaVerificaRequest extends FormRequest
             foreach($campos as $key => $value)
                 isset($dados[0][$key]) ? $this->merge([$value => $dados[0][$key]]) : $this->merge([$value => null]);
 
+            if(!isset($dados[0]["SITUACAO"]) || (isset($dados[0]["SITUACAO"]) && ($dados[0]["SITUACAO"] != 'Ativo')))
+                $this->merge(['registro_core' => null]);
+
             if($this->total_participantes <= 0)
                 $this->merge(['tipo_sala' => "não disponível"]);
 
@@ -96,11 +99,8 @@ class AgendamentoSalaVerificaRequest extends FormRequest
                 ]);
             }
 
-            if(Carbon::hasFormat($this->dia, 'Y-m-d'))
-            {
-                if(Carbon::parse($this->dia)->isWeekend())
-                    $this->merge(['dia' => null]);
-            }
+            if(Carbon::hasFormat($this->dia, 'Y-m-d') && Carbon::parse($this->dia)->isWeekend())
+                $this->merge(['dia' => null]);
         }
     }
 
@@ -162,7 +162,7 @@ class AgendamentoSalaVerificaRequest extends FormRequest
             'periodo_entrada.before' => 'Deve ser até as 17:30',
             'periodo_saida.after' => 'Deve ser depois do período de entrada',
             'nome.required' => 'Nome não existe no Gerenti',
-            'registro_core.required' => 'Registro Core não existe no Gerenti',
+            'registro_core.required' => 'Registro Core não existe ou não está ativo no Gerenti',
             'email.required' => 'E-mail não existe no Gerenti',
             'dia.required' => 'Dia não está preenchido ou o dia escolhido é fim de semana',
             'participantes_cpf.*.not_in' => 'Não pode inserir o CPF do responsável novamente como participante',
