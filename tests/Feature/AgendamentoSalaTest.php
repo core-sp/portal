@@ -900,6 +900,7 @@ class AgendamentoSalaTest extends TestCase
         $this->get(route('representante.agendar.inserir.view', ['justificar', $agendamento->id]))->assertRedirect(route('representante.login'));
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'))->assertRedirect(route('representante.login'));
+        $this->post(route('representante.agendar.inserir.post', 'verificar'))->assertRedirect(route('representante.login'));
         $this->put(route('representante.agendar.inserir.put', ['editar', $agendamento->id]))->assertRedirect(route('representante.login'));
         $this->put(route('representante.agendar.inserir.put', ['cancelar', $agendamento->id]))->assertRedirect(route('representante.login'));
         $this->put(route('representante.agendar.inserir.put', ['justificar', $agendamento->id]))->assertRedirect(route('representante.login'));
@@ -1036,6 +1037,68 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
+    public function non_authenticated_cannot_verify_gerenti()
+    {
+        $agenda = factory('App\AgendamentoSala')->create();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'))
+        ->assertRedirect(route('representante.login'));
+    }
+
+    /** @test */
+    public function remove_verify_gerenti_after_submit()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ])
+        ->assertJson([
+            'participante_irregular' => null
+        ])
+        ->assertSessionHas('participantes_verificados')
+        ->assertSessionMissing('participantes_invalidos');
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => 'reuniao',
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'], 
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => $agenda['periodo'],
+            'participantes_cpf' => ['569.832.380-10'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM'],
+            'aceite' => 'on'
+        ])->assertStatus(302);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento criado com sucesso! Foi enviado um e-mail com os detalhes.')
+        ->assertSessionMissing('participantes_verificados')
+        ->assertSessionMissing('participantes_invalidos');
+    }
+
+    /** @test */
+    public function remove_verify_gerenti_in_route_home_agendar()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ])
+        ->assertJson([
+            'participante_irregular' => null
+        ])
+        ->assertSessionHas('participantes_verificados')
+        ->assertSessionMissing('participantes_invalidos');
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSessionMissing('participantes_verificados')
+        ->assertSessionMissing('participantes_invalidos');
+    }
+
+    /** @test */
     public function can_submit_agendar_sala_coworking()
     {
         Mail::fake();
@@ -1102,12 +1165,30 @@ class AgendamentoSalaTest extends TestCase
 
         $this->assertEquals(AgendamentoSala::count(), 0);
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ])
+        ->assertJson([
+            'participante_irregular' => null
+        ])
+        ->assertSessionHas('participantes_verificados')
+        ->assertSessionMissing('participantes_invalidos');
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ])
+        ->assertJson([
+            'participante_irregular' => null
+        ])
+        ->assertSessionHas('participantes_verificados')
+        ->assertSessionMissing('participantes_invalidos');
+
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => 'reuniao',
             'sala_reuniao_id' => $agenda['sala_reuniao_id'], 
             'dia' => onlyDate($agenda['dia']), 
             'periodo' => $agenda['periodo'],
-            'participantes_cpf' => ['56983238010', '81921923008'],
+            'participantes_cpf' => ['569.832.380-10', '819.219.230-08'],
             'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
             'aceite' => 'on'
         ])->assertStatus(302);
@@ -1115,7 +1196,8 @@ class AgendamentoSalaTest extends TestCase
         Mail::assertQueued(AgendamentoSalaMail::class);
 
         $this->get(route('representante.agendar.inserir.view'))
-        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento criado com sucesso! Foi enviado um e-mail com os detalhes.');
+        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento criado com sucesso! Foi enviado um e-mail com os detalhes.')
+        ->assertSessionMissing('participantes_verificados');
 
         $this->assertDatabaseHas('agendamentos_salas', [
             'tipo_sala' => 'reuniao',
@@ -1383,6 +1465,58 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
+    public function cannot_submit_agendar_sala_reuniao_without_verify_gerenti()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => $agenda['tipo_sala'],
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'],
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => $agenda['periodo'],
+            'participantes_cpf' => ['569.832.380-10'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM'],
+            'aceite' => 'on'
+        ])
+        ->assertSessionHasErrors([
+            'participantes_cpf'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_submit_agendar_sala_reuniao_if_invalid_cpf_gerenti()
+    {
+        // alterar gerentiStatus em GerentiRepositoryMock
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ])
+        ->assertJson([
+            'participante_irregular' => '<strong>CPF:</strong> 569.832.380-10'
+        ])
+        ->assertSessionHas('participantes_verificados')
+        ->assertSessionHas('participantes_invalidos');
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => $agenda['tipo_sala'],
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'],
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => $agenda['periodo'],
+            'participantes_cpf' => ['569.832.380-10'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM'],
+            'aceite' => 'on'
+        ])
+        ->assertSessionHasErrors([
+            'participantes_cpf'
+        ]);
+    }
+
+    /** @test */
     public function cannot_submit_agendar_sala_reuniao_with_participantes_cpf_not_array()
     {
         $representante = factory('App\Representante')->create();
@@ -1394,8 +1528,8 @@ class AgendamentoSalaTest extends TestCase
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
             'dia' => onlyDate($agenda['dia']), 
             'periodo' => $agenda['periodo'],
-            'participantes_cpf' => 'dfdfdf',
-            'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+            'participantes_cpf' => '569.832.380-10',
+            'participantes_nome' => ['NOME PARTICIPANTE UM'],
             'aceite' => 'on'
         ])
         ->assertSessionHasErrors([
@@ -1409,6 +1543,14 @@ class AgendamentoSalaTest extends TestCase
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '111.111.111-11',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '222.333.444-99',
+        ]);
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
@@ -1431,6 +1573,10 @@ class AgendamentoSalaTest extends TestCase
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
@@ -1452,6 +1598,17 @@ class AgendamentoSalaTest extends TestCase
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => $representante->cpf_cnpj,
+        ])
+        ->assertJson([
+            'participante_irregular' => '<strong>Não pode inserir o próprio CPF!</strong>'
+        ]);
+
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
@@ -1462,7 +1619,7 @@ class AgendamentoSalaTest extends TestCase
             'aceite' => 'on'
         ])
         ->assertSessionHasErrors([
-            'participantes_cpf.*'
+            'participantes_nome'
         ]);
     }
 
@@ -1472,6 +1629,14 @@ class AgendamentoSalaTest extends TestCase
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ]);
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
@@ -1494,6 +1659,14 @@ class AgendamentoSalaTest extends TestCase
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ]);
+
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
@@ -1514,6 +1687,14 @@ class AgendamentoSalaTest extends TestCase
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ]);
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
@@ -1536,6 +1717,14 @@ class AgendamentoSalaTest extends TestCase
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ]);
+
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
@@ -1556,6 +1745,14 @@ class AgendamentoSalaTest extends TestCase
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ]);
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
@@ -1578,6 +1775,14 @@ class AgendamentoSalaTest extends TestCase
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ]);
+
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
@@ -1599,6 +1804,14 @@ class AgendamentoSalaTest extends TestCase
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ]);
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
@@ -1629,6 +1842,14 @@ class AgendamentoSalaTest extends TestCase
         ]);
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ]);
+
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
@@ -1657,6 +1878,14 @@ class AgendamentoSalaTest extends TestCase
             'idrepresentante' => $representante1->id
         ]);
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ]);
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
@@ -1690,6 +1919,14 @@ class AgendamentoSalaTest extends TestCase
         ]);
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ]);
+
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
@@ -1721,6 +1958,14 @@ class AgendamentoSalaTest extends TestCase
         $agenda1->sala->update(['horarios_reuniao' => '09:30,10:30,11:30']);
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ]);
+
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda1->sala->id,
@@ -1749,6 +1994,14 @@ class AgendamentoSalaTest extends TestCase
             'idrepresentante' => $representante1->id
         ]);
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ]);
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
@@ -1782,6 +2035,14 @@ class AgendamentoSalaTest extends TestCase
         ]);
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ]);
+
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
@@ -1807,6 +2068,14 @@ class AgendamentoSalaTest extends TestCase
 
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ]);
+
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
@@ -1827,6 +2096,14 @@ class AgendamentoSalaTest extends TestCase
         $this->actingAs($representante, 'representante');
 
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '819.219.230-08',
+        ]);
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
@@ -1863,6 +2140,10 @@ class AgendamentoSalaTest extends TestCase
             'sala_reuniao_id' => $agenda1->sala_reuniao_id
         ]);
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '651.337.265-89',
+        ]);
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
@@ -1909,6 +2190,10 @@ class AgendamentoSalaTest extends TestCase
         ]);
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '651.337.265-89',
+        ]);
+
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda1->sala_reuniao_id,
@@ -1935,6 +2220,10 @@ class AgendamentoSalaTest extends TestCase
             'periodo' => '09:00 - 10:00'
         ]);
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '651.337.265-89',
+        ]);
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
@@ -2321,11 +2610,15 @@ class AgendamentoSalaTest extends TestCase
         ->assertSeeInOrder($itens)
         ->assertSeeText('Salvar');
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
         $this->put(route('representante.agendar.inserir.put', [
             'acao' => 'editar',
             'id' => $agenda->id
         ]), [
-            'participantes_cpf' => ['56983238010'],
+            'participantes_cpf' => ['569.832.380-10'],
             'participantes_nome' => ['NOME PARTICIPANTE UM'],
         ])->assertStatus(302);
 
@@ -2350,11 +2643,15 @@ class AgendamentoSalaTest extends TestCase
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->create();
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
         $this->put(route('representante.agendar.inserir.put', [
             'acao' => 'editar',
             'id' => $agenda->id
         ]), [
-            'participantes_cpf' => ['56983238010'],
+            'participantes_cpf' => ['569.832.380-10'],
             'participantes_nome' => ['NOME PARTICIPANTE UM'],
         ])->assertStatus(302);
 
@@ -2378,11 +2675,15 @@ class AgendamentoSalaTest extends TestCase
             ], JSON_FORCE_OBJECT)
         ]);
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
         $this->put(route('representante.agendar.inserir.put', [
             'acao' => 'editar',
             'id' => $agenda->id
         ]), [
-            'participantes_cpf' => ['56983238010'],
+            'participantes_cpf' => ['569.832.380-10'],
             'participantes_nome' => ['NOME PARTICIPANTE UM'],
         ])->assertStatus(302);
 
@@ -2417,11 +2718,15 @@ class AgendamentoSalaTest extends TestCase
         $this->get(route('representante.agendar.inserir.view'))
         ->assertSee('<i class="fas fa-times"></i>&nbsp;&nbsp;Não é possível editar o agendamento.');
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
         $this->put(route('representante.agendar.inserir.put', [
             'acao' => 'editar',
             'id' => $agenda->id
         ]), [
-            'participantes_cpf' => ['56983238010'],
+            'participantes_cpf' => ['569.832.380-10'],
             'participantes_nome' => ['NOME PARTICIPANTE UM'],
         ])->assertStatus(302);
 
@@ -2432,6 +2737,85 @@ class AgendamentoSalaTest extends TestCase
             'tipo_sala' => 'reuniao',
             'idrepresentante' => 1,
             'participantes' => $agenda['participantes']
+        ]);
+    }
+
+    /** @test */
+    public function cannot_to_edit_participantes_reuniao_without_verify_gerenti()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->create();
+
+        $this->put(route('representante.agendar.inserir.put', [
+            'acao' => 'editar',
+            'id' => $agenda->id
+        ]), [
+            'participantes_cpf' => ['651.337.265-89'],
+            'participantes_nome' => ['NOME PARTICIPANTE TRES'],
+        ])
+        ->assertSessionHasErrors([
+            'participantes_cpf'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_to_edit_participantes_reuniao_if_invalid_cpf_gerenti()
+    {
+        // alterar gerentiStatus em GerentiRepositoryMock
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->create();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ])
+        ->assertJson([
+            'participante_irregular' => '<strong>CPF:</strong> 569.832.380-10'
+        ])
+        ->assertSessionHas('participantes_verificados')
+        ->assertSessionHas('participantes_invalidos');
+        
+        $this->put(route('representante.agendar.inserir.put', [
+            'acao' => 'editar',
+            'id' => $agenda->id
+        ]), [
+            'participantes_cpf' => ['569.832.380-10'],
+            'participantes_nome' => ['NOME PARTICIPANTE TRES'],
+        ])
+        ->assertSessionHasErrors([
+            'participantes_cpf'
+        ]);
+    }
+
+    /** @test */
+    public function can_to_edit_participantes_reuniao_nome_without_verify_gerenti()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->create();
+
+        $this->put(route('representante.agendar.inserir.put', [
+            'acao' => 'editar',
+            'id' => $agenda->id
+        ]), [
+            'participantes_cpf' => ['569.832.380-10', '819.219.230-08'],
+            'participantes_nome' => ['NOME PARTICIPANTE MUDOU', 'NOME PARTICIPANTE DOIS'],
+        ]);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Participantes foram alterados com sucesso! Foi enviado um e-mail com os detalhes.');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'tipo_sala' => 'reuniao',
+            'idrepresentante' => 1,
+            'participantes' => json_encode([
+                '56983238010' => 'NOME PARTICIPANTE MUDOU',
+                '81921923008' => 'NOME PARTICIPANTE DOIS'
+            ], JSON_FORCE_OBJECT)
         ]);
     }
 
@@ -2886,7 +3270,7 @@ class AgendamentoSalaTest extends TestCase
             'acao' => 'editar',
             'id' => $agenda->id
         ]), [
-            'participantes_cpf' => ['56983238010'],
+            'participantes_cpf' => ['569.832.380-10'],
             'participantes_nome' => ['NOME PARTICIPANTE UM'],
         ])->assertStatus(302);
 
@@ -2916,34 +3300,24 @@ class AgendamentoSalaTest extends TestCase
             'participantes_coworking' => 0
         ]);
 
-        $this->get(route('representante.agendar.inserir.view'))
-        ->assertSee('<p><i class="fas fa-info-circle text-primary"></i> <b><em>No momento não há salas disponíveis para novos agendamentos.</em></b></p>');
-
-        $this->get(route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $agenda->id]))
-        ->assertOk()
-        ->assertSeeText('Salvar');
-
         $this->put(route('representante.agendar.inserir.put', [
             'acao' => 'editar',
             'id' => $agenda->id
         ]), [
-            'participantes_cpf' => ['56983238010', '81921923008'],
-            'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+            'participantes_cpf' => ['569.832.380-10'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM'],
         ]);
 
-        $this->get(route('representante.agendar.inserir.view'))
-        ->assertSee('<i class="fas fa-info-circle"></i>&nbsp;&nbsp;Não houve alterações nos participantes.');
-
         $this->put(route('representante.agendar.inserir.put', [
             'acao' => 'editar',
             'id' => $agenda->id
         ]), [
-            'participantes_cpf' => ['81921923008', '56983238010'],
+            'participantes_cpf' => ['819.219.230-08', '569.832.380-10'],
             'participantes_nome' => ['NOME PARTICIPANTE DOIS', 'NOME PARTICIPANTE UM'],
         ]);
 
         $this->get(route('representante.agendar.inserir.view'))
-        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Participantes foram alterados com sucesso! Foi enviado um e-mail com os detalhes.');
+        ->assertDontSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Participantes foram alterados com sucesso! Foi enviado um e-mail com os detalhes.');
     }
 
     /** @test */

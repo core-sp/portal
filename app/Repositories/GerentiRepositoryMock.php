@@ -395,6 +395,16 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
                 "EMAILS" => "desenvolvimento@core-sp.org.br"
             ];
         }
+        elseif($cpfCnpj == "56983238010") {
+            $resultado[0] = [
+                "SITUACAO" => "Ativo", 
+                "REGISTRONUM" => "0000000003", 
+                "ASS_ID" => "000003", 
+                "NOME" => "RC Teste Tres", 
+                "EMAILS" => "novo_rc@teste.com"
+            ];
+        }else
+            $resultado = [];
 
         return $resultado;
     }
