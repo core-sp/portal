@@ -404,7 +404,13 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
                 "EMAILS" => "novo_rc@teste.com"
             ];
         }else
-            $resultado = [];
+            $resultado[0] = [
+                "SITUACAO" => "Não encontrado", 
+                "REGISTRONUM" => null, 
+                "ASS_ID" => null, 
+                "NOME" => null, 
+                "EMAILS" => null
+            ];
 
         return $resultado;
     }

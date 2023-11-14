@@ -1488,7 +1488,7 @@ class AgendamentoSalaTest extends TestCase
     /** @test */
     public function cannot_submit_agendar_sala_reuniao_if_invalid_cpf_gerenti()
     {
-        // alterar gerentiStatus em GerentiRepositoryMock
+        // alterar gerentiAtivo em GerentiRepositoryMock
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
@@ -2763,7 +2763,7 @@ class AgendamentoSalaTest extends TestCase
     /** @test */
     public function cannot_to_edit_participantes_reuniao_if_invalid_cpf_gerenti()
     {
-        // alterar gerentiStatus em GerentiRepositoryMock
+        // alterar gerentiAtivo em GerentiRepositoryMock
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
 

@@ -265,11 +265,11 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
         if($participante_excecao)
             return null;
 
-        $dados = !in_array($cpf, $verificados) ? $gerenti->gerentiAtivo(apenasNumeros($cpf)) : array();
+        $dados = !in_array($cpf, $verificados) ? utf8_converter($gerenti->gerentiAtivo(apenasNumeros($cpf))) : array();
 
-        if(isset($dados[0]))
+        if(isset($dados[0]["SITUACAO"]) && ($dados[0]["SITUACAO"] != 'Não encontrado'))
         {
-            $dados[0]["STATUS"] = isset($dados[0]["ASS_ID"]) && isset($dados[0]["SITUACAO"]) && ($dados[0]["SITUACAO"] == 'Ativo') ? 
+            $dados[0]["STATUS"] = isset($dados[0]["ASS_ID"]) && ($dados[0]["SITUACAO"] == 'Ativo') ? 
             trim(explode(':', $gerenti->gerentiStatus($dados[0]["ASS_ID"]))[1]) : "";
 
             if($dados[0]["STATUS"] != 'Em dia.'){
