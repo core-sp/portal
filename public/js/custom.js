@@ -646,7 +646,8 @@ function verificarDadosCriarAgendaSala(nome_campo){
     success: function(response) {
       switch(nome_campo) {
         case "cpf_cnpj":
-          var situacao = response.registroGerenti != null ? response.registroGerenti.substring(0, response.registroGerenti.indexOf(',')) : 'Ativo';
+          var resultado = response.situacaoGerenti;
+          var situacao = resultado != null ? resultado.substring(0, resultado.indexOf(',')) : 'Ativo';
           $.each(response, function(i, valor) {
             $('#' + i).text(valor);
           });
