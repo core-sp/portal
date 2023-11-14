@@ -202,20 +202,33 @@
 <!-- The Modal -->
 <div class="modal fade" id="modal-criar_agenda">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <!-- Modal Header -->
-        <div class="modal-header">
-          <h4 class="modal-title">Atenção!</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Atenção!</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body"></div>
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Não</button>
+                <button type="button" class="btn btn-success" id="enviarCriarAgenda">Sim</button>
+            </div>
         </div>
-        <!-- Modal body -->
-        <div class="modal-body">
-        </div>
-         <!-- Modal footer -->
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Não</button>
-          <button type="button" class="btn btn-success" id="enviarCriarAgenda">Sim</button>
-        </div>
-      </div>
     </div>
-  </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal" id="modal-load-criar_agenda">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Modal body -->
+            <div class="modal-body text-center">
+                <div class="spinner-border text-primary"></div>
+                <br>
+                Buscando informações no Gerenti...
+            </div>
+        </div>
+    </div>
+</div>

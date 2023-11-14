@@ -643,7 +643,15 @@ function verificarDadosCriarAgendaSala(nome_campo){
     dataType: 'json',
     url: '/admin/salas-reunioes/agendados/verifica',
     data: json,
+    beforeSend: function(){
+      if(nome_campo == "cpf_cnpj")
+        $('#modal-load-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
+    },
+    complete: function(){
+      $('#modal-load-criar_agenda').modal('hide');
+    },
     success: function(response) {
+      $('#modal-load-criar_agenda').modal('hide');
       switch(nome_campo) {
         case "cpf_cnpj":
           var resultado = response.situacaoGerenti;
@@ -695,6 +703,12 @@ function verificarDadosCriarAgendaSala(nome_campo){
           $('#modal-criar_agenda .modal-body')
           .html(response.suspenso + '<br><br><strong>Confirmar esse agendamento?</strong>');
       }
+    },
+    error: function() {
+      $('#modal-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
+      $('.modal-footer').hide();
+      $('#modal-criar_agenda .modal-body')
+      .html('<span class="text-danger">Deu erro! Recarregue a página.</span>');
     }
   });
 }
