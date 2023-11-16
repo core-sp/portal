@@ -176,8 +176,10 @@
                     class="form-control {{ $errors->has('periodo_saida') ? 'is-invalid' : '' }}"
                     required
                 >
-                @foreach(todasHoras() as $hora)
+                @foreach(array_merge(todasHoras(), ['18:00']) as $hora)
+                    @if($hora > '09:00')
                     <option value="{{ $hora }}" {{ old('periodo_saida') == $hora ? 'selected' : '' }}>{{ $hora }}</option>
+                    @endif
                 @endforeach
                 </select>
                 @if($errors->has('periodo_saida'))

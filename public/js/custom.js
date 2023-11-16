@@ -739,6 +739,17 @@ $('#criarAgendaSala').ready(function(){
   $('#verificaSuspensos').click(function(){
     verificarDadosCriarAgendaSala("participantes_cpf[]");
   });
+
+  $('select[name="periodo_entrada"]').change(function(){
+    var valor = this.value;
+    var indice = 0;
+    if(valor != '')
+      $('select[name="periodo_saida"] option').each(function(i) {
+        $(this).val() <= valor ? $(this).hide() : $(this).show();
+        indice = $(this).val() == valor ? i + 1 : indice;
+      });
+      $('select[name="periodo_saida"] option:eq(' + indice + ')').prop('selected', true);
+  });
 });
 
 $('#enviarCriarAgenda').click(function(){

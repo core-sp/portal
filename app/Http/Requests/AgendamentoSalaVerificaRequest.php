@@ -116,7 +116,7 @@ class AgendamentoSalaVerificaRequest extends FormRequest
                 'sala_reuniao_id' => 'required|in:'.implode(',', $this->salas->pluck('id')->all()),
                 'dia' => 'required|date_format:Y-m-d|before_or_equal:'.date('Y-m-d'),
                 'periodo_entrada' => 'required|date_format:H:i|before:17:31|in:'.implode(',', todasHoras()),
-                'periodo_saida' => 'required|date_format:H:i|after:periodo_entrada|in:'.implode(',', todasHoras()),
+                'periodo_saida' => 'required|date_format:H:i|after:periodo_entrada|in:'.implode(',', array_merge(todasHoras(), ['18:00'])),
                 'participantes_cpf' => 'exclude_unless:tipo_sala,reuniao|required_if:tipo_sala,reuniao|array',
                 'participantes_cpf.*' => ['distinct', new Cpf, 'not_in:'.$this->cpf_cnpj],
                 'participantes_nome' => 'exclude_unless:tipo_sala,reuniao|required_if:tipo_sala,reuniao|array|size:'.$this->total_participantes,
