@@ -56,6 +56,7 @@ class RepSalaReuniaoRequest extends FormRequest
 
         $verificar = [
             'participante_irregular' => '',
+            'suspenso' => '',
         ];
 
         if($this->acao == 'agendar')
@@ -80,15 +81,19 @@ class RepSalaReuniaoRequest extends FormRequest
 
         if($this->acao == 'verificar')
         {
-            if($user->cpf_cnpj == $this->participantes_cpf)
+            if(($user->cpf_cnpj == $this->participantes_cpf) || (formataCpfCnpj(apenasNumeros($this->participantes_cpf)) != $this->participantes_cpf))
             {
-                $this->merge(['participante_irregular' => '<strong>Não pode inserir o próprio CPF!</strong>']);
+                $texto = $user->cpf_cnpj != $this->participantes_cpf ? '<strong>Formato do CPF inválido!</strong>' : '<strong>Não pode inserir o próprio CPF!</strong>';
+                $this->merge(['participante_irregular' => $texto, 'suspenso' => null]);
                 return;
             }
 
             $cpfs_excecoes = isset($this->id) ? array_keys($user->agendamentosSalas()->findOrFail($this->id)->getParticipantes()) : array();
             $texto = $this->service->site()->participanteIrregularConselho($this->session(), $this->participantes_cpf, $this->gerentiRepository, $cpfs_excecoes);
-            $this->merge(['participante_irregular' => $texto]);
+
+            $suspenso = $this->service->suspensaoExcecao()->participantesSuspensos([$this->participantes_cpf]);
+            $texto_s = isset($suspenso) && !empty($suspenso) ? '<strong>CPF:</strong> ' . $suspenso[0] : null;
+            $this->merge(['participante_irregular' => $texto, 'suspenso' => $texto_s]);
             return;
         }
 

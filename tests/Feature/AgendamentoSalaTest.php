@@ -1046,6 +1046,32 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
+    public function cannot_verify_invalid_format_cpf()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '56983238010',
+        ])
+        ->assertJson([
+            'participante_irregular' => '<strong>Formato do CPF inválido!</strong>'
+        ])
+        ->assertSessionMissing('participantes_verificados')
+        ->assertSessionMissing('participantes_invalidos');
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380.10',
+        ])
+        ->assertJson([
+            'participante_irregular' => '<strong>Formato do CPF inválido!</strong>'
+        ])
+        ->assertSessionMissing('participantes_verificados')
+        ->assertSessionMissing('participantes_invalidos');
+    }
+
+    /** @test */
     public function remove_verify_gerenti_after_submit()
     {
         $representante = factory('App\Representante')->create();

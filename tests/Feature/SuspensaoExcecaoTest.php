@@ -1239,6 +1239,20 @@ class SuspensaoExcecaoTest extends TestCase
 
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ])->assertJsonMissing([
+            'suspenso' => '<strong>CPF:</strong> 569.832.380-10'
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '862.943.730-85',
+        ])->assertJson([
+            'suspenso' => '<strong>CPF:</strong> 862.943.730-85'
+        ])
+        ->assertSessionHas('participantes_verificados')
+        ->assertSessionMissing('participantes_invalidos');
+
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
@@ -1264,6 +1278,16 @@ class SuspensaoExcecaoTest extends TestCase
         $this->actingAs($representante1, 'representante');
 
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '862.943.730-85',
+        ])->assertJson([
+            'suspenso' => '<strong>CPF:</strong> 862.943.730-85'
+        ]);
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
@@ -1296,6 +1320,18 @@ class SuspensaoExcecaoTest extends TestCase
         $this->actingAs($representante1, 'representante');
 
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ])->assertJson([
+            'suspenso' => '<strong>CPF:</strong> 569.832.380-10'
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '862.943.730-85',
+        ])->assertJson([
+            'suspenso' => '<strong>CPF:</strong> 862.943.730-85'
+        ]);
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
@@ -1373,11 +1409,17 @@ class SuspensaoExcecaoTest extends TestCase
         ->assertOk()
         ->assertSeeText('Salvar');
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ])->assertJsonMissing([
+            'suspenso' => '<strong>CPF:</strong> 569.832.380-10'
+        ]);
+
         $this->put(route('representante.agendar.inserir.put', [
             'acao' => 'editar',
             'id' => $agenda->id
         ]), [
-            'participantes_cpf' => ['56983238010'],
+            'participantes_cpf' => ['569.832.380-10'],
             'participantes_nome' => ['NOME PARTICIPANTE UM'],
         ])->assertStatus(302);
 
@@ -1479,6 +1521,18 @@ class SuspensaoExcecaoTest extends TestCase
             'participantes' => json_encode(['56983238010' => 'NOME PARTICIPANTE UM', '86294373085' => 'NOME PARTICIPANTE DOIS'], JSON_FORCE_OBJECT)
         ]);
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ])->assertJsonMissing([
+            'suspenso' => '<strong>CPF:</strong> 569.832.380-10'
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '862.943.730-85',
+        ])->assertJsonMissing([
+            'suspenso' => '<strong>CPF:</strong> 862.943.730-85'
+        ]);
+        
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
@@ -1515,11 +1569,17 @@ class SuspensaoExcecaoTest extends TestCase
         ->assertOk()
         ->assertSeeText('Salvar');
 
+        $this->post(route('representante.agendar.inserir.post', 'verificar'), [
+            'participantes_cpf' => '569.832.380-10',
+        ])->assertJsonMissing([
+            'suspenso' => '<strong>CPF:</strong> 569.832.380-10'
+        ]);
+
         $this->put(route('representante.agendar.inserir.put', [
             'acao' => 'editar',
             'id' => $agenda->id
         ]), [
-            'participantes_cpf' => ['56983238010'],
+            'participantes_cpf' => ['569.832.380-10'],
             'participantes_nome' => ['NOME PARTICIPANTE UM'],
         ])->assertStatus(302);
 

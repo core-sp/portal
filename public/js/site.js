@@ -847,7 +847,7 @@ $('#ano-mapa').on({
 		getDadosSalas('getDias', $("#tipo_sala").val(), $("#sala_reuniao_id").val(), $('#datepicker').val());
 	});
 
-	// verifica a situação do participante junto ao conselho
+	// verifica a situação do participante junto ao conselho e no Portal
 	const idAgendaSala = $('#tempIdSala').length > 0 ? $('#tempIdSala').val() : null;
 
 	$('input[name="participantes_cpf[]"]').change(function(){
@@ -869,20 +869,30 @@ $('#ano-mapa').on({
 				beforeSend: function(){
 					$('#loadingSala').modal({backdrop: 'static', keyboard: false, show: true});
 					$('#loadingSala .modal-body')
-					.html('<div class="spinner-border text-danger"></div><br>Conferindo situação do participante junto ao Conselho...');
+					.html('<div class="spinner-border text-danger"></div><br>Conferindo situação junto ao Conselho e no Portal...');
 				},
 				complete: function(){
 					$('#loadingSala').modal('hide');
 				},
 				success: function(response) {
 					$('#loadingSala').modal('hide');
-					if(response.participante_irregular != null){
+					if((response.participante_irregular != null) || (response.suspenso != null)){
+						var n_cpf = response.participante_irregular != null ? response.participante_irregular : response.suspenso;
+						var texto_c = 'situação junto ao Conselho';
+						var texto_s = 'suspensão no Portal para novos agendamentos de sala';
+						var texto = '';
+						if((response.participante_irregular != null) && (response.suspenso != null))
+							texto = texto_c + ' e ' + texto_s;
+						else
+							texto = response.participante_irregular != null ? texto_c : texto_s;
 						$('#verificaSala').modal({backdrop: 'static', keyboard: false, show: true});
-						$('#verificaSala .modal-body #cpfIrregular').html(response.participante_irregular);
-						$('#verificaSala .modal-body #cpfIrregular').after('<div id="texto"><br><strong>Não será possível criar / editar o agendamento com este participante devido a situação junto ao Conselho.</strong></div>');
+						$('#verificaSala .modal-body #cpfIrregular').html(n_cpf);
+						$('#verificaSala .modal-body #cpfIrregular')
+						.after('<div id="texto"><br><strong>Não será possível criar / editar o agendamento com este participante devido ' + texto + '.</strong></div>');
 					}
 				},
 				error: function() {
+					$('#loadingSala').modal('hide');
 					$("#dialog_agendamento")
 						.empty()
 						.append("Falha. Recarregue a página ou tente mais tarde.");
