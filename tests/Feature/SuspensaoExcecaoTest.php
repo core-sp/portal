@@ -1265,6 +1265,10 @@ class SuspensaoExcecaoTest extends TestCase
         ->assertSessionHasErrors([
             'participante_suspenso'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('O seguinte participante está suspenso para novos agendamentos:<br><strong>862.943.730-85</strong>');
     }
 
     /** @test */
@@ -1302,8 +1306,9 @@ class SuspensaoExcecaoTest extends TestCase
             'participante_suspenso'
         ]);
 
-        $this->assertEquals(session()->get('errors')->first('participante_suspenso'), 
-        'O seguinte participante está suspenso para novos agendamentos:<br><strong>862.943.730-85</strong>');
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('O seguinte participante está suspenso para novos agendamentos:<br><strong>862.943.730-85</strong>');
     }
 
     /** @test */
@@ -1346,8 +1351,9 @@ class SuspensaoExcecaoTest extends TestCase
             'participante_suspenso'
         ]);
 
-        $this->assertEquals(session()->get('errors')->first('participante_suspenso'), 
-        'Os seguintes participantes estão suspensos para novos agendamentos:<br><strong>862.943.730-85<br>569.832.380-10</strong>');
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('Os seguintes participantes estão suspensos para novos agendamentos:<br><strong>862.943.730-85<br>569.832.380-10</strong>');
     }
 
     /** @test */

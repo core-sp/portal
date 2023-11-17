@@ -1509,6 +1509,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participantes_cpf'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('É obrigatório ter participante');
     }
 
     /** @test */
@@ -1540,6 +1544,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participantes_cpf'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('É obrigatório ter participante');
     }
 
     /** @test */
@@ -1561,6 +1569,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participantes_cpf'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('Formato inválido do campo Participantes');
     }
 
     /** @test */
@@ -1590,6 +1602,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participantes_cpf.*'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('CPF inválido');
     }
 
     /** @test */
@@ -1615,6 +1631,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participantes_cpf.*'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('Existe CPF repetido');
     }
 
     /** @test */
@@ -1647,6 +1667,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participantes_nome'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('Total de nomes difere do total de CPFs ou encontrado CPF irregular junto ao Conselho');
     }
 
     /** @test */
@@ -1676,6 +1700,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participantes_nome'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('É obrigatório ter participante');
     }
 
     /** @test */
@@ -1705,6 +1733,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participantes_nome'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('Formato inválido do campo Participantes');
     }
 
     /** @test */
@@ -1734,6 +1766,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participantes_nome'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('Total de nomes difere do total de CPFs ou encontrado CPF irregular junto ao Conselho');
     }
 
     /** @test */
@@ -1763,6 +1799,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participantes_nome.*'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('Existe nome repetido');
     }
 
     /** @test */
@@ -1792,6 +1832,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participantes_nome.*'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('Não pode conter número no nome');
     }
 
     /** @test */
@@ -1821,6 +1865,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participantes_nome.*'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('O nome deve ter 5 caracteres ou mais');
     }
 
     /** @test */
@@ -1851,6 +1899,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participantes_nome.*'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('O nome deve ter 191 caracteres ou menos');
     }
 
     /** @test */
@@ -1888,6 +1940,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participante_vetado'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('Os seguintes participantes já estão agendados neste mesmo dia e período:<br><strong>569.832.380-10<br>819.219.230-08</strong>');
     }
 
     /** @test */
@@ -1926,6 +1982,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participante_vetado'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('Os seguintes participantes já estão agendados neste mesmo dia e período:<br><strong>569.832.380-10<br>819.219.230-08</strong>');
     }
 
     /** @test */
@@ -1965,6 +2025,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participante_vetado'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('Os seguintes participantes já estão agendados neste mesmo dia e período:<br><strong>569.832.380-10<br>819.219.230-08</strong>');
     }
 
     /** @test */
@@ -2004,6 +2068,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participante_vetado'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('Os seguintes participantes já estão agendados neste mesmo dia e período:<br><strong>569.832.380-10<br>819.219.230-08</strong>');
     }
 
     /** @test */
@@ -2042,8 +2110,9 @@ class AgendamentoSalaTest extends TestCase
             'participante_vetado'
         ]);
 
-        $this->assertEquals(session()->get('errors')->first('participante_vetado'), 
-        'O seguinte participante já está agendado neste mesmo dia e período:<br><strong>569.832.380-10</strong>');
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('O seguinte participante já está agendado neste mesmo dia e período:<br><strong>569.832.380-10</strong>');
     }
 
     /** @test */
@@ -2082,8 +2151,9 @@ class AgendamentoSalaTest extends TestCase
             'participante_vetado'
         ]);
 
-        $this->assertEquals(session()->get('errors')->first('participante_vetado'), 
-        'Os seguintes participantes já estão agendados neste mesmo dia e período:<br><strong>569.832.380-10<br>819.219.230-08</strong>');
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('Os seguintes participantes já estão agendados neste mesmo dia e período:<br><strong>569.832.380-10<br>819.219.230-08</strong>');
     }
 
     /** @test */
@@ -2784,6 +2854,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participantes_cpf'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('É obrigatório ter participante');
     }
 
     /** @test */
@@ -2814,6 +2888,10 @@ class AgendamentoSalaTest extends TestCase
         ->assertSessionHasErrors([
             'participantes_cpf'
         ]);
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'))
+        ->assertSee('<p class="alert alert-danger" data-clarity-mask="True">')
+        ->assertSee('É obrigatório ter participante');
     }
 
     /** @test */

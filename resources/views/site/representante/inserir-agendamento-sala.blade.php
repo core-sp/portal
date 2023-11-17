@@ -22,20 +22,21 @@
     </h4>
     <div class="linha-lg-mini mb-3"></div>
 
-    @if($errors->has('participante_vetado') || $errors->has('participante_suspenso') || $errors->has('participantes_cpf') || $errors->has('participantes_cpf.*') || $errors->has('participantes_nome') || $errors->has('participantes_nome.*'))
+  @foreach(['participante_vetado', 'participante_suspenso', 'participantes_cpf', 'participantes_cpf.*', 'participantes_nome', 'participantes_nome.*'] as $erro)
+    @if($errors->has($erro))
     <div class="d-block w-100">
       <p class="alert alert-danger" data-clarity-mask="True">
         <i class="fas fa-times"></i>&nbsp;&nbsp;
-        @if($errors->has('participante_vetado') || $errors->has('participante_suspenso'))
-        {!! $errors->has('participante_vetado') ? $errors->first('participante_vetado') : $errors->first('participante_suspenso') !!}
-        @elseif($errors->has('participantes_cpf.*') || $errors->has('participantes_nome.*'))
-        {{ $errors->has('participantes_cpf.*') ? $errors->first('participantes_cpf.*') : $errors->first('participantes_nome.*') }}
+        @if(in_array($erro, ['participante_suspenso', 'participante_vetado']))
+        {!! $errors->first($erro) !!}
         @else
-        {{ $errors->has('participantes_cpf') ? $errors->first('participantes_cpf') : $errors->first('participantes_nome') }}
+        {{ $errors->first($erro) }}
         @endif
       </p>
     </div>
+      @break
     @endif
+  @endforeach
     
     <p>Preencha as informações abaixo para agendar o uso de uma sala para reunião ou coworking.</p>
 
