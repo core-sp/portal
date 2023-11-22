@@ -526,6 +526,28 @@ class SalaReuniaoTest extends TestCase
     }
 
     /** @test */
+    public function sala_cannot_be_edited_with_participantes_reuniao_greater_than_20()
+    {
+        $this->signInAsAdmin();
+        $sala = factory('App\SalaReuniao')->states('desativa_coworking')->create();
+                
+        $this->get(route('sala.reuniao.index'))->assertOk();
+        $this->get(route('sala.reuniao.editar.view', $sala->id))->assertOk();
+
+        $dados = $sala->toArray();
+        $dados['participantes_reuniao'] = 21;
+        $dados['horarios_reuniao'] = $sala->getHorarios('reuniao');
+        $dados['horarios_coworking'] = [];
+        $dados['itens_coworking'] = [];
+        $dados['itens_reuniao'] = $sala->getItens('reuniao');
+
+        $this->put(route('sala.reuniao.editar', $sala->id), $dados)
+        ->assertSessionHasErrors([
+            'participantes_reuniao'
+        ]);
+    }
+
+    /** @test */
     public function sala_cannot_be_edited_without_horarios_when_participantes_reuniao_greater_than_1()
     {
         $this->signInAsAdmin();
@@ -747,6 +769,28 @@ class SalaReuniaoTest extends TestCase
 
         $dados = $sala->toArray();
         $dados['participantes_coworking'] = 'A';
+        $dados['horarios_coworking'] = ['09:00','10:00','11:00'];
+        $dados['itens_coworking'] = $sala->getItens('coworking');
+        $dados['itens_reuniao'] = [];
+        $dados['horarios_reuniao'] = [];
+
+        $this->put(route('sala.reuniao.editar', $sala->id), $dados)
+        ->assertSessionHasErrors([
+            'participantes_coworking'
+        ]);
+    }
+
+    /** @test */
+    public function sala_cannot_be_edited_when_participantes_coworking_greater_than_20()
+    {
+        $this->signInAsAdmin();
+        $sala = factory('App\SalaReuniao')->states('desativa_reuniao')->create();
+                
+        $this->get(route('sala.reuniao.index'))->assertOk();
+        $this->get(route('sala.reuniao.editar.view', $sala->id))->assertOk();
+
+        $dados = $sala->toArray();
+        $dados['participantes_coworking'] = 21;
         $dados['horarios_coworking'] = ['09:00','10:00','11:00'];
         $dados['itens_coworking'] = $sala->getItens('coworking');
         $dados['itens_reuniao'] = [];

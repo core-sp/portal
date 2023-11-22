@@ -72,13 +72,13 @@ class SalaReuniaoRequest extends FormRequest
                 'hora_limite_final_manha' => 'required|in:' . implode(',', $this->service->getHorasPeriodo('manha')),
                 'hora_limite_final_tarde' => 'required|in:' . implode(',', $this->service->getHorasPeriodo('tarde')),
 
-                'participantes_reuniao' => 'required|integer|not_in:1',
+                'participantes_reuniao' => 'required|integer|not_in:1|max:20',
                 'horarios_reuniao' => $this->required_horas_reuniao . '|array|in:' . implode(',', $this->horas),
                 'horarios_reuniao.*' => 'distinct',
                 'itens_reuniao' => 'required_unless:participantes_reuniao,0|array',
                 'itens_reuniao.*' => 'distinct',
 
-                'participantes_coworking' => 'required|integer',
+                'participantes_coworking' => 'required|integer|max:20',
                 'horarios_coworking' => $this->required_horas_coworking . '|array|in:' . implode(',', $this->horas),
                 'horarios_coworking.*' => 'distinct',
                 'itens_coworking' => 'required_unless:participantes_coworking,0|array|in:' . implode(',', $this->service->getItensByTipo('coworking')),
@@ -99,7 +99,8 @@ class SalaReuniaoRequest extends FormRequest
             'array' => 'Formato inválido',
             'integer' => 'Deve ser um número',
             'distinct' => 'Existe valor repetido',
-            'participantes_reuniao.not_in' => 'Deve ter pelo menos 2 participantes em reunião, ou 0 para tornar indisponível'
+            'participantes_reuniao.not_in' => 'Deve ter pelo menos 2 participantes em reunião, ou 0 para tornar indisponível',
+            'max' => 'Máximo permitido de participantes é :max',
         ];
     }
 }
