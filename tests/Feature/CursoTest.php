@@ -1682,10 +1682,9 @@ class CursoTest extends TestCase
     /** @test */
     public function inscrito_private_cannot_be_created_gerenti_without_situacao_em_dia()
     {
-        // Editar GerentiMock gerentiStatus()
         $curso = factory('App\Curso')->create();
 
-        $representante = factory('App\Representante')->create();
+        $representante = factory('App\Representante')->states('irregular')->create();
         $this->actingAs($representante, 'representante');
 
         $this->get(route('cursos.inscricao.website', $curso->idcurso))

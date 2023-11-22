@@ -329,7 +329,7 @@ class PaginaTest extends TestCase
     }
 
     /** @test */
-    function pagina_author_is_shown_on_admin()
+    public function pagina_author_is_shown_on_admin()
     {
         $user = $this->signInAsAdmin();
 
@@ -339,7 +339,7 @@ class PaginaTest extends TestCase
     }
 
     /** @test */
-    function link_to_create_pagina_is_shown_on_admin()
+    public function link_to_create_pagina_is_shown_on_admin()
     {
         $this->signInAsAdmin();
 
@@ -347,7 +347,7 @@ class PaginaTest extends TestCase
     }
 
     /** @test */
-    function link_to_edit_pagina_is_shown_on_admin()
+    public function link_to_edit_pagina_is_shown_on_admin()
     {
         $this->signInAsAdmin();
 
@@ -357,7 +357,7 @@ class PaginaTest extends TestCase
     }
 
     /** @test */
-    function link_to_destroy_pagina_is_shown_on_admin()
+    public function link_to_destroy_pagina_is_shown_on_admin()
     {
         $this->signInAsAdmin();
 
@@ -367,7 +367,7 @@ class PaginaTest extends TestCase
     }
 
     /** @test */
-    function pagina_conteudoBusca_is_stored_with_no_tags()
+    public function pagina_conteudoBusca_is_stored_with_no_tags()
     {
         $this->signInAsAdmin();
 

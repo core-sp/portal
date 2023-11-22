@@ -51,7 +51,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function a_concurso_can_be_created()
+    public function a_concurso_can_be_created()
     {
         $concurso = factory('App\Concurso')->create();
 
@@ -128,7 +128,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function multiple_concursos_can_be_created()
+    public function multiple_concursos_can_be_created()
     {
         $this->signInAsAdmin();
 
@@ -141,7 +141,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function a_concurso_without_modalidade_cannot_be_created()
+    public function a_concurso_without_modalidade_cannot_be_created()
     {
         $this->signInAsAdmin();
 
@@ -154,7 +154,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function a_concurso_without_titulo_cannot_be_created()
+    public function a_concurso_without_titulo_cannot_be_created()
     {
         $this->signInAsAdmin();
 
@@ -167,7 +167,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function a_concurso_without_nrprocesso_cannot_be_created()
+    public function a_concurso_without_nrprocesso_cannot_be_created()
     {
         $this->signInAsAdmin();
 
@@ -180,7 +180,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function a_concurso_without_situacao_cannot_be_created()
+    public function a_concurso_without_situacao_cannot_be_created()
     {
         $this->signInAsAdmin();
 
@@ -193,7 +193,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function a_concurso_without_datarealizacao_cannot_be_created()
+    public function a_concurso_without_datarealizacao_cannot_be_created()
     {
         $this->signInAsAdmin();
 
@@ -206,7 +206,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function a_concurso_without_objeto_cannot_be_created()
+    public function a_concurso_without_objeto_cannot_be_created()
     {
         $this->signInAsAdmin();
 
@@ -219,7 +219,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function a_concurso_cannot_have_duplicate_nrprocesso()
+    public function a_concurso_cannot_have_duplicate_nrprocesso()
     {
         $this->signInAsAdmin();
 
@@ -354,7 +354,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function concurso_can_be_searched()
+    public function concurso_can_be_searched()
     {
         $this->signInAsAdmin();
 
@@ -365,7 +365,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function concurso_author_is_shown_on_admin()
+    public function concurso_author_is_shown_on_admin()
     {
         $user = $this->signInAsAdmin();
 
@@ -375,7 +375,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function link_to_edit_concurso_is_shown_on_admin()
+    public function link_to_edit_concurso_is_shown_on_admin()
     {
         $this->signInAsAdmin();
 
@@ -386,7 +386,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function link_to_destroy_concurso_is_shown_on_admin()
+    public function link_to_destroy_concurso_is_shown_on_admin()
     {
         $this->signInAsAdmin();
 
@@ -397,7 +397,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function link_to_create_concurso_is_shown_on_admin()
+    public function link_to_create_concurso_is_shown_on_admin()
     {
         $this->signInAsAdmin();
 
@@ -405,7 +405,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function concurso_can_be_searched_by_modalidade_on_website()
+    public function concurso_can_be_searched_by_modalidade_on_website()
     {
         $concurso = factory('App\Concurso')->create();
 
@@ -416,7 +416,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function concurso_can_be_searched_by_situacao_on_website()
+    public function concurso_can_be_searched_by_situacao_on_website()
     {
         $concurso = factory('App\Concurso')->create();
 
@@ -427,7 +427,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function concurso_can_be_searched_by_nrprocesso_on_website()
+    public function concurso_can_be_searched_by_nrprocesso_on_website()
     {
         $concurso = factory('App\Concurso')->create();
 
@@ -438,7 +438,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function concurso_can_be_searched_by_datarealizacao_on_website()
+    public function concurso_can_be_searched_by_datarealizacao_on_website()
     {
         $concurso = factory('App\Concurso')->create();
 
@@ -449,7 +449,7 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
-    function concurso_lixeira_is_acessible_by_authorized_users()
+    public function concurso_lixeira_is_acessible_by_authorized_users()
     {
         $this->signInAsAdmin();
         $concurso = factory('App\Concurso')->create();

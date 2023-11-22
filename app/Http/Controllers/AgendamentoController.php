@@ -34,6 +34,9 @@ class AgendamentoController extends Controller
             abort(500, "Erro ao carregar os agendamentos.");
         }
 
+        if(\Route::is('sala.reuniao.*'))
+            $this->service->getService('SalaReuniao')->site()->limparVerificadosConselho(request()->session());
+
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
     }
 
@@ -128,6 +131,8 @@ class AgendamentoController extends Controller
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao criar agendamento de sala.");
         }
+
+        $this->service->getService('SalaReuniao')->site()->limparVerificadosConselho(request()->session());
 
         return redirect()->route('sala.reuniao.agendados.busca', ['q' => $dados['protocolo']])->with($dados);
     }

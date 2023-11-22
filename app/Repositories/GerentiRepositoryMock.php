@@ -310,7 +310,16 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
 
     public function gerentiStatus($ass_id)
     {
-        return "Situação: Em dia.";
+        switch ($ass_id) {
+            case "000004":
+                return "Situação: Proc. Administrativo.";
+                break;
+            case "000005":
+                return "Situação: Cancelado ou Bloqueado.";
+            default:
+                return "Situação: Em dia.";
+                break;
+        }
     }
 
     /**
@@ -403,6 +412,24 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
                 "NOME" => "RC Teste Tres", 
                 "EMAILS" => "novo_rc@teste.com"
             ];
+        }
+        elseif($cpfCnpj == "68126712589") {
+            $resultado[0] = [
+                "SITUACAO" => "Ativo", 
+                "REGISTRONUM" => "0000000004", 
+                "ASS_ID" => "000004", 
+                "NOME" => "RC Teste Quatro", 
+                "EMAILS" => "novo_rc@teste.org"
+            ];
+        }
+        elseif($cpfCnpj == "22553674830") {
+            $resultado[0] = [
+                "SITUACAO" => "Cancelado", 
+                "REGISTRONUM" => "0000000005", 
+                "ASS_ID" => "000005", 
+                "NOME" => "RC Teste Cinco", 
+                "EMAILS" => "novo_rc@teste.com.br"
+            ];
         }else
             $resultado[0] = [
                 "SITUACAO" => "Não encontrado", 
@@ -485,6 +512,8 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
     public function gerentiGetSegmentosByAssId($ass_id) 
     {
         // Segmentos igual ao do BDO
+        if($ass_id == "000003")
+            return [];
         return [
             [
                 "SEGMENTO" => "Alimentício",

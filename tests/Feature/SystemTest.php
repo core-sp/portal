@@ -215,6 +215,7 @@ class SystemTest extends TestCase
         $this->assertEquals($mediador->getService('Representante'), $servico);
     }
 
+    /** @test */
     public function mediador_interface_get_instace_sala_reuniao_service()
     {
         $servico = new \App\Services\SalaReuniaoService();

@@ -20,3 +20,27 @@ $factory->define(Representante::class, function (Faker $faker) {
         'updated_at' => now()
     ];
 });
+
+$factory->state(Representante::class, 'irregular', function ($faker) {
+    return [
+        'cpf_cnpj' => '68126712589',
+        'registro_core' => '0000000004',
+        'ass_id' => '000004',
+    ];
+});
+
+$factory->state(Representante::class, 'cancelado', function ($faker) {
+    return [
+        'cpf_cnpj' => '22553674830',
+        'registro_core' => '0000000005',
+        'ass_id' => '000005',
+    ];
+});
+
+$factory->state(Representante::class, 'sem_segmento', function ($faker) {
+    return [
+        'cpf_cnpj' => '56983238010',
+        'registro_core' => '0000000003',
+        'ass_id' => '000003',
+    ];
+});

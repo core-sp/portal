@@ -641,18 +641,16 @@ class RepresentanteTest extends TestCase
     /** @test 
      * 
      * Não visualiza as oportunidades no bdo se não possuir segmento. 
-     * Tem de comentar o array do segmento no GerentiMock
     */
     public function cannot_view_alert_bdo_if_hasnt_segment()
     {
-        // Tem de comentar o array do segmento no GerentiMock
         factory('App\Regional')->create([
             'regional' => 'SÃO PAULO',
         ]);
         $bdo = factory('App\BdoOportunidade')->create([
             'segmento' => 'Alimentício',
         ]);
-        $representante = factory('App\Representante')->create();
+        $representante = factory('App\Representante')->states('sem_segmento')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         $this->get(route('representante.bdo'))->assertDontSee($bdo->segmento);
     }
@@ -696,11 +694,10 @@ class RepresentanteTest extends TestCase
     */
     public function cannot_view_alert_bdo_if_hasnt_bdo_and_segmento()
     {
-        // Comentar o segmento no GerentiMock
         factory('App\Regional')->create([
             'regional' => 'SÃO PAULO',
         ]);
-        $representante = factory('App\Representante')->create();
+        $representante = factory('App\Representante')->states('sem_segmento')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         $this->get(route('representante.bdo'))->assertDontSee('Alimentício');
     }

@@ -617,7 +617,7 @@ $('select[name="add_campo"]').change(function(){
 
 // Funcionalidade Sala Reunião / Agendados / Criar agendamento
 
-function verificarDadosCriarAgendaSala(nome_campo){
+function verificarDadosCriarAgendaSala(nome_campo, valor){
   var final;
   switch(nome_campo) {
     case "cpf_cnpj":
@@ -626,6 +626,9 @@ function verificarDadosCriarAgendaSala(nome_campo){
     case "sala_reuniao_id":
       final = '"' + nome_campo + '":' + '"' + $('#criarAgendaSala select[name="sala_reuniao_id"]').val();
       final = final + '", "tipo_sala":"' + $('select[name="tipo_sala"]').val() + '"';
+      break;
+    case "participantes_cpf":
+      final = '"participantes_cpf":' + '"' + valor + '"';
       break;
     default:
       var cpfs = [$('#criarAgendaSala input[name="cpf_cnpj"]').val()];
@@ -644,7 +647,7 @@ function verificarDadosCriarAgendaSala(nome_campo){
     url: '/admin/salas-reunioes/agendados/verifica',
     data: json,
     beforeSend: function(){
-      if(nome_campo == "cpf_cnpj")
+      if((nome_campo == "cpf_cnpj") || (nome_campo == "participantes_cpf"))
         $('#modal-load-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
     },
     complete: function(){
@@ -687,11 +690,27 @@ function verificarDadosCriarAgendaSala(nome_campo){
           }
           if((response.total_participantes > 0) && ($('select[name="tipo_sala"]').val() == 'reuniao')){
             for (let i = 1; i < response.total_participantes; i++)
-              $('#area_participantes').append($('.participante:last').clone());
-            $('.participante :input[name="participantes_cpf[]"]').val('').unmask().mask('999.999.999-99');
+              $('#area_participantes').append($('.participante:last').clone(true));
+            $('.participante :input[name="participantes_cpf[]"]').val('').mask('999.999.999-99');
             $('.participante :input[name="participantes_nome[]"]').val('');
             $('#area_participantes').show();
           }
+          break;
+        case "participantes_cpf":
+          if((response.participante_irregular != null) || (response.suspenso != null)){
+						var n_cpf = response.participante_irregular != null ? response.participante_irregular : response.suspenso;
+						var texto_c = 'está ativo, porém não está em dia no Gerenti';
+						var texto_s = 'está suspenso no Portal para novos agendamentos de sala';
+						var texto = '';
+						if((response.participante_irregular != null) && (response.suspenso != null))
+							texto = texto_c + ' e ' + texto_s;
+						else
+							texto = response.participante_irregular != null ? texto_c : texto_s;
+						$('#modal-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
+            $('.modal-footer').hide();
+						$('#modal-criar_agenda .modal-body')
+						.html(n_cpf + '<br><strong>Participante ' + texto + '.</strong>');
+					}
           break;
         default:
           if(response.suspenso == ''){
@@ -715,19 +734,33 @@ function verificarDadosCriarAgendaSala(nome_campo){
 
 $('#criarAgendaSala').ready(function(){
   var tam = $('#criarAgendaSala input[name="cpf_cnpj"]').length > 0 ? $('#criarAgendaSala input[name="cpf_cnpj"]').val().length : 0;
-  if((tam == 14) || (tam == 18))
-      verificarDadosCriarAgendaSala("cpf_cnpj");
+  if((tam == 14) || (tam == 18)){
+    $('select[name="sala_reuniao_id"]').prop('disabled', false);
+    verificarDadosCriarAgendaSala("cpf_cnpj");
+  }else{
+    $('select[name="sala_reuniao_id"]').prop('disabled', true);
+    $('select[name="tipo_sala"]').prop('disabled', true);
+  }
 
   $('input[name="cpf_cnpj"]').change(function(){
     var tamanho = $('#criarAgendaSala input[name="cpf_cnpj"]').val().length;
-    if((tamanho == 14) || (tamanho == 18))
+    if((tamanho == 14) || (tamanho == 18)){
+      $('select[name="sala_reuniao_id"]').prop('disabled', false);
       verificarDadosCriarAgendaSala("cpf_cnpj");
+    }else{
+      $('select[name="sala_reuniao_id"]').prop('disabled', true);
+      $('select[name="tipo_sala"]').prop('disabled', true);
+    }
   });
   
   $('select[name="sala_reuniao_id"]').change(function(){
-    if(this.value == "")
+    if(this.value == ""){
       $(".participante:gt(0)").remove();
+      $('select[name="tipo_sala"]').prop('disabled', true);
+      return;
+    }
     verificarDadosCriarAgendaSala("sala_reuniao_id");
+    $('select[name="tipo_sala"]').prop('disabled', false);
   });
 
   $('select[name="tipo_sala"]').change(function(){
@@ -750,6 +783,19 @@ $('#criarAgendaSala').ready(function(){
       });
       $('select[name="periodo_saida"] option:eq(' + indice + ')').prop('selected', true);
   });
+});
+
+$('input[name="participantes_cpf[]"]').change(function(){
+  if(this.value.length == 14){
+    if(this.value == $('input[name="cpf_cnpj"]').val()){
+      $('#modal-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
+      $('.modal-footer').hide();
+      $('#modal-criar_agenda .modal-body').html('<strong>Não pode inserir CPF do representante responsável!</strong>');
+      this.value = "";
+      return;
+    }
+    verificarDadosCriarAgendaSala("participantes_cpf", this.value);
+  }
 });
 
 $('#enviarCriarAgenda').click(function(){

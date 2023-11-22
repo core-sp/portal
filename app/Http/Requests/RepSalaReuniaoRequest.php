@@ -126,9 +126,7 @@ class RepSalaReuniaoRequest extends FormRequest
 
             $periodo_todo = array_keys($this->horas, $this->periodo, true);
             $periodo_todo = isset($periodo_todo[0]) && in_array($periodo_todo[0], ['manha', 'tarde']) ? 1 : 0;
-            $this->merge(['periodo_todo' => $periodo_todo]);
-
-            $this->merge(['ip' => request()->ip()]);
+            $this->merge(['periodo_todo' => $periodo_todo, 'ip' => request()->ip()]);
         }
 
         $temp = null;

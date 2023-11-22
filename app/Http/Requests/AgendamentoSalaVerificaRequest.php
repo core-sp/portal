@@ -17,7 +17,7 @@ class AgendamentoSalaVerificaRequest extends FormRequest
 
     public function __construct(MediadorServiceInterface $service, GerentiRepositoryInterface $gerentiRepository)
     {
-        $this->service = $service;
+        $this->service = $service->getService('SalaReuniao');
         $this->gerentiRepository = $gerentiRepository;
     }
 
@@ -45,8 +45,25 @@ class AgendamentoSalaVerificaRequest extends FormRequest
                 $this->merge(['registroGerenti' => formataRegistro($this->registroGerenti)]);
         }
 
+        if($this->filled('participantes_cpf') && !is_array($this->participantes_cpf))
+        {
+            if(($this->cpf_cnpj == $this->participantes_cpf) || (formataCpfCnpj(apenasNumeros($this->participantes_cpf)) != $this->participantes_cpf))
+            {
+                $texto = $this->cpf_cnpj != $this->participantes_cpf ? '<strong>Formato do CPF inválido!</strong>' : '<strong>Não pode inserir o próprio CPF!</strong>';
+                $this->merge(['participante_irregular' => $texto, 'suspenso' => null]);
+                return;
+            }
+
+            $texto = $this->service->site()->participanteIrregularConselho($this->session(), $this->participantes_cpf, $this->gerentiRepository);
+
+            $suspenso = $this->service->suspensaoExcecao()->participantesSuspensos([$this->participantes_cpf]);
+            $texto_s = isset($suspenso) && !empty($suspenso) ? '<strong>CPF:</strong> ' . $suspenso[0] : null;
+            $this->merge(['participante_irregular' => $texto, 'suspenso' => $texto_s]);
+            return;
+        }
+
         if($this->filled('sala_reuniao_id') || !\Route::is('sala.reuniao.agendados.verifica.criar'))
-            $this->salas = $this->service->getService('SalaReuniao')->salasAtivas();
+            $this->salas = $this->service->salasAtivas();
 
         if($this->filled('sala_reuniao_id') && $this->filled('tipo_sala')){
             $this->merge(['sala_reuniao_id' => in_array(auth()->user()->idperfil, [8, 21]) ? auth()->user()->idregional : $this->sala_reuniao_id]);
@@ -61,7 +78,7 @@ class AgendamentoSalaVerificaRequest extends FormRequest
 
         if(\Route::is('sala.reuniao.agendados.verifica.criar') && isset($this->participantes_cpf) && is_array($this->participantes_cpf))
         {
-            $suspensos = $this->service->getService('SalaReuniao')->suspensaoExcecao()->participantesSuspensos($this->participantes_cpf);
+            $suspensos = $this->service->suspensaoExcecao()->participantesSuspensos($this->participantes_cpf);
             $textoSuspensos = isset($suspensos) && !empty($suspensos) && (count($suspensos) == 1) ? 
             'O seguinte participante está suspenso para novos agendamentos na área restrita do representante:' :
             'Os seguintes participantes estão suspensos para novos agendamentos na área restrita do representante:';
@@ -142,6 +159,7 @@ class AgendamentoSalaVerificaRequest extends FormRequest
 
         if($this->filled('participantes_cpf'))
             return [
+                'participante_irregular' => '',
                 'suspenso' => '',
             ];
     }
@@ -161,7 +179,7 @@ class AgendamentoSalaVerificaRequest extends FormRequest
             'regex' => 'Não pode conter número no nome',
             'participantes_cpf.*.distinct' => 'Existe CPF repetido',
             'participantes_nome.*.distinct' => 'Existe nome repetido',
-            'size' => 'Total de nomes difere do total de CPFs',
+            'size' => 'Total de nomes difere do total de CPFs ou encontrado CPF irregular junto ao Conselho',
             'periodo_entrada.before' => 'Deve ser até as 17:30',
             'periodo_saida.after' => 'Deve ser depois do período de entrada',
             'nome.required' => 'Nome não existe no Gerenti',
