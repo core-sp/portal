@@ -272,6 +272,9 @@ Route::middleware(['block_ip'])->group(function () {
         Route::prefix('agendados')->group(function(){
           Route::name('agendados.')->group(function () {
             Route::get('/', 'AgendamentoController@index')->name('index');
+            Route::get('/criar', 'AgendamentoController@create')->name('create');
+            Route::post('/verifica', 'AgendamentoController@verificar')->name('verifica.criar');
+            Route::post('/criar', 'AgendamentoController@store')->name('store');
             Route::get('/visualizar/{id}/{anexo?}', 'AgendamentoController@view')->name('view');
             Route::put('/{id}/{acao}', 'AgendamentoController@updateStatus')->where('acao', 'confirma|aceito|recusa')->name('update');
             Route::get('/filtro', 'AgendamentoController@index')->name('filtro');

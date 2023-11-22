@@ -115,6 +115,11 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\SuspensaoExcecao', 'idusuario');
     }
+    
+    public function agendamentosSala()
+    {
+        return $this->hasMany('App\AgendamentoSala', 'idusuario');
+    }
 
     public function preRegistros()
     {

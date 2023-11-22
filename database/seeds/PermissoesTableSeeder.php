@@ -298,6 +298,10 @@ class PermissoesTableSeeder extends Seeder
                 'metodo' => 'edit',
                 'perfis' => '1,'
             ], [
+                'controller' => 'AgendamentoController',
+                'metodo' => 'create',
+                'perfis' => '1,'
+            ], [
                 'controller' => 'PreRegistroController',
                 'metodo' => 'index',
                 'perfis' => '1,'
@@ -305,7 +309,7 @@ class PermissoesTableSeeder extends Seeder
                 'controller' => 'PreRegistroController',
                 'metodo' => 'edit',
                 'perfis' => '1,'
-            ]
+            ],
         ]);
     }
 }
