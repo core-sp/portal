@@ -52,6 +52,7 @@ class Licitacao extends Model
     const SIT_JULGAMENTO = 'Julgamento';
     const SIT_PREPARATORIA = 'Preparatória';
     const SIT_SUSPENSO = 'Suspenso';
+    const SIT_REVOGADO = 'Revogado';
 
     public function user()
     {
@@ -101,6 +102,7 @@ class Licitacao extends Model
             Licitacao::SIT_HOMOLOGADO,
             Licitacao::SIT_JULGAMENTO,
             Licitacao::SIT_PREPARATORIA,
+            Licitacao::SIT_REVOGADO,
             Licitacao::SIT_SUSPENSO
         ];
     }

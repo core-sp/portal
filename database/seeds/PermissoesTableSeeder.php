@@ -297,7 +297,11 @@ class PermissoesTableSeeder extends Seeder
                 'controller' => 'SuspensaoExcecaoController',
                 'metodo' => 'edit',
                 'perfis' => '1,'
-            ]
+            ], [
+                'controller' => 'AgendamentoController',
+                'metodo' => 'create',
+                'perfis' => '1,'
+            ],
         ]);
     }
 }
