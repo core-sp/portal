@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\AgendamentoRequest;
+use App\Http\Requests\AgendamentoSalaVerificaRequest;
 use App\Contracts\MediadorServiceInterface;
 
 class AgendamentoController extends Controller
@@ -77,6 +78,58 @@ class AgendamentoController extends Controller
         }
 
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
+    }
+
+    public function create()
+    {
+        $user = auth()->user();
+        $this->authorize('create', $user);
+        
+        try{
+            $dados = $this->service->getService('SalaReuniao')->agendados()->view();
+            $dados['salas'] = $this->service->getService('SalaReuniao')->salasAtivas();
+            $dados['salas'] = in_array($user->idperfil, [8, 21]) && $dados['salas']->isNotEmpty() ? $dados['salas']->where('idregional', $user->idregional) : $dados['salas'];
+
+            if($dados['salas']->isEmpty())
+                return redirect()->route('sala.reuniao.agendados.index')
+                ->with(['message' => 'Não possui salas ativas para criar agendamento!', 'class' => 'alert-danger']);
+
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [403, 404]) ? abort($e->getCode(), $e->getMessage()) : 
+            abort(500, "Erro ao carregar a página para criar o agendamento de sala.");
+        }
+
+        return view('admin.crud.criar', $dados);
+    }
+
+    public function verificar(AgendamentoSalaVerificaRequest $request)
+    {
+        $this->authorize('create', auth()->user());
+
+        try{
+            $dados = $request->validated();
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao verificar dados para criar agendamento de sala.");
+        }
+
+        return response()->json($dados);
+    }
+
+    public function store(AgendamentoSalaVerificaRequest $request)
+    {
+        $this->authorize('create', auth()->user());
+
+        try{
+            $validated = $request->validated();
+            $dados = $this->service->getService('SalaReuniao')->agendados()->save($validated, auth()->user());
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao criar agendamento de sala.");
+        }
+
+        return redirect()->route('sala.reuniao.agendados.busca', ['q' => $dados['protocolo']])->with($dados);
     }
 
     public function view($id, $anexo = null)

@@ -9,6 +9,7 @@
             <hr>
             <h4>Agendamento:</h4>
             <p class="mb-0">Status: <strong>{!! $resultado->getStatusHTML() !!}</strong></p>
+            <p class="mb-0">Agendamento criado via: <strong>{{ $resultado->formaAgendamento() }}</strong></p>
             <p class="mb-0">Tipo de Sala: <strong>{{ $resultado->getTipoSala() }}</strong></p>
             <p class="mb-0">Dia e Período: <strong>{{ onlyDate($resultado->dia) }} | {{ $resultado->getPeriodo() }}</strong></p>
             <p class="mb-0">Regional: <strong>{{ $resultado->sala->regional->regional }}</strong></p>
@@ -77,6 +78,13 @@
         @endif
         </div>
     </div>
+
+    @if($resultado->formaAgendamento() == 'Presencial')
+    <div>
+        <strong>Criado por:</strong> {{ isset($resultado->user->nome) ? $resultado->user->nome : 'Usuário Deletado' }}, às {{ organizaData($resultado->created_at) }}
+    </div>
+    <hr>
+    @endif
 
     <div class="float-left">
         <a href="{{ session('url') ?? route('sala.reuniao.agendados.index') }}" class="btn btn-outline-secondary mt-4">
