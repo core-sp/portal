@@ -65,7 +65,8 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
         if(isset($situacao['message']))
             return $situacao;
 
-        if(!$user->podeAgendar($mes, $ano))
+        $cpf_cnpj = apenasNumeros($user->cpf_cnpj);
+        if(!AgendamentoSala::podeAgendar($cpf_cnpj, $mes, $ano))
             return [
                 'message' => '<i class="fas fa-times"></i>&nbsp;&nbsp;Já possui o limite de 4 agendamentos confirmados ou com presença a confirmar no mês atual e/ou seguinte.',
                 'class' => 'alert-danger'

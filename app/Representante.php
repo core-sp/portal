@@ -131,57 +131,6 @@ class Representante extends Authenticable
         ->paginate(4);
     }
 
-    public function podeAgendar($mes = null, $ano = null)
-    {
-        $total = 4;
-
-        // devido poder agendar somente no dia seguinte
-        $dia = Carbon::tomorrow();
-        while($dia->isWeekend())
-            $dia->addDay();
-
-        $atual = $this->agendamentosSalas()
-        ->when(isset($mes) && !isset($ano), function($query) use($mes){
-            $query->whereMonth('dia', $mes)
-            ->whereYear('dia', now()->year);
-        })
-        ->when(isset($ano) && !isset($mes), function($query) use($ano){
-            $query->whereMonth('dia', now()->month)
-            ->whereYear('dia', $ano);
-        })
-        ->when(isset($mes) && isset($ano), function($query) use($mes, $ano){
-            $query->whereMonth('dia', $mes)
-            ->whereYear('dia', $ano);
-        })
-        ->when(!isset($mes) && !isset($ano), function($query) use($dia){
-            $query->whereMonth('dia', $dia->month)
-            ->whereYear('dia', $dia->year);
-        })
-        ->where(function($query){
-            $query->whereNull('status')
-            ->orWhere('status', 'Compareceu');
-        })        
-        ->count() < $total;
-
-        $seguinte = false;
-        // Evitar que pule mês. Ex: janeiro para fevereiro.
-        $dataSeguinte = Carbon::parse($dia->format('Y-m') . '-01')->addMonth();
-        $mesSeguinte = $dataSeguinte->month;
-        $anoSeguinte = $dataSeguinte->year;
-        
-        if(!isset($mes) && !isset($ano))
-            $seguinte = $this->agendamentosSalas()
-            ->whereMonth('dia', $mesSeguinte)
-            ->whereYear('dia', $anoSeguinte)
-            ->where(function($query){
-                $query->whereNull('status')
-                ->orWhere('status', 'Compareceu');
-            }) 
-            ->count() < $total;
-
-        return $atual || $seguinte;
-    }
-
     public function getPeriodoByDia($dia, $periodosDisponiveis)
     {
         $agendados = $this->agendamentosSalas()
