@@ -688,6 +688,8 @@ $('#ano-mapa').on({
 
 	// Funcionalidade Agendamentos Salas Area Restrita RC ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+	const idAgendaSala = $('#tempIdSala').length > 0 ? $('#tempIdSala').val() : null;
+
 	function formatSalas(response){
 		regionaisAtivas = response;
 		$('#agendamentoSala #sala_reuniao_id option').each(function(){
@@ -727,9 +729,10 @@ $('#ano-mapa').on({
 				var cont = $('.participante').length;
 				if(cont < response.total)
 					for (let i = cont; i < response.total; i++)
-						$('#area_participantes').append($('.participante:last').clone(true));
+						$('#area_participantes').append($('.participante:last').clone());
 				$('.participante :input[name="participantes_cpf[]"]').val('').mask('999.999.999-99');
 				$('.participante :input[name="participantes_nome[]"]').val('');
+				changeParticipanteCpf();
 				$('#area_participantes').show();
 			}
 		}else
@@ -821,94 +824,90 @@ $('#ano-mapa').on({
 		});
 	}
 
-	$('#agendamentoSala #tipo_sala').change(function(){
-		$("#sala_reuniao_id").val("");
-		if(this.value == "")
-			return false;
-		limpaDiasHorariosAgendamentoSala();
-		getDadosSalas('getSalas', $("#tipo_sala").val());
-	});	
-
-	$('#agendamentoSala #sala_reuniao_id').change(function(){
-		if($("#tipo_sala").val() == "")
-			return false;
-		limpaDiasHorariosAgendamentoSala();
-		$('#agendamentoSala #sala_reuniao_id option[value=""]').hide();
-		getDadosSalas('getDias', $("#tipo_sala").val(), $("#sala_reuniao_id").val());
-	});	
-
-	if($("#agendamentoSala #tipo_sala option:selected").val() != "")
-		getDadosSalas('getSalas', $("#tipo_sala").val());
+	if(idAgendaSala == null){
+		$('#agendamentoSala #tipo_sala').change(function(){
+			$("#sala_reuniao_id").val("");
+			if(this.value == "")
+				return false;
+			limpaDiasHorariosAgendamentoSala();
+			getDadosSalas('getSalas', $("#tipo_sala").val());
+		});	
 	
-	if($("#agendamentoSala #sala_reuniao_id option:selected").val() != "")
-		getDadosSalas('getDias', $("#tipo_sala").val(), $("#sala_reuniao_id").val());
-
-	$('#agendamentoSala #datepicker').change(function(){
-		getDadosSalas('getDias', $("#tipo_sala").val(), $("#sala_reuniao_id").val(), $('#datepicker').val());
-	});
+		$('#agendamentoSala #sala_reuniao_id').change(function(){
+			if($("#tipo_sala").val() == "")
+				return false;
+			limpaDiasHorariosAgendamentoSala();
+			$('#agendamentoSala #sala_reuniao_id option[value=""]').hide();
+			getDadosSalas('getDias', $("#tipo_sala").val(), $("#sala_reuniao_id").val());
+		});	
+	
+		if($("#agendamentoSala #tipo_sala option:selected").val() != "")
+			getDadosSalas('getSalas', $("#tipo_sala").val());
+		
+		if($("#agendamentoSala #sala_reuniao_id option:selected").val() != "")
+			getDadosSalas('getDias', $("#tipo_sala").val(), $("#sala_reuniao_id").val());
+	
+		$('#agendamentoSala #datepicker').change(function(){
+			getDadosSalas('getDias', $("#tipo_sala").val(), $("#sala_reuniao_id").val(), $('#datepicker').val());
+		});
+	}
 
 	// verifica a situação do participante junto ao conselho e no Portal
-	const idAgendaSala = $('#tempIdSala').length > 0 ? $('#tempIdSala').val() : null;
 
-	$('input[name="participantes_cpf[]"]').change(function(){
-		if(this.value.length == 14){
-			if(this.value == $('#partResp').val()){
-				$('#verificaSala').modal({backdrop: 'static', keyboard: false, show: true});
-				$('#verificaSala .modal-body #cpfIrregular').after('<div id="texto"><br><strong>Não pode inserir o próprio CPF!</strong></div>');
-				this.value = "";
-				return;
-			}
-		
-			var final = '"participantes_cpf":' + '"' + this.value + '"';
-			final = idAgendaSala != null ? final + ', "id":'+ '"' + idAgendaSala + '"' : final;
-			$.ajax({
-				method: "POST",
-				dataType: 'json',
-				url: '/representante/agendamento-sala/verificar',
-				data: JSON.parse('{"_method":"POST", "_token":"' + $('meta[name="csrf-token"]').attr('content') + '", ' + final + '}'),
-				beforeSend: function(){
-					$('#loadingSala').modal({backdrop: 'static', keyboard: false, show: true});
-					$('#loadingSala .modal-body')
-					.html('<div class="spinner-border text-danger"></div><br>Conferindo situação junto ao Conselho e no Portal...');
-				},
-				complete: function(){
-					$('#loadingSala').modal('hide');
-				},
-				success: function(response) {
-					$('#loadingSala').modal('hide');
-					if((response.participante_irregular != null) || (response.suspenso != null)){
-						var n_cpf = response.participante_irregular != null ? response.participante_irregular : response.suspenso;
-						var texto_c = 'situação junto ao Conselho';
-						var texto_s = 'suspensão no Portal para novos agendamentos de sala';
-						var texto = '';
-						if((response.participante_irregular != null) && (response.suspenso != null))
-							texto = texto_c + ' e ' + texto_s;
-						else
-							texto = response.participante_irregular != null ? texto_c : texto_s;
-						$('#verificaSala').modal({backdrop: 'static', keyboard: false, show: true});
-						$('#verificaSala .modal-body #cpfIrregular').html(n_cpf);
-						$('#verificaSala .modal-body #cpfIrregular')
-						.after('<div id="texto"><br><strong>Não será possível criar / editar o agendamento com este participante devido ' + texto + '.</strong></div>');
-					}
-				},
-				error: function() {
-					$('#loadingSala').modal('hide');
-					$("#dialog_agendamento")
-						.empty()
-						.append("Falha. Recarregue a página ou tente mais tarde.");
-					$("#dialog_agendamento").dialog({
-						draggable: false,
-						buttons: [{
-							text: "Recarregar",
-							click: function() {
-								location.reload(true);
-							}
-						}]
-					});
+	// verifica ao editar
+	if(idAgendaSala != null)
+		changeParticipanteCpf();
+
+	function changeParticipanteCpf(){
+		$('input[name="participantes_cpf[]"]').on("change", function(){
+			if(this.value.length == 14){
+				if(this.value == $('#partResp').val()){
+					$('#verificaSala').modal({backdrop: 'static', keyboard: false, show: true});
+					$('#verificaSala .modal-body #cpfIrregular').after('<div id="texto"><br><strong>Não pode inserir o próprio CPF!</strong></div>');
+					this.value = "";
+					return;
 				}
-			});
-		}
-	});
+			
+				var final = '"participantes_cpf":' + '"' + this.value + '"';
+				final = idAgendaSala != null ? final + ', "id":'+ '"' + idAgendaSala + '"' : final;
+				$.ajax({
+					method: "POST",
+					dataType: 'json',
+					url: '/representante/agendamento-sala/verificar',
+					data: JSON.parse('{"_method":"POST", "_token":"' + $('meta[name="csrf-token"]').attr('content') + '", ' + final + '}'),
+					beforeSend: function(){
+						$('#loadingSala').modal({backdrop: 'static', keyboard: false, show: true});
+						$('#loadingSala .modal-body')
+						.html('<div class="spinner-border text-danger"></div><br>Conferindo situação junto ao Conselho e no Portal...');
+					},
+					complete: function(){
+						$('#loadingSala').modal('hide');
+					},
+					success: function(response) {
+						$('#loadingSala').modal('hide');
+						if((response.participante_irregular != null) || (response.suspenso != null)){
+							var n_cpf = response.participante_irregular != null ? response.participante_irregular : response.suspenso;
+							var texto_c = 'situação junto ao Conselho';
+							var texto_s = 'suspensão no Portal para novos agendamentos de sala';
+							var texto = '';
+							if((response.participante_irregular != null) && (response.suspenso != null))
+								texto = texto_c + ' e ' + texto_s;
+							else
+								texto = response.participante_irregular != null ? texto_c : texto_s;
+							$('#verificaSala').modal({backdrop: 'static', keyboard: false, show: true});
+							$('#verificaSala .modal-body #cpfIrregular').html(n_cpf);
+							$('#verificaSala .modal-body #cpfIrregular')
+							.after('<div id="texto"><br><strong>Não será possível criar / editar o agendamento com este participante devido ' + texto + '.</strong></div>');
+						}
+					},
+					error: function() {
+						$('#loadingSala').modal('hide');
+						limpaDiasHorariosAgendamentoSala();
+					}
+				});
+			}
+		});
+	}
 
 	$("#verificaSala").on('hidden.bs.modal', function(){
 		$('#verificaSala .modal-body #texto').remove();

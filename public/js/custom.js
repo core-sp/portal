@@ -690,9 +690,10 @@ function verificarDadosCriarAgendaSala(nome_campo, valor){
           }
           if((response.total_participantes > 0) && ($('select[name="tipo_sala"]').val() == 'reuniao')){
             for (let i = 1; i < response.total_participantes; i++)
-              $('#area_participantes').append($('.participante:last').clone(true));
+              $('#area_participantes').append($('.participante:last').clone());
             $('.participante :input[name="participantes_cpf[]"]').val('').mask('999.999.999-99');
             $('.participante :input[name="participantes_nome[]"]').val('');
+            changeParticipanteCpf();
             $('#area_participantes').show();
           }
           break;
@@ -785,18 +786,20 @@ $('#criarAgendaSala').ready(function(){
   });
 });
 
-$('input[name="participantes_cpf[]"]').change(function(){
-  if(this.value.length == 14){
-    if(this.value == $('input[name="cpf_cnpj"]').val()){
-      $('#modal-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
-      $('.modal-footer').hide();
-      $('#modal-criar_agenda .modal-body').html('<strong>Não pode inserir CPF do representante responsável!</strong>');
-      this.value = "";
-      return;
+function changeParticipanteCpf(){
+  $('input[name="participantes_cpf[]"]').on("change", function(){
+    if(this.value.length == 14){
+      if(this.value == $('input[name="cpf_cnpj"]').val()){
+        $('#modal-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
+        $('.modal-footer').hide();
+        $('#modal-criar_agenda .modal-body').html('<strong>Não pode inserir CPF do representante responsável!</strong>');
+        this.value = "";
+        return;
+      }
+      verificarDadosCriarAgendaSala("participantes_cpf", this.value);
     }
-    verificarDadosCriarAgendaSala("participantes_cpf", this.value);
-  }
-});
+  });
+}
 
 $('#enviarCriarAgenda').click(function(){
   $('#criarAgendaSala').submit();
