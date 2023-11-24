@@ -678,7 +678,7 @@ function verificarDadosCriarAgendaSala(nome_campo, valor){
           }
           break;
         case "sala_reuniao_id":
-          $(".participante:gt(0)").remove();
+          cleanParticipanteCpf();
           if(response.total_participantes <= 0){
             $('#area_participantes').hide();
             $('#modal-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
@@ -756,7 +756,7 @@ $('#criarAgendaSala').ready(function(){
   
   $('select[name="sala_reuniao_id"]').change(function(){
     if(this.value == ""){
-      $(".participante:gt(0)").remove();
+      cleanParticipanteCpf();
       $('select[name="tipo_sala"]').prop('disabled', true);
       return;
     }
@@ -786,8 +786,14 @@ $('#criarAgendaSala').ready(function(){
   });
 });
 
+function cleanParticipanteCpf(){
+  $(".participante:gt(0)").remove();
+  $('.participante:eq(0) input[name="participantes_cpf[]"]').off('change.verificaCpf');
+  $('.participante:eq(0) input[name="participantes_cpf[]"]').val('');
+}
+
 function changeParticipanteCpf(){
-  $('input[name="participantes_cpf[]"]').on("change", function(){
+  $('input[name="participantes_cpf[]"]').on("change.verificaCpf", function(){
     if(this.value.length == 14){
       if(this.value == $('input[name="cpf_cnpj"]').val()){
         $('#modal-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});

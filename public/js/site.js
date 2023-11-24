@@ -725,7 +725,7 @@ $('#ano-mapa').on({
 			$('#agendamentoSala #periodo').prop('disabled', false);
 			$('#agendamentoSala #datepicker').css('background-color','#FFFFFF');
 			if(tipo == 'reuniao'){
-				$(".participante:gt(0)").remove();
+				cleanParticipanteCpf();
 				var cont = $('.participante').length;
 				if(cont < response.total)
 					for (let i = cont; i < response.total; i++)
@@ -858,8 +858,14 @@ $('#ano-mapa').on({
 	if(idAgendaSala != null)
 		changeParticipanteCpf();
 
+	function cleanParticipanteCpf(){
+		$(".participante:gt(0)").remove();
+		$('.participante:eq(0) input[name="participantes_cpf[]"]').off('change.verificaCpf');
+		$('.participante:eq(0) input[name="participantes_cpf[]"]').val('');
+	}
+
 	function changeParticipanteCpf(){
-		$('input[name="participantes_cpf[]"]').on("change", function(){
+		$('input[name="participantes_cpf[]"]').on("change.verificaCpf", function(){
 			if(this.value.length == 14){
 				if(this.value == $('#partResp').val()){
 					$('#verificaSala').modal({backdrop: 'static', keyboard: false, show: true});
