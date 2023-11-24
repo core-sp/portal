@@ -657,24 +657,26 @@ function verificarDadosCriarAgendaSala(nome_campo, valor){
       $('#modal-load-criar_agenda').modal('hide');
       switch(nome_campo) {
         case "cpf_cnpj":
-          var resultado = response.situacaoGerenti;
-          var situacao = resultado != null ? resultado.substring(0, resultado.indexOf(',')) : 'Ativo';
+          var situacao = response.situacaoGerenti != null ? response.situacaoGerenti.substring(0, response.situacaoGerenti.indexOf(',')) : 'Ativo';
+          var ver_registro = (response.registroGerenti == null) || (situacao != 'Ativo');
           $.each(response, function(i, valor) {
             $('#' + i).text(valor);
           });
           $('#area_gerenti').show();
           $('#cpfResponsavel').val($('#criarAgendaSala input[name="cpf_cnpj"]').val());
           $('#nomeResponsavel').val(response['nomeGerenti']);
-          if(response.registroGerenti == null){
+          if(ver_registro || (response.suspenso != null)){
+						var texto_c = response.registroGerenti == null ? 'sem registro no Gerenti não pode criar o agendamento' : 'sem registro Ativo no Gerenti não pode criar o agendamento';
+						var texto_s = 'está suspenso no Portal para novos agendamentos de sala pela área restrita do representante';
+						var texto = '';
+						if(ver_registro && (response.suspenso != null))
+							texto = texto_c + ' e ' + texto_s;
+						else
+							texto = (response.registroGerenti == null) || (situacao != 'Ativo') ? texto_c : texto_s;
             $('#modal-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
             $('.modal-footer').hide();
             $('#modal-criar_agenda .modal-body')
-            .html('<strong>Sem registro no Gerenti! Não pode criar o agendamento.</strong>');
-          }else if(situacao != 'Ativo'){
-            $('#modal-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
-            $('.modal-footer').hide();
-            $('#modal-criar_agenda .modal-body')
-            .html('<strong>Sem registro Ativo no Gerenti! Não pode criar o agendamento.</strong>');
+            .html('<strong><i>Situação:</i> ' + texto + '.</strong>');
           }
           break;
         case "sala_reuniao_id":
@@ -701,7 +703,7 @@ function verificarDadosCriarAgendaSala(nome_campo, valor){
           if((response.participante_irregular != null) || (response.suspenso != null)){
 						var n_cpf = response.participante_irregular != null ? response.participante_irregular : response.suspenso;
 						var texto_c = 'está ativo, porém não está em dia no Gerenti';
-						var texto_s = 'está suspenso no Portal para novos agendamentos de sala';
+						var texto_s = 'está suspenso no Portal para novos agendamentos de sala pela área restrita do representante';
 						var texto = '';
 						if((response.participante_irregular != null) && (response.suspenso != null))
 							texto = texto_c + ' e ' + texto_s;

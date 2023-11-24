@@ -519,6 +519,20 @@ class AgendamentoSalaTest extends TestCase
             "situacaoGerenti" => "Ativo, Em dia.",
         ]);
 
+        $suspenso2 = factory('App\SuspensaoExcecao')->create([
+            'cpf_cnpj' => '11748345000144'
+        ]);
+
+        $this->post(route('sala.reuniao.agendados.verifica.criar'), ['cpf_cnpj' => formataCpfCnpj('11748345000144')])
+        ->assertJson([
+            "nomeGerenti" => "RC Teste 2",
+            "registroGerenti" => formataRegistro("0000000002"),
+            "emailGerenti" => "desenvolvimento@core-sp.org.br",
+            "situacaoGerenti" => "Ativo, Em dia.",
+            "suspenso" => formataCpfCnpj('11748345000144'),
+        ]);
+        $suspenso2->delete();
+
         $this->post(route('sala.reuniao.agendados.verifica.criar'), ['cpf_cnpj' => formataCpfCnpj('76797171768')])
         ->assertJson([
             "nomeGerenti" => "",

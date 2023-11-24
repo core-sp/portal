@@ -43,6 +43,12 @@ class AgendamentoSalaVerificaRequest extends FormRequest
             }
             if(isset($dados[0]["REGISTRONUM"]))
                 $this->merge(['registroGerenti' => formataRegistro($this->registroGerenti)]);
+
+            if(\Route::is('sala.reuniao.agendados.verifica.criar')){
+                $suspenso = $this->service->suspensaoExcecao()->participantesSuspensos([$this->cpf_cnpj]);
+                $texto_s = isset($suspenso) && !empty($suspenso) ? $suspenso[0] : null;
+                $this->merge(['suspenso' => $texto_s]);
+            }
         }
 
         if($this->filled('participantes_cpf') && !is_array($this->participantes_cpf))
@@ -78,7 +84,8 @@ class AgendamentoSalaVerificaRequest extends FormRequest
 
         if(\Route::is('sala.reuniao.agendados.verifica.criar') && isset($this->participantes_cpf) && is_array($this->participantes_cpf))
         {
-            $suspensos = $this->service->suspensaoExcecao()->participantesSuspensos($this->participantes_cpf);
+            $array_cpfs = array_merge([formataCpfCnpj(apenasNumeros($this->cpf_cnpj))], $this->participantes_cpf);
+            $suspensos = $this->service->suspensaoExcecao()->participantesSuspensos($array_cpfs);
             $textoSuspensos = isset($suspensos) && !empty($suspensos) && (count($suspensos) == 1) ? 
             'O seguinte participante está suspenso para novos agendamentos na área restrita do representante:' :
             'Os seguintes participantes estão suspensos para novos agendamentos na área restrita do representante:';
@@ -150,6 +157,7 @@ class AgendamentoSalaVerificaRequest extends FormRequest
                 'registroGerenti' => '',
                 'emailGerenti' => '',
                 'situacaoGerenti' => '',
+                'suspenso' => '',
             ];
 
         if($this->filled('sala_reuniao_id'))
