@@ -67,7 +67,7 @@
     <a id="accesskeyContraste" accesskey="5"></a>
 
       @section('header')
-      <header id="header-principal">
+      <header id="header-principal" style="{{ isset($itens_home['header_fundo']) ? $itens_home['header_fundo'] : 'background-image: url(/img/banner-55-anos.png)' }}">
         <div class="container-fluid">
           <div class="row">
             <div class="linha-dourada w-100"></div>
@@ -76,7 +76,7 @@
         <div class="container">
           <div class="row header-margin">
             <div class="col-lg-4 col-md-6 text-left center-768">
-                <a href="/"><img src="{{ asset('img/Selo-para-site002.png') }}" alt="CORE-SP" id="logo-header" /></a>
+                <a href="/"><img src="{{ isset($itens_home['header_logo']) ? asset($itens_home['header_logo']) : asset('img/Selo-para-site002.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai hide-768">
               <div class="d-block setembro">
@@ -278,7 +278,7 @@
 
       @section('footer')
       <div class="linha-dourada"></div>
-      <footer class="pt-4" id="rodape">
+      <footer class="pt-4" id="rodape" style="background-color:{{ isset($itens_home['rodape']) ? $itens_home['rodape'] : '#004587' }}">
         <div class="container mb-4">
           <div class="row">
             <div class="col-md-4">

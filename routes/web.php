@@ -180,8 +180,12 @@ Route::middleware(['block_ip'])->group(function () {
 
     // Rota para Home Imagens
     Route::prefix('imagens')->group(function(){
-      Route::get('/bannerprincipal', 'HomeImagemController@editBannerPrincipal');
-      Route::put('/bannerprincipal', 'HomeImagemController@updateBannerPrincipal');
+      Route::get('/banner', 'HomeImagemController@editBanner')->name('imagens.banner');
+      Route::put('/banner', 'HomeImagemController@updateBanner')->name('imagens.banner.put');
+      Route::get('/itens-home', 'HomeImagemController@editItensHome')->name('imagens.itens.home');
+      Route::patch('/itens-home', 'HomeImagemController@updateItensHome')->name('imagens.itens.home.update');
+      Route::get('/itens-home/armazenamento', 'HomeImagemController@storageItensHome')->name('imagens.itens.home.storage');
+      Route::delete('/itens-home/armazenamento/delete-file/{file}', 'HomeImagemController@destroyFile')->name('imagens.itens.home.storage.delete');
     });
 
     // Rotas para Blog Posts

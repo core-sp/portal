@@ -13,26 +13,16 @@
     <div class="row" id="conteudo-principal">
       <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="6000">
         <ol class="carousel-indicators">
-          @php $i = -1; @endphp
-          @foreach($imagens as $img)
-          @php $i++; @endphp
+          @foreach($imagens as $key => $img)
           @if(!empty($img->url))
-            @if($i === 0)
-              <li data-target="#carousel" data-slide-to="{{ $i }}" class="active"></li>
-            @else
-              <li data-target="#carousel" data-slide-to="{{ $i }}"></li>
-            @endif
+            <li data-target="#carousel" data-slide-to="{{ $key }}" {{ $key === 0 ? 'class="active"' : '' }}></li>
           @endif
           @endforeach
         </ol>
         <div class="carousel-inner h-100">
           @foreach($imagens as $img)
           @if(!empty($img->url))
-            @if($img->ordem === 1)
-            <div class="carousel-item h-100 active">
-            @else
-            <div class="carousel-item h-100">
-            @endif
+            <div class="carousel-item h-100 {{ $img->ordem === 1 ? 'active' : '' }}">
               <a href="{{ $img->link }}" target="{{ $img->target }}">
                 <img class="w-100 hide-576" src="{{ asset($img->url) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
                 <img class="w-100 show-576" src="{{ asset($img->url_mobile) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
@@ -94,7 +84,7 @@
     </div>
     <div class="row justify-content-center">
       <div class="col-lg-3 col-sm-6 pb-15">
-        <div class="box text-center azul-escuro-bg">
+        <div class="box text-center {{ isset($itens_home['cards_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_1']) ? 'background-color:'.$itens_home['cards_1'] : '' }}">
           <div class="inside-box">
             <img src="{{ asset('img/padlock.png') }}" class="inside-img" alt="Área restrita do Representante | Core-SP" />
             <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Área restrita<br class="hide-992" /> do Representante</h3>
@@ -109,9 +99,9 @@
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="/consulta-de-situacao" class="d-block">
-          <div class="box text-center azul-bg">
+          <div class="box text-center {{ isset($itens_home['cards_2']) ? '' : 'azul-bg' }}" style="{{ isset($itens_home['cards_2']) ? 'background-color:'.$itens_home['cards_2'] : '' }}">
             <div class="inside-box">
-              <img src="{{ asset('img/file.png') }}" class="inside-img alt="Consulta de Ativos | Core-SP">
+              <img src="{{ asset('img/file.png') }}" class="inside-img" alt="Consulta de Ativos | Core-SP">
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Consulta<br class="hide-992" /> Pública</h3>
               <button class="btn-box azul">Consultar</button>
             </div>
@@ -119,7 +109,7 @@
         </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <div class="box text-center azul-escuro-bg">
+        <div class="box text-center {{ isset($itens_home['cards_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_1']) ? 'background-color:'.$itens_home['cards_1'] : '' }}">
           <div class="inside-box">
             <img src="{{ asset('img/001-work.png') }}" class="inside-img" alt="Balcão de Oportunidades | Core-SP" />
             <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Balcão de<br class="hide-992" /> Oportunidades</h3>
@@ -134,7 +124,7 @@
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="/anuidade-ano-vigente" class="d-block h-100">
-          <div class="box text-center azul-bg">
+          <div class="box text-center {{ isset($itens_home['cards_2']) ? '' : 'azul-bg' }}" style="{{ isset($itens_home['cards_2']) ? 'background-color:'.$itens_home['cards_2'] : '' }}">
             <div class="inside-box">
               <img src="{{ asset('img/printer.png') }}" class="inside-img" alt="Anuidade do ano vigente | Core-SP" />
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Boleto<br class="hide-992" /> anuidade {{ date('Y') }}</h3>
@@ -145,7 +135,7 @@
       </div>
       <div class="col-lg-3 col-sm-6 text-right pb-15">
         <a href="/simulador" class="d-block h-100">
-          <div class="box text-center azul-bg">
+          <div class="box text-center {{ isset($itens_home['cards_2']) ? '' : 'azul-bg' }}" style="{{ isset($itens_home['cards_2']) ? 'background-color:'.$itens_home['cards_2'] : '' }}">
             <div class="inside-box">
               <img src="{{ asset('img/001-paper.png') }}" class="inside-img" alt="Simulador | Core-SP">
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Simulador de<br class="hide-992" /> valores</h3>
@@ -155,7 +145,7 @@
         </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <div class="box text-center azul-escuro-bg">
+        <div class="box text-center {{ isset($itens_home['cards_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_1']) ? 'background-color:'.$itens_home['cards_1'] : '' }}">
           <div class="inside-box">
             <img src="{{ asset('img/appointment.png') }}" class="inside-img" alt="Agendamento | Core-SP" />
             <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Agendamento<br class="hide-992" /> de Atendimento</h3>
@@ -170,7 +160,7 @@
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="/cartilha-do-representante" class="d-block h-100">
-          <div class="box text-center azul-bg">
+          <div class="box text-center {{ isset($itens_home['cards_2']) ? '' : 'azul-bg' }}" style="{{ isset($itens_home['cards_2']) ? 'background-color:'.$itens_home['cards_2'] : '' }}">
             <div class="inside-box">
               <img src="{{ asset('img/open-book.png') }}" class="inside-img" alt="Cartilha do Representante | Core-SP" />
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Cartilha do<br class="hide-992" /> Representante</h3>
@@ -181,7 +171,7 @@
       </div>
       {{--<div class="col-lg-3 col-sm-6 pb-15">
         <!-- <a href="/noticias/anuidade-2021-taxas-e-emolumentos" class="d-block h-100"> -->
-          <div class="box text-center azul-escuro-bg">
+          <div class="box text-center {{ isset($itens_home['cards_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_1']) ? 'background-color:'.$itens_home['cards_1'] : '' }}">
             <div class="inside-box">
               <img src="{{ asset('img/003-bill.png') }}" class="inside-img" alt="Anuidade 2019 | Core-SP" />
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Anuidade 2021<br class="hide-992" /> taxas e emolumentos</h3>
@@ -193,7 +183,7 @@
 
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="{{ route('cursos.index.website') }}" class="d-block h-100">
-          <div class="box text-center azul-escuro-bg">
+          <div class="box text-center {{ isset($itens_home['cards_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_1']) ? 'background-color:'.$itens_home['cards_1'] : '' }}">
             <div class="inside-box">
               <img src="{{ asset('img/icone-curso.png') }}" class="inside-img" alt="Cursos" />
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Cursos</h3>
@@ -205,7 +195,7 @@
 
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="{{ route('agenda-institucional') }}" class="d-block h-100">
-          <div class="box text-center azul-escuro-bg">
+          <div class="box text-center {{ isset($itens_home['cards_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_1']) ? 'background-color:'.$itens_home['cards_1'] : '' }}">
             <div class="inside-box">
               <img src="{{ asset('img/appointment.png') }}" class="inside-img" alt="Serviços do Atendimento" />
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Agenda<br class="hide-992" /> Institucional</h3>
@@ -217,7 +207,7 @@
 
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="https://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" class="d-block h-100">
-          <div class="box text-center azul-bg">
+          <div class="box text-center {{ isset($itens_home['cards_2']) ? '' : 'azul-bg' }}" style="{{ isset($itens_home['cards_2']) ? 'background-color:'.$itens_home['cards_2'] : '' }}">
             <div class="inside-box">
               <img src="{{ asset('img/icone-portal-da-transparencia.png') }}" class="inside-img" alt="Portal da transparência" />
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Portal da <br class="hide-992" /> Transparência</h3>
@@ -229,7 +219,7 @@
 
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="https://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" class="d-block h-100">
-          <div class="box text-center azul-escuro-bg">
+          <div class="box text-center {{ isset($itens_home['cards_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_1']) ? 'background-color:'.$itens_home['cards_1'] : '' }}">
             <div class="inside-box">
               <img src="{{ asset('img/icone-denuncie.png') }}" class="inside-img" alt="Exercício ilegal da profissão" />
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Denuncie o Exercício<br class="hide-992" /> Ilegal da Profissão</h3>
@@ -241,7 +231,7 @@
 
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="/noticias/core-sp-e-a-protecao-de-dados-pessoais" class="d-block h-100">
-          <div class="box text-center azul-bg">
+          <div class="box text-center {{ isset($itens_home['cards_2']) ? '' : 'azul-bg' }}" style="{{ isset($itens_home['cards_2']) ? 'background-color:'.$itens_home['cards_2'] : '' }}">
             <div class="inside-box">
               <img src="{{ asset('img/icone-termo.png') }}" class="inside-img" alt="Termo de Consentimento" />
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Termo de Consentimento</h3>
@@ -454,7 +444,7 @@
         <div id="calendario" class="row">
           <div class="col-sm-8">
             <a href="/calendario-oficial-core-sp">
-              <img class="lazy" data-src="{{ asset('img/arte-calendario-2023.png') }}" alt="Calendário | Core-SP" />
+              <img class="lazy" data-src="{{ isset($itens_home['calendario']) ? asset($itens_home['calendario']) : asset('img/arte-calendario-2023.png') }}" alt="Calendário | Core-SP" />
             </a>
           </div>
           <div class="col-sm-4 hide-576 align-self-center text-right pr-4">

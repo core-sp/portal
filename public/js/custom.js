@@ -75,6 +75,11 @@ $(document).ready(function(){
 		}
 	});
 
+  $(".custom-file-input").on("change", function(e) {
+    var fileName = e.target.files[0].name;
+		$(this).next('.custom-file-label').html(fileName);
+  });
+  
   // Máscaras para datas
   // $('#dataTermino').mask('00/00/0000', {
   //   onComplete: function() {
@@ -757,3 +762,84 @@ $('#enviarCriarAgenda').click(function(){
 });
 
 // FIM Funcionalidade Sala Reunião / Agendados / Criar agendamento
+
+// Funcionalidade Home Imagem / Itens Home
+var caminho = '';
+function preencheTabelaPath(value, index, array) {
+  var href_path = caminho + value;
+  var img_path = location.protocol + '//' + location.hostname + '/' + href_path;
+  $('#armazenamento tbody').append('<tr class="storageFile"></tr>');
+  $('#armazenamento tbody .storageFile:last')
+  .append('<td><button class="btn btn-link storagePath" value="' + href_path + '" type="button">' + href_path + '</button></td>')
+  .append('<td><div class="col-sm-3"><a href="/' + href_path + '" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home_storage"><img src="' + img_path + '"></a></div></td>')
+  .append('<td><button class="btn btn-danger deleteFileStorage" type="button" value="' + value + '">Excluir</button></td>');
+}
+
+$('.openStorage').click(function(){
+  var id = $(this).parent().parent().find('input').attr('id');
+  $.ajax({
+    method: "GET",
+    data: {},
+    dataType: 'json',
+    url: "/admin/imagens/itens-home/armazenamento",
+    success: function(response) {
+      caminho = response.caminho;
+      response.path.forEach(preencheTabelaPath);
+      eventClickSelecionar(id);
+      eventClickExcluir();
+    },
+    error: function() {
+      alert('Erro ao carregar os arquivos. Recarregue a página.');
+    }
+  });
+});
+
+$("#armazenamento").on('hidden.bs.modal', function(){
+  $('#armazenamento tbody tr').remove();
+});
+
+$("#calendario, #header_logo, #header_fundo").change(function() {
+  $('#' + this.id + '_texto').val('');
+});
+
+$("#header_fundo_cor").change(function() {
+  var nome = this.id.replace('_cor', '');
+  $('#' + nome + '_texto').val('');
+  $('#' + nome).val('');
+  $('label[for="' + nome + '"]').text('Selecionar arquivo...');
+});
+
+function eventClickSelecionar(id){
+  $('.storagePath').on('click', function(){
+    var linha = this.value;
+    var nome = id.replace('_texto', '');
+    $('#' + id).val(linha);
+    $("#armazenamento").modal("hide");
+    $('#' + nome).val('');
+    $('label[for="' + nome + '"]').text('Selecionar arquivo...');
+  });
+}
+
+function eventClickExcluir(){
+  $('.deleteFileStorage').on('click', function(){
+    var linha = $(this);
+    $.ajax({
+      method: "POST",
+      data: {
+        _method: "DELETE",
+        _token: $('meta[name="csrf-token"]').attr('content'),
+      },
+      dataType: 'json',
+      url: "/admin/imagens/itens-home/armazenamento/delete-file/" + this.value,
+      success: function(response) {
+        if(response != 'Não foi removido.')
+          linha.parent().parent().remove();
+      },
+      error: function() {
+        alert('Erro ao excluir o arquivo. Recarregue a página.');
+      }
+    });
+  });
+}
+
+// FIM Funcionalidade Home Imagem / Itens Home

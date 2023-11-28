@@ -467,7 +467,7 @@ figure.align-left {
 	/* Fim da função neve */
 
 	/* 55 anos */
-	background-image: url('/img/banner-55-anos.png');
+	/* background-image: url('/img/banner-55-anos.png'); */
 	
 	/* Novembro Azul */
 	/* background-color: rgba(0,31,137,1); */
@@ -1172,11 +1172,11 @@ input[type=file]::-webkit-file-upload-button {
 /*
  * REGRAS DO FOOTER
  */
-footer {
-	background-color: #004587;
+/* footer { */
+	/* background-color: #004587; */
 	/* Outubro Rosa */
 	/* background-color: rgba(191,68,101,1); */
-}
+/* } */
 
 footer p {
 	font-weight: 300;
