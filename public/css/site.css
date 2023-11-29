@@ -459,11 +459,11 @@ figure.align-left {
 
 	/* Função neve */
 	/* vermelho */
-	/* background-color: #d11111; */
+	background-color: #d11111;
 	/* troca o banner pelo gif */
-	/* background-image: url('/img/snowing.gif'); */
+	background-image: url('/img/snowing.gif');
 	/* repetir o gif */
-	/* background-repeat: repeat-x; */
+	background-repeat: repeat-x;
 	/* Fim da função neve */
 
 	/* 55 anos */
