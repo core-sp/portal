@@ -78,12 +78,14 @@ class HomeImagemController extends Controller
             ->with('class', 'alert-success');
     }
 
-    public function storageItensHome()
+    public function storageItensHome(HomeImagemRequest $request)
     {
         $this->authorize('updateOther', auth()->user());
 
         try{
-            $dados = $this->service->getService('HomeImagem')->itensHomeStorage();
+            $validated = $request->validated();
+            $dados = \Route::is('imagens.itens.home.storage.post') ? 
+            $this->service->getService('HomeImagem')->uploadFileStorage($validated['file_itens_home']) : $this->service->getService('HomeImagem')->itensHomeStorage();
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os arquivos do storage dos itens da home.");

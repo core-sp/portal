@@ -66,13 +66,6 @@ class HomeImagem extends Model
 
     public static function getValor($campo, $valor)
     {
-        if($valor instanceof \Illuminate\Http\UploadedFile)
-        {
-            $url = $valor->getClientOriginalName();
-            $valor->storeAs('/', $url, 'itens_home');
-            $valor = str_replace(self::pathCompleto(), '', Storage::disk('itens_home')->path($url));
-        }
-
         return isset(self::padrao()[$campo]) ? self::padrao()[$campo] : $valor;
     }
 

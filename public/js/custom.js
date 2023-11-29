@@ -764,25 +764,77 @@ $('#enviarCriarAgenda').click(function(){
 // FIM Funcionalidade Sala Reunião / Agendados / Criar agendamento
 
 // Funcionalidade Home Imagem / Itens Home
+
 var caminho = '';
+var openStorage_id = '';
 function preencheTabelaPath(value, index, array) {
   var href_path = caminho + value;
   var img_path = location.protocol + '//' + location.hostname + '/' + href_path;
   $('#armazenamento tbody').append('<tr class="storageFile"></tr>');
   $('#armazenamento tbody .storageFile:last')
-  .append('<td><button class="btn btn-link storagePath" value="' + href_path + '" type="button">' + href_path + '</button></td>')
+  .append('<td><button class="btn btn-link storagePath" value="' + href_path + '" type="button">' + value + '</button></td>')
   .append('<td><div class="col-sm-3"><a href="/' + href_path + '" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home_storage"><img src="' + img_path + '"></a></div></td>')
   .append('<td><button class="btn btn-danger deleteFileStorage" type="button" value="' + value + '">Excluir</button></td>');
 }
 
 $('.openStorage').click(function(){
-  var id = $(this).parent().parent().find('input').attr('id');
+  openStorage_id = $(this).parent().parent().find('input').attr('id');
+  receberArquivos(openStorage_id);
+});
+
+$("#armazenamento").on('hidden.bs.modal', function(){
+  $('#armazenamento #msgStorage').hide();
+  cleanTabelaStorage();
+});
+
+$("#header_fundo_cor").change(function() {
+  var nome = this.id.replace('_cor', '');
+  $('#' + nome).val('');
+});
+
+$('#armazenamento #file_itens_home').change(function(e){
+  if($(this).val() == '')
+    return;
+
+  var form = new FormData();
+  form.append('_method', "POST");
+  form.append('_token', $('meta[name="csrf-token"]').attr('content'));
+  form.append('file_itens_home', e.target.files[0]);
+
+  $.ajax({
+    method: "POST",
+    data: form,
+    contentType : false,
+		processData : false,
+    url: "/admin/imagens/itens-home/armazenamento/",
+    success: function(response) {
+      if(response.novo_arquivo != null){
+        $('#armazenamento .custom-file-label').text('Selecionar arquivo...');
+        receberArquivos(openStorage_id);
+        $('#armazenamento #msgStorage').removeClass('alert-danger')
+        .addClass('alert-success').html('Arquivo <strong><i>"' + response.novo_arquivo + '"</i></strong> foi adicionado da pasta!').show();
+      }
+    },
+    error: function() {
+      $('#armazenamento #msgStorage').removeClass('alert-success')
+      .addClass('alert-danger').html('Erro ao adicionar o arquivo. Recarregue a página.').show();
+    }
+  });
+});
+
+function cleanTabelaStorage()
+{
+  $('#armazenamento tbody tr').remove();
+}
+
+function receberArquivos(id){
   $.ajax({
     method: "GET",
     data: {},
     dataType: 'json',
     url: "/admin/imagens/itens-home/armazenamento",
     success: function(response) {
+      cleanTabelaStorage();
       caminho = response.caminho;
       response.path.forEach(preencheTabelaPath);
       eventClickSelecionar(id);
@@ -792,37 +844,20 @@ $('.openStorage').click(function(){
       alert('Erro ao carregar os arquivos. Recarregue a página.');
     }
   });
-});
-
-$("#armazenamento").on('hidden.bs.modal', function(){
-  $('#armazenamento tbody tr').remove();
-});
-
-$("#calendario, #header_logo, #header_fundo").change(function() {
-  $('#' + this.id + '_texto').val('');
-});
-
-$("#header_fundo_cor").change(function() {
-  var nome = this.id.replace('_cor', '');
-  $('#' + nome + '_texto').val('');
-  $('#' + nome).val('');
-  $('label[for="' + nome + '"]').text('Selecionar arquivo...');
-});
+}
 
 function eventClickSelecionar(id){
   $('.storagePath').on('click', function(){
     var linha = this.value;
-    var nome = id.replace('_texto', '');
     $('#' + id).val(linha);
     $("#armazenamento").modal("hide");
-    $('#' + nome).val('');
-    $('label[for="' + nome + '"]').text('Selecionar arquivo...');
   });
 }
 
 function eventClickExcluir(){
   $('.deleteFileStorage').on('click', function(){
     var linha = $(this);
+    var arquivo = this.value;
     $.ajax({
       method: "POST",
       data: {
@@ -830,13 +865,22 @@ function eventClickExcluir(){
         _token: $('meta[name="csrf-token"]').attr('content'),
       },
       dataType: 'json',
-      url: "/admin/imagens/itens-home/armazenamento/delete-file/" + this.value,
+      url: "/admin/imagens/itens-home/armazenamento/delete-file/" + arquivo,
       success: function(response) {
-        if(response != 'Não foi removido.')
+        if(response != 'Não foi removido.'){
           linha.parent().parent().remove();
+          $('#armazenamento #msgStorage').removeClass('alert-danger')
+          .addClass('alert-success').html('Arquivo <strong><i>"' + arquivo + '"</i></strong> foi removido da pasta!').show();
+        }else{
+          $('#armazenamento #msgStorage').removeClass('alert-success')
+          .addClass('alert-danger').html('Arquivo <strong><i>"' + arquivo + '"</i></strong> NÃO foi removido da pasta!').show();
+        }
+        $('#armazenamento').scrollTop(0);
       },
       error: function() {
-        alert('Erro ao excluir o arquivo. Recarregue a página.');
+        $('#armazenamento #msgStorage').removeClass('alert-success')
+          .addClass('alert-danger').html('Erro ao excluir o arquivo <strong><i>"' + arquivo + '"</i></strong>. Recarregue a página.').show();
+          $('#armazenamento').scrollTop(0);
       }
     });
   });

@@ -6,6 +6,7 @@ use App\HomeImagem;
 use App\Contracts\HomeImagemServiceInterface;
 use App\Events\CrudEvent;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 
 class HomeImagemService implements HomeImagemServiceInterface {
 
@@ -61,8 +62,6 @@ class HomeImagemService implements HomeImagemServiceInterface {
                 $item = HomeImagem::getItemPorResultado($resultado, $key);
                 if(isset($item))
                 {
-                    if($dado instanceof \Illuminate\Http\UploadedFile)
-                        event(new CrudEvent('arquivo de imagem em itens da home no campo '.$key.' com upload do file: ' . $dado->getClientOriginalName(), 'está armazenando', $item->idimagem));
                     $dado = HomeImagem::getValor($key, $dado);
                     if($dado == $item->url)
                         continue;
@@ -122,5 +121,18 @@ class HomeImagemService implements HomeImagemServiceInterface {
             'path' => $files,
             'caminho' => HomeImagem::caminhoStorage(),
         ];
+    }
+
+    public function uploadFileStorage($file)
+    {
+        if($file instanceof UploadedFile)
+        {
+            $url = $file->getClientOriginalName();
+            $file->storeAs('/', $url, 'itens_home');
+            event(new CrudEvent('arquivo de imagem em itens da home com upload do file: ' . $url, 'está armazenando', '---'));
+            return ['novo_arquivo' => $url];
+        }
+
+        throw new \Exception('Arquivo para upload não existe', 404);
     }
 }
