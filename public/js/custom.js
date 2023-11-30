@@ -856,34 +856,40 @@ function eventClickSelecionar(id){
 
 function eventClickExcluir(){
   $('.deleteFileStorage').on('click', function(){
-    var linha = $(this);
-    var arquivo = this.value;
-    $.ajax({
-      method: "POST",
-      data: {
-        _method: "DELETE",
-        _token: $('meta[name="csrf-token"]').attr('content'),
-      },
-      dataType: 'json',
-      url: "/admin/imagens/itens-home/armazenamento/delete-file/" + arquivo,
-      success: function(response) {
-        if(response != 'Não foi removido.'){
-          linha.parent().parent().remove();
-          $('#armazenamento #msgStorage').removeClass('alert-danger')
-          .addClass('alert-success').html('Arquivo <strong><i>"' + arquivo + '"</i></strong> foi removido da pasta!').show();
-        }else{
-          $('#armazenamento #msgStorage').removeClass('alert-success')
-          .addClass('alert-danger').html('Arquivo <strong><i>"' + arquivo + '"</i></strong> NÃO foi removido da pasta!').show();
-        }
-        $('#armazenamento').scrollTop(0);
-      },
-      error: function() {
-        $('#armazenamento #msgStorage').removeClass('alert-success')
-          .addClass('alert-danger').html('Erro ao excluir o arquivo <strong><i>"' + arquivo + '"</i></strong>. Recarregue a página.').show();
-          $('#armazenamento').scrollTop(0);
-      }
-    });
+    $('#confirmDelete #confirmFile').text(this.value);
+    $('#confirmDelete #deleteFileStorage').val(this.value);
+    $('#confirmDelete').modal({backdrop: 'static', keyboard: false, show: true});
   });
 }
+
+$('#deleteFileStorage').on('click', function(){
+  var arquivo = this.value;
+  $('#confirmDelete').modal('hide');
+  $.ajax({
+    method: "POST",
+    data: {
+      _method: "DELETE",
+      _token: $('meta[name="csrf-token"]').attr('content'),
+    },
+    dataType: 'json',
+    url: "/admin/imagens/itens-home/armazenamento/delete-file/" + arquivo,
+    success: function(response) {
+      if(response != 'Não foi removido.'){
+        $('.deleteFileStorage[value="' + arquivo + '"]').parent().parent().remove();
+        $('#armazenamento #msgStorage').removeClass('alert-danger')
+        .addClass('alert-success').html('Arquivo <strong><i>"' + arquivo + '"</i></strong> foi removido da pasta!').show();
+      }else{
+        $('#armazenamento #msgStorage').removeClass('alert-success')
+        .addClass('alert-danger').html('Arquivo <strong><i>"' + arquivo + '"</i></strong> NÃO foi removido da pasta!').show();
+      }
+      $('#armazenamento .modal-body').scrollTop(0);
+    },
+    error: function() {
+      $('#armazenamento #msgStorage').removeClass('alert-success')
+        .addClass('alert-danger').html('Erro ao excluir o arquivo <strong><i>"' + arquivo + '"</i></strong>. Recarregue a página.').show();
+        $('#armazenamento .modal-body').scrollTop(0);
+    }
+  });
+});
 
 // FIM Funcionalidade Home Imagem / Itens Home

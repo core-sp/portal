@@ -88,7 +88,7 @@
         <!-- header-fundo -->
         <fieldset class="form-group border border-primary p-3 mt-2">
             <legend class="w-auto">
-                <small>Cor de fundo do logo principal</small>
+                <small>Fundo do logo principal</small>
             </legend>
 
             <h6 class="text-danger"><i>* Pode escolher usar imagem ou cor.</i></h6>
@@ -172,6 +172,44 @@
                         {{ $errors->first('header_fundo_cor') }}
                     </div>
                     @endif
+                    @if(isset($header_fundo) && !$header_fundo->itemDefault() && !$header_fundo->possuiImagem())
+                    <small><em>Cor atual na home</em></small>
+                    <br>
+                    @endif
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- Neve -->
+        <fieldset class="form-group border border-primary p-3 mt-2">
+            <legend class="w-auto">
+                <small>Função Neve</small>
+            </legend>
+
+            <h6>Efeito de neve caindo como fundo do logo principal.</h6>
+            <h6 class="text-danger"><i>* O fundo do logo principal deve ser uma cor.</i></h6>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input type="checkbox"
+                                name="neve_default"
+                                class="form-check-input {{ $errors->has('neve_default') ? 'is-invalid' : '' }}"
+                                id="neve_default"
+                                value="neve_default"
+                                {{ !empty(old('neve_default')) || (isset($neve_default) && $neve_default->itemDefault()) ? 'checked' : '' }}
+                            /> Sim, inserir neve
+                            @if($errors->has('neve_default'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('neve_default') }}
+                            </div>
+                            @endif
+                        </label>
+                    </div>
+                    <div class="card-img-bottom w-25">
+                        <img src="{{ asset('img/snowing.gif') }}" class="bg-secondary mx-auto d-block" alt="Efeito neve">
+                    </div>
                 </div>
             </div>
         </fieldset>
@@ -361,36 +399,6 @@
             </div>
         </fieldset>
 
-        <!-- footer -->
-        <fieldset class="form-group border border-primary p-3 mt-2">
-            <legend class="w-auto">
-                <small>Função Neve</small>
-            </legend>
-
-            <h6 class="text-danger"><i>* O fundo do logo principal não pode ser uma imagem.</i></h6>
-
-            <div class="form-row">
-                <div class="col">
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input type="checkbox"
-                                name="neve_default"
-                                class="form-check-input {{ $errors->has('neve_default') ? 'is-invalid' : '' }}"
-                                id="neve_default"
-                                value="neve_default"
-                                {{ !empty(old('neve_default')) || (isset($neve_default) && $neve_default->itemDefault()) ? 'checked' : '' }}
-                            /> Sim, inserir neve
-                            @if($errors->has('neve_default'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('neve_default') }}
-                            </div>
-                            @endif
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </fieldset>
-
     </div>
 
     <div class="card-footer">
@@ -402,7 +410,7 @@
 
     <!-- The Modal -->
     <div class="modal" id="armazenamento">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content">
         
                 <!-- Modal Header -->
@@ -449,5 +457,25 @@
             </div>
         </div>
     </div>
-
 </form>
+
+<!-- The Modal -->
+<div class="modal" id="confirmDelete">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header bg-warning">
+                <h4 class="modal-title"><i class="fas fa-trash"></i> Excluir arquivo</h4>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body">
+                Tem certeza que deseja excluir o arquivo "<strong><span class="font-italic" id="confirmFile"></span></strong>" da pasta?
+            </div>
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="deleteFileStorage" value="">Sim</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Não</button>
+            </div>
+        </div>
+    </div>
+</div>
