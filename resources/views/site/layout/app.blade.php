@@ -67,7 +67,11 @@
     <a id="accesskeyContraste" accesskey="5"></a>
 
       @section('header')
+      @if(isset($itens_home['neve']))
+      <header id="header-principal" style="{{ isset($itens_home['header_fundo']) ? $itens_home['header_fundo'] : 'background-color: #d11111' }};{{ $itens_home['neve'] }};background-repeat: repeat-x">
+      @else
       <header id="header-principal" style="{{ isset($itens_home['header_fundo']) ? $itens_home['header_fundo'] : 'background-image: url(/img/banner-55-anos.png)' }}">
+      @endif
         <div class="container-fluid">
           <div class="row">
             <div class="linha-dourada w-100"></div>

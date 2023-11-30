@@ -82,6 +82,7 @@ class HomeImagemService implements HomeImagemServiceInterface {
             'calendario_default' => HomeImagem::padrao()['calendario_default'],
             'header_logo_default' => HomeImagem::padrao()['header_logo_default'],
             'header_fundo_default' => HomeImagem::padrao()['header_fundo_default'],
+            'neve_default' => HomeImagem::getItemPorResultado($resultado, 'neve'),
             'variaveis' => (object) $variaveis,
             'padroes' => HomeImagem::padrao(),
         ];
@@ -97,14 +98,16 @@ class HomeImagemService implements HomeImagemServiceInterface {
         $calendario = HomeImagem::getItemPorResultado($resultado, 'calendario');
         $header_logo = HomeImagem::getItemPorResultado($resultado, 'header_logo');
         $header_fundo = HomeImagem::getItemPorResultado($resultado, 'header_fundo');
+        $neve = HomeImagem::getItemPorResultado($resultado, 'neve');
 
         return [
             'rodape' => isset($rodape) ? $rodape->url : null,
             'cards_1' => isset($cards_1) ? $cards_1->url : null,
             'cards_2' => isset($cards_2) ? $cards_2->url : null,
-            'calendario' => isset($calendario) ? $calendario->url : null,
-            'header_logo' => isset($header_logo) ? $header_logo->url : null,
+            'calendario' => isset($calendario) ? $calendario->getLinkHref() : null,
+            'header_logo' => isset($header_logo) ? $header_logo->getLinkHref() : null,
             'header_fundo' => isset($header_fundo) ? $header_fundo->getHeaderFundo() : null,
+            'neve' => isset($neve) ? $neve->getNeve() : null,
         ];
     }
 

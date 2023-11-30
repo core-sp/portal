@@ -770,11 +770,11 @@ var openStorage_id = '';
 function preencheTabelaPath(value, index, array) {
   var href_path = caminho + value;
   var img_path = location.protocol + '//' + location.hostname + '/' + href_path;
-  $('#armazenamento tbody').append('<tr class="storageFile"></tr>');
-  $('#armazenamento tbody .storageFile:last')
-  .append('<td><button class="btn btn-link storagePath" value="' + href_path + '" type="button">' + value + '</button></td>')
-  .append('<td><div class="col-sm-3"><a href="/' + href_path + '" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home_storage"><img src="' + img_path + '"></a></div></td>')
-  .append('<td><button class="btn btn-danger deleteFileStorage" type="button" value="' + value + '">Excluir</button></td>');
+  var texto_html = '<div class="card-body text-center pt-0 pl-0 pr-0"><div class="card-img-top"><a href="/' + href_path + '" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home_storage"><img src="' + img_path + '"></a></div><br>';
+  texto_html += '<button class="btn btn-link text-break storagePath" value="' + href_path + '">' + value + '</button><br>';
+  texto_html += '<hr><button class="btn btn-sm btn-danger deleteFileStorage" type="button" value="' + value + '">Excluir</button></div>';
+  $('#armazenamento #cards').append('<div class="card storageFile w-100 border border-primary"></div>');
+  $('#armazenamento #cards .storageFile:last').append(texto_html);
 }
 
 $('.openStorage').click(function(){
@@ -824,7 +824,7 @@ $('#armazenamento #file_itens_home').change(function(e){
 
 function cleanTabelaStorage()
 {
-  $('#armazenamento tbody tr').remove();
+  $('#armazenamento .card-columns .card').remove();
 }
 
 function receberArquivos(id){

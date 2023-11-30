@@ -17,7 +17,8 @@ class HomeImagem extends Model
     const DEFAULT_RODAPE = "#004587";
     const DEFAULT_CALENDARIO = 'img/arte-calendario-2023.png';
     const DEFAULT_HEADER_LOGO = 'img/Selo-para-site002.png';
-    const DEFAULT_HEADER_FUNDO = '/img/banner-55-anos.png';
+    const DEFAULT_HEADER_FUNDO = 'img/banner-55-anos.png';
+    const DEFAULT_NEVE = 'img/snowing.gif';
 
     private static function arrayPadrao($nome)
     {
@@ -46,6 +47,7 @@ class HomeImagem extends Model
             'calendario_default' => self::DEFAULT_CALENDARIO,
             'header_logo_default' => self::DEFAULT_HEADER_LOGO,
             'header_fundo_default' => self::DEFAULT_HEADER_FUNDO,
+            'neve_default' => self::DEFAULT_NEVE,
         ];
     }
 
@@ -66,6 +68,9 @@ class HomeImagem extends Model
 
     public static function getValor($campo, $valor)
     {
+        if(($campo == 'neve_default') && (!isset($valor)))
+            return null;
+        
         return isset(self::padrao()[$campo]) ? self::padrao()[$campo] : $valor;
     }
 
@@ -99,6 +104,9 @@ class HomeImagem extends Model
 
     public function itemDefault()
     {
+        if(!isset($this->url))
+            return false;
+
         $campo = $this->funcao == 'cards' ? $this->funcao . '_' . $this->ordem . '_default' : $this->funcao . '_default';
 
         return $this->url == self::padrao()[$campo];
@@ -106,13 +114,29 @@ class HomeImagem extends Model
 
     public function possuiImagem()
     {
+        if(!isset($this->url))
+            return false;
+
         return preg_match('/#{1}([\da-fA-F]{2})([\da-fA-F]{2})([\da-fA-F]{2})/', $this->url) === 0;
     }
 
     public function getHeaderFundo()
     {
-        if($this->possuiImagem())
-            return 'background-image: url('.$this->url.')';
-        return 'background-color: '.$this->url;
+        return $this->possuiImagem() ? 'background-image: url('.$this->getLinkHref().')' : 'background-color: '.$this->url;
+    }
+
+    public function getNeve()
+    {
+        return $this->possuiImagem() ? 'background-image: url('.$this->getLinkHref().')' : null;
+    }
+
+    public function getLinkHref()
+    {
+        if(!isset($this->url))
+            return '';
+
+        $url = '/' . $this->url;
+
+        return strpos('/', $this->url) !== 0 ? $url : $this->url;
     }
 }
