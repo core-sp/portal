@@ -231,7 +231,7 @@
                                 id="cards_1_default"
                                 value="cards_1_default"
                                 {{ !empty(old('cards_1_default')) || (isset($cards_1) && $cards_1->itemDefault()) ? 'checked' : '' }}
-                            /> Usar cor padrão do card escuro<i class="fas fa-square fa-border ml-1" style="color:{{ $padroes['cards_1_default'] }};"></i>
+                            /> Usar cor padrão do card escuro<i class="fas fa-circle fa-lg ml-1" style="color:{{ $padroes['cards_1_default'] }};"></i>
                             @if($errors->has('cards_1_default'))
                             <div class="invalid-feedback">
                                 {{ $errors->first('cards_1_default') }}
@@ -262,7 +262,7 @@
                                 id="cards_2_default"
                                 value="cards_2_default"
                                 {{ !empty(old('cards_2_default')) || (isset($cards_2) && $cards_2->itemDefault()) ? 'checked' : '' }}
-                            /> Usar cor padrão do card claro<i class="fas fa-square fa-border ml-1" style="color:{{ $padroes['cards_2_default'] }};"></i>
+                            /> Usar cor padrão do card claro<i class="fas fa-circle fa-lg ml-1" style="color:{{ $padroes['cards_2_default'] }};"></i>
                             @if($errors->has('cards_2_default'))
                             <div class="invalid-feedback">
                                 {{ $errors->first('cards_2_default') }}
@@ -375,7 +375,7 @@
                                 id="footer_default"
                                 value="footer_default"
                                 {{ !empty(old('footer_default')) || (isset($footer) && $footer->itemDefault()) ? 'checked' : '' }}
-                            /> Usar cor padrão do rodapé<i class="fas fa-square fa-border ml-1" style="color:{{ $padroes['footer_default'] }};"></i>
+                            /> Usar cor padrão do rodapé<i class="fas fa-circle fa-lg ml-1" style="color:{{ $padroes['footer_default'] }};"></i>
                         </label>
                         @if($errors->has('footer_default'))
                         <div class="invalid-feedback">

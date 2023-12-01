@@ -95,6 +95,11 @@ class HomeImagem extends Model
         return array_chunk($array, 4);
     }
 
+    public static function itensHome()
+    {
+        return self::whereIn('funcao', ['header_logo', 'header_fundo', 'calendario', 'cards', 'footer', 'neve'])->get();
+    }
+
     public static function getItemPorResultado($resultado, $campo)
     {
         return $resultado->where('funcao', self::padraoUpdate()[$campo]['funcao'])

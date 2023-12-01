@@ -772,7 +772,8 @@ function preencheTabelaPath(value, index, array) {
   var img_path = location.protocol + '//' + location.hostname + '/' + href_path;
   var texto_html = '<div class="card-body text-center pt-0 pl-0 pr-0"><div class="card-img-top"><a href="/' + href_path + '" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home_storage"><img src="' + img_path + '"></a></div><br>';
   texto_html += '<button class="btn btn-link text-break storagePath" value="' + href_path + '">' + value + '</button><br>';
-  texto_html += '<hr><button class="btn btn-sm btn-danger deleteFileStorage" type="button" value="' + value + '">Excluir</button></div>';
+  texto_html += '<hr><a href="' + img_path + '" class="btn btn-sm btn-primary mr-2" download><i class="fas fa-download"></i></a>';
+  texto_html += '<button class="btn btn-sm btn-danger deleteFileStorage" type="button" value="' + value + '"><i class="fas fa-trash"></i></button></div>';
   $('#armazenamento #cards').append('<div class="card storageFile w-100 border border-primary"></div>');
   $('#armazenamento #cards .storageFile:last').append(texto_html);
 }
@@ -815,9 +816,11 @@ $('#armazenamento #file_itens_home').change(function(e){
         .addClass('alert-success').html('Arquivo <strong><i>"' + response.novo_arquivo + '"</i></strong> foi adicionado da pasta!').show();
       }
     },
-    error: function() {
+    error: function(xhr) {
+      var txt = xhr.status == 422 ? xhr.responseJSON.errors.file_itens_home[0] : 'Erro ao adicionar o arquivo. Recarregue a página.';
       $('#armazenamento #msgStorage').removeClass('alert-success')
-      .addClass('alert-danger').html('Erro ao adicionar o arquivo. Recarregue a página.').show();
+      .addClass('alert-danger').html(txt).show();
+      $('#armazenamento .custom-file-label').text('Selecionar arquivo...');
     }
   });
 });

@@ -53,7 +53,7 @@ class HomeImagemService implements HomeImagemServiceInterface {
             'form' => 'itens-home'
         ];
 
-        $resultado = HomeImagem::where('funcao', '!=', 'bannerprincipal')->get();
+        $resultado = HomeImagem::itensHome();
         
         if(isset($dados) && is_array($dados))
         {
@@ -90,7 +90,7 @@ class HomeImagemService implements HomeImagemServiceInterface {
 
     public function getItens()
     {
-        $resultado = HomeImagem::where('funcao', '!=', 'bannerprincipal')->get();
+        $resultado = HomeImagem::itensHome();
 
         $rodape = HomeImagem::getItemPorResultado($resultado, 'footer');
         $cards_1 = HomeImagem::getItemPorResultado($resultado, 'cards_1');
@@ -132,7 +132,7 @@ class HomeImagemService implements HomeImagemServiceInterface {
         {
             $url = $file->getClientOriginalName();
             $file->storeAs('/', $url, 'itens_home');
-            event(new CrudEvent('arquivo de imagem em itens da home com upload do file: ' . $url, 'está armazenando', '---'));
+            event(new CrudEvent('arquivo de imagem em itens da home com upload do file: ' . HomeImagem::pathCompleto() . $url, 'está armazenando', '---'));
             return ['novo_arquivo' => $url];
         }
 
