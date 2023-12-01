@@ -459,7 +459,9 @@ figure.align-left {
 
 	/* Função neve */
 	/* vermelho */
-	background-color: #d11111;
+	/* background-color: #d11111; */
+	/* verde */
+	background-color: #52792D;
 	/* troca o banner pelo gif */
 	background-image: url('/img/snowing.gif');
 	/* repetir o gif */
