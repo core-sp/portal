@@ -19,6 +19,7 @@ class HomeImagem extends Model
     const DEFAULT_HEADER_LOGO = 'img/Selo-para-site002.png';
     const DEFAULT_HEADER_FUNDO = 'img/banner-55-anos.png';
     const DEFAULT_NEVE = 'img/snowing.gif';
+    const DEFAULT_POPUP_VIDEO = 'https://www.youtube.com/embed/ACXUu6WiC5k';
 
     private static function arrayPadrao($nome)
     {
@@ -48,6 +49,7 @@ class HomeImagem extends Model
             'header_logo_default' => self::DEFAULT_HEADER_LOGO,
             'header_fundo_default' => self::DEFAULT_HEADER_FUNDO,
             'neve_default' => self::DEFAULT_NEVE,
+            'popup_video_default' => self::DEFAULT_POPUP_VIDEO,
         ];
     }
 
@@ -68,7 +70,7 @@ class HomeImagem extends Model
 
     public static function getValor($campo, $valor)
     {
-        if(($campo == 'neve_default') && (!isset($valor)))
+        if((in_array($campo, ['neve_default', 'popup_video_default'])) && (!isset($valor)))
             return null;
         
         return isset(self::padrao()[$campo]) ? self::padrao()[$campo] : $valor;
@@ -97,7 +99,7 @@ class HomeImagem extends Model
 
     public static function itensHome()
     {
-        return self::whereIn('funcao', ['header_logo', 'header_fundo', 'calendario', 'cards', 'footer', 'neve'])->get();
+        return self::whereIn('funcao', ['header_logo', 'header_fundo', 'calendario', 'cards', 'footer', 'neve', 'popup_video'])->get();
     }
 
     public static function getItemPorResultado($resultado, $campo)

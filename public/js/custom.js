@@ -767,30 +767,59 @@ $('#enviarCriarAgenda').click(function(){
 
 var caminho = '';
 var openStorage_id = '';
+const PastaItensHomePrincipal = 'img/';
+
 function preencheTabelaPath(value, index, array) {
   var href_path = caminho + value;
   var img_path = location.protocol + '//' + location.hostname + '/' + href_path;
   var texto_html = '<div class="card-body text-center pt-0 pl-0 pr-0"><div class="card-img-top"><a href="/' + href_path + '" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home_storage"><img src="' + img_path + '"></a></div><br>';
   texto_html += '<button class="btn btn-link text-break storagePath" value="' + href_path + '">' + value + '</button><br>';
   texto_html += '<hr><a href="' + img_path + '" class="btn btn-sm btn-primary mr-2" download><i class="fas fa-download"></i></a>';
-  texto_html += '<button class="btn btn-sm btn-danger deleteFileStorage" type="button" value="' + value + '"><i class="fas fa-trash"></i></button></div>';
+  texto_html += caminho == PastaItensHomePrincipal ? '</div>' : '<button class="btn btn-sm btn-danger deleteFileStorage" type="button" value="' + value + '"><i class="fas fa-trash"></i></button></div>';
   $('#armazenamento #cards').append('<div class="card storageFile w-100 border border-primary"></div>');
   $('#armazenamento #cards .storageFile:last').append(texto_html);
 }
 
+$(document).ready(function(){
+  $("#filtrarFile").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#cards .card .storagePath").filter(function() {
+      $(this).parent().parent().toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+
 $('.openStorage').click(function(){
   openStorage_id = $(this).parent().parent().find('input').attr('id');
-  receberArquivos(openStorage_id);
+  receberArquivos(openStorage_id, null);
+});
+
+$('.openStoragePasta').click(function(){
+  var pasta = this.value == "" ? null : this.value;
+  $('.openStoragePasta').attr('disabled', false);
+  $(this).attr('disabled', true);
+  receberArquivos(openStorage_id, pasta);
 });
 
 $("#armazenamento").on('hidden.bs.modal', function(){
   $('#armazenamento #msgStorage').hide();
+  $("#filtrarFile").val('');
   cleanTabelaStorage();
+});
+
+$("#armazenamento").on('shown.bs.modal', function () {
+  $('.openStoragePasta[value=""]').attr('disabled', true);
+  $('.openStoragePasta[value!=""]').attr('disabled', false);
 });
 
 $("#header_fundo_cor").change(function() {
   var nome = this.id.replace('_cor', '');
   $('#' + nome).val('');
+});
+
+$('#popup_video_vazio, #popup_video_default').change(function() {
+  if(this.checked)
+    $('#popup_video_novo').val('');
 });
 
 $('#armazenamento #file_itens_home').change(function(e){
@@ -811,7 +840,7 @@ $('#armazenamento #file_itens_home').change(function(e){
     success: function(response) {
       if(response.novo_arquivo != null){
         $('#armazenamento .custom-file-label').text('Selecionar arquivo...');
-        receberArquivos(openStorage_id);
+        receberArquivos(openStorage_id, null);
         $('#armazenamento #msgStorage').removeClass('alert-danger')
         .addClass('alert-success').html('Arquivo <strong><i>"' + response.novo_arquivo + '"</i></strong> foi adicionado da pasta!').show();
       }
@@ -830,12 +859,12 @@ function cleanTabelaStorage()
   $('#armazenamento .card-columns .card').remove();
 }
 
-function receberArquivos(id){
+function receberArquivos(id, pasta){
   $.ajax({
     method: "GET",
     data: {},
     dataType: 'json',
-    url: "/admin/imagens/itens-home/armazenamento",
+    url: pasta == null ? "/admin/imagens/itens-home/armazenamento" : "/admin/imagens/itens-home/armazenamento/" + pasta,
     success: function(response) {
       cleanTabelaStorage();
       caminho = response.caminho;
@@ -858,6 +887,8 @@ function eventClickSelecionar(id){
 }
 
 function eventClickExcluir(){
+  if(caminho == PastaItensHomePrincipal)
+    return;
   $('.deleteFileStorage').on('click', function(){
     $('#confirmDelete #confirmFile').text(this.value);
     $('#confirmDelete #deleteFileStorage').val(this.value);

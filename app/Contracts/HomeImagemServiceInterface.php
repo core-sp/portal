@@ -10,7 +10,7 @@ interface HomeImagemServiceInterface {
 
     public function getItens();
 
-    public function itensHomeStorage($file = null);
+    public function itensHomeStorage($folder = null, $file = null);
 
     public function uploadFileStorage($file);
 }

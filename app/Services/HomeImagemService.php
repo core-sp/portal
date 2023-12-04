@@ -72,20 +72,17 @@ class HomeImagemService implements HomeImagemServiceInterface {
             return;
         }
             
-        return [
-            'cards_1' => HomeImagem::getItemPorResultado($resultado, 'cards_1'),
-            'cards_2' => HomeImagem::getItemPorResultado($resultado, 'cards_2'),
-            'footer' => HomeImagem::getItemPorResultado($resultado, 'footer'),
-            'calendario' => HomeImagem::getItemPorResultado($resultado, 'calendario'),
-            'header_logo' => HomeImagem::getItemPorResultado($resultado, 'header_logo'),
-            'header_fundo' => HomeImagem::getItemPorResultado($resultado, 'header_fundo'),
-            'calendario_default' => HomeImagem::padrao()['calendario_default'],
-            'header_logo_default' => HomeImagem::padrao()['header_logo_default'],
-            'header_fundo_default' => HomeImagem::padrao()['header_fundo_default'],
-            'neve_default' => HomeImagem::getItemPorResultado($resultado, 'neve'),
+        $itens = array();
+        foreach(HomeImagem::padrao() as $key => $campo)
+        {
+            $chave = str_replace('_default', '', $key);
+            $itens[$chave] = HomeImagem::getItemPorResultado($resultado, $chave);
+        }
+
+        return array_merge([
             'variaveis' => (object) $variaveis,
             'padroes' => HomeImagem::padrao(),
-        ];
+        ], $itens);
     }
 
     public function getItens()
@@ -99,6 +96,7 @@ class HomeImagemService implements HomeImagemServiceInterface {
         $header_logo = HomeImagem::getItemPorResultado($resultado, 'header_logo');
         $header_fundo = HomeImagem::getItemPorResultado($resultado, 'header_fundo');
         $neve = HomeImagem::getItemPorResultado($resultado, 'neve');
+        $popup_video = HomeImagem::getItemPorResultado($resultado, 'popup_video');
 
         return [
             'rodape' => isset($rodape) ? $rodape->url : null,
@@ -108,21 +106,27 @@ class HomeImagemService implements HomeImagemServiceInterface {
             'header_logo' => isset($header_logo) ? $header_logo->getLinkHref() : null,
             'header_fundo' => isset($header_fundo) ? $header_fundo->getHeaderFundo() : null,
             'neve' => isset($neve) ? $neve->getNeve() : null,
+            'popup_video' => isset($popup_video) ? $popup_video->url : null,
         ];
     }
 
-    public function itensHomeStorage($file = null)
+    public function itensHomeStorage($folder = null, $file = null)
     {
         if(isset($file) && Storage::disk('itens_home')->exists($file))
             return Storage::disk('itens_home')->delete($file) ? event(new CrudEvent('arquivo armazenado como item da home: '.$file, 'excluiu', '---')) : 'Não foi removido.';
         if(isset($file) && !Storage::disk('itens_home')->exists($file))
             throw new \Exception('Arquivo não existe', 404);
         
-        $files = Storage::disk('itens_home')->allFiles();
+        $files = isset($folder) ? array() : Storage::disk('itens_home')->allFiles();
+        $files_folder = isset($folder) ? scandir(public_path() . '/' . $folder) : array();
+        foreach($files_folder as $key => $img){
+            if(preg_match('/(\.jpg|\.png|\.jpeg)+$/i', $img) === 0)
+                unset($files_folder[$key]);
+        }
 
         return [
-            'path' => $files,
-            'caminho' => HomeImagem::caminhoStorage(),
+            'path' => isset($folder) ? array_values($files_folder) : $files,
+            'caminho' => isset($folder) ? $folder . '/' : HomeImagem::caminhoStorage(),
         ];
     }
 

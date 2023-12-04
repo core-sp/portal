@@ -41,8 +41,8 @@
                                 </label>
                             </div>
                             <div class="card-img-bottom" style="width:30%">
-                                <a href="{{ '/' . $header_logo_default }}" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home">
-                                    <img src="{{ asset($header_logo_default) }}" class="img-thumbnail" alt="Logo padrão">
+                                <a href="{{ '/' . $padroes['header_logo_default'] }}" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home">
+                                    <img src="{{ asset($padroes['header_logo_default']) }}" class="img-thumbnail" alt="Logo padrão">
                                 </a>
                             </div>
                         </div>
@@ -115,8 +115,8 @@
                                 </label>
                             </div>
                             <div class="card-img-bottom" style="width:30%">
-                                <a href="{{ '/' . $header_fundo_default }}" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home">
-                                    <img src="{{ asset($header_fundo_default) }}" class="img-thumbnail" alt="Fundo do logo padrão">
+                                <a href="{{ '/' . $padroes['header_fundo_default'] }}" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home">
+                                    <img src="{{ asset($padroes['header_fundo_default']) }}" class="img-thumbnail" alt="Fundo do logo padrão">
                                 </a>
                             </div>
                         </div>
@@ -198,7 +198,7 @@
                                 class="form-check-input {{ $errors->has('neve_default') ? 'is-invalid' : '' }}"
                                 id="neve_default"
                                 value="neve_default"
-                                {{ !empty(old('neve_default')) || (isset($neve_default) && $neve_default->itemDefault()) ? 'checked' : '' }}
+                                {{ !empty(old('neve_default')) || (isset($neve) && $neve->itemDefault()) ? 'checked' : '' }}
                             /> Sim, inserir neve
                             @if($errors->has('neve_default'))
                             <div class="invalid-feedback">
@@ -208,8 +208,108 @@
                         </label>
                     </div>
                     <div class="card-img-bottom w-25">
-                        <img src="{{ asset('img/snowing.gif') }}" class="bg-secondary mx-auto d-block" alt="Efeito neve">
+                        <img src="{{ asset($padroes['neve_default']) }}" class="bg-secondary mx-auto d-block" alt="Efeito neve">
                     </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- popup vídeo ao carregar home -->
+        <fieldset class="form-group border border-primary p-3 mt-2">
+            <legend class="w-auto">
+                <small>Função pop-up vídeo</small>
+            </legend>
+
+            <h6 class="text-danger"><i>* Deve ser um link "embed", próprio para incorporar na página.</i></h6>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="radio"
+                                    id="popup_video_vazio"
+                                    name="popup_video_default"
+                                    class="mr-2 {{ $errors->has('popup_video_default') ? 'is-invalid' : '' }}"
+                                    value="sem_video"
+                                    {{ isset($popup_video) && !isset($popup_video->url) ? 'checked' : '' }}
+                                /> <strong>Não</strong>&nbsp;inserir pop-up de vídeo 
+                                @if($errors->has('popup_video_default'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('popup_video_default') }}
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row mt-2">
+                <div class="col">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="radio"
+                                    id="popup_video_default"
+                                    name="popup_video_default"
+                                    class="mr-2 {{ $errors->has('popup_video_default') ? 'is-invalid' : '' }}"
+                                    value="popup_video_default"
+                                    {{ (!empty(old('popup_video_default')) && (old('popup_video_default') == 'popup_video_default')) || (isset($popup_video) && $popup_video->itemDefault()) ? 'checked' : '' }}
+                                /> Sim, inserir pop-up com link padrão
+                                @if($errors->has('popup_video_default'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('popup_video_default') }}
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <iframe
+                        src="{{ $padroes['popup_video_default'] }}" 
+                        title="YouTube video player" 
+                        frameborder="0" 
+                    >
+                    </iframe>
+                </div>
+                <div class="col">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="radio" 
+                                    name="popup_video_default"
+                                    class="mr-2 {{ $errors->has('popup_video_default') ? 'is-invalid' : '' }}"
+                                    value="popup_video"
+                                    {{ !empty(old('popup_video')) || (isset($popup_video) && isset($popup_video->url) && !$popup_video->itemDefault()) ? 'checked' : '' }}
+                                /> Sim, inserir pop-up com&nbsp;<strong>novo</strong>&nbsp;link
+                                @if($errors->has('popup_video_default'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('popup_video_default') }}
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                        <input type="text" 
+                            id="popup_video_novo"
+                            class="form-control {{ $errors->has('popup_video') ? 'is-invalid' : '' }}" 
+                            placeholder="https://..."
+                            name="popup_video"
+                            value="{{ !empty(old('popup_video')) || (isset($popup_video) && isset($popup_video->url) && !$popup_video->itemDefault()) ? $popup_video->url : '' }}"
+                        />
+                        @if($errors->has('popup_video'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('popup_video') }}
+                        </div>
+                        @endif
+                    </div>
+                    @if(!empty(old('popup_video')) || (isset($popup_video) && isset($popup_video->url) && !$popup_video->itemDefault()))
+                    <iframe
+                        src="{{ !empty(old('popup_video')) || (isset($popup_video) && isset($popup_video->url) && !$popup_video->itemDefault()) ? $popup_video->url : '' }}" 
+                        title="YouTube video player" 
+                        frameborder="0" 
+                    >
+                    </iframe>
+                    @endif
                 </div>
             </div>
         </fieldset>
@@ -314,8 +414,8 @@
                                 </label>
                             </div>
                             <div class="card-img-bottom" style="width:30%">
-                                <a href="{{ '/' . $calendario_default }}" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home">
-                                    <img src="{{ asset($calendario_default) }}" class="img-thumbnail" alt="Calendário padrão">
+                                <a href="{{ '/' . $padroes['calendario_default'] }}" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home">
+                                    <img src="{{ asset($padroes['calendario_default']) }}" class="img-thumbnail" alt="Calendário padrão">
                                 </a>
                             </div>
                         </div>
@@ -410,12 +510,12 @@
 
     <!-- The Modal -->
     <div class="modal" id="armazenamento">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
             <div class="modal-content">
         
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h4 class="modal-title"><i class="fas fa-folder-open"></i> Armazenamento - Adicionar / Selecionar arquivo</h4>
+                    <h4 class="modal-title"><i class="fas fa-folder"></i> Armazenamento - Adicionar / Selecionar arquivo</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 
@@ -424,7 +524,7 @@
                     <div class="alert alert-dismissible alert-success" id="msgStorage" style="display: none"></div>
 
                     <div>
-                        <h5>Adicionar novo arquivo</h5>
+                        <h5>Adicionar novo arquivo na pasta de itens da home</h5>
                         <hr>
                         <label for="file_itens_home">Nova imagem</label>
                         <div class="custom-file">
@@ -445,7 +545,15 @@
                         
                     <div class="mt-4">
                         <hr>
+                        <button type="button" value="img" class="btn btn-link openStoragePasta pl-0">
+                            <i class="fas fa-folder-open"></i> Pasta principal de imagens do Portal
+                        </button>
+                        <br>
+                        <button type="button" value="" class="btn btn-link openStoragePasta mt-2 mb-3 pl-0">
+                            <i class="fas fa-folder-open"></i> Pasta dos itens da home
+                        </button>
                         <h5>Selecionar arquivos</h5>
+                        <input class="form-control mb-3" id="filtrarFile" type="text" placeholder="Filtrar...">
                         <div class="card-columns" id="cards"></div>
                     </div>
                 </div>

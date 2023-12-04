@@ -8,6 +8,7 @@ class HomeImagemRequest extends FormRequest
 {
     private $regex_hex;
     private $tipo_campo;
+    private $required_video;
 
     protected function prepareForValidation()
     {
@@ -22,6 +23,23 @@ class HomeImagemRequest extends FormRequest
 
         if(isset($this->header_fundo_default) && isset($this->neve_default))
             $this->merge(['neve_default' => 'erro']);
+
+        if(isset($this->popup_video_default) && ($this->popup_video_default == 'popup_video'))
+        {
+            $all = $this->all();
+            unset($all['popup_video_default']);
+            $this->replace($all);
+        }
+
+        if(isset($this->popup_video_default) && ($this->popup_video_default == 'sem_video'))
+        {
+            $all = $this->all();
+            unset($all['popup_video']);
+            $this->replace($all);
+            $this->merge(['popup_video_default' => null]);
+        }
+
+        $this->required_video = isset($this->popup_video) ? '|required|' : '|';
 
         if(isset($this->header_fundo))
         {
@@ -47,7 +65,7 @@ class HomeImagemRequest extends FormRequest
         
         if(\Route::is('imagens.itens.home.storage.post'))
             return [
-                'file_itens_home' => 'required|mimes:jpeg,jpg,png,JPEG,JPG,PNG|max:2048',
+                'file_itens_home' => 'required|mimes:jpeg,jpg,png,JPEG,JPG,PNG|max:2048|regex:/^[^áéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇ]*$/',
             ];
 
         return [
@@ -64,6 +82,8 @@ class HomeImagemRequest extends FormRequest
             'header_fundo_default' => 'nullable|in:header_fundo_default',
             'header_fundo' => 'exclude_if:header_fundo_default,header_fundo_default|required_unless:header_fundo_default,header_fundo_default|nullable|'.$this->tipo_campo,
             'neve_default' => 'nullable|in:neve_default',
+            'popup_video_default' => 'nullable|in:popup_video_default',
+            'popup_video' => 'exclude_if:popup_video_default,popup_video_default' . $this->required_video .'nullable|url|max:191',
         ];
     }
 
@@ -71,6 +91,7 @@ class HomeImagemRequest extends FormRequest
     {
         return [
             'in' => 'Valor não aceito',
+            'file_itens_home.regex' => 'Não pode conter acentuação no nome do arquivo',
             'regex' => 'Formato inválido de cor',
             'max' => 'O campo não permite mais que :max caracteres',
             'string' => 'Deve ser um texto',
@@ -79,6 +100,7 @@ class HomeImagemRequest extends FormRequest
             'file_itens_home.max' => 'Somente imagens de até 2MB',
             'required_unless' => 'Campo obrigatório se o padrão não for escolhido',
             'neve_default.in' => 'Valor não aceito quando fundo do logo principal é uma imagem',
+            'url' => 'Deve ser um link https://',
         ];
     }
 }
