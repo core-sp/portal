@@ -12,6 +12,7 @@ class HomeImagem extends Model
     protected $guarded = [];
 
     const TOTAL = 7;
+    const TOTAL_ITENS_HOME = 8;
     const DEFAULT_CARD_ESCURO = "#004587";
     const DEFAULT_CARD_CLARO = "#15AAE2";
     const DEFAULT_RODAPE = "#004587";

@@ -13,3 +13,46 @@ $factory->define(HomeImagem::class, function (Faker $faker) {
         'target' => '_blank'
     ];
 });
+
+$factory->afterCreating(HomeImagem::class, function ($homeImagens, $faker) {
+    $homeImagens->each(function ($banner) {
+        $banner->update(['ordem' => $banner->idimagem]);
+    });
+});
+
+$factory->state(HomeImagem::class, 'itens_home', function ($faker) {
+    return [
+        'funcao' => 'itens_home',
+        'url' => null,
+        'url_mobile' => null,
+        'link' => '#',
+        'target' => '_self'
+    ];
+});
+
+$factory->afterCreatingState(HomeImagem::class, 'itens_home', function ($homeImagens, $faker) {
+    $funcoes = [
+        'header_logo', 'header_fundo', 'cards_1', 'cards_2', 'calendario', 'footer', 'neve', 'popup_video'
+    ];
+
+    $homeImagens->each(function ($banner) use($funcoes){
+        $id = $banner->idimagem - 1;
+        $chave = $funcoes[$id];
+        switch ($chave) {
+            case 'neve':
+            case 'popup_video':
+                $banner->update(['funcao' => $chave, 'ordem' => 1]);
+                break;
+            case 'cards_1':
+            case 'cards_2':
+                $ordem = $chave == 'cards_1' ? 1 : 2;
+                $banner->update(['funcao' => 'cards', 'ordem' => $ordem, 'url' => HomeImagem::padrao()[$chave.'_default'], 'url_mobile' => HomeImagem::padrao()[$chave.'_default']]);
+                break;
+            default:
+                $banner->update(['funcao' => $chave, 'ordem' => 1, 'url' => HomeImagem::padrao()[$chave.'_default'], 'url_mobile' => HomeImagem::padrao()[$chave.'_default']]);
+                break;
+        }
+    });
+
+    $homeImagens->refresh();
+});

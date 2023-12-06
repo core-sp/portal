@@ -63,8 +63,6 @@ class HomeImagemController extends Controller
 
     public function updateItensHome(HomeImagemRequest $request)
     {
-        $this->authorize('updateOther', auth()->user());
-
         try{
             $validated = $request->validated();
             $dados = $this->service->getService('HomeImagem')->itensHome($validated);
@@ -80,8 +78,6 @@ class HomeImagemController extends Controller
 
     public function storageItensHome(HomeImagemRequest $request, $folder = null)
     {
-        $this->authorize('updateOther', auth()->user());
-
         try{
             $validated = $request->validated();
             $dados = \Route::is('imagens.itens.home.storage.post') ? 
@@ -102,6 +98,7 @@ class HomeImagemController extends Controller
             $dados = $this->service->getService('HomeImagem')->itensHomeStorage(null, $file);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [404]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao excluir o arquivo do storage dos itens da home.");
         }
 

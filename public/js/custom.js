@@ -843,6 +843,8 @@ $('#armazenamento #file_itens_home').change(function(e){
         receberArquivos(openStorage_id, null);
         $('#armazenamento #msgStorage').removeClass('alert-danger')
         .addClass('alert-success').html('Arquivo <strong><i>"' + response.novo_arquivo + '"</i></strong> foi adicionado da pasta!').show();
+        $('.openStoragePasta[value=""]').attr('disabled', true);
+        $('.openStoragePasta[value!=""]').attr('disabled', false);
       }
     },
     error: function(xhr) {

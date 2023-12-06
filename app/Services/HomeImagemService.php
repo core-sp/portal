@@ -7,6 +7,7 @@ use App\Contracts\HomeImagemServiceInterface;
 use App\Events\CrudEvent;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Schema;
 
 class HomeImagemService implements HomeImagemServiceInterface {
 
@@ -87,7 +88,7 @@ class HomeImagemService implements HomeImagemServiceInterface {
 
     public function getItens()
     {
-        $resultado = HomeImagem::itensHome();
+        $resultado = !Schema::hasTable('home_imagens') ? collect() : HomeImagem::itensHome();
 
         $rodape = HomeImagem::getItemPorResultado($resultado, 'footer');
         $cards_1 = HomeImagem::getItemPorResultado($resultado, 'cards_1');
@@ -99,12 +100,12 @@ class HomeImagemService implements HomeImagemServiceInterface {
         $popup_video = HomeImagem::getItemPorResultado($resultado, 'popup_video');
 
         return [
-            'rodape' => isset($rodape) ? $rodape->url : null,
-            'cards_1' => isset($cards_1) ? $cards_1->url : null,
-            'cards_2' => isset($cards_2) ? $cards_2->url : null,
-            'calendario' => isset($calendario) ? $calendario->getLinkHref() : null,
-            'header_logo' => isset($header_logo) ? $header_logo->getLinkHref() : null,
-            'header_fundo' => isset($header_fundo) ? $header_fundo->getHeaderFundo() : null,
+            'rodape' => isset($rodape) ? $rodape->url : HomeImagem::padrao()['footer_default'],
+            'cards_1' => isset($cards_1) ? $cards_1->url : HomeImagem::padrao()['cards_1_default'],
+            'cards_2' => isset($cards_2) ? $cards_2->url : HomeImagem::padrao()['cards_2_default'],
+            'calendario' => isset($calendario) ? $calendario->getLinkHref() : HomeImagem::padrao()['calendario_default'],
+            'header_logo' => isset($header_logo) ? $header_logo->getLinkHref() : HomeImagem::padrao()['header_logo_default'],
+            'header_fundo' => isset($header_fundo) ? $header_fundo->getHeaderFundo() : 'background-image: url('.HomeImagem::padrao()['header_fundo_default'].')',
             'neve' => isset($neve) ? $neve->getNeve() : null,
             'popup_video' => isset($popup_video) ? $popup_video->url : null,
         ];
@@ -135,6 +136,7 @@ class HomeImagemService implements HomeImagemServiceInterface {
         if($file instanceof UploadedFile)
         {
             $url = $file->getClientOriginalName();
+            $url = strtr(utf8_decode($url), utf8_decode('àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ'), 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY');
             $file->storeAs('/', $url, 'itens_home');
             event(new CrudEvent('arquivo de imagem em itens da home com upload do file: ' . HomeImagem::pathCompleto() . $url, 'está armazenando', '---'));
             return ['novo_arquivo' => $url];

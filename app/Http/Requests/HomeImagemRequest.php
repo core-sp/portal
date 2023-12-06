@@ -10,6 +10,12 @@ class HomeImagemRequest extends FormRequest
     private $tipo_campo;
     private $required_video;
 
+    public function authorize()
+    {
+        $user = auth()->user();
+        return $user->can('updateOther', $user);
+    }
+
     protected function prepareForValidation()
     {
         if(\Route::is('imagens.itens.home.storage.post') || \Route::is('imagens.itens.home.storage'))
@@ -65,16 +71,16 @@ class HomeImagemRequest extends FormRequest
         
         if(\Route::is('imagens.itens.home.storage.post'))
             return [
-                'file_itens_home' => 'required|mimes:jpeg,jpg,png,JPEG,JPG,PNG|max:2048|regex:/^[^áéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇ]*$/',
+                'file_itens_home' => 'required|file|mimetypes:image/png,image/jpeg|max:2048',
             ];
 
         return [
             'cards_1_default' => 'nullable|in:cards_1_default',
-            'cards_1' => 'exclude_if:cards_1_default,cards_1_default|nullable|'.$this->regex_hex,
+            'cards_1' => 'exclude_if:cards_1_default,cards_1_default|required_unless:cards_1_default,cards_1_default|nullable|'.$this->regex_hex,
             'cards_2_default' => 'nullable|in:cards_2_default',
-            'cards_2' => 'exclude_if:cards_2_default,cards_2_default|nullable|'.$this->regex_hex,
+            'cards_2' => 'exclude_if:cards_2_default,cards_2_default|required_unless:cards_2_default,cards_2_default|nullable|'.$this->regex_hex,
             'footer_default' => 'nullable|in:footer_default',
-            'footer' => 'exclude_if:footer_default,footer_default|nullable|'.$this->regex_hex,
+            'footer' => 'exclude_if:footer_default,footer_default|required_unless:footer_default,footer_default|nullable|'.$this->regex_hex,
             'calendario_default' => 'nullable|in:calendario_default',
             'calendario' => 'exclude_if:calendario_default,calendario_default|required_unless:calendario_default,calendario_default|nullable|string|max:191',
             'header_logo_default' => 'nullable|in:header_logo_default',
@@ -91,16 +97,16 @@ class HomeImagemRequest extends FormRequest
     {
         return [
             'in' => 'Valor não aceito',
-            'file_itens_home.regex' => 'Não pode conter acentuação no nome do arquivo',
             'regex' => 'Formato inválido de cor',
             'max' => 'O campo não permite mais que :max caracteres',
             'string' => 'Deve ser um texto',
             'required' => 'Campo obrigatório',
-            'mimes' => 'Tipo de arquivo não aceito',
+            'mimetypes' => 'Tipo de arquivo não aceito',
             'file_itens_home.max' => 'Somente imagens de até 2MB',
             'required_unless' => 'Campo obrigatório se o padrão não for escolhido',
             'neve_default.in' => 'Valor não aceito quando fundo do logo principal é uma imagem',
             'url' => 'Deve ser um link https://',
+            'file' => 'Deve ser um arquivo',
         ];
     }
 }

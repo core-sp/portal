@@ -531,7 +531,7 @@
                             <input type="file"
                                 id="file_itens_home" 
                                 class="custom-file-input {{ $errors->has('file_itens_home') ? 'is-invalid' : '' }}"
-                                accept="image/png, image/jpeg, image/jpg"
+                                accept="image/png, image/jpeg"
                                 name="file_itens_home" 
                             />
                             <label class="custom-file-label" for="file_itens_home">Selecionar arquivo...</label>

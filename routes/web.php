@@ -1,6 +1,6 @@
 <?php
 
-Route::middleware(['block_ip'])->group(function () {
+Route::middleware(['share_data', 'block_ip'])->group(function () {
 
   Route::get('/', 'SiteController@index')->name('site.home');
 

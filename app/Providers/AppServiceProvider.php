@@ -8,7 +8,6 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Validator;
 use App\Repositories\GerentiRepositoryMock;
 use App\Repositories\GerentiRepositoryInterface;
-use Illuminate\Support\Facades\View;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,9 +35,5 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
         Validator::extend('recaptcha', 'App\\Validators\\ReCaptcha@validate');
-
-        $service = resolve('App\Contracts\MediadorServiceInterface');
-        $itens_home = $service->getService('HomeImagem')->getItens();
-        View::share('itens_home', $itens_home);
     }
 }
