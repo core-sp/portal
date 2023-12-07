@@ -8,6 +8,8 @@ use App\Events\CrudEvent;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class HomeImagemService implements HomeImagemServiceInterface {
 
@@ -137,6 +139,14 @@ class HomeImagemService implements HomeImagemServiceInterface {
         {
             $url = $file->getClientOriginalName();
             $url = strtr(utf8_decode($url), utf8_decode('àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ'), 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY');
+
+            // renomear arquivo que já existe para não sobrescrever...
+            if(Storage::disk('itens_home')->exists($url))
+            {
+                $ext = '.' . $file->getClientOriginalExtension();
+                $url = Str::replaceLast($ext, '', $url) . '_' . Carbon::now()->timestamp . $ext;
+            }
+            
             $file->storeAs('/', $url, 'itens_home');
             event(new CrudEvent('arquivo de imagem em itens da home com upload do file: ' . HomeImagem::pathCompleto() . $url, 'está armazenando', '---'));
             return ['novo_arquivo' => $url];

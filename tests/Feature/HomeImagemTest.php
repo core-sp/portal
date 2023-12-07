@@ -9,6 +9,7 @@ use App\HomeImagem;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Testing\WithFaker;
+use Carbon\Carbon;
 
 class HomeImagemTest extends TestCase
 {
@@ -1441,6 +1442,39 @@ class HomeImagemTest extends TestCase
         ->assertOk()
         ->assertJsonFragment([
             'path' => $files,
+            'caminho' => HomeImagem::caminhoStorage()
+        ]);
+    }
+
+    /** @test */
+    public function can_rename_upload_file_itens_home()
+    {
+        Storage::fake('itens_home');
+
+        $user = $this->signInAsAdmin();
+
+        $temp = strtr(utf8_decode('teste.jpeg'), utf8_decode('àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ'), 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY');
+        $this->post(route('imagens.itens.home.storage.post'), ['file_itens_home' => UploadedFile::fake()->create($temp)])
+        ->assertJson(['novo_arquivo' => $temp]);
+        Storage::disk('itens_home')->assertExists($temp);
+
+        $this->get(route('imagens.itens.home.storage'))
+        ->assertOk()
+        ->assertJsonFragment([
+            'path' => [$temp],
+            'caminho' => HomeImagem::caminhoStorage()
+        ]);
+
+        $temp = strtr(utf8_decode($temp), utf8_decode('àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ'), 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY');
+        $copia = 'teste_' .Carbon::now()->timestamp.'.jpeg';
+        $this->post(route('imagens.itens.home.storage.post'), ['file_itens_home' => UploadedFile::fake()->create($temp)])
+        ->assertJson(['novo_arquivo' => $copia]);
+        Storage::disk('itens_home')->assertExists($copia);
+
+        $this->get(route('imagens.itens.home.storage'))
+        ->assertOk()
+        ->assertJsonFragment([
+            'path' => [$temp, $copia],
             'caminho' => HomeImagem::caminhoStorage()
         ]);
     }
