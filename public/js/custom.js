@@ -836,7 +836,7 @@ $('#armazenamento #file_itens_home').change(function(e){
     data: form,
     contentType : false,
 		processData : false,
-    url: "/admin/imagens/itens-home/armazenamento/",
+    url: "/admin/imagens/itens-home/armazenamento",
     success: function(response) {
       if(response.novo_arquivo != null){
         $('#armazenamento .custom-file-label').text('Selecionar arquivo...');
