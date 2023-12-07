@@ -103,9 +103,9 @@ class HomeImagemService implements HomeImagemServiceInterface {
             'rodape' => isset($rodape) ? $rodape->url : HomeImagem::padrao()['footer_default'],
             'cards_1' => isset($cards_1) ? $cards_1->url : HomeImagem::padrao()['cards_1_default'],
             'cards_2' => isset($cards_2) ? $cards_2->url : HomeImagem::padrao()['cards_2_default'],
-            'calendario' => isset($calendario) ? $calendario->getLinkHref() : HomeImagem::padrao()['calendario_default'],
-            'header_logo' => isset($header_logo) ? $header_logo->getLinkHref() : HomeImagem::padrao()['header_logo_default'],
-            'header_fundo' => isset($header_fundo) ? $header_fundo->getHeaderFundo() : 'background-image: url('.HomeImagem::padrao()['header_fundo_default'].')',
+            'calendario' => isset($calendario) ? $calendario->url : HomeImagem::padrao()['calendario_default'],
+            'header_logo' => isset($header_logo) ? $header_logo->url : HomeImagem::padrao()['header_logo_default'],
+            'header_fundo' => isset($header_fundo) ? $header_fundo->getHeaderFundo() : 'background-image: url(/'.HomeImagem::padrao()['header_fundo_default'].')',
             'neve' => isset($neve) ? $neve->getNeve() : null,
             'popup_video' => isset($popup_video) ? $popup_video->url : null,
         ];

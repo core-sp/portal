@@ -282,6 +282,44 @@ class HomeImagemTest extends TestCase
     }
 
     /** @test */
+    public function can_view_defaults_without_itens_home_created()
+    {
+        factory('App\Regional')->create();
+        $banners = factory('App\HomeImagem', HomeImagem::TOTAL)->create();
+
+        $this->get(route('site.home'))
+        ->assertOk()
+        ->assertSee('<a href="/"><img src="'.asset(HomeImagem::padrao()['header_logo_default']).'" alt="CORE-SP" id="logo-header" /></a>')
+        ->assertSee('<header id="header-principal" style="background-image: url(/'.HomeImagem::padrao()['header_fundo_default'].')">')
+        ->assertSeeInOrder([
+            '<a href="/calendario-oficial-core-sp">',
+            '<img class="lazy" data-src="'.asset(HomeImagem::padrao()['calendario_default']).'" alt="Calendário | Core-SP" />',
+            '</a>'
+        ])
+        ->assertSee('<div class="box text-center " style="background-color:'.HomeImagem::padrao()['cards_1_default'].'">')
+        ->assertSee('<div class="box text-center " style="background-color:'.HomeImagem::padrao()['cards_2_default'].'">')
+        ->assertSee('<footer class="pt-4" id="rodape" style="background-color:'.HomeImagem::padrao()['footer_default'].'">');
+
+        $this->get(route('licitacoes.siteBusca'))
+        ->assertOk()
+        ->assertSee('<a href="/"><img src="'.asset(HomeImagem::padrao()['header_logo_default']).'" alt="CORE-SP" id="logo-header" /></a>')
+        ->assertSee('<header id="header-principal" style="background-image: url(/'.HomeImagem::padrao()['header_fundo_default'].')">')
+        ->assertSee('<footer class="pt-4" id="rodape" style="background-color:'.HomeImagem::padrao()['footer_default'].'">');
+
+        $this->get(route('bdosite.index'))
+        ->assertOk()
+        ->assertSee('<a href="/"><img src="'.asset(HomeImagem::padrao()['header_logo_default']).'" alt="CORE-SP" id="logo-header" /></a>')
+        ->assertSee('<header id="header-principal" style="background-image: url(/'.HomeImagem::padrao()['header_fundo_default'].')">')
+        ->assertSee('<footer class="pt-4" id="rodape" style="background-color:'.HomeImagem::padrao()['footer_default'].'">');
+
+        $this->get(route('regionais.show', 1))
+        ->assertOk()
+        ->assertSee('<a href="/"><img src="'.asset(HomeImagem::padrao()['header_logo_default']).'" alt="CORE-SP" id="logo-header" /></a>')
+        ->assertSee('<header id="header-principal" style="background-image: url(/'.HomeImagem::padrao()['header_fundo_default'].')">')
+        ->assertSee('<footer class="pt-4" id="rodape" style="background-color:'.HomeImagem::padrao()['footer_default'].'">');
+    }
+
+    /** @test */
     public function log_is_generated_when_update_itens_home()
     {
         $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
