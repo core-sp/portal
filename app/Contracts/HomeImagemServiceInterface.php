@@ -13,4 +13,6 @@ interface HomeImagemServiceInterface {
     public function itensHomeStorage($folder = null, $file = null);
 
     public function uploadFileStorage($file);
+
+    public function downloadFileStorage($folder, $arquivo);
 }

@@ -27,6 +27,7 @@ class HomeImagemTest extends TestCase
         $this->get(route('imagens.itens.home.storage'))->assertRedirect(route('login'));
         $this->post(route('imagens.itens.home.storage.post'))->assertRedirect(route('login'));
         $this->delete(route('imagens.itens.home.storage.delete', 'arquivo.png'))->assertRedirect(route('login'));
+        $this->get(route('imagens.itens.home.storage.download', ['folder' => 'itens-home', 'arquivo' => 'teste.jpeg']))->assertRedirect(route('login'));
     }
 
     /** @test */
@@ -43,6 +44,7 @@ class HomeImagemTest extends TestCase
         $this->get(route('imagens.itens.home.storage'))->assertForbidden();
         $this->post(route('imagens.itens.home.storage.post'))->assertForbidden();
         $this->delete(route('imagens.itens.home.storage.delete', 'arquivo.png'))->assertForbidden();
+        $this->get(route('imagens.itens.home.storage.download', ['folder' => 'itens-home', 'arquivo' => 'teste.jpeg']))->assertForbidden();
     }
 
     /** 
@@ -1395,7 +1397,8 @@ class HomeImagemTest extends TestCase
         ->assertOk()
         ->assertJson([
             'path' => ['teste.jpg'],
-            'caminho' => HomeImagem::caminhoStorage()
+            'caminho' => HomeImagem::caminhoStorage(),
+            'folder' => 'itens-home'
         ]);
     }
 
@@ -1408,7 +1411,8 @@ class HomeImagemTest extends TestCase
         ->assertOk()
         ->assertJsonFragment([
             '001-whatsapp.png',
-            'caminho' => 'img/'
+            'caminho' => 'img/',
+            'folder' => 'img'
         ]);
     }
 
@@ -1442,7 +1446,8 @@ class HomeImagemTest extends TestCase
         ->assertOk()
         ->assertJsonFragment([
             'path' => $files,
-            'caminho' => HomeImagem::caminhoStorage()
+            'caminho' => HomeImagem::caminhoStorage(),
+            'folder' => 'itens-home'
         ]);
     }
 
@@ -1462,7 +1467,8 @@ class HomeImagemTest extends TestCase
         ->assertOk()
         ->assertJsonFragment([
             'path' => [$temp],
-            'caminho' => HomeImagem::caminhoStorage()
+            'caminho' => HomeImagem::caminhoStorage(),
+            'folder' => 'itens-home'
         ]);
 
         $temp = strtr(utf8_decode($temp), utf8_decode('àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ'), 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY');
@@ -1554,6 +1560,8 @@ class HomeImagemTest extends TestCase
         $this->delete(route('imagens.itens.home.storage.delete', 'teste.jpeg'))
         ->assertOk()
         ->assertJson([]);
+
+        Storage::disk('itens_home')->assertMissing('teste.jpeg');
     }
 
     /** @test */
@@ -1584,6 +1592,54 @@ class HomeImagemTest extends TestCase
         $user = $this->signInAsAdmin();
 
         $this->delete(route('imagens.itens.home.storage.delete', 'teste.jpeg'))
+        ->assertNotFound();
+    }
+
+    /** @test */
+    public function can_download_file()
+    {
+        Storage::fake('itens_home');
+
+        $user = $this->signInAsAdmin();
+
+        $this->post(route('imagens.itens.home.storage.post'), ['file_itens_home' => UploadedFile::fake()->create('teste.jpeg')]);
+        Storage::disk('itens_home')->assertExists('teste.jpeg');
+
+        $this->get(route('imagens.itens.home.storage.download', ['folder' => 'itens-home', 'arquivo' => 'teste.jpeg']))
+        ->assertOk();
+
+        $this->get(route('imagens.itens.home.storage.download', ['folder' => 'img', 'arquivo' => '001-whatsapp.png']))
+        ->assertOk();
+    }
+
+    /** @test */
+    public function cannot_download_file_without_file()
+    {
+        Storage::fake('itens_home');
+
+        $user = $this->signInAsAdmin();
+
+        $this->get(route('imagens.itens.home.storage.download', ['folder' => 'itens-home', 'arquivo' => 'teste.jpeg']))
+        ->assertNotFound();
+
+        $this->get(route('imagens.itens.home.storage.download', ['folder' => 'img', 'arquivo' => 'teste_teste.png']))
+        ->assertNotFound();
+    }
+
+    /** @test */
+    public function cannot_download_file_with_invalid_folder()
+    {
+        Storage::fake('itens_home');
+
+        $user = $this->signInAsAdmin();
+
+        $this->post(route('imagens.itens.home.storage.post'), ['file_itens_home' => UploadedFile::fake()->create('teste.jpeg')]);
+        Storage::disk('itens_home')->assertExists('teste.jpeg');
+
+        $this->get(route('imagens.itens.home.storage.download', ['folder' => 'itens_home', 'arquivo' => 'teste.jpeg']))
+        ->assertNotFound();
+
+        $this->get(route('imagens.itens.home.storage.download', ['folder' => 'imge', 'arquivo' => '001-whatsapp.png']))
         ->assertNotFound();
     }
 }

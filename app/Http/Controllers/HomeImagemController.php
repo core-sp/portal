@@ -104,4 +104,19 @@ class HomeImagemController extends Controller
 
         return response()->json($dados);
     }
+
+    public function downloadStorageItensHome($folder, $arquivo)
+    {
+        $this->authorize('updateOther', auth()->user());
+
+        try{
+            $file = $this->service->getService('HomeImagem')->downloadFileStorage($folder, $arquivo);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [404]) ? abort($e->getCode(), $e->getMessage()) : 
+            abort(500, "Erro ao realizar download do arquivo.");
+        }
+
+        return response()->download($file, $arquivo, ['Cache-Control' => 'no-cache, no-store, must-revalidate']);
+    }
 }

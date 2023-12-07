@@ -187,6 +187,7 @@ Route::middleware(['share_data', 'block_ip'])->group(function () {
       Route::get('/itens-home/armazenamento/{folder?}', 'HomeImagemController@storageItensHome')->where('folder', 'img')->name('imagens.itens.home.storage');
       Route::post('/itens-home/armazenamento', 'HomeImagemController@storageItensHome')->name('imagens.itens.home.storage.post');
       Route::delete('/itens-home/armazenamento/delete-file/{file}', 'HomeImagemController@destroyFile')->name('imagens.itens.home.storage.delete');
+      Route::get('/itens-home/armazenamento/download/{folder}/{arquivo}', 'HomeImagemController@downloadStorageItensHome')->where('folder', 'itens-home|img')->name('imagens.itens.home.storage.download');
     });
 
     // Rotas para Blog Posts

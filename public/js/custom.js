@@ -767,14 +767,14 @@ $('#enviarCriarAgenda').click(function(){
 
 var caminho = '';
 var openStorage_id = '';
+var folder_name = '';
 const PastaItensHomePrincipal = 'img/';
 
 function preencheTabelaPath(value, index, array) {
   var href_path = caminho + value;
-  // var img_path = location.protocol + '//' + location.hostname + '/' + href_path;
   var texto_html = '<div class="card-body text-center pt-0 pl-0 pr-0"><div class="card-img-top"><a href="/' + href_path + '" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home_storage"><img src="/' + href_path + '"></a></div><br>';
   texto_html += '<button class="btn btn-link text-break storagePath" value="' + href_path + '">' + value + '</button><br>';
-  texto_html += '<hr><a href="/' + href_path + '" class="btn btn-sm btn-primary mr-2" download><i class="fas fa-download"></i></a>';
+  texto_html += '<hr><a href="/admin/imagens/itens-home/armazenamento/download/' + folder_name + '/' + value + '" class="btn btn-sm btn-primary mr-2"><i class="fas fa-download"></i></a>';
   texto_html += caminho == PastaItensHomePrincipal ? '</div>' : '<button class="btn btn-sm btn-danger deleteFileStorage" type="button" value="' + value + '"><i class="fas fa-trash"></i></button></div>';
   $('#armazenamento #cards').append('<div class="card storageFile w-100 border border-primary"></div>');
   $('#armazenamento #cards .storageFile:last').append(texto_html);
@@ -870,6 +870,7 @@ function receberArquivos(id, pasta){
     success: function(response) {
       cleanTabelaStorage();
       caminho = response.caminho;
+      folder_name = response.folder;
       response.path.forEach(preencheTabelaPath);
       eventClickSelecionar(id);
       eventClickExcluir();

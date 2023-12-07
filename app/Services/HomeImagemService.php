@@ -130,6 +130,7 @@ class HomeImagemService implements HomeImagemServiceInterface {
         return [
             'path' => isset($folder) ? array_values($files_folder) : $files,
             'caminho' => isset($folder) ? $folder . '/' : HomeImagem::caminhoStorage(),
+            'folder' => isset($folder) ? $folder : 'itens-home',
         ];
     }
 
@@ -153,5 +154,23 @@ class HomeImagemService implements HomeImagemServiceInterface {
         }
 
         throw new \Exception('Arquivo para upload não existe', 404);
+    }
+
+    public function downloadFileStorage($folder, $arquivo)
+    {
+        switch ($folder) {
+            case 'img':
+                $temp = HomeImagem::pathCompleto() . $folder . '/' . $arquivo;
+                if(\File::exists($temp))
+                    return $temp;
+                break;
+            
+            default:
+                if(Storage::disk('itens_home')->exists($arquivo))
+                    return Storage::disk('itens_home')->path($arquivo);
+                break;
+        }
+
+        throw new \Exception('Arquivo "'.$arquivo.'" para download não existe no folder "'.$folder.'" !', 404);
     }
 }
