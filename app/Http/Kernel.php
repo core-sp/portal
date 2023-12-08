@@ -20,6 +20,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\TrustProxies::class,
         \App\Http\Middleware\HttpsProtocol::class,
+        \App\Http\Middleware\ShareData::class,
     ];
 
     /**
@@ -62,7 +63,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'block_ip' => \App\Http\Middleware\BlockIP::class,
-        'share_data' => \App\Http\Middleware\ShareData::class,
     ];
 
     /**

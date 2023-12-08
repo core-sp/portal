@@ -358,6 +358,15 @@ class HomeImagemTest extends TestCase
     public function authorized_users_can_update_header_logo()
     {
         $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
+        $banners->where('funcao', 'header_logo')->first()->update(['url' => 'imagens/itens_home/teste.png', 'url_mobile' => 'imagens/itens_home/teste.png']);
+        
+        $this->get('/teste/teste/teste')
+        ->assertNotFound()
+        ->assertSee('<a href="/"><img src="'.asset('imagens/itens_home/teste.png').'" alt="CORE-SP" id="logo-header" /></a>');
+
+        $this->assertEquals($this->app->resolved('App\Http\Middleware\ShareData'), true);
+        $banners->where('funcao', 'header_logo')->first()->update(['url' => HomeImagem::padrao()['header_logo_default'], 'url_mobile' => HomeImagem::padrao()['header_logo_default']]);
+
         $dados = [
             'calendario_default' => 'calendario_default',
             'header_fundo_default' => 'header_fundo_default',
@@ -366,7 +375,7 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'footer_default' => 'footer_default',
         ];
-        
+
         $user = $this->signInAsAdmin();
         
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -389,6 +398,8 @@ class HomeImagemTest extends TestCase
         $this->get(route('bdosite.index'))
         ->assertOk()
         ->assertSee('<a href="/"><img src="'.asset('imagens/itens_home/teste.png').'" alt="CORE-SP" id="logo-header" /></a>');
+        
+        $this->assertEquals($this->app->resolved('App\Http\Middleware\ShareData'), true);
 
         $this->assertDatabaseHas("home_imagens", [
             'funcao' => 'header_logo',
@@ -403,6 +414,15 @@ class HomeImagemTest extends TestCase
     public function authorized_users_can_update_header_fundo_with_image()
     {
         $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
+        $banners->where('funcao', 'header_fundo')->first()->update(['url' => 'imagens/itens_home/teste.png', 'url_mobile' => 'imagens/itens_home/teste.png']);
+        
+        $this->get('/teste/teste/teste')
+        ->assertNotFound()
+        ->assertSee('<header id="header-principal" style="background-image: url(/imagens/itens_home/teste.png)">');
+
+        $this->assertEquals($this->app->resolved('App\Http\Middleware\ShareData'), true);
+        $banners->where('funcao', 'header_fundo')->first()->update(['url' => HomeImagem::padrao()['header_fundo_default'], 'url_mobile' => HomeImagem::padrao()['header_fundo_default']]);
+
         $dados = [
             'calendario_default' => 'calendario_default',
             'header_logo_default' => 'header_logo_default',
@@ -435,6 +455,8 @@ class HomeImagemTest extends TestCase
         ->assertOk()
         ->assertSee('<header id="header-principal" style="background-image: url(/imagens/itens_home/teste.png)">');
 
+        $this->assertEquals($this->app->resolved('App\Http\Middleware\ShareData'), true);
+
         $this->assertDatabaseHas("home_imagens", [
             'funcao' => 'header_fundo',
             "url" => 'imagens/itens_home/teste.png',
@@ -448,6 +470,15 @@ class HomeImagemTest extends TestCase
     public function authorized_users_can_update_header_fundo_with_color()
     {
         $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
+        $banners->where('funcao', 'header_fundo')->first()->update(['url' => '#000fff', 'url_mobile' => '#000fff']);
+        
+        $this->get('/teste/teste/teste')
+        ->assertNotFound()
+        ->assertSee('<header id="header-principal" style="background-color: #000fff">');
+
+        $this->assertEquals($this->app->resolved('App\Http\Middleware\ShareData'), true);
+        $banners->where('funcao', 'header_fundo')->first()->update(['url' => HomeImagem::padrao()['header_fundo_default'], 'url_mobile' => HomeImagem::padrao()['header_fundo_default']]);
+        
         $dados = [
             'calendario_default' => 'calendario_default',
             'header_logo_default' => 'header_logo_default',
@@ -479,6 +510,8 @@ class HomeImagemTest extends TestCase
         $this->get(route('bdosite.index'))
         ->assertOk()
         ->assertSee('<header id="header-principal" style="background-color: #000fff">');
+
+        $this->assertEquals($this->app->resolved('App\Http\Middleware\ShareData'), true);
 
         $this->assertDatabaseHas("home_imagens", [
             'funcao' => 'header_fundo',
@@ -608,6 +641,15 @@ class HomeImagemTest extends TestCase
     public function authorized_users_can_update_footer()
     {
         $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
+        $banners->where('funcao', 'footer')->first()->update(['url' => '#ff00f0', 'url_mobile' => '#ff00f0']);
+        
+        $this->get('/teste/teste/teste')
+        ->assertNotFound()
+        ->assertSee('<footer class="pt-4" id="rodape" style="background-color:#ff00f0">');
+
+        $this->assertEquals($this->app->resolved('App\Http\Middleware\ShareData'), true);
+        $banners->where('funcao', 'header_fundo')->first()->update(['url' => HomeImagem::padrao()['footer_default'], 'url_mobile' => HomeImagem::padrao()['footer_default']]);
+
         $dados = [
             'header_fundo_default' => 'header_fundo_default',
             'header_logo_default' => 'header_logo_default',
@@ -639,6 +681,8 @@ class HomeImagemTest extends TestCase
         ->assertOk()
         ->assertSee('<footer class="pt-4" id="rodape" style="background-color:#ff00f0">');
 
+        $this->assertEquals($this->app->resolved('App\Http\Middleware\ShareData'), true);
+
         $this->assertDatabaseHas("home_imagens", [
             'funcao' => 'footer',
             'ordem' => 1,
@@ -653,6 +697,17 @@ class HomeImagemTest extends TestCase
     public function authorized_users_can_update_neve()
     {
         $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
+        $banners->where('funcao', 'header_fundo')->first()->update(['url' => '#000fff', 'url_mobile' => '#000fff']);
+        $banners->where('funcao', 'neve')->first()->update(['url' => HomeImagem::padrao()['neve_default'], 'url_mobile' => HomeImagem::padrao()['neve_default']]);
+        
+        $this->get('/teste/teste/teste')
+        ->assertNotFound()
+        ->assertSee('<header id="header-principal" style="background-color: #000fff;background-image: url(/'.HomeImagem::padrao()['neve_default'].');background-repeat: repeat-x">');
+
+        $this->assertEquals($this->app->resolved('App\Http\Middleware\ShareData'), true);
+        $banners->where('funcao', 'header_fundo')->first()->update(['url' => HomeImagem::padrao()['header_fundo_default'], 'url_mobile' => HomeImagem::padrao()['header_fundo_default']]);
+        $banners->where('funcao', 'neve')->first()->update(['url' => null, 'url_mobile' => null]);
+
         $dados = [
             'header_fundo_cor' => '#000fff',
             'header_logo_default' => 'header_logo_default',
@@ -689,6 +744,8 @@ class HomeImagemTest extends TestCase
         ->assertOk()
         ->assertSee('<header id="header-principal" style="background-color: #000fff;background-image: url(/'.HomeImagem::padrao()['neve_default'].');background-repeat: repeat-x">');
 
+        $this->assertEquals($this->app->resolved('App\Http\Middleware\ShareData'), true);
+
         $this->assertDatabaseHas("home_imagens", [
             'funcao' => 'neve',
             'ordem' => 1,
@@ -721,6 +778,12 @@ class HomeImagemTest extends TestCase
             'neve_default' => null,
         ];
         
+        $this->get('/teste/teste/teste')
+        ->assertNotFound()
+        ->assertSee('<header id="header-principal" style="background-color: #000fff;background-image: url(/'.HomeImagem::padrao()['neve_default'].');background-repeat: repeat-x">');
+
+        $this->assertEquals($this->app->resolved('App\Http\Middleware\ShareData'), true);
+
         $this->get(route('site.home'))
         ->assertOk()
         ->assertSee('<header id="header-principal" style="background-color: #000fff;background-image: url(/'.HomeImagem::padrao()['neve_default'].');background-repeat: repeat-x">');
@@ -732,6 +795,8 @@ class HomeImagemTest extends TestCase
         $this->get(route('bdosite.index'))
         ->assertOk()
         ->assertSee('<header id="header-principal" style="background-color: #000fff;background-image: url(/'.HomeImagem::padrao()['neve_default'].');background-repeat: repeat-x">');
+
+        $this->assertEquals($this->app->resolved('App\Http\Middleware\ShareData'), true);
 
         $user = $this->signInAsAdmin();
         
@@ -739,6 +804,10 @@ class HomeImagemTest extends TestCase
         ->assertRedirect(route('imagens.itens.home'))
         ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Itens da home editados com sucesso!');
 
+        $this->get('/teste/teste/teste')
+        ->assertNotFound()
+        ->assertDontSee('<header id="header-principal" style="background-color: #000fff;background-image: url(/'.HomeImagem::padrao()['neve_default'].');background-repeat: repeat-x">');
+
         $this->get(route('site.home'))
         ->assertOk()
         ->assertDontSee('<header id="header-principal" style="background-color: #000fff;background-image: url(/'.HomeImagem::padrao()['neve_default'].');background-repeat: repeat-x">');
@@ -751,6 +820,8 @@ class HomeImagemTest extends TestCase
         ->assertOk()
         ->assertDontSee('<header id="header-principal" style="background-color: #000fff;background-image: url(/'.HomeImagem::padrao()['neve_default'].');background-repeat: repeat-x">');
 
+        $this->assertEquals($this->app->resolved('App\Http\Middleware\ShareData'), true);
+        
         $this->assertDatabaseHas("home_imagens", [
             'funcao' => 'neve',
             'ordem' => 1,

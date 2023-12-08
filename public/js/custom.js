@@ -813,8 +813,24 @@ $("#armazenamento").on('shown.bs.modal', function () {
 });
 
 $("#header_fundo_cor").change(function() {
-  var nome = this.id.replace('_cor', '');
-  $('#' + nome).val('');
+  $('#header_fundo').val('');
+  $('#header_fundo').attr('placeholder', 'Cor selecionada');
+});
+
+$("#header_fundo_cor").ready(function() {
+  if($("#header_fundo_default").prop('checked') || ($("#header_fundo").val() != ""))
+    return;
+  $('#header_fundo').val('');
+  $('#header_fundo').attr('placeholder', 'Cor selecionada');
+});
+
+$("#header_fundo_default").change(function() {
+  if(!this.checked){
+    $('#header_fundo').attr('placeholder', '');
+  }else{
+    $('#header_fundo').val('');
+    $('#header_fundo').attr('placeholder', 'Imagem padrão escolhida');
+  }
 });
 
 $('#popup_video_vazio, #popup_video_default').change(function() {

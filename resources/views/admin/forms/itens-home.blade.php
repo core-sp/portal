@@ -525,7 +525,7 @@
 
                     <div>
                         <h5>Adicionar novo arquivo na pasta de itens da home</h5>
-                        <p class="text-danger">* Arquivos com mesmo nome serão renomeados com "nomeOriginal_valorÚnico.extensão"</p>
+                        <p class="text-danger">* Se o arquivo com mesmo nome já existir na pasta, será renomeado: "nomeOriginal_valorÚnico.extensão"</p>
                         <hr>
                         <label for="file_itens_home">Nova imagem</label>
                         <div class="custom-file">
