@@ -319,7 +319,17 @@ class HomeImagemTest extends TestCase
         ->assertOk()
         ->assertSee('<a href="/"><img src="'.asset(HomeImagem::padrao()['header_logo_default']).'" alt="CORE-SP" id="logo-header" /></a>')
         ->assertSee('<header id="header-principal" style="background-image: url(/'.HomeImagem::padrao()['header_fundo_default'].')">')
-        ->assertSee('<footer class="pt-4" id="rodape" style="background-color:'.HomeImagem::padrao()['footer_default'].'">');
+        ->assertSee('<footer class="pt-4" id="rodape" style="background-color:'.HomeImagem::padrao()['footer_default'].'">')
+        ->assertSeeInOrder([
+            '<a href="/agendamento">',
+            '<div class="box-dois mb-3 " style="background-color:'.HomeImagem::padrao()['cards_laterais_1_default'].'">',
+            '<div class="inside-box-dois d-flex">'
+        ])
+        ->assertSeeInOrder([
+            '<a href="/representante/login">',
+            '<div class="box-dois mb-3 " style="background-color:'.HomeImagem::padrao()['cards_laterais_2_default'].'">',
+            '<div class="inside-box-dois d-flex">'
+        ]);
     }
 
     /** @test */
@@ -335,6 +345,8 @@ class HomeImagemTest extends TestCase
             'header_logo' => 'imagens/itens_home/fundo.jpg',
             'cards_2' => '#0f0f0f',
             'cards_1' => '#f0f0f0',
+            'cards_laterais_2' => '#2a2a2a',
+            'cards_laterais_1' => '#a1a1a1',
             'footer' => '#000000',
             'neve_default' => 'neve_default',
             'popup_video_default' => 'popup_video_default',
@@ -374,6 +386,8 @@ class HomeImagemTest extends TestCase
             'cards_2_default' => 'cards_2_default',
             'cards_1_default' => 'cards_1_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $user = $this->signInAsAdmin();
@@ -430,6 +444,8 @@ class HomeImagemTest extends TestCase
             'cards_2_default' => 'cards_2_default',
             'cards_1_default' => 'cards_1_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
         
         $user = $this->signInAsAdmin();
@@ -486,6 +502,8 @@ class HomeImagemTest extends TestCase
             'cards_2_default' => 'cards_2_default',
             'cards_1_default' => 'cards_1_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
         
         $user = $this->signInAsAdmin();
@@ -533,6 +551,8 @@ class HomeImagemTest extends TestCase
             'cards_2_default' => 'cards_2_default',
             'cards_1_default' => 'cards_1_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
         
         $user = $this->signInAsAdmin();
@@ -574,6 +594,8 @@ class HomeImagemTest extends TestCase
             'cards_1' => '#fff000',
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
         
         $user = $this->signInAsAdmin();
@@ -611,6 +633,8 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'cards_2' => '#f0f0f0',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
         
         $user = $this->signInAsAdmin();
@@ -638,6 +662,84 @@ class HomeImagemTest extends TestCase
     }
 
     /** @test */
+    public function authorized_users_can_update_cards_laterais_1()
+    {
+        $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
+        $dados = [
+            'header_fundo_default' => 'header_fundo_default',
+            'header_logo_default' => 'header_logo_default',
+            'calendario_default' => 'calendario_default',
+            'cards_1_default' => 'cards_1_default',
+            'cards_2_default' => 'cards_2_default',
+            'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1' => '#00ff22',
+        ];
+        
+        $user = $this->signInAsAdmin();
+        
+        $this->patch(route('imagens.itens.home.update', $dados))
+        ->assertRedirect(route('imagens.itens.home'))
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Itens da home editados com sucesso!');
+
+        $this->get(route('imagens.itens.home'))
+        ->assertOk()
+        ->assertSee('value="#00ff22"');
+
+        $this->get(route('representante.login'))
+        ->assertOk()
+        ->assertSee('<div class="box-dois mb-3 " style="background-color:#00ff22">');
+
+        $this->assertDatabaseHas("home_imagens", [
+            'funcao' => 'cards_laterais',
+            'ordem' => 1,
+            "url" => '#00ff22',
+            "url_mobile" => '#00ff22',
+            'link' => '#',
+            'target' => '_self'
+        ]);
+    }
+
+    /** @test */
+    public function authorized_users_can_update_cards_laterais_2()
+    {
+        $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
+        $dados = [
+            'header_fundo_default' => 'header_fundo_default',
+            'header_logo_default' => 'header_logo_default',
+            'calendario_default' => 'calendario_default',
+            'cards_1_default' => 'cards_1_default',
+            'cards_2_default' => 'cards_2_default',
+            'footer_default' => 'footer_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
+            'cards_laterais_2' => '#00ff11',
+        ];
+        
+        $user = $this->signInAsAdmin();
+        
+        $this->patch(route('imagens.itens.home.update', $dados))
+        ->assertRedirect(route('imagens.itens.home'))
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Itens da home editados com sucesso!');
+
+        $this->get(route('imagens.itens.home'))
+        ->assertOk()
+        ->assertSee('value="#00ff11"');
+
+        $this->get(route('representante.login'))
+        ->assertOk()
+        ->assertSee('<div class="box-dois mb-3 " style="background-color:#00ff11">');
+
+        $this->assertDatabaseHas("home_imagens", [
+            'funcao' => 'cards_laterais',
+            'ordem' => 2,
+            "url" => '#00ff11',
+            "url_mobile" => '#00ff11',
+            'link' => '#',
+            'target' => '_self'
+        ]);
+    }
+
+    /** @test */
     public function authorized_users_can_update_footer()
     {
         $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
@@ -657,6 +759,8 @@ class HomeImagemTest extends TestCase
             'cards_2_default' => 'cards_2_default',
             'cards_1_default' => 'cards_1_default',
             'footer' => '#ff00f0',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
         
         $user = $this->signInAsAdmin();
@@ -716,6 +820,8 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'footer_default' => 'footer_default',
             'neve_default' => 'neve_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
         
         $user = $this->signInAsAdmin();
@@ -776,6 +882,8 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'footer_default' => 'footer_default',
             'neve_default' => null,
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
         
         $this->get('/teste/teste/teste')
@@ -844,6 +952,8 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'footer_default' => 'footer_default',
             'popup_video_default' => 'popup_video_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
         
         $user = $this->signInAsAdmin();
@@ -888,6 +998,8 @@ class HomeImagemTest extends TestCase
             'footer_default' => 'footer_default',
             'popup_video_default' => 'sem_video',
             'popup_video' => 'https://youtube.com/embed/123YUO',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
         
         $user = $this->signInAsAdmin();
@@ -935,6 +1047,8 @@ class HomeImagemTest extends TestCase
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
             'popup_video_default' => 'sem_video',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
         
         $user = $this->signInAsAdmin();
@@ -977,6 +1091,8 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -997,6 +1113,8 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1017,6 +1135,8 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1037,6 +1157,8 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1057,6 +1179,8 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1077,6 +1201,8 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1098,6 +1224,8 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1118,6 +1246,8 @@ class HomeImagemTest extends TestCase
             'calendario_default' => 'calendario_default',
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1138,6 +1268,8 @@ class HomeImagemTest extends TestCase
             'calendario_default' => 'calendario_default',
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1158,6 +1290,8 @@ class HomeImagemTest extends TestCase
             'calendario_default' => 'calendario_default',
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1178,6 +1312,8 @@ class HomeImagemTest extends TestCase
             'calendario_default' => 'calendario_default',
             'cards_1_default' => 'cards_1_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1198,6 +1334,8 @@ class HomeImagemTest extends TestCase
             'calendario_default' => 'calendario_default',
             'cards_1_default' => 'cards_1_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1218,10 +1356,144 @@ class HomeImagemTest extends TestCase
             'calendario_default' => 'calendario_default',
             'cards_1_default' => 'cards_1_default',
             'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
         ->assertSessionHasErrors('cards_2');
+    }
+
+    /** @test */
+    public function cannot_be_updated_without_cards_laterais_1()
+    {
+        $user = $this->signInAsAdmin();
+
+        $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
+        $dados = [
+            'header_logo_default' => 'header_logo_default',
+            'header_fundo_default' => 'header_fundo_default',
+            'cards_1_default' => 'cards_1_default',
+            'calendario_default' => 'calendario_default',
+            'cards_2_default' => 'cards_2_default',
+            'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => null,
+            'cards_laterais_1' => null,
+        ];
+
+        $this->patch(route('imagens.itens.home.update', $dados))
+        ->assertSessionHasErrors('cards_laterais_1');
+    }
+
+    /** @test */
+    public function cannot_be_updated_with_cards_laterais_1_default_invalid()
+    {
+        $user = $this->signInAsAdmin();
+
+        $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
+        $dados = [
+            'header_logo_default' => 'header_logo_default',
+            'header_fundo_default' => 'header_fundo_default',
+            'cards_1_default' => 'cards_1_default',
+            'calendario_default' => 'calendario_default',
+            'cards_2_default' => 'cards_2_default',
+            'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_deault',
+            'cards_laterais_1' => null,
+        ];
+
+        $this->patch(route('imagens.itens.home.update', $dados))
+        ->assertSessionHasErrors('cards_laterais_1_default');
+    }
+
+    /** @test */
+    public function cannot_be_updated_with_cards_laterais_1_invalid()
+    {
+        $user = $this->signInAsAdmin();
+
+        $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
+        $dados = [
+            'header_logo_default' => 'header_logo_default',
+            'header_fundo_default' => 'header_fundo_default',
+            'cards_1_default' => 'cards_1_default',
+            'calendario_default' => 'calendario_default',
+            'cards_2_default' => 'cards_2_default',
+            'footer_default' => 'footer_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => null,
+            'cards_laterais_1' => '#',
+        ];
+
+        $this->patch(route('imagens.itens.home.update', $dados))
+        ->assertSessionHasErrors('cards_laterais_1');
+    }
+
+    /** @test */
+    public function cannot_be_updated_without_cards_laterais_2()
+    {
+        $user = $this->signInAsAdmin();
+
+        $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
+        $dados = [
+            'header_logo_default' => 'header_logo_default',
+            'header_fundo_default' => 'header_fundo_default',
+            'cards_1_default' => 'cards_1_default',
+            'calendario_default' => 'calendario_default',
+            'cards_2_default' => 'cards_2_default',
+            'footer_default' => 'footer_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
+            'cards_laterais_2_default' => null,
+            'cards_laterais_2' => null,
+        ];
+
+        $this->patch(route('imagens.itens.home.update', $dados))
+        ->assertSessionHasErrors('cards_laterais_2');
+    }
+
+    /** @test */
+    public function cannot_be_updated_with_cards_laterais_2_default_invalid()
+    {
+        $user = $this->signInAsAdmin();
+
+        $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
+        $dados = [
+            'header_logo_default' => 'header_logo_default',
+            'header_fundo_default' => 'header_fundo_default',
+            'cards_1_default' => 'cards_1_default',
+            'calendario_default' => 'calendario_default',
+            'cards_2_default' => 'cards_2_default',
+            'footer_default' => 'footer_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_deault',
+            'cards_laterais_2' => null,
+        ];
+
+        $this->patch(route('imagens.itens.home.update', $dados))
+        ->assertSessionHasErrors('cards_laterais_2_default');
+    }
+
+    /** @test */
+    public function cannot_be_updated_with_cards_laterais_2_invalid()
+    {
+        $user = $this->signInAsAdmin();
+
+        $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
+        $dados = [
+            'header_logo_default' => 'header_logo_default',
+            'header_fundo_default' => 'header_fundo_default',
+            'cards_1_default' => 'cards_1_default',
+            'calendario_default' => 'calendario_default',
+            'cards_2_default' => 'cards_2_default',
+            'footer_default' => 'footer_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
+            'cards_laterais_2_default' => null,
+            'cards_laterais_2' => '#',
+        ];
+
+        $this->patch(route('imagens.itens.home.update', $dados))
+        ->assertSessionHasErrors('cards_laterais_2');
     }
 
     /** @test */
@@ -1238,6 +1510,8 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'footer_default' => null,
             'footer' => null,
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1258,6 +1532,8 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'footer_default' => 'footer_defaul',
             'footer' => null,
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1278,6 +1554,8 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'footer_default' => null,
             'footer' => '#36jjP',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1297,7 +1575,9 @@ class HomeImagemTest extends TestCase
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
             'calendario_default' => null,
-            'calendario' => null
+            'calendario' => null,
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1317,7 +1597,9 @@ class HomeImagemTest extends TestCase
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
             'calendario_default' => 'calendario_def',
-            'calendario' => null
+            'calendario' => null,
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1338,6 +1620,8 @@ class HomeImagemTest extends TestCase
             'footer_default' => 'footer_default',
             'calendario_default' => null,
             'calendario' => $this->faker()->sentence(400),
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1357,7 +1641,9 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
-            'neve_default' => 'neve_'
+            'neve_default' => 'neve_',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1377,7 +1663,9 @@ class HomeImagemTest extends TestCase
             'cards_1_default' => 'cards_1_default',
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
-            'neve_default' => 'neve_default'
+            'neve_default' => 'neve_default',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1398,7 +1686,9 @@ class HomeImagemTest extends TestCase
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
             'popup_video_default' => 'popup_video_defaul',
-            'popup_video' => null
+            'popup_video' => null,
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1419,7 +1709,9 @@ class HomeImagemTest extends TestCase
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
             'popup_video_default' => null,
-            'popup_video' => 'abcdefg'
+            'popup_video' => 'abcdefg',
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))
@@ -1440,7 +1732,9 @@ class HomeImagemTest extends TestCase
             'cards_2_default' => 'cards_2_default',
             'footer_default' => 'footer_default',
             'popup_video_default' => null,
-            'popup_video' => $this->faker()->sentence(400)
+            'popup_video' => $this->faker()->sentence(400),
+            'cards_laterais_2_default' => 'cards_laterais_2_default',
+            'cards_laterais_1_default' => 'cards_laterais_1_default',
         ];
 
         $this->patch(route('imagens.itens.home.update', $dados))

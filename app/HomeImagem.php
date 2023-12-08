@@ -12,9 +12,11 @@ class HomeImagem extends Model
     protected $guarded = [];
 
     const TOTAL = 7;
-    const TOTAL_ITENS_HOME = 8;
+    const TOTAL_ITENS_HOME = 10;
     const DEFAULT_CARD_ESCURO = "#004587";
     const DEFAULT_CARD_CLARO = "#15AAE2";
+    const DEFAULT_CARD_LATERAL_ESCURO = "#004587";
+    const DEFAULT_CARD_LATERAL_CLARO = "#15AAE2";
     const DEFAULT_RODAPE = "#004587";
     const DEFAULT_CALENDARIO = 'img/arte-calendario-2023.png';
     const DEFAULT_HEADER_LOGO = 'img/Selo-para-site002.png';
@@ -26,6 +28,9 @@ class HomeImagem extends Model
     {
         if(in_array($nome, ['cards_1', 'cards_2']))
             return $nome == 'cards_1' ? ['funcao' => 'cards', 'ordem' => 1] : ['funcao' => 'cards', 'ordem' => 2];
+
+        if(in_array($nome, ['cards_laterais_1', 'cards_laterais_2']))
+            return $nome == 'cards_laterais_1' ? ['funcao' => 'cards_laterais', 'ordem' => 1] : ['funcao' => 'cards_laterais', 'ordem' => 2];
 
         return ['funcao' => $nome, 'ordem' => 1];
     }
@@ -40,11 +45,29 @@ class HomeImagem extends Model
         return str_replace(self::pathCompleto(), '', Storage::disk('itens_home')->getAdapter()->getPathPrefix());
     }
 
+    public static function recriarItensHome()
+    {
+        self::where('funcao', '!=', 'bannerprincipal')->delete();
+
+        self::create(['funcao' => 'header_logo', 'ordem' => 1, 'url' => self::DEFAULT_HEADER_LOGO, 'url_mobile' => self::DEFAULT_HEADER_LOGO]);
+        self::create(['funcao' => 'header_fundo', 'ordem' => 1, 'url' => self::DEFAULT_HEADER_FUNDO, 'url_mobile' => self::DEFAULT_HEADER_FUNDO]);
+        self::create(['funcao' => 'cards', 'ordem' => 1, 'url' => self::DEFAULT_CARD_ESCURO, 'url_mobile' => self::DEFAULT_CARD_ESCURO]);
+        self::create(['funcao' => 'cards', 'ordem' => 2, 'url' => self::DEFAULT_CARD_CLARO, 'url_mobile' => self::DEFAULT_CARD_CLARO]);
+        self::create(['funcao' => 'cards_laterais', 'ordem' => 1, 'url' => self::DEFAULT_CARD_LATERAL_ESCURO, 'url_mobile' => self::DEFAULT_CARD_LATERAL_ESCURO]);
+        self::create(['funcao' => 'cards_laterais', 'ordem' => 2, 'url' => self::DEFAULT_CARD_LATERAL_CLARO, 'url_mobile' => self::DEFAULT_CARD_LATERAL_CLARO]);
+        self::create(['funcao' => 'calendario', 'ordem' => 1, 'url' => self::DEFAULT_CALENDARIO, 'url_mobile' => self::DEFAULT_CALENDARIO]);
+        self::create(['funcao' => 'footer', 'ordem' => 1, 'url' => self::DEFAULT_RODAPE, 'url_mobile' => self::DEFAULT_RODAPE]);
+        self::create(['funcao' => 'neve', 'ordem' => 1, 'url' => null, 'url_mobile' => null]);
+        self::create(['funcao' => 'popup_video', 'ordem' => 1, 'url' => null, 'url_mobile' => null]);
+    }
+
     public static function padrao()
     {
         return [
             'cards_1_default' => self::DEFAULT_CARD_ESCURO,
             'cards_2_default' => self::DEFAULT_CARD_CLARO,
+            'cards_laterais_1_default' => self::DEFAULT_CARD_LATERAL_ESCURO,
+            'cards_laterais_2_default' => self::DEFAULT_CARD_LATERAL_CLARO,
             'footer_default' => self::DEFAULT_RODAPE,
             'calendario_default' => self::DEFAULT_CALENDARIO,
             'header_logo_default' => self::DEFAULT_HEADER_LOGO,
@@ -100,7 +123,7 @@ class HomeImagem extends Model
 
     public static function itensHome()
     {
-        return self::whereIn('funcao', ['header_logo', 'header_fundo', 'calendario', 'cards', 'footer', 'neve', 'popup_video'])->get();
+        return self::whereIn('funcao', ['header_logo', 'header_fundo', 'calendario', 'cards', 'cards_laterais', 'footer', 'neve', 'popup_video'])->get();
     }
 
     public static function getItemPorResultado($resultado, $campo)
@@ -115,7 +138,7 @@ class HomeImagem extends Model
         if(!isset($this->url))
             return false;
 
-        $campo = $this->funcao == 'cards' ? $this->funcao . '_' . $this->ordem . '_default' : $this->funcao . '_default';
+        $campo = ($this->funcao == 'cards') || ($this->funcao == 'cards_laterais') ? $this->funcao . '_' . $this->ordem . '_default' : $this->funcao . '_default';
 
         return $this->url == self::padrao()[$campo];
     }

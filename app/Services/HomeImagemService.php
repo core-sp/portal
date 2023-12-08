@@ -95,6 +95,8 @@ class HomeImagemService implements HomeImagemServiceInterface {
         $rodape = HomeImagem::getItemPorResultado($resultado, 'footer');
         $cards_1 = HomeImagem::getItemPorResultado($resultado, 'cards_1');
         $cards_2 = HomeImagem::getItemPorResultado($resultado, 'cards_2');
+        $cards_laterais_1 = HomeImagem::getItemPorResultado($resultado, 'cards_laterais_1');
+        $cards_laterais_2 = HomeImagem::getItemPorResultado($resultado, 'cards_laterais_2');
         $calendario = HomeImagem::getItemPorResultado($resultado, 'calendario');
         $header_logo = HomeImagem::getItemPorResultado($resultado, 'header_logo');
         $header_fundo = HomeImagem::getItemPorResultado($resultado, 'header_fundo');
@@ -105,6 +107,8 @@ class HomeImagemService implements HomeImagemServiceInterface {
             'rodape' => isset($rodape) ? $rodape->url : HomeImagem::padrao()['footer_default'],
             'cards_1' => isset($cards_1) ? $cards_1->url : HomeImagem::padrao()['cards_1_default'],
             'cards_2' => isset($cards_2) ? $cards_2->url : HomeImagem::padrao()['cards_2_default'],
+            'cards_laterais_1' => isset($cards_laterais_1) ? $cards_laterais_1->url : HomeImagem::padrao()['cards_laterais_1_default'],
+            'cards_laterais_2' => isset($cards_laterais_2) ? $cards_laterais_2->url : HomeImagem::padrao()['cards_laterais_2_default'],
             'calendario' => isset($calendario) ? $calendario->url : HomeImagem::padrao()['calendario_default'],
             'header_logo' => isset($header_logo) ? $header_logo->url : HomeImagem::padrao()['header_logo_default'],
             'header_fundo' => isset($header_fundo) ? $header_fundo->getHeaderFundo() : 'background-image: url(/'.HomeImagem::padrao()['header_fundo_default'].')',

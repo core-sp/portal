@@ -386,6 +386,78 @@
             </div>
         </fieldset>
 
+        <!-- cards-laterais -->
+        <fieldset class="form-group border border-primary p-3 mt-2">
+            <legend class="w-auto">
+                <small>Cards Laterais - Localizados em notícias, páginas, área restrita...</small>
+            </legend>
+
+            <div class="form-row">
+                <div class="col mr-2">
+                    <!-- opção de usar a cor padrão -->
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input type="checkbox"
+                                name="cards_laterais_1_default"
+                                class="form-check-input {{ $errors->has('cards_laterais_1_default') ? 'is-invalid' : '' }}"
+                                id="cards_laterais_1_default"
+                                value="cards_laterais_1_default"
+                                {{ !empty(old('cards_laterais_1_default')) || (isset($cards_laterais_1) && $cards_laterais_1->itemDefault()) ? 'checked' : '' }}
+                            /> Usar cor padrão do card lateral escuro<i class="fas fa-circle fa-lg ml-1" style="color:{{ $padroes['cards_laterais_1_default'] }};"></i>
+                            @if($errors->has('cards_laterais_1_default'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('cards_laterais_1_default') }}
+                            </div>
+                            @endif
+                        </label>
+                    </div>
+                    <label for="cards_laterais_1" class="mt-2">Nova cor do card lateral escuro:</label>
+                    <input type="color" 
+                        id="cards_laterais_1" 
+                        class="form-control {{ $errors->has('cards_laterais_1') ? 'is-invalid' : '' }}"
+                        name="cards_laterais_1" 
+                        value="{{ (!empty(old('cards_laterais_1')) && (old('cards_laterais_1') != $padroes['cards_laterais_1_default'])) || (isset($cards_laterais_1) && !$cards_laterais_1->itemDefault()) ? $cards_laterais_1->url : '#000000' }}"
+                    />
+                    @if($errors->has('cards_laterais_1'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('cards_laterais_1') }}
+                    </div>
+                    @endif
+                </div>
+                <div class="col ml-2">
+                    <!-- opção de usar a cor padrão -->
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input type="checkbox"
+                                name="cards_laterais_2_default"
+                                class="form-check-input {{ $errors->has('cards_laterais_2_default') ? 'is-invalid' : '' }}"
+                                id="cards_laterais_2_default"
+                                value="cards_laterais_2_default"
+                                {{ !empty(old('cards_laterais_2_default')) || (isset($cards_laterais_2) && $cards_laterais_2->itemDefault()) ? 'checked' : '' }}
+                            /> Usar cor padrão do card lateral claro<i class="fas fa-circle fa-lg ml-1" style="color:{{ $padroes['cards_laterais_2_default'] }};"></i>
+                            @if($errors->has('cards_laterais_2_default'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('cards_laterais_2_default') }}
+                            </div>
+                            @endif
+                        </label>
+                    </div>
+                    <label for="cards_laterais_2" class="mt-2">Nova cor do card lateral claro:</label>
+                    <input type="color" 
+                        id="cards_laterais_2" 
+                        class="form-control {{ $errors->has('cards_laterais_2') ? 'is-invalid' : '' }}"
+                        name="cards_laterais_2" 
+                        value="{{ (!empty(old('cards_laterais_2')) && (old('cards_laterais_2') != $padroes['cards_laterais_2_default'])) || (isset($cards_laterais_2) && !$cards_laterais_2->itemDefault()) ? $cards_laterais_2->url : '#ffffff' }}"
+                    />
+                    @if($errors->has('cards_laterais_2'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('cards_laterais_2') }}
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </fieldset>
+
         <!-- calendário -->
         <fieldset class="form-group border border-primary p-3 mt-2">
             <legend class="w-auto">
