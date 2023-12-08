@@ -250,6 +250,44 @@ class HomeImagemTest extends TestCase
      */
 
     /** @test */
+    public function can_created_itens_home_tinker()
+    {
+        $banners = factory('App\HomeImagem', HomeImagem::TOTAL)->create();
+        $funcoes = ['header_logo' => 1, 'header_fundo' => 1, 'calendario' => 1, 'cards' => 1, 'cards' => 2, 'cards_laterais' => 1, 'cards_laterais' => 2, 'footer' => 1, 'neve' => 1, 'popup_video' => 1];
+        
+        $this->signInAsAdmin();
+        
+        for($cont = 1; $cont <= HomeImagem::TOTAL; $cont++)
+            $this->assertDatabaseHas("home_imagens", [
+                'funcao' => 'bannerprincipal',
+                'ordem' => $cont
+            ]);
+
+        foreach($funcoes as $funcao => $ordem)
+            $this->assertDatabaseMissing("home_imagens", [
+                'funcao' => $funcao,
+                'ordem' => $ordem
+            ]);
+
+        HomeImagem::recriarItensHome();
+
+        for($cont = 1; $cont <= HomeImagem::TOTAL; $cont++)
+            $this->assertDatabaseHas("home_imagens", [
+                'funcao' => 'bannerprincipal',
+                'ordem' => $cont
+            ]);
+
+        foreach($funcoes as $funcao => $ordem)
+            $this->assertDatabaseHas("home_imagens", [
+                'funcao' => $funcao,
+                'ordem' => $ordem
+            ]);
+
+        $total = HomeImagem::TOTAL + HomeImagem::TOTAL_ITENS_HOME;
+        $this->assertEquals(HomeImagem::count(), $total);
+    }
+
+    /** @test */
     public function authorized_users_can_view_defaults()
     {
         $banners = factory('App\HomeImagem', HomeImagem::TOTAL_ITENS_HOME)->states('itens_home')->create();
@@ -275,6 +313,11 @@ class HomeImagemTest extends TestCase
             '/> Usar cor padrão do card escuro<i class="fas fa-circle fa-lg ml-1" style="color:' . HomeImagem::padrao()['cards_1_default'].';"></i>',
             'checked',
             '/> Usar cor padrão do card claro<i class="fas fa-circle fa-lg ml-1" style="color:' . HomeImagem::padrao()['cards_2_default'].';"></i>',
+            '<small>Cards Laterais - Localizados em notícias, páginas, área restrita...</small>',
+            'checked',
+            '/> Usar cor padrão do card lateral escuro<i class="fas fa-circle fa-lg ml-1" style="color:' . HomeImagem::padrao()['cards_laterais_1_default'].';"></i>',
+            'checked',
+            '/> Usar cor padrão do card lateral claro<i class="fas fa-circle fa-lg ml-1" style="color:' . HomeImagem::padrao()['cards_laterais_2_default'].';"></i>',
             '<small>Calendário</small>',
             'checked',
             '/> Usar calendário padrão',
