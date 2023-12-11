@@ -12,7 +12,7 @@ $factory->define(Licitacao::class, function (Faker $faker) {
         'uasg' => '926753',
         'titulo' => $faker->sentence,
         'edital' => '/arquivos' . '/' . date('Y') . '-' . date('m') . '/teste.pdf',
-        'nrlicitacao' => $faker->numberBetween(1, 999) . '/' . date('Y'),
+        'nrlicitacao' => $faker->numberBetween(1, 99999) . '/' . date('Y'),
         'nrprocesso' => $faker->numberBetween(1, 999) . '/' . date('Y'),
         'datarealizacao' => $faker->dateTime()->format('Y-m-d H:i:s'),
         'objeto' => htmlentities($faker->text, ENT_NOQUOTES, 'UTF-8'),
