@@ -10,6 +10,8 @@ class LicitacaoRequest extends FormRequest
     private $service;
     private $regraRegex;
     private $regraRegexBusca;
+    private $regraRegexNl;
+    private $regraRegexBuscaNl;
     private $msgRegex;
 
     public function __construct(MediadorServiceInterface $service)
@@ -19,9 +21,11 @@ class LicitacaoRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+        $this->regraRegexNl = 'regex:/^[0-9]{1,5}\/[0-9]{4}$/';
         $this->regraRegex = 'regex:/^[0-9]{1,3}\/[0-9]{4}$/';
+        $this->regraRegexBuscaNl = 'regex:/^[0-9]{1,5}\/[0-9]{2,4}$/';
         $this->regraRegexBusca = 'regex:/^[0-9]{1,3}\/[0-9]{2,4}$/';
-        $this->msgRegex = 'Formato válido: 001/1900';
+        $this->msgRegex = 'Formato válido: n° processo 001/1900 e n° licitação 00001/1900';
 
         if(!\Route::is('licitacoes.siteBusca'))
             if(isset(request()->datarealizacao))
@@ -36,7 +40,7 @@ class LicitacaoRequest extends FormRequest
             return [
                 'palavrachave' => 'nullable|max:191',
                 'modalidade' => 'nullable|in:' . implode(',', $this->service->getModalidades()),
-                'nrlicitacao' => 'nullable|' . $this->regraRegexBusca,
+                'nrlicitacao' => 'nullable|' . $this->regraRegexBuscaNl,
                 'nrprocesso' => 'nullable|' . $this->regraRegexBusca,
                 'situacao' => 'nullable|in:' . implode(',', $this->service->getSituacoes()),
                 'datarealizacao' => 'nullable|date',
@@ -48,7 +52,7 @@ class LicitacaoRequest extends FormRequest
             'edital' => 'max:191',
             'modalidade' => 'required|in:' . implode(',', $this->service->getModalidades()),
             'titulo' => 'required|max:191',
-            'nrlicitacao' => 'required|' . $this->regraRegex,
+            'nrlicitacao' => 'required|' . $this->regraRegexNl,
             'nrprocesso' => 'required|' . $this->regraRegex,
             'situacao' => 'required|in:' . implode(',', $this->service->getSituacoes()),
             'objeto' => 'required',
