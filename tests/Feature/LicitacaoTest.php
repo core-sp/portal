@@ -90,6 +90,30 @@ class LicitacaoTest extends TestCase
     }
 
     /** @test */
+    public function licitacao_can_be_created_with_nrlicitacao_more_than_3_chars_and_year()
+    {
+        $user = $this->signInAsAdmin();
+
+        $attributes = factory('App\Licitacao')->raw([
+            'idusuario' => $user->idusuario,
+            'uasg' => null,
+            'edital' => null,
+            'nrlicitacao' => '1234/2023'
+        ]);
+        $attributes['datarealizacao'] = Carbon::create($attributes['datarealizacao'])->format('Y-m-d H:i');
+
+        $this->get(route('licitacoes.index'))->assertOk();
+        $this->post(route('licitacoes.store'), $attributes)->assertRedirect(route('licitacoes.index'));
+        $this->assertDatabaseHas('licitacoes', $attributes);
+
+        $attributes['nrlicitacao'] = '12345/2023';
+
+        $this->get(route('licitacoes.index'))->assertOk();
+        $this->post(route('licitacoes.store'), $attributes)->assertRedirect(route('licitacoes.index'));
+        $this->assertDatabaseHas('licitacoes', $attributes);
+    }
+
+    /** @test */
     public function non_authorized_users_cannot_create_licitacoes()
     {
         $user = $this->signIn();
@@ -238,6 +262,11 @@ class LicitacaoTest extends TestCase
         ->assertSessionHasErrors('nrlicitacao');
 
         $attributes['nrlicitacao'] = '2/123';
+
+        $this->post(route('licitacoes.store'), $attributes)
+        ->assertSessionHasErrors('nrlicitacao');
+
+        $attributes['nrlicitacao'] = '123456/123';
 
         $this->post(route('licitacoes.store'), $attributes)
         ->assertSessionHasErrors('nrlicitacao');
@@ -450,6 +479,43 @@ class LicitacaoTest extends TestCase
     }
 
     /** @test */
+    public function licitacao_can_be_updated_with_nrlicitacao_more_than_3_chars_and_year()
+    {
+        $user = $this->signInAsAdmin();
+
+        $attributes = factory('App\Licitacao')->create();
+
+        $attributes->datarealizacao = '2022-05-03 10:30';
+        $attributes->titulo = 'Qualquer título para edição';
+        $attributes->uasg = null;
+        $attributes->edital = null;
+        $attributes->modalidade = Licitacao::modalidadesLicitacao()[7];
+        $attributes->situacao = Licitacao::situacoesLicitacao()[5];
+        $attributes->nrlicitacao = '1234/1234';
+        $attributes->nrprocesso = '1/4567';
+
+        $this->get(route('licitacoes.index'))->assertOk();
+        $this->patch(route('licitacoes.update', $attributes->idlicitacao), $attributes->toArray())->assertRedirect(route('licitacoes.index'));
+
+        $attributes->idusuario = $user->idusuario;
+        $dados = $attributes->toArray();
+        unset($dados['updated_at']);
+
+        $this->assertDatabaseHas('licitacoes', $dados);
+
+        $attributes->nrlicitacao = '12345/1234';
+
+        $this->get(route('licitacoes.index'))->assertOk();
+        $this->patch(route('licitacoes.update', $attributes->idlicitacao), $attributes->toArray())->assertRedirect(route('licitacoes.index'));
+
+        $attributes->idusuario = $user->idusuario;
+        $dados = $attributes->toArray();
+        unset($dados['updated_at']);
+
+        $this->assertDatabaseHas('licitacoes', $dados);
+    }
+
+    /** @test */
     public function non_authorized_users_cannot_update_licitacoes()
     {
         $user = $this->signIn();
@@ -600,6 +666,11 @@ class LicitacaoTest extends TestCase
         ->assertSessionHasErrors('nrlicitacao');
 
         $attributes['nrlicitacao'] = '2/123';
+
+        $this->patch(route('licitacoes.update', $attributes->idlicitacao), $attributes->toArray())
+        ->assertSessionHasErrors('nrlicitacao');
+
+        $attributes['nrlicitacao'] = '123456/123';
 
         $this->patch(route('licitacoes.update', $attributes->idlicitacao), $attributes->toArray())
         ->assertSessionHasErrors('nrlicitacao');
@@ -1382,7 +1453,7 @@ class LicitacaoTest extends TestCase
             'nrprocesso' => $licitacao->nrprocesso,
             'situacao' => $licitacao->situacao,
             'datarealizacao' => Carbon::create($licitacao->datarealizacao)->format('Y-m-d'),
-            'nrlicitacao' => '1245/1234',
+            'nrlicitacao' => '124567/1234',
             'modalidade' => $licitacao->modalidade,
             'palavrachave' => $first_word
         ]))
