@@ -7,10 +7,11 @@ use App\Permissao;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\WithFaker;
 
 class LicitacaoTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithFaker;
 
     /** 
      * =======================================================================================================
@@ -210,12 +211,11 @@ class LicitacaoTest extends TestCase
     /** @test */
     public function licitacao_with_titulo_more_than_191_chars_cannot_be_created()
     {
-        $faker = \Faker\Factory::create();
         $user = $this->signInAsAdmin();
 
         $attributes = factory('App\Licitacao')->raw([
             'idusuario' => $user->idusuario,
-            'titulo' => $faker->sentence(400)
+            'titulo' => $this->faker()->sentence(400)
         ]);
         $attributes['datarealizacao'] = Carbon::create($attributes['datarealizacao'])->format('Y-m-d H:i');
 
@@ -398,12 +398,11 @@ class LicitacaoTest extends TestCase
     /** @test */
     public function licitacao_with_uasg_more_than_191_chars_cannot_be_created()
     {
-        $faker = \Faker\Factory::create();
         $user = $this->signInAsAdmin();
 
         $attributes = factory('App\Licitacao')->raw([
             'idusuario' => $user->idusuario,
-            'uasg' => $faker->sentence(400)
+            'uasg' => $this->faker()->sentence(400)
         ]);
         $attributes['datarealizacao'] = Carbon::create($attributes['datarealizacao'])->format('Y-m-d H:i');
 
@@ -414,12 +413,11 @@ class LicitacaoTest extends TestCase
     /** @test */
     public function licitacao_with_edital_more_than_191_chars_cannot_be_created()
     {
-        $faker = \Faker\Factory::create();
         $user = $this->signInAsAdmin();
 
         $attributes = factory('App\Licitacao')->raw([
             'idusuario' => $user->idusuario,
-            'edital' => $faker->sentence(400)
+            'edital' => $this->faker()->sentence(400)
         ]);
         $attributes['datarealizacao'] = Carbon::create($attributes['datarealizacao'])->format('Y-m-d H:i');
 
@@ -616,13 +614,12 @@ class LicitacaoTest extends TestCase
     /** @test */
     public function licitacao_with_titulo_more_than_191_chars_cannot_be_updated()
     {
-        $faker = \Faker\Factory::create();
         $user = $this->signInAsAdmin();
         $attributes = factory('App\Licitacao')->create([
             'idusuario' => $user->idusuario
         ]);
         $attributes['datarealizacao'] = Carbon::create($attributes['datarealizacao'])->format('Y-m-d H:i');
-        $attributes->titulo = $faker->sentence(400);
+        $attributes->titulo = $this->faker()->sentence(400);
 
         $this->patch(route('licitacoes.update', $attributes->idlicitacao), $attributes->toArray())
         ->assertSessionHasErrors('titulo');
@@ -798,13 +795,12 @@ class LicitacaoTest extends TestCase
     /** @test */
     public function licitacao_with_uasg_more_than_191_chars_cannot_be_updated()
     {
-        $faker = \Faker\Factory::create();
         $user = $this->signInAsAdmin();
         $attributes = factory('App\Licitacao')->create([
             'idusuario' => $user->idusuario
         ]);
         $attributes['datarealizacao'] = Carbon::create($attributes['datarealizacao'])->format('Y-m-d H:i');
-        $attributes['uasg'] = $faker->sentence(400);
+        $attributes['uasg'] = $this->faker()->sentence(400);
 
         $this->patch(route('licitacoes.update', $attributes->idlicitacao), $attributes->toArray())
         ->assertSessionHasErrors('uasg');
@@ -815,13 +811,12 @@ class LicitacaoTest extends TestCase
     /** @test */
     public function licitacao_with_edital_more_than_191_chars_cannot_be_updated()
     {
-        $faker = \Faker\Factory::create();
         $user = $this->signInAsAdmin();
         $attributes = factory('App\Licitacao')->create([
             'idusuario' => $user->idusuario
         ]);
         $attributes['datarealizacao'] = Carbon::create($attributes['datarealizacao'])->format('Y-m-d H:i');
-        $attributes['edital'] = $faker->sentence(400);
+        $attributes['edital'] = $this->faker()->sentence(400);
 
         $this->patch(route('licitacoes.update', $attributes->idlicitacao), $attributes->toArray())
         ->assertSessionHasErrors('edital');
@@ -1180,7 +1175,18 @@ class LicitacaoTest extends TestCase
         $this->get(route('licitacoes.show', $licitacao->idlicitacao))
         ->assertSeeText('Edital disponível para download')
         ->assertSeeText('Clique aqui para baixar o edital')
-        ->assertSee('<a href="' . $licitacao->edital . '" download >');
+        ->assertSeeInOrder([
+            '<form method="POST" action="'. route('download.arquivo.lfm') .'">',
+            '<input type="hidden" name="arquivo_lfm" value="'. $licitacao->edital .'" />',
+            '<div class="edital-download d-flex">',
+            '<div class="flex-one">',
+            '<h5 class="pb-0">Edital disponível para download</h5>',
+            '<h6 class="light pb-0">Clique aqui para baixar o edital</h6>',
+            '</div>',
+            '<button class="btn-edital" type="submit"><i class="fas fa-download"></i>&nbsp;&nbsp;Download</button>',
+            '</div>',
+            '</form>',
+        ]);
     }
 
     /** @test */
@@ -1193,7 +1199,93 @@ class LicitacaoTest extends TestCase
         $this->get(route('licitacoes.show', $licitacao->idlicitacao))
         ->assertDontSeeText('Edital disponível para download')
         ->assertDontSeeText('Clique aqui para baixar o edital')
-        ->assertDontSee('<a href="' . $licitacao->edital . '" download >');
+        ->assertDontSee('<form method="POST" action="'. route('download.arquivo.lfm') .'">');
+    }
+
+    /** @test */
+    public function download_edital()
+    {
+        $path = '/arquivos/' . date('Y-m');
+        $dir = public_path() . $path;
+        $nome = 'edital_teste.txt';
+
+        mkdir($dir);
+        $myfile = fopen(public_path() . $path . '/' . $nome, "wb");
+        $txt = "John Doe\n";
+        fwrite($myfile, $txt);
+        fclose($myfile);
+
+        $licitacao = factory('App\Licitacao')->create([
+            'edital' => $path . '/' . $nome
+        ]);
+        
+        $this->get(route('licitacoes.show', $licitacao->idlicitacao))
+        ->assertSeeText('Edital disponível para download')
+        ->assertSeeText('Clique aqui para baixar o edital')
+        ->assertSee('<form method="POST" action="'. route('download.arquivo.lfm') .'">');
+
+        $this->post(route('download.arquivo.lfm'), ['arquivo_lfm' => $licitacao->edital])
+        ->assertOk();
+
+        unlink($dir . '/' . $nome);
+        rmdir($dir);
+    }
+
+    /** @test */
+    public function redirect_if_error_code_404_without_file_to_download_edital()
+    {
+        $licitacao = factory('App\Licitacao')->create();
+        
+        $this->get(route('licitacoes.show', $licitacao->idlicitacao))
+        ->assertSeeText('Edital disponível para download')
+        ->assertSeeText('Clique aqui para baixar o edital')
+        ->assertSee('<form method="POST" action="'. route('download.arquivo.lfm') .'">');
+
+        $this->post(route('download.arquivo.lfm'), ['arquivo_lfm' => $licitacao->edital])
+        ->assertRedirect(route('licitacoes.show', $licitacao->idlicitacao))
+        ->assertSessionHas('message', 'Arquivo não existe!');
+    }
+
+    /** @test */
+    public function cannot_download_without_arquivo_lfm_input()
+    {
+        $licitacao = factory('App\Licitacao')->create();
+        
+        $this->get(route('licitacoes.show', $licitacao->idlicitacao))
+        ->assertSeeText('Edital disponível para download')
+        ->assertSeeText('Clique aqui para baixar o edital')
+        ->assertSee('<form method="POST" action="'. route('download.arquivo.lfm') .'">');
+
+        $this->post(route('download.arquivo.lfm'), ['arquivo_lfm' => ''])
+        ->assertSessionHasErrors('arquivo_lfm');
+    }
+
+    /** @test */
+    public function cannot_download_with_arquivo_lfm_input_invalid_start_with()
+    {
+        $licitacao = factory('App\Licitacao')->create();
+        
+        $this->get(route('licitacoes.show', $licitacao->idlicitacao))
+        ->assertSeeText('Edital disponível para download')
+        ->assertSeeText('Clique aqui para baixar o edital')
+        ->assertSee('<form method="POST" action="'. route('download.arquivo.lfm') .'">');
+
+        $this->post(route('download.arquivo.lfm'), ['arquivo_lfm' => '/img' . $licitacao->edital])
+        ->assertSessionHasErrors('arquivo_lfm');
+    }
+
+    /** @test */
+    public function cannot_download_with_arquivo_lfm_input_greater_than_191_chars()
+    {
+        $licitacao = factory('App\Licitacao')->create();
+        
+        $this->get(route('licitacoes.show', $licitacao->idlicitacao))
+        ->assertSeeText('Edital disponível para download')
+        ->assertSeeText('Clique aqui para baixar o edital')
+        ->assertSee('<form method="POST" action="'. route('download.arquivo.lfm') .'">');
+
+        $this->post(route('download.arquivo.lfm'), ['arquivo_lfm' => $this->faker()->sentence(400)])
+        ->assertSessionHasErrors('arquivo_lfm');
     }
 
     /** @test */
@@ -1336,7 +1428,6 @@ class LicitacaoTest extends TestCase
     /** @test */
     public function licitacao_cannot_be_searched_with_palavrachave_more_than_191_chars_on_website()
     {
-        $faker = \Faker\Factory::create();
         $licitacao = factory('App\Licitacao')->create();
 
         $this->get(route('licitacoes.siteBusca', [
@@ -1345,7 +1436,7 @@ class LicitacaoTest extends TestCase
             'datarealizacao' => Carbon::create($licitacao->datarealizacao)->format('Y-m-d'),
             'nrlicitacao' => $licitacao->nrlicitacao,
             'modalidade' => $licitacao->modalidade,
-            'palavrachave' => $faker->sentence(400)
+            'palavrachave' => $this->faker()->sentence(400)
         ]))
         ->assertSessionHasErrors('palavrachave');
     }

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Repositories\CompromissoRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 use App\Contracts\MediadorServiceInterface;
+use App\Http\Requests\SiteRequest;
 
 class SiteController extends Controller
 {
@@ -112,5 +113,22 @@ class SiteController extends Controller
         $resultados = $this->compromissoRepository->getByData(date('Y-m-d', strtotime($data)));
 
         return view('site.agenda-institucional', compact('resultados', 'data'));
+    }
+
+    public function downloadArquivoLfm(SiteRequest $request)
+    {
+        try{
+            $validated = $request->validated();
+            $path = public_path() . $validated['arquivo_lfm'];
+            if(!\File::exists($path))
+                throw new \Exception('Arquivo "' . $validated['arquivo_lfm'] . '" não existe!', 404);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            if(in_array($e->getCode(), [404]))
+                return redirect()->back()->with(['message' => 'Arquivo não existe!', 'class' => 'alert-danger']);
+            abort(500, "Erro ao realizar download do arquivo.");
+        }
+
+        return response()->download($path);
     }
 }

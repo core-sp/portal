@@ -322,6 +322,9 @@ Route::middleware(['block_ip'])->group(function () {
     // Rotas de admin abertas
     Route::get('admin', 'AdminController@index')->name('admin');
 
+    // Rota geral p/ downloads de arquivos do LFM
+    Route::post('download-arquivo-lfm', 'SiteController@downloadArquivoLfm')->name('download.arquivo.lfm');
+
     // Regionais
     Route::get('seccionais', 'RegionalController@siteGrid')->name('regionais.siteGrid');
     Route::get('seccionais/{id}', 'RegionalController@show')->name('regionais.show');

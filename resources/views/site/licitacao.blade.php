@@ -67,16 +67,21 @@
         </table>
       </div>
       <div class="col-xl-8 col-lg-7">
+        @if(Session::has('message'))
+          <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
+        @endif
         @if(isset($licitacao->edital))
-        <a href="{{ $licitacao->edital }}" download >
+        <form method="POST" action="{{ route('download.arquivo.lfm') }}">
+          @csrf
+          <input type="hidden" name="arquivo_lfm" value="{{ $licitacao->edital }}" />
           <div class="edital-download d-flex">
             <div class="flex-one">
               <h5 class="pb-0">Edital disponível para download</h5>
               <h6 class="light pb-0">Clique aqui para baixar o edital</h6>
             </div>
-            <button class="btn-edital"><i class="fas fa-download"></i>&nbsp;&nbsp;Download</button>
+            <button class="btn-edital" type="submit"><i class="fas fa-download"></i>&nbsp;&nbsp;Download</button>
           </div>
-     	  </a>
+        </form>
         @endif
         <div class="edital-download {{ isset($licitacao->edital) ? 'mt-3' : '' }}">
           <h4 class="azul pb-0">Objeto</h4>

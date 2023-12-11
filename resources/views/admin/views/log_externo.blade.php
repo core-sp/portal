@@ -62,7 +62,6 @@
             <fieldset class="border border-secondary p-3">
                 <legend>Buscar por dia</legend>
                 <form action="{{ route('suporte.log.externo.busca') }}">
-                    @csrf
                     <div class="form-inline">
                         <label for="tipo" class="mr-sm-2">Tipo de log:</label>
                         <select name="tipo" class="form-control mb-2 mr-sm-3 {{ $errors->has('tipo') ? 'is-invalid' : '' }}">
@@ -99,7 +98,6 @@
             <fieldset class="border border-secondary p-3">
                 <legend>Buscar texto por mês</legend>
                 <form action="{{ route('suporte.log.externo.busca') }}">
-                    @csrf
                     <div class="form-inline">
                         <label for="tipo" class="mr-sm-2">Tipo de log:</label>
                         <select name="tipo" class="form-control mb-2 mr-sm-3 {{ $errors->has('tipo') ? 'is-invalid' : '' }}">
@@ -123,7 +121,26 @@
                             class="form-control mb-2 mr-sm-3 {{ $errors->has('texto') ? 'is-invalid' : '' }}" 
                             id="buscar-texto"
                             value="{{ old('texto') }}"
-                        >
+                            size="70"
+                            list="opcoes_m"
+                        />
+                        <datalist id="opcoes_m">
+                            <option value="IP BLOQUEADO">
+                            <option value="IP DESBLOQUEADO por ">
+                            <option value="[IP: xxx.xxx.xxx.xxx] - ">
+                            <option value=" (&quot;xxx.xxx.xxx-xx&quot;) verificou o email após o cadastro.">
+                            <option value=" (&quot;xx.xxx.xxx/xxxx-xx&quot;) verificou o email após o cadastro.">
+                            <option value="&quot;xxxxxx/xxxx&quot; alterou o email para ">
+                            <option value="&quot;xxx.xxx.xxx-xx&quot; (&quot;email&quot;) cadastrou-se na Área do Representante.">
+                            <option value="&quot;xx.xxx.xxx/xxxx-xx&quot; (&quot;email&quot;) cadastrou-se na Área do Representante.">
+                            <option value=" (&quot;xxxxxx/xxxx&quot;) conectou-se à Área do Representante.">
+                            <option value=" (&quot;xxxxxx/xxxx&quot;) desconectou-se da Área do Representante.">
+                            <option value="Usuário com o cpf/cnpj xxx.xxx.xxx-xx alterou a senha com sucesso na Área do Representante.">
+                            <option value="Usuário com o cpf/cnpj xx.xxx.xxx/xxxx-xx alterou a senha com sucesso na Área do Representante.">
+                            <option value=" (&quot;xxxxxx/xxxx&quot;) gerou certidão com código: ">
+                            <option value=" (&quot;xxxxxx/xxxx&quot;) não conseguiu emitir certidão.">
+                            <option value="Possível bot tentou login ">
+                        </datalist>
 
                         <input type="checkbox"
 							name="n_linhas"
@@ -158,7 +175,6 @@
             <fieldset class="border border-secondary p-3">
                 <legend>Buscar texto por ano</legend>
                 <form action="{{ route('suporte.log.externo.busca') }}">
-                    @csrf
                     <div class="form-inline">
                         <label for="tipo" class="mr-sm-2">Tipo de log:</label>
                         <select name="tipo" class="form-control mb-2 mr-sm-3 {{ $errors->has('tipo') ? 'is-invalid' : '' }}">
@@ -183,7 +199,26 @@
                             class="form-control mb-2 mr-sm-3 {{ $errors->has('texto') ? 'is-invalid' : '' }}" 
                             id="buscar-texto"
                             value="{{ old('texto') }}"
-                        >
+                            size="70"
+                            list="opcoes_y"
+                        />
+                        <datalist id="opcoes_y">
+                            <option value="IP BLOQUEADO">
+                            <option value="IP DESBLOQUEADO por ">
+                            <option value="[IP: xxx.xxx.xxx.xxx] - ">
+                            <option value=" (&quot;xxx.xxx.xxx-xx&quot;) verificou o email após o cadastro.">
+                            <option value=" (&quot;xx.xxx.xxx/xxxx-xx&quot;) verificou o email após o cadastro.">
+                            <option value="&quot;xxxxxx/xxxx&quot; alterou o email para ">
+                            <option value="&quot;xxx.xxx.xxx-xx&quot; (&quot;email&quot;) cadastrou-se na Área do Representante.">
+                            <option value="&quot;xx.xxx.xxx/xxxx-xx&quot; (&quot;email&quot;) cadastrou-se na Área do Representante.">
+                            <option value=" (&quot;xxxxxx/xxxx&quot;) conectou-se à Área do Representante.">
+                            <option value=" (&quot;xxxxxx/xxxx&quot;) desconectou-se da Área do Representante.">
+                            <option value="Usuário com o cpf/cnpj xxx.xxx.xxx-xx alterou a senha com sucesso na Área do Representante.">
+                            <option value="Usuário com o cpf/cnpj xx.xxx.xxx/xxxx-xx alterou a senha com sucesso na Área do Representante.">
+                            <option value=" (&quot;xxxxxx/xxxx&quot;) gerou certidão com código: ">
+                            <option value=" (&quot;xxxxxx/xxxx&quot;) não conseguiu emitir certidão.">
+                            <option value="Possível bot tentou login ">
+                        </datalist>
 
                         <input type="checkbox"
 							name="n_linhas"
