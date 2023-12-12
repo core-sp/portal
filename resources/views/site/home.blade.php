@@ -15,7 +15,7 @@
         <ol class="carousel-indicators">
           @foreach($imagens as $key => $img)
           @if(!empty($img->url))
-            <li data-target="#carousel" data-slide-to="{{ $key }}" {{ $key === 0 ? 'class="active"' : '' }}></li>
+            <li data-target="#carousel" data-slide-to="{{ $key }}" class="{{ $key === 0 ? 'active' : '' }}"></li>
           @endif
           @endforeach
         </ol>

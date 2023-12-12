@@ -117,7 +117,7 @@
                   method="GET"
                   role="form"
                   action ="/busca"
-                />
+                >
                   <input type="text"
                     name="busca"
                     class="form-control float-right {{ $errors->has('busca') ? 'is-invalid' : '' }}"
