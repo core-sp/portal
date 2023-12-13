@@ -85,9 +85,9 @@ class BdoSiteController extends Controller
 
     public function anunciarVaga(AnunciarVagaRequest $request)
     {
-        $request->validated();
+        $validated = $request->validated();
 
-        if($request->idempresa === "0") {
+        if($validated['idempresa'] == "0") {
 
             $empresa = $this->bdoEmpresaRepository->store($request->toEmpresaModel());
 
@@ -98,7 +98,7 @@ class BdoSiteController extends Controller
             $request->idempresa = $empresa->idempresa;
         } 
         else {
-            $empresa = $this->bdoEmpresaRepository->getOportunidadesAbertasbyEmpresa($request->idempresa);
+            $empresa = $this->bdoEmpresaRepository->getOportunidadesAbertasbyEmpresa($validated['idempresa']);
 
             if($empresa->oportunidade_count > 0) {
                 return redirect()
