@@ -235,8 +235,8 @@ class HomeImagemTest extends TestCase
         $banners = factory('App\HomeImagem', HomeImagem::TOTAL)->create();
 
         foreach($banners as $key => $banner)
-            $key == 0 ? array_push($view, '<li data-target="#carousel" data-slide-to="'.$key.'" class=&quot;active&quot;></li>') : 
-            array_push($view, '<li data-target="#carousel" data-slide-to="'.$key.'" ></li>');
+            $key == 0 ? array_push($view, '<li data-target="#carousel" data-slide-to="'.$key.'" class="active"></li>') : 
+            array_push($view, '<li data-target="#carousel" data-slide-to="'.$key.'" class=""></li>');
 
         $this->get(route('site.home'))
         ->assertOk()
