@@ -1209,7 +1209,8 @@ class LicitacaoTest extends TestCase
         $dir = public_path() . $path;
         $nome = 'edital_teste.txt';
 
-        mkdir($dir);
+        if(!\File::exists($dir))
+            mkdir($dir);
         $myfile = fopen(public_path() . $path . '/' . $nome, "wb");
         $txt = "John Doe\n";
         fwrite($myfile, $txt);
@@ -1225,10 +1226,10 @@ class LicitacaoTest extends TestCase
         ->assertSee('<form method="POST" action="'. route('download.arquivo.lfm') .'">');
 
         $this->post(route('download.arquivo.lfm'), ['arquivo_lfm' => $licitacao->edital])
-        ->assertOk();
+        ->assertOk()
+        ->assertHeader('Cache-Control', 'no-cache, no-store, public');
 
         unlink($dir . '/' . $nome);
-        rmdir($dir);
     }
 
     /** @test */

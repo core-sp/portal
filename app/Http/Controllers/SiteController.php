@@ -122,6 +122,9 @@ class SiteController extends Controller
             $path = public_path() . $validated['arquivo_lfm'];
             if(!\File::exists($path))
                 throw new \Exception('Arquivo "' . $validated['arquivo_lfm'] . '" não existe!', 404);
+
+            $indice = strripos($validated['arquivo_lfm'], '/') + 1;
+            $nome = substr($validated['arquivo_lfm'], $indice, strlen($validated['arquivo_lfm']));
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             if(in_array($e->getCode(), [404]))
@@ -129,6 +132,6 @@ class SiteController extends Controller
             abort(500, "Erro ao realizar download do arquivo.");
         }
 
-        return response()->download($path);
+        return response()->download($path, $nome, ['Cache-Control' => 'no-cache, no-store']);
     }
 }
