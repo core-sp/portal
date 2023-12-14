@@ -81,6 +81,13 @@ return [
             'root' => storage_path('logs/erros'),
             'url' => env('APP_URL').'/storage/log/erros',
         ],
+
+        'itens_home' => [
+            'driver' => 'local',
+            'root' => public_path('imagens/itens_home'),
+            'url' => env('APP_URL').'/imagens/home',
+            'visibility' => 'public',
+        ],
     ],
 
 ];
