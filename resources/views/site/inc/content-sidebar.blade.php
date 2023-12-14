@@ -12,7 +12,7 @@
     </div>
   </a>
   <a href="/agendamento">
-    <div class="box-dois azul-escuro-bg mb-3">
+    <div class="box-dois mb-3 {{ isset($itens_home['cards_laterais_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_laterais_1']) ? 'background-color:'.$itens_home['cards_laterais_1'] : '' }}">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
           <img src="{{ asset('img/appointment.png') }}" class="inside-img">
@@ -24,7 +24,7 @@
     </div>
   </a>
   <a href="/representante/login">
-    <div class="box-dois azul-bg mb-3">
+    <div class="box-dois mb-3 {{ isset($itens_home['cards_laterais_2']) ? '' : 'azul-bg' }}" style="{{ isset($itens_home['cards_laterais_2']) ? 'background-color:'.$itens_home['cards_laterais_2'] : '' }}">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
           <img src="{{ asset('img/padlock.png') }}" class="inside-img">
@@ -36,7 +36,7 @@
     </div>
   </a>
   <a href="/balcao-de-oportunidades">
-    <div class="box-dois azul-escuro-bg mb-3">
+    <div class="box-dois mb-3 {{ isset($itens_home['cards_laterais_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_laterais_1']) ? 'background-color:'.$itens_home['cards_laterais_1'] : '' }}">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
           <img src="{{ asset('img/001-work.png') }}" class="inside-img">
@@ -48,7 +48,7 @@
     </div>
   </a>
   <a href="/consulta-de-situacao">
-    <div class="box-dois azul-bg mb-3">
+    <div class="box-dois mb-3 {{ isset($itens_home['cards_laterais_2']) ? '' : 'azul-bg' }}" style="{{ isset($itens_home['cards_laterais_2']) ? 'background-color:'.$itens_home['cards_laterais_2'] : '' }}">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
           <img src="{{ asset('img/file.png') }}" class="inside-img" alt="Consulta de Ativos | Core-SP">
@@ -60,7 +60,7 @@
     </div>
   </a>
   <a href="/cursos">
-    <div class="box-dois azul-escuro-bg mb-3">
+    <div class="box-dois mb-3 {{ isset($itens_home['cards_laterais_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_laterais_1']) ? 'background-color:'.$itens_home['cards_laterais_1'] : '' }}">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
           <img src="{{ asset('img/teacher.png') }}" class="inside-img">
@@ -72,7 +72,7 @@
     </div>
   </a>
   <a href="/simulador">
-    <div class="box-dois azul-bg mb-3">
+    <div class="box-dois mb-3 {{ isset($itens_home['cards_laterais_2']) ? '' : 'azul-bg' }}" style="{{ isset($itens_home['cards_laterais_2']) ? 'background-color:'.$itens_home['cards_laterais_2'] : '' }}">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
           <img src="{{ asset('img/001-paper.png') }}" class="inside-img" alt="Simulador | Core-SP">

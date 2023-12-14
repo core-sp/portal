@@ -75,6 +75,11 @@ $(document).ready(function(){
 		}
 	});
 
+  $(".custom-file-input").on("change", function(e) {
+    var fileName = e.target.files[0].name;
+		$(this).next('.custom-file-label').html(fileName);
+  });
+  
   // Máscaras para datas
   // $('#dataTermino').mask('00/00/0000', {
   //   onComplete: function() {
@@ -749,3 +754,187 @@ $('#enviarCriarAgenda').click(function(){
 });
 
 // FIM Funcionalidade Sala Reunião / Agendados / Criar agendamento
+
+// Funcionalidade Home Imagem / Itens Home
+
+var caminho = '';
+var openStorage_id = '';
+var folder_name = '';
+const PastaItensHomePrincipal = 'img/';
+
+function preencheTabelaPath(value, index, array) {
+  var href_path = caminho + value;
+  var texto_html = '<div class="card-body text-center pt-0 pl-0 pr-0"><div class="card-img-top"><a href="/' + href_path + '" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home_storage"><img src="/' + href_path + '"></a></div><br>';
+  texto_html += '<button class="btn btn-link text-break storagePath" value="' + href_path + '">' + value + '</button><br>';
+  texto_html += '<hr><a href="/admin/imagens/itens-home/armazenamento/download/' + folder_name + '/' + value + '" class="btn btn-sm btn-primary mr-2"><i class="fas fa-download"></i></a>';
+  texto_html += caminho == PastaItensHomePrincipal ? '</div>' : '<button class="btn btn-sm btn-danger deleteFileStorage" type="button" value="' + value + '"><i class="fas fa-trash"></i></button></div>';
+  $('#armazenamento #cards').append('<div class="card storageFile w-100 border border-primary"></div>');
+  $('#armazenamento #cards .storageFile:last').append(texto_html);
+}
+
+$(document).ready(function(){
+  $("#filtrarFile").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#cards .card .storagePath").filter(function() {
+      $(this).parent().parent().toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+
+$('.openStorage').click(function(){
+  openStorage_id = $(this).parent().parent().find('input').attr('id');
+  receberArquivos(openStorage_id, null);
+});
+
+$('.openStoragePasta').click(function(){
+  var pasta = this.value == "" ? null : this.value;
+  $('.openStoragePasta').attr('disabled', false);
+  $(this).attr('disabled', true);
+  receberArquivos(openStorage_id, pasta);
+});
+
+$("#armazenamento").on('hidden.bs.modal', function(){
+  $('#armazenamento #msgStorage').hide();
+  $("#filtrarFile").val('');
+  cleanTabelaStorage();
+});
+
+$("#armazenamento").on('shown.bs.modal', function () {
+  $('.openStoragePasta[value=""]').attr('disabled', true);
+  $('.openStoragePasta[value!=""]').attr('disabled', false);
+});
+
+$("#header_fundo_cor").change(function() {
+  $('#header_fundo').val('');
+  $('#header_fundo').attr('placeholder', 'Cor selecionada');
+});
+
+$("#header_fundo_cor").ready(function() {
+  if($("#header_fundo_default").prop('checked') || ($("#header_fundo").val() != ""))
+    return;
+  $('#header_fundo').val('');
+  $('#header_fundo').attr('placeholder', 'Cor selecionada');
+});
+
+$("#header_fundo_default").change(function() {
+  if(!this.checked){
+    $('#header_fundo').attr('placeholder', '');
+  }else{
+    $('#header_fundo').val('');
+    $('#header_fundo').attr('placeholder', 'Imagem padrão escolhida');
+  }
+});
+
+$('#popup_video_vazio, #popup_video_default').change(function() {
+  if(this.checked)
+    $('#popup_video_novo').val('');
+});
+
+$('#armazenamento #file_itens_home').change(function(e){
+  if($(this).val() == '')
+    return;
+
+  var form = new FormData();
+  form.append('_method', "POST");
+  form.append('_token', $('meta[name="csrf-token"]').attr('content'));
+  form.append('file_itens_home', e.target.files[0]);
+
+  $.ajax({
+    method: "POST",
+    data: form,
+    contentType : false,
+		processData : false,
+    url: "/admin/imagens/itens-home/armazenamento",
+    success: function(response) {
+      if(response.novo_arquivo != null){
+        $('#armazenamento .custom-file-label').text('Selecionar arquivo...');
+        receberArquivos(openStorage_id, null);
+        $('#armazenamento #msgStorage').removeClass('alert-danger')
+        .addClass('alert-success').html('Arquivo <strong><i>"' + response.novo_arquivo + '"</i></strong> foi adicionado da pasta!').show();
+        $('.openStoragePasta[value=""]').attr('disabled', true);
+        $('.openStoragePasta[value!=""]').attr('disabled', false);
+      }
+    },
+    error: function(xhr) {
+      var txt = xhr.status == 422 ? xhr.responseJSON.errors.file_itens_home[0] : 'Erro ao adicionar o arquivo. Recarregue a página.';
+      $('#armazenamento #msgStorage').removeClass('alert-success')
+      .addClass('alert-danger').html(txt).show();
+      $('#armazenamento .custom-file-label').text('Selecionar arquivo...');
+    }
+  });
+});
+
+function cleanTabelaStorage()
+{
+  $('#armazenamento .card-columns .card').remove();
+}
+
+function receberArquivos(id, pasta){
+  $.ajax({
+    method: "GET",
+    data: {},
+    dataType: 'json',
+    url: pasta == null ? "/admin/imagens/itens-home/armazenamento" : "/admin/imagens/itens-home/armazenamento/" + pasta,
+    success: function(response) {
+      cleanTabelaStorage();
+      caminho = response.caminho;
+      folder_name = response.folder;
+      response.path.forEach(preencheTabelaPath);
+      eventClickSelecionar(id);
+      eventClickExcluir();
+    },
+    error: function() {
+      alert('Erro ao carregar os arquivos. Recarregue a página.');
+    }
+  });
+}
+
+function eventClickSelecionar(id){
+  $('.storagePath').on('click', function(){
+    var linha = this.value;
+    $('#' + id).val(linha);
+    $("#armazenamento").modal("hide");
+  });
+}
+
+function eventClickExcluir(){
+  if(caminho == PastaItensHomePrincipal)
+    return;
+  $('.deleteFileStorage').on('click', function(){
+    $('#confirmDelete #confirmFile').text(this.value);
+    $('#confirmDelete #deleteFileStorage').val(this.value);
+    $('#confirmDelete').modal({backdrop: 'static', keyboard: false, show: true});
+  });
+}
+
+$('#deleteFileStorage').on('click', function(){
+  var arquivo = this.value;
+  $('#confirmDelete').modal('hide');
+  $.ajax({
+    method: "POST",
+    data: {
+      _method: "DELETE",
+      _token: $('meta[name="csrf-token"]').attr('content'),
+    },
+    dataType: 'json',
+    url: "/admin/imagens/itens-home/armazenamento/delete-file/" + arquivo,
+    success: function(response) {
+      if(response != 'Não foi removido.'){
+        $('.deleteFileStorage[value="' + arquivo + '"]').parent().parent().remove();
+        $('#armazenamento #msgStorage').removeClass('alert-danger')
+        .addClass('alert-success').html('Arquivo <strong><i>"' + arquivo + '"</i></strong> foi removido da pasta!').show();
+      }else{
+        $('#armazenamento #msgStorage').removeClass('alert-success')
+        .addClass('alert-danger').html('Arquivo <strong><i>"' + arquivo + '"</i></strong> NÃO foi removido da pasta!').show();
+      }
+      $('#armazenamento .modal-body').scrollTop(0);
+    },
+    error: function() {
+      $('#armazenamento #msgStorage').removeClass('alert-success')
+        .addClass('alert-danger').html('Erro ao excluir o arquivo <strong><i>"' + arquivo + '"</i></strong>. Recarregue a página.').show();
+        $('#armazenamento .modal-body').scrollTop(0);
+    }
+  });
+});
+
+// FIM Funcionalidade Home Imagem / Itens Home
