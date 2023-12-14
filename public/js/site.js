@@ -242,7 +242,8 @@ $(document).ready(function(){
 	// }
 
 	$(window).on('load', function(){
-		$('#popup-campanha').modal('show');
+		if($('#popup-campanha').length > 0)
+			$('#popup-campanha').modal('show');
 	});
 	$('#popup-campanha').on('hidden.bs.modal', function(){
 		var youtube = $('#video-campanha').attr('src');
