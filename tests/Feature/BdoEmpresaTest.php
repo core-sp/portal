@@ -449,6 +449,53 @@ class BdoEmpresaTest extends TestCase
      * 
      * Criação de BdoEmpresa pelo Portal (página para anunciar vagas). 
      * Criação de BdoEmpresa pelo Portal sempre cria também uma BdoOportunidade.
+     * Esse teste cobre de criação de ambas as entidades juntas (BdoEmpresa e BdoOportunidade) e situação de cnpj sem máscara.
+    */
+    public function create_bdoempresa_on_portal_cnpj_only_numbers()
+    {
+        Mail::fake();
+
+        $this->get(route('bdosite.anunciarVagaView'))->assertOk();
+
+        $bdoEmpresa = factory('App\BdoEmpresa')->raw();
+        $bdoOportunidade = factory('App\BdoOportunidade')->raw();
+
+        $anunciarVaga['idempresa'] = "0";
+        $anunciarVaga['segmento'] = $bdoEmpresa['segmento'];
+        $anunciarVaga['cnpj'] = apenasNumeros($bdoEmpresa['cnpj']);
+        $anunciarVaga['razaosocial'] = $bdoEmpresa['razaosocial'];
+        $anunciarVaga['fantasia'] = $bdoEmpresa['fantasia'];
+        $anunciarVaga['capitalsocial'] = $bdoEmpresa['capitalsocial'];
+        $anunciarVaga['endereco'] = $bdoEmpresa['endereco'];
+        $anunciarVaga['site'] = $bdoEmpresa['site'];
+        $anunciarVaga['email'] = $bdoEmpresa['email'];
+        $anunciarVaga['telefone'] = $bdoEmpresa['telefone'];
+        $anunciarVaga['descricao'] = $bdoEmpresa['descricao'];
+        $anunciarVaga['contatonome'] = $bdoEmpresa['contatonome'];
+        $anunciarVaga['contatotelefone'] = $bdoEmpresa['contatotelefone'];
+        $anunciarVaga['contatoemail'] = $bdoEmpresa['contatoemail'];
+        $anunciarVaga['idusuario'] = $bdoEmpresa['idusuario'];
+
+        $anunciarVaga['titulo'] = $bdoOportunidade['titulo'];
+        $anunciarVaga['segmentoOportunidade'] = $bdoOportunidade['segmento'];
+        $anunciarVaga['regiaoAtuacao'] = explode(',', trim($bdoOportunidade['regiaoatuacao'], ','));
+        $anunciarVaga['descricaoOportunidade'] = $bdoOportunidade['descricao'];
+        $anunciarVaga['nrVagas'] = $bdoOportunidade['vagasdisponiveis'];
+        $anunciarVaga['termo'] = 'on';
+
+        $this->post(route('bdosite.anunciarVaga'), $anunciarVaga);
+
+        $this->assertDatabaseHas('bdo_empresas', ['cnpj' => $bdoEmpresa['cnpj']]);
+
+        $this->assertDatabaseHas('bdo_oportunidades', ['titulo' => $bdoOportunidade['titulo']]);
+
+        Mail::assertQueued(AnunciarVagaMail::class);
+    }
+
+    /** @test 
+     * 
+     * Criação de BdoEmpresa pelo Portal (página para anunciar vagas). 
+     * Criação de BdoEmpresa pelo Portal sempre cria também uma BdoOportunidade.
      * Dois possíveis comportamentos: caso nenhum CNPJ seja fornecido, uma mensagem de erro é retornada,
      * caso um CNPJ que não esteja cadastrado no Portal seja fornecido, o valor "0" é atribuído ao
      * "idempresa" e a validação das outras entradas é verificada.
