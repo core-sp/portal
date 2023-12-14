@@ -2,9 +2,20 @@
     @csrf
     @method('PUT')
     <div class="card-body">
-    <p class="mb-4"><i>* Insira as imagens e arraste as caixas para definir a ordem de exibição<br>
-    ** Para remover uma imagem, basta deixar seus campos vazios
-    </i></p>
+        @if(\Session::has('message'))
+        <div class="row">
+            <div class="col">
+                <div class="alert alert-dismissible {{ \Session::get('class') }}">
+                    {!! \Session::get('message') !!}
+                </div>
+            </div>
+        </div>
+        @endif
+        <p class="mb-4">
+            <i>* Insira as imagens e arraste as caixas para definir a ordem de exibição<br>
+            ** Para remover uma imagem, basta deixar seus campos vazios
+            </i>
+        </p>
         <ul id="sortable" class="mb-0 pl-0">
             @php $i = 0; @endphp
             @foreach($resultado as $img)
@@ -59,13 +70,8 @@
                                 <div class="col">
                                     <label for="selectTarget">Destino</label>
                                     <select name="target-{{ $i }}" class="form-control form-control-sm" id="selectTarget">
-                                    @if($img->target === '_self')
-                                        <option value="_self" selected>Abrir na mesma aba</option>
-                                        <option value="_blank">Abrir em outra aba</option>
-                                    @else
-                                        <option value="_self">Abrir na mesma aba</option>
-                                        <option value="_blank" selected>Abrir em outra aba</option>
-                                    @endif
+                                        <option value="_self" {{ !in_array($img->target, ['_self']) ? 'selected' : '' }}>Abrir na mesma aba</option>
+                                        <option value="_blank" {{ $img->target === '_blank' ? 'selected' : '' }}>Abrir em outra aba</option>
                                     </select>
                                 </div>
                             </div>
@@ -78,7 +84,7 @@
     </div>
     <div class="card-footer">
         <div class="float-right">
-            <a href="/admin/paginas" class="btn btn-default">Cancelar</a>
+            <a href="{{ route('admin') }}" class="btn btn-default">Cancelar</a>
             <button type="submit" class="btn btn-primary ml-1">Salvar</button>
         </div>
     </div>

@@ -461,11 +461,11 @@ figure.align-left {
 	/* vermelho */
 	/* background-color: #d11111; */
 	/* verde */
-	background-color: #52792D;
+	/* background-color: #52792D; */
 	/* troca o banner pelo gif */
-	background-image: url('/img/snowing.gif');
+	/* background-image: url('/img/snowing.gif'); */
 	/* repetir o gif */
-	background-repeat: repeat-x;
+	/* background-repeat: repeat-x; */
 	/* Fim da função neve */
 
 	/* 55 anos */
@@ -1174,11 +1174,11 @@ input[type=file]::-webkit-file-upload-button {
 /*
  * REGRAS DO FOOTER
  */
-footer {
-	background-color: #004587;
+/* footer { */
+	/* background-color: #004587; */
 	/* Outubro Rosa */
 	/* background-color: rgba(191,68,101,1); */
-}
+/* } */
 
 footer p {
 	font-weight: 300;

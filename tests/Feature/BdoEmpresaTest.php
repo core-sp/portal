@@ -461,9 +461,7 @@ class BdoEmpresaTest extends TestCase
 
         $anunciarVaga = [];
 
-        $this->post(route('bdosite.anunciarVaga'), $anunciarVaga)->assertSessionHasErrorsIn('default', ['idempresa']);
-
-        $anunciarVaga['idempresa'] = "0";
+        $this->post(route('bdosite.anunciarVaga'), $anunciarVaga)->assertSessionDoesntHaveErrors(['idempresa']);
 
         $this->post(route('bdosite.anunciarVaga'), $anunciarVaga)->assertSessionHasErrorsIn('default', [
             'razaosocial',

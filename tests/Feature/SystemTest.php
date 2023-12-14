@@ -30,6 +30,7 @@ class SystemTest extends TestCase
             'SalaReuniao' => new \App\Services\SalaReuniaoService(),
             'Aviso' => new \App\Services\AvisoService(),
             'Curso' => new \App\Services\CursoService(),
+            'HomeImagem' => new \App\Services\HomeImagemService(),
             'UserExterno' => new \App\Services\UserExternoService(),
             'PreRegistro' => new \App\Services\PreRegistroService(),
         ];
@@ -53,6 +54,7 @@ class SystemTest extends TestCase
         $servicosCarregados = [
             'Mediador' => 'App\Contracts\MediadorServiceInterface',
             'Suporte' => 'App\Contracts\SuporteServiceInterface',
+            'HomeImagem' => 'App\Contracts\HomeImagemServiceInterface',
         ];
         $servicosNaoCarregados = [
             'PlantaoJuridico' => 'App\Contracts\PlantaoJuridicoServiceInterface',
@@ -239,6 +241,14 @@ class SystemTest extends TestCase
         $servico = new \App\Services\CursoService();
         $mediador = $this->app->make(MediadorServiceInterface::class);
         $this->assertEquals($mediador->getService('Curso'), $servico);
+    }
+
+    /** @test */
+    public function mediador_interface_get_instace_home_imagem_service()
+    {
+        $servico = new \App\Services\HomeImagemService();
+        $mediador = $this->app->make(MediadorServiceInterface::class);
+        $this->assertEquals($mediador->getService('HomeImagem'), $servico);
     }
     
     /** @test */
