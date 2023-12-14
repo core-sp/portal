@@ -274,6 +274,62 @@ class BdoOportunidadeTest extends TestCase
     /** @test 
      * 
      * Criação de BdoOportunidade pelo Portal (página para anunciar vagas). 
+     * Cenário onde uma nova BdoOportunidade está sendo criada em cima de uma nova BdoEmpresa.
+    */
+    public function create_bdooportunidade_on_portal_without_existing_bdoempresa()
+    {
+        Mail::fake();
+
+        $this->get(route('bdosite.anunciarVagaView'))->assertOk();
+
+        factory('App\BdoEmpresa')->create()->delete();
+
+        $bdoEmpresa = factory('App\BdoEmpresa')->raw();
+
+        $bdoOportunidade = factory('App\BdoOportunidade')->raw();
+
+        $anunciarVaga['idempresa'] = "0";
+        $anunciarVaga['segmento'] = $bdoEmpresa['segmento'];
+        $anunciarVaga['cnpj'] = $bdoEmpresa['cnpj'];
+        $anunciarVaga['razaosocial'] = $bdoEmpresa['razaosocial'];
+        $anunciarVaga['fantasia'] = $bdoEmpresa['fantasia'];
+        $anunciarVaga['capitalsocial'] = $bdoEmpresa['capitalsocial'];
+        $anunciarVaga['endereco'] = $bdoEmpresa['endereco'];
+        $anunciarVaga['site'] = $bdoEmpresa['site'];
+        $anunciarVaga['email'] = $bdoEmpresa['email'];
+        $anunciarVaga['telefone'] = $bdoEmpresa['telefone'];
+        $anunciarVaga['descricao'] = null;
+        $anunciarVaga['contatonome'] = $bdoEmpresa['contatonome'];
+        $anunciarVaga['contatotelefone'] = $bdoEmpresa['contatotelefone'];
+        $anunciarVaga['contatoemail'] = $bdoEmpresa['contatoemail'];
+        $anunciarVaga['idusuario'] = $bdoEmpresa['idusuario'];
+
+        $anunciarVaga['titulo'] = $bdoOportunidade['titulo'];
+        $anunciarVaga['segmentoOportunidade'] = $bdoOportunidade['segmento'];
+        $anunciarVaga['regiaoAtuacao'] = explode(',', trim($bdoOportunidade['regiaoatuacao'], ','));
+        $anunciarVaga['descricaoOportunidade'] = $bdoOportunidade['descricao'];
+        $anunciarVaga['nrVagas'] = $bdoOportunidade['vagasdisponiveis'];
+        $anunciarVaga['termo'] = 'on';
+
+        $this->post(route('bdosite.anunciarVaga'), $anunciarVaga);
+
+        $this->assertDatabaseHas('bdo_empresas', [
+            'idempresa' => 2,
+            'cnpj' => $bdoEmpresa['cnpj'],
+            'descricao' => 'Empresa cadastrada pelo site.',
+        ]);
+
+        $this->assertDatabaseHas('bdo_oportunidades', [
+            'idempresa' => 2,
+            'titulo' => $bdoOportunidade['titulo']
+        ]);
+
+        Mail::assertQueued(AnunciarVagaMail::class);
+    }
+
+    /** @test 
+     * 
+     * Criação de BdoOportunidade pelo Portal (página para anunciar vagas). 
      * Cenário onde uma nova BdoOportunidade está sendo criada em cima de uma BdoEmpresa existente. Esta
      * BdoEmpresa não possui nenhuma BdoOportunidades, portanto a BdoOportunidade pode ser criada.
     */

@@ -89,6 +89,7 @@ class BdoSiteController extends Controller
 
         if($validated['idempresa'] == "0") {
 
+            $request->descricao = 'Empresa cadastrada pelo site.';
             $empresa = $this->bdoEmpresaRepository->store($request->toEmpresaModel());
 
             if(!$empresa) {
