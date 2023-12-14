@@ -13,7 +13,10 @@ class AnunciarVagaRequest extends FormRequest
     protected function prepareForValidation()
     {
         if($this->filled('avisoAtivado') && $this->avisoAtivado)
+        {
             $this->replace([]);
+            return;
+        }
 
         $this->object_empresa = null;
 
