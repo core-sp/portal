@@ -3,102 +3,120 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\HomeImagem;
-use App\Events\CrudEvent;
+use App\Contracts\MediadorServiceInterface;
+use App\Http\Requests\HomeImagemRequest;
 
 class HomeImagemController extends Controller
 {
-    private $class = 'HomeImagemController';
+    private $service;
 
-    public function __construct()
+    public function __construct(MediadorServiceInterface $service)
     {
         $this->middleware('auth');
+        $this->service = $service;
     }
     
-    public function editBannerPrincipal()
+    public function editBanner()
     {
         $this->authorize('updateOther', auth()->user());
-        $resultado = HomeImagem::select('ordem','url','url_mobile','link','target')
-            ->orderBy('ordem','ASC')
-            ->get();
-        $variaveis = [
-            'singular' => 'banner principal',
-            'singulariza' => 'o banner principal',
-            'plural' => 'banner principal',
-            'pluraliza' => 'banner principal',
-            'form' => 'bannerprincipal'
-        ];
-        $variaveis = (object) $variaveis;
-        return view('admin.crud.editar', compact('resultado', 'variaveis'));
+
+        try{
+            $dados = $this->service->getService('HomeImagem')->carrossel();
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os dados das imagens do carrossel.");
+        }
+
+        return view('admin.crud.editar', $dados);
     }
 
-    public function updateBannerPrincipal(Request $request)
+    public function updateBanner(Request $request)
     {
         $this->authorize('updateOther', auth()->user());
-        $array = $request->all();
-        unset($array['_token'], $array['_method']);
-        $chunk = array_chunk($array, 4);
-        $update1 = HomeImagem::where('ordem',1)
-            ->where('funcao','bannerprincipal')
-            ->update([
-                'url' => $chunk[0][0],
-                'url_mobile' => $chunk[0][1],
-                'link' => $chunk[0][2],
-                'target' => $chunk[0][3]
-            ]);
-        $update2 = HomeImagem::where('ordem',2)
-            ->where('funcao','bannerprincipal')
-            ->update([
-                'url' => $chunk[1][0],
-                'url_mobile' => $chunk[1][1],
-                'link' => $chunk[1][2],
-                'target' => $chunk[1][3]
-            ]);
-        $update3 = HomeImagem::where('ordem',3)
-            ->where('funcao','bannerprincipal')
-            ->update([
-                'url' => $chunk[2][0],
-                'url_mobile' => $chunk[2][1],
-                'link' => $chunk[2][2],
-                'target' => $chunk[2][3]
-            ]);
-        $update4 = HomeImagem::where('ordem',4)
-            ->where('funcao','bannerprincipal')
-            ->update([
-                'url' => $chunk[3][0],
-                'url_mobile' => $chunk[3][1],
-                'link' => $chunk[3][2],
-                'target' => $chunk[3][3]
-            ]);
-        $update5 = HomeImagem::where('ordem','5')
-            ->where('funcao','bannerprincipal')
-            ->update([
-                'url' => $chunk[4][0],
-                'url_mobile' => $chunk[4][1],
-                'link' => $chunk[4][2],
-                'target' => $chunk[4][3]
-            ]);
-        $update6 = HomeImagem::where('ordem','6')
-            ->where('funcao','bannerprincipal')
-            ->update([
-                'url' => $chunk[5][0],
-                'url_mobile' => $chunk[5][1],
-                'link' => $chunk[5][2],
-                'target' => $chunk[5][3]
-            ]);
-        $update7 = HomeImagem::where('ordem','7')
-            ->where('funcao','bannerprincipal')
-            ->update([
-                'url' => $chunk[6][0],
-                'url_mobile' => $chunk[6][1],
-                'link' => $chunk[6][2],
-                'target' => $chunk[6][3]
-            ]);
-        if(!$update1 || !$update2 || !$update3 || !$update4 || !$update5 || !$update6 || !$update7)
-            abort(500);
-        event(new CrudEvent('banner principal', 'editou', 1));
+
+        try{
+            $array = $request->except(['_token', '_method']);
+            $dados = $this->service->getService('HomeImagem')->carrossel($array);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            return $e->getCode() == 400 ? redirect()->route('imagens.banner')->with(['message' => $e->getMessage(), 'class' => 'alert-danger']) : abort(500, "Erro ao atualizar os dados das imagens do carrossel.");
+        }
+
         return redirect('/admin')
             ->with('message', '<i class="icon fa fa-check"></i>Banner editado com sucesso!')
             ->with('class', 'alert-success');
+    }
+
+    public function editItensHome()
+    {
+        $this->authorize('updateOther', auth()->user());
+
+        try{
+            $dados = $this->service->getService('HomeImagem')->itensHome();
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os dados dos itens da home.");
+        }
+
+        return view('admin.crud.editar', $dados);
+    }
+
+    public function updateItensHome(HomeImagemRequest $request)
+    {
+        try{
+            $validated = $request->validated();
+            $dados = $this->service->getService('HomeImagem')->itensHome($validated);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao atualizar os dados dos itens da home.");
+        }
+
+        return redirect()->route('imagens.itens.home')
+            ->with('message', '<i class="icon fa fa-check"></i>Itens da home editados com sucesso!')
+            ->with('class', 'alert-success');
+    }
+
+    public function storageItensHome(HomeImagemRequest $request, $folder = null)
+    {
+        try{
+            $validated = $request->validated();
+            $dados = \Route::is('imagens.itens.home.storage.post') ? 
+            $this->service->getService('HomeImagem')->uploadFileStorage($validated['file_itens_home']) : $this->service->getService('HomeImagem')->itensHomeStorage($folder);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os arquivos do storage dos itens da home.");
+        }
+
+        return response()->json($dados);
+    }
+
+    public function destroyFile($file)
+    {
+        $this->authorize('updateOther', auth()->user());
+
+        try{
+            $dados = $this->service->getService('HomeImagem')->itensHomeStorage(null, $file);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [404]) ? abort($e->getCode(), $e->getMessage()) : 
+            abort(500, "Erro ao excluir o arquivo do storage dos itens da home.");
+        }
+
+        return response()->json($dados);
+    }
+
+    public function downloadStorageItensHome($folder, $arquivo)
+    {
+        $this->authorize('updateOther', auth()->user());
+
+        try{
+            $file = $this->service->getService('HomeImagem')->downloadFileStorage($folder, $arquivo);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [404]) ? abort($e->getCode(), $e->getMessage()) : 
+            abort(500, "Erro ao realizar download do arquivo.");
+        }
+
+        return response()->download($file, $arquivo, ['Cache-Control' => 'no-cache, no-store, must-revalidate']);
     }
 }

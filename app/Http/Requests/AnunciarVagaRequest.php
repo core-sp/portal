@@ -8,10 +8,22 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class AnunciarVagaRequest extends FormRequest
 {
+    private $object_empresa;
+
     protected function prepareForValidation()
     {
         if($this->filled('avisoAtivado') && $this->avisoAtivado)
+        {
             $this->replace([]);
+            return;
+        }
+
+        $this->object_empresa = null;
+
+        if(isset($this->cnpj))
+            $this->object_empresa = \App\BdoEmpresa::where('cnpj', $this->cnpj)->first();
+        
+        $this->merge(['idempresa' => isset($this->object_empresa) ? $this->object_empresa->idempresa : "0"]);
     }
 
     public function rules()

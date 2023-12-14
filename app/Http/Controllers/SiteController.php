@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Pagina;
-use App\HomeImagem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Input;
@@ -30,9 +29,7 @@ class SiteController extends Controller
         $latestNoticias = $this->service->getService('Noticia')->latest();
         $noticias = $latestNoticias['noticias'];
         $cotidianos = $latestNoticias['cotidianos'];
-        $imagens = HomeImagem::select('ordem','url','url_mobile','link','target')
-            ->orderBy('ordem','ASC')
-            ->get();
+        $imagens = $this->service->getService('HomeImagem')->carrossel()['resultado'];
         $posts = $this->service->getService('Post')->latest();
 
         return response()
