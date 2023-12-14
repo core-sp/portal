@@ -21,6 +21,9 @@ class AnunciarVagaRequest extends FormRequest
         $this->object_empresa = null;
 
         if(isset($this->cnpj))
+            $this->merge(['cnpj' => formataCpfCnpj(apenasNumeros($this->cnpj))]);
+
+        if(isset($this->cnpj))
             $this->object_empresa = \App\BdoEmpresa::where('cnpj', $this->cnpj)->first();
         
         $this->merge(['idempresa' => isset($this->object_empresa) ? $this->object_empresa->idempresa : "0"]);
