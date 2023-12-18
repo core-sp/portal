@@ -14,7 +14,7 @@ interface GerarTextoServiceInterface {
 
     public function excluir($tipo_doc, $id);
 
-    public function show($tipo_doc, $id = null);
+    public function show($tipo_doc, $id = null, $user = null);
 
-    public function buscar($tipo_doc, $busca);
+    public function buscar($tipo_doc, $busca, $user = null);
 }

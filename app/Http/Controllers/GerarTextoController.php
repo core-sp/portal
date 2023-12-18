@@ -63,11 +63,13 @@ class GerarTextoController extends Controller
 
     public function view($tipo_doc)
     {
-        $this->authorize('gerarTextoView', auth()->user());
+        $user = auth()->user();
+        $this->authorize('gerarTextoView', $user);
 
         try{
             $dados = $this->service->getService('GerarTexto')->view($tipo_doc);
             $dados['tipo_doc'] = $tipo_doc;
+            $dados['can_update'] = $user->can('gerarTextoUpdate', $user);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os textos de ".$tipo_doc.".");
@@ -114,8 +116,9 @@ class GerarTextoController extends Controller
     public function show($id = null)
     {
         try{
+            $user = auth()->user();
             $tipo_doc = \Route::currentRouteName();
-            $dados = $this->service->getService('GerarTexto')->show($tipo_doc, $id);
+            $dados = $this->service->getService('GerarTexto')->show($tipo_doc, $id, $user);
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().', para o documento '.$tipo_doc.'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(404, "Texto não encontrado.");
@@ -132,9 +135,10 @@ class GerarTextoController extends Controller
     public function buscar(GerarTextoRequest $request)
     {
         try{
+            $user = auth()->user();
             $busca = $request->validated()['buscaTexto'];
             $tipo_doc = Str::beforeLast(\Route::currentRouteName(), '-buscar');
-            $dados = $this->service->getService('GerarTexto')->buscar($tipo_doc, $busca);
+            $dados = $this->service->getService('GerarTexto')->buscar($tipo_doc, $busca, $user);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar textos no documento ".$tipo_doc.".");

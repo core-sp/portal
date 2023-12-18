@@ -48,7 +48,7 @@ class GerarTextoService implements GerarTextoServiceInterface {
         // atualiza os campos, não atualiza ordem e indice
         if(isset($id))
         {
-            $dados['texto_tipo'] = $dados['tipo'] == 'Título' ? mb_strtoupper($dados['texto_tipo'], 'UTF-8') : $dados['texto_tipo'];
+            $dados['texto_tipo'] = $dados['tipo'] == GerarTexto::TIPO_TITULO ? mb_strtoupper($dados['texto_tipo'], 'UTF-8') : $dados['texto_tipo'];
             $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->where('id', $id)->firstOrFail();
             $ok = $resultado->update($dados);
             event(new CrudEvent('campos do texto do documento '.$tipo_doc, 'atualizou', $id));
@@ -89,31 +89,51 @@ class GerarTextoService implements GerarTextoServiceInterface {
         return $ok;
     }
 
-    public function show($tipo_doc, $id = null)
+    public function show($tipo_doc, $id = null, $user = null)
     {
-        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->where('publicar', true)->orderBy('ordem','ASC')->get();
+        $resultado = isset($user) ? GerarTexto::where('tipo_doc', $tipo_doc)->orderBy('ordem','ASC')->get() : 
+        GerarTexto::where('tipo_doc', $tipo_doc)->where('publicar', true)->orderBy('ordem','ASC')->get();
+
         $textos = array();
         if(isset($id))
         {
             $texto = $resultado->find($id);
             if(!isset($texto))
                 throw new ModelNotFoundException("No query results for model [App\GerarTexto] no documento ".$tipo_doc.", id = " . $id);
-            if(($texto->tipo == 'Título') && $texto->com_numeracao)
+
+            array_push($textos, $texto);
+            // junta os subtítulos com o título escolhido
+            if($texto->tituloNumerado())
+            {
                 foreach($resultado as $key => $val)
-                    Str::startsWith($val->indice, $texto->indice) ? array_push($textos, $val) : null;       
-            else
-                array_push($textos, $texto);
+                {
+                    // somente verifica os itens das ordens seguintes
+                    if($val->ordem <= $texto->ordem)
+                        continue;
+                    // quando encontra o próximo título, encerra
+                    if($val->tipoTitulo())
+                        break;
+                    array_push($textos, $val);
+                }
+            }
+
+            $btn_anterior = $resultado->where('ordem', '<', $texto->ordem)->where('tipo', GerarTexto::TIPO_TITULO)->last();
+            $btn_proximo = $resultado->where('ordem', '>', $texto->ordem)->where('tipo', GerarTexto::TIPO_TITULO)->first();
         }
 
         return [
             'resultado' => $resultado,
-            'textos' => $textos
+            'textos' => $textos,
+            'btn_anterior' => isset($btn_anterior) ? route('carta-servicos', $btn_anterior->id) : null,
+            'btn_proximo' => isset($btn_proximo) ? route('carta-servicos', $btn_proximo->id) : null,
         ];
     }
 
-    public function buscar($tipo_doc, $busca)
+    public function buscar($tipo_doc, $busca, $user = null)
     {
-        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->where('publicar', true)->orderBy('ordem','ASC')->get();
+        $resultado = isset($user) ? GerarTexto::where('tipo_doc', $tipo_doc)->orderBy('ordem','ASC')->get() : 
+        GerarTexto::where('tipo_doc', $tipo_doc)->where('publicar', true)->orderBy('ordem','ASC')->get();
+
         $textos = array();
 
         if(isset($busca))

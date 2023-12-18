@@ -13,6 +13,7 @@
     @method('PUT')
     <div class="card-body">
 
+        <p class="text-muted"><em>* Sumário após última atualização da índice.</em></p>
         <h4><strong>Sumário:</strong></h4>
         @foreach($resultado as $texto)
             @switch($texto->nivel)
@@ -37,9 +38,9 @@
 
         <input type="hidden" id="tipo_doc" value="{{ $tipo_doc }}" />
         <div id="accordion" class="mb-0 pl-0">
-            @can('gerarTextoUpdate', auth()->user())
+            @if(isset($can_update) && $can_update)
             <button type="button" id="criarTexto" class="btn btn-success mb-3"><i class="fas fa-plus"></i> Texto</button>
-            @endcan
+            @endif
 
             @foreach($resultado as $texto)
             <div class="row homeimagens" id="lista-{{ $texto->id }}">
@@ -104,14 +105,14 @@
 
                         </div>
 
-                        @can('gerarTextoUpdate', auth()->user())
+                        @if(isset($can_update) && $can_update)
                         <div class="card-footer">
                             <div class="float-right">
                                 <button type="button" value="{{ $texto->id }}" class="btn btn-primary updateCampos">Atualizar campos</button>
                                 <button type="button" value="{{ $texto->id }}" class="btn btn-danger deleteTexto"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
-                        @endcan
+                        @endif
 
                     </div>
                 </div>
@@ -128,10 +129,10 @@
             <a href="{{ route($tipo_doc) }}" target="_blank" class="btn btn-secondary ml-1">Ver</a>
 
             @if(isset($resultado) && isset($texto))
-                @can('gerarTextoUpdate', auth()->user())
+                @if(isset($can_update) && $can_update)
                 <button type="submit" class="btn btn-primary ml-1">Atualizar índice</button>
                 <button type="button" id="publicarTexto" value="{{ $resultado->get(0)->publicar ? '0' : '1' }}" class="btn btn-{{ $resultado->get(0)->publicar ? 'danger' : 'success' }} ml-1">{{ $texto->publicar ? 'Reverter publicação' : 'Publicar' }}</button>
-                @endcan
+                @endif
             @endif
 
         </div>

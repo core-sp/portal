@@ -66,7 +66,7 @@ class UserPolicy
         $tipo = ucfirst(Str::camel(request()->tipo_doc));
 
         if(class_basename(\Route::current()->controller) == 'GerarTextoController')
-            return true/*perfisPermitidos($tipo, 'index')*/;
+            return perfisPermitidos($tipo, 'index');
     }
 
     public function gerarTextoUpdate(User $user)
@@ -74,6 +74,6 @@ class UserPolicy
         $tipo = ucfirst(Str::camel(request()->tipo_doc));
 
         if(class_basename(\Route::current()->controller) == 'GerarTextoController')
-            return true/*perfisPermitidos($tipo, 'edit')*/;
+            return perfisPermitidos($tipo, 'edit');
     }
 }

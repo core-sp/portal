@@ -54,11 +54,7 @@
         >
           <option value="" style="font-style: italic;">Escolha um título ou subtítulo ...</option>
           @foreach($resultado as $texto)
-            @if($texto->tipo == 'Título')
-            <option value="{{ $texto->id }}">{{ isset($texto->indice) ? $texto->indice . '. ' : '' }}{{ $texto->texto_tipo }}</option>
-            @else
-            <option value="{{ $texto->id }}" style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $texto->indice }} - {{ $texto->texto_tipo }}</option>
-            @endif
+            <option value="{{ $texto->id }}" style="{{ $texto->tipoTitulo() ? '' : 'font-weight: bold;' }}">{!! $texto->tipoTitulo() ? '' : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' !!}{{ $texto->tipoTitulo() ? $texto->tituloFormatado() : $texto->subtituloFormatado() }}</option>
           @endforeach
         </select>
 
@@ -91,11 +87,7 @@
           @if($busca->count() > 0)
           <div class="list-group list-group-flush">
             @foreach($busca as $t)
-              @if($t->tipo == 'Título')
-              <a href="{{ route('carta-servicos', $t->id) }}" class="list-group-item list-group-item-action"><strong>{{ isset($t->indice) ? $t->indice . '. ' : '' }}{{ $t->texto_tipo }}</strong></a>
-              @else
-              <a href="{{ route('carta-servicos', $t->id) }}" class="list-group-item list-group-item-action"><strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></a>
-              @endif
+              <a href="{{ route('carta-servicos', $t->id) }}" class="list-group-item list-group-item-action"><strong>{{ $t->tipoTitulo() ? $t->tituloFormatado() : $t->subtituloFormatado() }}</strong></a>
             @endforeach
           </div>
           @endif
@@ -103,31 +95,45 @@
 
         <!-- RESULTADO TEXTO SELECIONADO *********************************************************************************************************** -->
         @if(isset($textos) && !empty($textos))
-        <div class="border mt-3">
+        <ul class="pagination p-0 mt-2 mb-2">
+          <li class="page-item {{ isset($btn_anterior) ? '' : 'disabled' }}"><a class="page-link" href="{{ isset($btn_anterior) ? $btn_anterior : '#' }}"><i class="fas fa-angle-double-left"></i></a></li>
+          <li class="page-item {{ isset($btn_proximo) ? '' : 'disabled' }}"><a class="page-link" href="{{ isset($btn_proximo) ? $btn_proximo : '#' }}"><i class="fas fa-angle-double-right"></i></a></li>
+        </ul>
+
+        <div class="border">
           <div class="p-2">
+            <!-- cabeçalho da carta -->
+            <img src="{{ asset('img/logo-core.png') }}" class="mb-3" style="display: block;margin: 0 auto;"/>
+            <hr />
             <span id="corpoTexto" tabindex="0"></span>
           @foreach($textos as $t)
               @switch($t->nivel)
                 @case(1)
-                  <p {!! $texto->getCorTituloSub() !!}>&nbsp;&nbsp;&nbsp;<strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></p>
+                  <p {!! $t->getCorTituloSub() !!}>&nbsp;&nbsp;&nbsp;<strong>{{ $t->subtituloFormatado() }}</strong></p>
                   <div class="pl-3">{!! $t->conteudo !!}</div>
                   @break
                 @case(2)
-                  <p {!! $texto->getCorTituloSub() !!}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></p>
+                  <p {!! $t->getCorTituloSub() !!}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $t->subtituloFormatado() }}</strong></p>
                   <div class="pl-4">{!! $t->conteudo !!}</div>
                   @break
                 @case(3)
-                  <p {!! $texto->getCorTituloSub() !!}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></p>
+                  <p {!! $t->getCorTituloSub() !!}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $t->subtituloFormatado() }}</strong></p>
                   <div class="pl-5">{!! $t->conteudo !!}</div>
                   @break
                 @default
-                  <p class="font-weight-bolder" {!! $texto->getCorTituloSub() !!}>{{ isset($t->indice) ? $t->indice . '. ' : '' }}{{ $t->texto_tipo }}</p>
+                  <h4 class="font-weight-bolder" {!! $t->getCorTituloSub() !!}>{{ $t->tituloFormatado() }}</h4>
                   <div class="pl-0">{!! $t->conteudo !!}</div>
               @endswitch
           @endforeach
           </div>
+          <!-- rodapé da carta -->
           <img src="{{ asset('img/base_carta_servicos.png') }}" />
         </div>
+
+        <ul class="pagination p-0 mt-2 mb-0">
+          <li class="page-item {{ isset($btn_anterior) ? '' : 'disabled' }}"><a class="page-link" href="{{ isset($btn_anterior) ? $btn_anterior : '#' }}"><i class="fas fa-angle-double-left"></i></a></li>
+          <li class="page-item {{ isset($btn_proximo) ? '' : 'disabled' }}"><a class="page-link" href="{{ isset($btn_proximo) ? $btn_proximo : '#' }}"><i class="fas fa-angle-double-right"></i></a></li>
+        </ul>
         @endif
 
       @endif

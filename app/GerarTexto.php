@@ -9,11 +9,14 @@ class GerarTexto extends Model
     protected $table = 'gerar_textos';
     protected $guarded = [];
 
+    const TIPO_TITULO = 'Título';
+    const TIPO_SUBTITULO = 'Subtítulo';
+    
     public static function tipos()
     {
         return [
-            'Título',
-            'Subtítulo',
+            self::TIPO_TITULO,
+            self::TIPO_SUBTITULO,
         ];
     }
 
@@ -92,5 +95,30 @@ class GerarTexto extends Model
     public function getCorTituloSub()
     {
         return 'style="color: #548dd4;"';
+    }
+
+    public function tituloNumerado()
+    {
+        return $this->tipoTitulo() && $this->com_numeracao;
+    }
+
+    public function tipoTitulo()
+    {
+        return $this->tipo == self::TIPO_TITULO;
+    }
+
+    public function indiceFormatada()
+    {
+        return isset($this->indice) ? $this->indice . '. ' : '';
+    }
+
+    public function tituloFormatado()
+    {
+        return $this->indiceFormatada() . $this->texto_tipo;
+    }
+
+    public function subtituloFormatado()
+    {
+        return $this->indice . ' - ' . $this->texto_tipo;
     }
 }

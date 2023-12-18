@@ -319,7 +319,7 @@ Route::middleware(['block_ip'])->group(function () {
     Route::post('/termo-de-consentimento/upload/{tipo_servico}', 'TermoConsentimentoController@uploadTermo')
     ->where('tipo_servico', 'sala-reuniao')->name('termo.consentimento.upload')->middleware('auth');
 
-    // Rota para Home Imagens
+    // Rota para Gerar Textos
     Route::prefix('textos')->group(function(){
       Route::get('/{tipo_doc}', 'GerarTextoController@view')->where('tipo_doc', 'carta-servicos')->name('textos.view');
       Route::post('/{tipo_doc}', 'GerarTextoController@create')->where('tipo_doc', 'carta-servicos')->name('textos.create');
