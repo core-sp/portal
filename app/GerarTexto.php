@@ -11,6 +11,8 @@ class GerarTexto extends Model
 
     const TIPO_TITULO = 'Título';
     const TIPO_SUBTITULO = 'Subtítulo';
+
+    const DOC_CARTA_SERV = 'carta-servicos';
     
     public static function tipos()
     {
@@ -20,19 +22,19 @@ class GerarTexto extends Model
         ];
     }
 
-    public static function tipos_doc()
+    public static function tiposDoc()
     {
         return [
-            'carta-servicos' => 'Carta de serviços ao usuário',
+            self::DOC_CARTA_SERV => 'Carta de serviços ao usuário',
         ];
     }
 
     public static function criar($tipo_doc)
     {
-        $total = GerarTexto::where('tipo_doc', $tipo_doc)->count() + 1;
-        $publicada = $total > 1 ? GerarTexto::select('publicar')->where('tipo_doc', $tipo_doc)->first()->publicar : false;
+        $total = self::where('tipo_doc', $tipo_doc)->count() + 1;
+        $publicada = $total > 1 ? self::select('publicar')->where('tipo_doc', $tipo_doc)->first()->publicar : false;
 
-        return GerarTexto::create([
+        return self::create([
             'texto_tipo' => mb_strtoupper('Título do texto...', 'UTF-8'),
             'conteudo' => '<p>Texto...</p>',
             'ordem' => $total,
@@ -90,6 +92,16 @@ class GerarTexto extends Model
                 ]);
             }
         }
+    }
+
+    public static function resultadoByDoc($tipo_doc, $user)
+    {
+        return self::where('tipo_doc', $tipo_doc)
+            ->when(!isset($user), function($query){
+                $query->where('publicar', true);
+            })
+            ->orderBy('ordem', 'ASC')
+            ->get();
     }
 
     public function getCorTituloSub()

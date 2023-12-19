@@ -18,35 +18,41 @@
         @foreach($resultado as $texto)
             @switch($texto->nivel)
                 @case(1)
-                  <p>&nbsp;&nbsp;&nbsp;<strong>{{ $texto->indice }} - {{ $texto->texto_tipo }}</strong></p>
+                  <p>&nbsp;&nbsp;&nbsp;<strong>{{ $texto->subtituloFormatado() }}</strong></p>
                   @break
                 @case(2)
-                  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $texto->indice }} - {{ $texto->texto_tipo }}</strong></p>
+                  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $texto->subtituloFormatado() }}</strong></p>
                   @break
                 @case(3)
-                  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $texto->indice }} - {{ $texto->texto_tipo }}</strong></p>
+                  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $texto->subtituloFormatado() }}</strong></p>
                   @break
                 @default
-                  <p>{{ isset($texto->indice) ? $texto->indice . '. ' : '' }}{{ $texto->texto_tipo }}</p>
+                  <p>{{ $texto->tituloFormatado() }}</p>
               @endswitch
         @endforeach
 
         <hr />
         <p class="mb-4">
-            <i>* Arraste as caixas para definir a ordem da índice<br></i>
+            <i>* Arraste as caixas para definir a ordem da índice</i>
         </p>
 
         <input type="hidden" id="tipo_doc" value="{{ $tipo_doc }}" />
         <div id="accordion" class="mb-0 pl-0">
             @if(isset($can_update) && $can_update)
-            <button type="button" id="criarTexto" class="btn btn-success mb-3"><i class="fas fa-plus"></i> Texto</button>
+            <button type="button" id="criarTexto" class="btn btn-success mb-3"><i class="fas fa-plus"></i>&nbsp;&nbsp;Texto</button>
             @endif
 
             @foreach($resultado as $texto)
             <div class="row homeimagens" id="lista-{{ $texto->id }}">
                 <input type="hidden" name="id-{{ $texto->id }}" value="{{ $texto->id }}" />
                 <div class="col">
-                    <h5 class="border rounded border-info bg-info p-2 {{ $loop->last ? '' : 'mb-3' }}">&nbsp;&nbsp;<strong><em>{{ $texto->texto_tipo }}</em>:</strong> {{ $texto->tipo }} <small>(nível {{ $texto->nivel }})</small></h5>
+                    <h5 class="border rounded bg-info p-2 {{ $loop->last ? '' : 'mb-3' }}">
+                        <strong>&nbsp;&nbsp;
+                            <em><span id="span-texto_tipo-{{ $texto->id }}">{{ $texto->texto_tipo }}</span></em>:&nbsp;
+                            <span id="span-tipo-{{ $texto->id }}" class="text-{{ $texto->tipoTitulo() ? 'warning' : 'dark' }}">{{ $texto->tipo }}</span>&nbsp;
+                            <small>(nível <span id="span-nivel-{{ $texto->id }}">{{ $texto->nivel }}</span>)</small>
+                        </strong>
+                    </h5>
                     <div class="card card-default bg-light">
                         <div class="card-body">
 
@@ -108,7 +114,7 @@
                         @if(isset($can_update) && $can_update)
                         <div class="card-footer">
                             <div class="float-right">
-                                <button type="button" value="{{ $texto->id }}" class="btn btn-primary updateCampos">Atualizar campos</button>
+                                <button type="button" value="{{ $texto->id }}" class="btn btn-primary updateCampos mr-2"><i class="fas fa-save"></i></button>
                                 <button type="button" value="{{ $texto->id }}" class="btn btn-danger deleteTexto"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>

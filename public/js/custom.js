@@ -1009,7 +1009,8 @@ function crudGerarTexto(acao, objeto){
       dataType: "json",
       data: dados,
       success: function(response) {
-          gerarTextoAvisosCrud(acao, response, id);          
+        atualizarTextoCrud(acao, id);
+        gerarTextoAvisosCrud(acao, response, id);
       },
       error: function(erro, textStatus, errorThrown) {
         var resposta = erro.status == 422 ? JSON.stringify(erro.responseJSON.errors) : 
@@ -1017,6 +1018,18 @@ function crudGerarTexto(acao, objeto){
         gerarTextoAvisosCrud('erro', resposta, null);
       }
   });
+}
+
+function atualizarTextoCrud(acao, valor){
+  if(acao == 'atualizar'){
+    var texto_campo = $('#tipo-' + valor).val();
+    var cor = texto_campo == 'Título' ? 'warning' : 'dark';
+    var upper = texto_campo == 'Título' ? 'text-uppercase' : '';
+    $('#span-tipo-' + valor).attr('class', 'text-' + cor).text(texto_campo);
+    $('#span-nivel-' + valor).text($('#nivel-' + valor).val());
+    $('#span-texto_tipo-' + valor).attr('class', upper).text($('#texto_tipo-' + valor).val());
+  }
+  return;
 }
 
 function gerarTextoAvisosCrud(acao, response, valor){

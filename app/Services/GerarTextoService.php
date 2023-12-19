@@ -91,8 +91,7 @@ class GerarTextoService implements GerarTextoServiceInterface {
 
     public function show($tipo_doc, $id = null, $user = null)
     {
-        $resultado = isset($user) ? GerarTexto::where('tipo_doc', $tipo_doc)->orderBy('ordem','ASC')->get() : 
-        GerarTexto::where('tipo_doc', $tipo_doc)->where('publicar', true)->orderBy('ordem','ASC')->get();
+        $resultado = GerarTexto::resultadoByDoc($tipo_doc, $user);
 
         $textos = array();
         if(isset($id))
@@ -124,15 +123,14 @@ class GerarTextoService implements GerarTextoServiceInterface {
         return [
             'resultado' => $resultado,
             'textos' => $textos,
-            'btn_anterior' => isset($btn_anterior) ? route('carta-servicos', $btn_anterior->id) : null,
-            'btn_proximo' => isset($btn_proximo) ? route('carta-servicos', $btn_proximo->id) : null,
+            'btn_anterior' => isset($btn_anterior) ? route($tipo_doc, $btn_anterior->id) : null,
+            'btn_proximo' => isset($btn_proximo) ? route($tipo_doc, $btn_proximo->id) : null,
         ];
     }
 
     public function buscar($tipo_doc, $busca, $user = null)
     {
-        $resultado = isset($user) ? GerarTexto::where('tipo_doc', $tipo_doc)->orderBy('ordem','ASC')->get() : 
-        GerarTexto::where('tipo_doc', $tipo_doc)->where('publicar', true)->orderBy('ordem','ASC')->get();
+        $resultado = GerarTexto::resultadoByDoc($tipo_doc, $user);
 
         $textos = array();
 

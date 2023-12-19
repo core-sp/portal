@@ -54,7 +54,7 @@
         >
           <option value="" style="font-style: italic;">Escolha um título ou subtítulo ...</option>
           @foreach($resultado as $texto)
-            <option value="{{ $texto->id }}" style="{{ $texto->tipoTitulo() ? '' : 'font-weight: bold;' }}">{!! $texto->tipoTitulo() ? '' : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' !!}{{ $texto->tipoTitulo() ? $texto->tituloFormatado() : $texto->subtituloFormatado() }}</option>
+            <option value="{{ $texto->id }}" style="{{ $texto->tipoTitulo() ? '' : 'font-weight: bold;' }}" {{ request()->url() == route('carta-servicos', $texto->id) ? 'selected' : '' }}>{!! $texto->tipoTitulo() ? '' : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' !!}{{ $texto->tipoTitulo() ? $texto->tituloFormatado() : $texto->subtituloFormatado() }}</option>
           @endforeach
         </select>
 
@@ -103,7 +103,7 @@
         <div class="border">
           <div class="p-2">
             <!-- cabeçalho da carta -->
-            <img src="{{ asset('img/logo-core.png') }}" class="mb-3" style="display: block;margin: 0 auto;"/>
+            <img src="{{ asset('img/LOGO-VERDE002.png') }}" class="mb-3" style="display: block;margin: 0 auto;"/>
             <hr />
             <span id="corpoTexto" tabindex="0"></span>
           @foreach($textos as $t)
