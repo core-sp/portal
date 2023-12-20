@@ -47,12 +47,13 @@ class GerarTextoController extends Controller
         return response()->json($ok);
     }
 
-    public function delete($tipo_doc, $id)
+    public function delete(GerarTextoRequest $request, $tipo_doc)
     {
         $this->authorize('gerarTextoUpdate', auth()->user());
 
         try{
-            $ok = $this->service->getService('GerarTexto')->excluir($tipo_doc, $id);
+            $dados = $request->validated();
+            $ok = $this->service->getService('GerarTexto')->excluir($tipo_doc, $dados['excluir_ids']);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao excluir o texto do documento ".$tipo_doc.".");

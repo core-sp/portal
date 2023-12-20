@@ -7,10 +7,11 @@ use App\Permissao;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\WithFaker;
 
 class GerarTextoTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithFaker;
 
     /** 
      * =======================================================================================================
@@ -29,39 +30,36 @@ class GerarTextoTest extends TestCase
         $this->post(route('textos.create', $texto->tipo_doc))->assertRedirect(route('login'));
         $this->post(route('textos.update.campos', [$texto->tipo_doc, $texto->id]))->assertRedirect(route('login'));
         $this->post(route('textos.publicar', $texto->tipo_doc))->assertRedirect(route('login'));
-        $this->delete(route('textos.delete', [$texto->tipo_doc, $texto->id]))->assertRedirect(route('login'));
+        $this->delete(route('textos.delete', $texto->tipo_doc))->assertRedirect(route('login'));
         $this->put(route('textos.update.indice', $texto->tipo_doc))->assertRedirect(route('login'));
     }
 
-    // /** @test */
-    // public function non_authorized_users_cannot_access_links()
-    // {
-    //     $this->signIn();
-    //     $this->assertAuthenticated('web');
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
         
-    //     $licitacao = factory('App\Licitacao')->create();
-    //     $licitacao->datarealizacao = Carbon::create($licitacao->datarealizacao)->format('Y-m-d H:i');
+        $texto = factory('App\GerarTexto')->create();
 
-    //     $this->get(route('licitacoes.index'))->assertForbidden();
-    //     $this->get(route('licitacoes.create'))->assertForbidden();
-    //     $this->get(route('licitacoes.edit', $licitacao->idlicitacao))->assertForbidden();
-    //     $this->post(route('licitacoes.store'), $licitacao->toArray())->assertForbidden();
-    //     $this->patch(route('licitacoes.update', $licitacao->idlicitacao), $licitacao->toArray())->assertForbidden();
-    //     $this->delete(route('licitacoes.destroy', $licitacao->idlicitacao))->assertForbidden();
-    //     $this->get(route('licitacoes.restore', $licitacao->idlicitacao))->assertForbidden();
-    //     $this->get(route('licitacoes.busca'))->assertForbidden();
-    //     $this->get(route('licitacoes.trashed'))->assertForbidden();
-    // }
+        $this->get(route('textos.view', $texto->tipo_doc))->assertForbidden();
+        $this->post(route('textos.create', $texto->tipo_doc))->assertForbidden();
+        $this->post(route('textos.update.campos', [$texto->tipo_doc, $texto->id]))->assertForbidden();
+        $this->post(route('textos.publicar', $texto->tipo_doc))->assertForbidden();
+        $this->delete(route('textos.delete', $texto->tipo_doc))->assertForbidden();
+        $this->put(route('textos.update.indice', $texto->tipo_doc))->assertForbidden();
+    }
 
     /** @test */
     public function texto_can_be_created_by_an_user()
     {
         $user = $this->signInAsAdmin();
-        $tipo = array_keys(GerarTexto::tipos_doc())[0];
+        $tipo = array_keys(GerarTexto::tiposDoc())[0];
 
         $this->get(route('textos.view', $tipo))->assertOk();
         $this->post(route('textos.create', $tipo))
-        ->assertRedirect(route('textos.view', $tipo));
+        ->assertRedirect(route('textos.view', $tipo))
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "TÍTULO DO TEXTO..." foi criado com sucesso e inserido no final do documento!');
 
         $this->get(route('textos.view', $tipo))
         ->assertSee(GerarTexto::first()->tipo)
@@ -88,15 +86,17 @@ class GerarTextoTest extends TestCase
     public function textos_can_be_created_by_an_user()
     {
         $user = $this->signInAsAdmin();
-        $tipo = array_keys(GerarTexto::tipos_doc())[0];
+        $tipo = array_keys(GerarTexto::tiposDoc())[0];
 
         for($cont = 0; $cont < 5; $cont++){
             $this->get(route('textos.view', $tipo))->assertOk();
             $this->post(route('textos.create', $tipo))
-            ->assertRedirect(route('textos.view', $tipo));
+            ->assertRedirect(route('textos.view', $tipo))
+            ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "TÍTULO DO TEXTO..." foi criado com sucesso e inserido no final do documento!');
     
             $this->get(route('textos.view', $tipo))
-            ->assertSee(GerarTexto::all()->get($cont)->conteudo);
+            ->assertSee(GerarTexto::all()->get($cont)->conteudo)
+            ->assertSee('id="conteudo-'.GerarTexto::all()->get($cont)->id.'"');
     
             $this->assertDatabaseHas('gerar_textos', GerarTexto::all()->get($cont)->toArray());
         }
@@ -108,7 +108,7 @@ class GerarTextoTest extends TestCase
     public function log_is_generated_when_texto_is_created()
     {
         $user = $this->signInAsAdmin();
-        $tipo = array_keys(GerarTexto::tipos_doc())[0];
+        $tipo = array_keys(GerarTexto::tiposDoc())[0];
         
         $this->post(route('textos.create', $tipo));
 
@@ -122,14 +122,23 @@ class GerarTextoTest extends TestCase
     public function texto_is_shown_on_admin_panel_after_its_creation()
     {
         $this->signInAsAdmin();
-        $tipo = array_keys(GerarTexto::tipos_doc())[0];
+        $tipo = array_keys(GerarTexto::tiposDoc())[0];
         $txt = factory('App\GerarTexto')->create();
         
         $this->get(route('textos.view', $tipo))
-            ->assertSeeText($txt->texto_tipo)
-            ->assertSeeText($txt->tipo)
-            ->assertSeeText($txt->conteudo)
-            ->assertSeeText($txt->nivel);
+            ->assertSee('value="'.$txt->texto_tipo.'"')
+            ->assertSee('<option value="Título" selected>Título</option>')
+            ->assertSee('<option value="0" selected style="">0</option>')
+            ->assertSee('<p>'.$txt->tituloFormatado().'</p>')
+            ->assertSeeInOrder([
+                '<textarea',
+                'class="form-control my-editor"',
+                'id="conteudo-1"',
+                'rows="15"',
+                '>',
+                $txt->conteudo,
+                '</textarea>'
+            ]);
     }
 
     /** @test */
@@ -196,10 +205,9 @@ class GerarTextoTest extends TestCase
     /** @test */
     public function texto_cannot_be_updated_with_texto_tipo_more_than_191_chars()
     {
-        $faker = \Faker\Factory::create();
         $user = $this->signInAsAdmin();
         $texto = factory('App\GerarTexto')->create()->toArray();
-        $texto['texto_tipo'] = $faker->sentence(400);
+        $texto['texto_tipo'] = $this->faker()->sentence(400);
 
         $this->get(route('textos.view', $texto['tipo_doc']))->assertOk();
         $this->post(route('textos.update.campos', [$texto['tipo_doc'], $texto['id']]), $texto)
@@ -311,11 +319,60 @@ class GerarTextoTest extends TestCase
         $user = $this->signInAsAdmin();
         $textos = factory('App\GerarTexto', 2)->create();
 
+        $id = $textos->get(1)->id;
         $this->get(route('textos.view', $textos->get(0)->tipo_doc))->assertOk();
-        $this->delete(route('textos.delete', [$textos->get(0)->tipo_doc, $textos->get(0)->id]))
-        ->assertJsonFragment([true]);
+        $this->delete(route('textos.delete', $textos->get(0)->tipo_doc), ['excluir_ids' => $id])
+        ->assertJson([$id]);
+
+        $this->assertDatabaseMissing('gerar_textos', $textos->get(1)->toArray());
+    }
+
+    /** @test */
+    public function textos_can_be_deleted()
+    {
+        $user = $this->signInAsAdmin();
+        $textos = factory('App\GerarTexto', 3)->create();
+
+        $ids = '1,2';
+        $this->get(route('textos.view', $textos->get(0)->tipo_doc))->assertOk();
+        $this->delete(route('textos.delete', $textos->get(0)->tipo_doc), ['excluir_ids' => $ids])
+        ->assertJson([
+            '1',
+            '2'
+        ]);
 
         $this->assertDatabaseMissing('gerar_textos', $textos->get(0)->toArray());
+        $this->assertDatabaseMissing('gerar_textos', $textos->get(1)->toArray());
+    }
+
+    /** @test */
+    public function textos_cannot_be_deleted_with_invalid_id()
+    {
+        $user = $this->signInAsAdmin();
+        $textos = factory('App\GerarTexto', 3)->create();
+
+        $ids = '1,22';
+        $this->get(route('textos.view', $textos->get(0)->tipo_doc))->assertOk();
+        $this->delete(route('textos.delete', $textos->get(0)->tipo_doc), ['excluir_ids' => $ids])
+        ->assertJson([
+            '1',
+        ])->assertJsonMissing([
+            '22'
+        ]);
+
+        $this->assertDatabaseMissing('gerar_textos', $textos->get(0)->toArray());
+        $this->assertEquals(GerarTexto::count(), 2);
+
+        $ids = 'ddd,2d';
+        $this->get(route('textos.view', $textos->get(0)->tipo_doc))->assertOk();
+        $this->delete(route('textos.delete', $textos->get(0)->tipo_doc), ['excluir_ids' => $ids])
+        ->assertJsonMissing([
+            'ddd',
+            '2d'
+        ]);
+
+        $this->assertDatabaseHas('gerar_textos', $textos->get(1)->toArray());
+        $this->assertEquals(GerarTexto::count(), 2);
     }
 
     /** @test */
@@ -325,7 +382,7 @@ class GerarTextoTest extends TestCase
         $texto = factory('App\GerarTexto')->create();
 
         $this->get(route('textos.view', $texto->tipo_doc))->assertOk();
-        $this->delete(route('textos.delete', [$texto->tipo_doc, $texto->id]))
+        $this->delete(route('textos.delete', $texto->tipo_doc), ['excluir_ids' => $texto->id])
         ->assertJsonFragment(["Deve existir no mínimo um texto."]);
 
         $this->assertDatabaseHas('gerar_textos', $texto->toArray());
@@ -337,11 +394,11 @@ class GerarTextoTest extends TestCase
         $user = $this->signInAsAdmin();
         $textos = factory('App\GerarTexto', 2)->create();
         
-        $this->delete(route('textos.delete', [$textos->get(0)->tipo_doc, $textos->get(0)->id]));
+        $this->delete(route('textos.delete', $textos->get(0)->tipo_doc), ['excluir_ids' => $textos->get(0)->id]);
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
-        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') excluiu *o texto do documento '.$textos->get(0)->tipo_doc.'* (id: 1)';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') excluiu *o texto do documento '.$textos->get(0)->tipo_doc.' com o nome: '.$textos->get(0)->texto_tipo.'* (id: 1)';
         $this->assertStringContainsString($txt, $log);
     }
 
@@ -357,6 +414,7 @@ class GerarTextoTest extends TestCase
         ->assertRedirect(route('textos.view', $textos->get(0)->tipo_doc));
 
         $this->assertDatabaseHas('gerar_textos', ['publicar' => 1]);
+        $this->assertDatabaseMissing('gerar_textos', ['publicar' => 0]);
     }
 
     /** @test */
@@ -377,7 +435,7 @@ class GerarTextoTest extends TestCase
     public function can_be_not_published()
     {
         $user = $this->signInAsAdmin();
-        $textos = factory('App\GerarTexto', 2)->create();
+        $textos = factory('App\GerarTexto', 2)->states('sumario_publicado')->create();
 
         $this->get(route('textos.view', $textos->get(0)->tipo_doc))->assertOk();
         $this->post(route('textos.publicar', $textos->get(0)->tipo_doc), ['publicar' => 0])
@@ -385,13 +443,14 @@ class GerarTextoTest extends TestCase
         ->assertRedirect(route('textos.view', $textos->get(0)->tipo_doc));
 
         $this->assertDatabaseHas('gerar_textos', ['publicar' => 0]);
+        $this->assertDatabaseMissing('gerar_textos', ['publicar' => 1]);
     }
 
     /** @test */
     public function log_is_generated_when_texto_is_not_published()
     {
         $user = $this->signInAsAdmin();
-        $textos = factory('App\GerarTexto', 2)->create();
+        $textos = factory('App\GerarTexto', 2)->states('sumario_publicado')->create();
         
         $this->post(route('textos.publicar', $textos->get(0)->tipo_doc), ['publicar' => 0]);
 
@@ -428,20 +487,56 @@ class GerarTextoTest extends TestCase
     }
 
     /** @test */
+    public function show_on_portal_not_published_and_authenticated_admin()
+    {
+        $textos = factory('App\GerarTexto', 2)->create();
+
+        $this->assertGuest();
+
+        $this->get(route('carta-servicos'))
+        ->assertSeeText('Ainda não consta a publicação atual.')
+        ->assertDontSee('<option value="'.$textos->get(0)->id.'">');
+
+        $this->get(route('carta-servicos', 1))
+        ->assertNotFound();
+
+        $user = $this->signInAsAdmin();
+
+        $this->get(route('carta-servicos'))
+        ->assertDontSeeText('Ainda não consta a publicação atual.')
+        ->assertSeeInOrder([
+            '<option value="" style="font-style: italic;">Escolha um título ou subtítulo ...</option>',
+            '<option value="'.$textos->get(0)->id.'" style="" >'.$textos->get(0)->tituloFormatado().'</option>',
+            '</select>'
+        ]);
+
+        $this->get(route('carta-servicos', 1))
+        ->assertSeeText($textos->get(0)->conteudo);
+    }
+
+    /** @test */
     public function show_on_portal_after_published()
     {
-        $user = $this->signInAsAdmin();
         $textos = factory('App\GerarTexto', 2)->create();
 
         $this->get(route('carta-servicos'))
         ->assertSeeText('Ainda não consta a publicação atual.')
         ->assertDontSee('<option value="'.$textos->get(0)->id.'">');
 
+        $user = $this->signInAsAdmin();
+
         $this->post(route('textos.publicar', $textos->get(0)->tipo_doc), ['publicar' => 1]);
+        $this->post('/admin/logout', []);
+
+        $this->assertGuest();
 
         $this->get(route('carta-servicos'))
         ->assertDontSeeText('Ainda não consta a publicação atual.')
-        ->assertSee('<option value="'.$textos->get(0)->id.'">');
+        ->assertSeeInOrder([
+            '<option value="" style="font-style: italic;">Escolha um título ou subtítulo ...</option>',
+            '<option value="'.$textos->get(0)->id.'" style="" >'.$textos->get(0)->tituloFormatado().'</option>',
+            '</select>'
+        ]);
     }
 
     /** @test */
@@ -454,16 +549,17 @@ class GerarTextoTest extends TestCase
             $dados['id-'.$val->id] = $val->id;
 
         $this->get(route('textos.view', $textos->get(0)->tipo_doc))->assertOk();
+
         $this->put(route('textos.update.indice', $textos->get(0)->tipo_doc), array_reverse($dados))
         ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Índice atualizada com sucesso!')
         ->assertRedirect(route('textos.view', $textos->get(0)->tipo_doc));
 
         $this->get(route('textos.view', $textos->get(0)->tipo_doc))
-        ->assertSeeText($textos->get(0)->indice . '. '.$textos->get(0)->texto_tipo)
-        ->assertSeeText($textos->get(1)->indice . '. '.$textos->get(1)->texto_tipo)
-        ->assertSeeText($textos->get(2)->indice . '. '.$textos->get(2)->texto_tipo)
-        ->assertSeeText($textos->get(3)->indice . '. '.$textos->get(3)->texto_tipo)
-        ->assertSeeText($textos->get(4)->indice . '. '.$textos->get(4)->texto_tipo);
+        ->assertSeeText($textos->get(0)->tituloFormatado())
+        ->assertSeeText($textos->get(1)->tituloFormatado())
+        ->assertSeeText($textos->get(2)->tituloFormatado())
+        ->assertSeeText($textos->get(3)->tituloFormatado())
+        ->assertSeeText($textos->get(4)->tituloFormatado());
 
         $this->assertDatabaseHas('gerar_textos', [
             'indice' => '1', 'indice' => '2', 'indice' => '3', 'indice' => '4', 'indice' => '5',
@@ -518,11 +614,11 @@ class GerarTextoTest extends TestCase
         ->assertRedirect(route('textos.view', $textos->get(0)->tipo_doc));
 
         $this->get(route('textos.view', $textos->get(0)->tipo_doc))
-        ->assertSeeText($textos->get(0)->indice . '. '.$textos->get(0)->texto_tipo)
-        ->assertSeeText($textos->get(1)->indice . ' - '.$textos->get(1)->texto_tipo)
-        ->assertSeeText($textos->get(2)->indice . '. '.$textos->get(2)->texto_tipo)
-        ->assertSeeText($textos->get(3)->indice . ' - '.$textos->get(3)->texto_tipo)
-        ->assertSeeText($textos->get(4)->indice . '. '.$textos->get(4)->texto_tipo);
+        ->assertSeeText($textos->get(0)->tituloFormatado())
+        ->assertSeeText($textos->get(1)->subtituloFormatado())
+        ->assertSeeText($textos->get(2)->tituloFormatado())
+        ->assertSeeText($textos->get(3)->subtituloFormatado())
+        ->assertSeeText($textos->get(4)->tituloFormatado());
 
         $this->assertDatabaseHas('gerar_textos', [
             'indice' => '1', 'indice' => '1.1', 'indice' => '2', 'indice' => '2.1', 'indice' => '3',
@@ -561,11 +657,11 @@ class GerarTextoTest extends TestCase
         ->assertRedirect(route('textos.view', $textos->get(0)->tipo_doc));
 
         $this->get(route('textos.view', $textos->get(0)->tipo_doc))
-        ->assertSeeText($textos->get(0)->indice . '. '.$textos->get(0)->texto_tipo)
-        ->assertSeeText($textos->get(1)->indice . ' - '.$textos->get(1)->texto_tipo)
-        ->assertSeeText($textos->get(2)->indice . ' - '.$textos->get(2)->texto_tipo)
-        ->assertSeeText($textos->get(3)->indice . ' - '.$textos->get(3)->texto_tipo)
-        ->assertSeeText($textos->get(4)->indice . ' - '.$textos->get(4)->texto_tipo);
+        ->assertSeeText($textos->get(0)->tituloFormatado())
+        ->assertSeeText($textos->get(1)->subtituloFormatado())
+        ->assertSeeText($textos->get(2)->subtituloFormatado())
+        ->assertSeeText($textos->get(3)->subtituloFormatado())
+        ->assertSeeText($textos->get(4)->subtituloFormatado());
 
         $this->assertDatabaseHas('gerar_textos', [
             'indice' => '1', 'indice' => '1.1', 'indice' => '1.2', 'indice' => '1.2.1', 'indice' => '1.2.2',
@@ -604,11 +700,11 @@ class GerarTextoTest extends TestCase
         ->assertRedirect(route('textos.view', $textos->get(0)->tipo_doc));
 
         $this->get(route('textos.view', $textos->get(0)->tipo_doc))
-        ->assertSeeText($textos->get(0)->indice . '. '.$textos->get(0)->texto_tipo)
-        ->assertSeeText($textos->get(1)->indice . ' - '.$textos->get(1)->texto_tipo)
-        ->assertSeeText($textos->get(2)->indice . ' - '.$textos->get(2)->texto_tipo)
-        ->assertSeeText($textos->get(3)->indice . ' - '.$textos->get(3)->texto_tipo)
-        ->assertSeeText($textos->get(4)->indice . ' - '.$textos->get(4)->texto_tipo);
+        ->assertSeeText($textos->get(0)->tituloFormatado())
+        ->assertSeeText($textos->get(1)->subtituloFormatado())
+        ->assertSeeText($textos->get(2)->subtituloFormatado())
+        ->assertSeeText($textos->get(3)->subtituloFormatado())
+        ->assertSeeText($textos->get(4)->subtituloFormatado());
 
         $this->assertDatabaseHas('gerar_textos', [
             'indice' => '1', 'indice' => '1.1', 'indice' => '1.2', 'indice' => '1.2.1.1', 'indice' => '1.2.1.1',
@@ -679,7 +775,7 @@ class GerarTextoTest extends TestCase
      */
 
     /** @test */
-    public function cannot_view_sumario_on_portal_when_not_published()
+    public function non_authenticated_admin_cannot_view_sumario_on_portal_when_not_published()
     {
         $textos = factory('App\GerarTexto', 5)->create();
 
@@ -692,7 +788,7 @@ class GerarTextoTest extends TestCase
     }
 
     /** @test */
-    public function cannot_view_content_sumario_on_portal_when_not_published()
+    public function non_authenticated_admin_cannot_view_content_sumario_on_portal_when_not_published()
     {
         $textos = factory('App\GerarTexto', 5)->create();
 
@@ -707,11 +803,11 @@ class GerarTextoTest extends TestCase
 
         $this->get(route($textos->get(0)->tipo_doc))
         ->assertDontSee('<strong>Ainda não consta a publicação atual.</strong>')
-        ->assertSee('<option value="'.$textos->get(0)->id.'">'.$textos->get(0)->indice.'. '.$textos->get(0)->texto_tipo.'</option>')
-        ->assertSee('<option value="'.$textos->get(1)->id.'" style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(1)->indice.' - '.$textos->get(1)->texto_tipo.'</option>')
-        ->assertSee('<option value="'.$textos->get(2)->id.'" style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(2)->indice.' - '.$textos->get(2)->texto_tipo.'</option>')
-        ->assertSee('<option value="'.$textos->get(3)->id.'" style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(3)->indice.' - '.$textos->get(3)->texto_tipo.'</option>')
-        ->assertSee('<option value="'.$textos->get(4)->id.'">'.$textos->get(4)->texto_tipo.'</option>');
+        ->assertSee('<option value="'.$textos->get(0)->id.'" style="" >'.$textos->get(0)->tituloFormatado().'</option>')
+        ->assertSee('<option value="'.$textos->get(1)->id.'" style="font-weight: bold;" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(1)->subtituloFormatado().'</option>')
+        ->assertSee('<option value="'.$textos->get(2)->id.'" style="font-weight: bold;" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(2)->subtituloFormatado().'</option>')
+        ->assertSee('<option value="'.$textos->get(3)->id.'" style="font-weight: bold;" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(3)->subtituloFormatado().'</option>')
+        ->assertSee('<option value="'.$textos->get(4)->id.'" style="" >'.$textos->get(4)->tituloFormatado().'</option>');
     }
 
     /** @test */
@@ -720,7 +816,8 @@ class GerarTextoTest extends TestCase
         $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
 
         $this->get(route($textos->get(0)->tipo_doc, $textos->get(3)->id))
-        ->assertSeeText($textos->get(3)->conteudo);
+        ->assertSeeText($textos->get(3)->conteudo)
+        ->assertSee('<option value="'.$textos->get(3)->id.'" style="font-weight: bold;" selected>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(3)->subtituloFormatado().'</option>');
     }
 
     /** @test */
@@ -728,11 +825,17 @@ class GerarTextoTest extends TestCase
     {
         $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
 
+        // id = 5 é outro título
         $this->get(route($textos->get(0)->tipo_doc, $textos->get(0)->id))
+        ->assertDontSeeText($textos->get(4)->conteudo)
         ->assertSeeTextInOrder([
+            $textos->get(0)->texto_tipo,
             $textos->get(0)->conteudo,
+            $textos->get(1)->texto_tipo,
             $textos->get(1)->conteudo,
+            $textos->get(2)->texto_tipo,
             $textos->get(2)->conteudo,
+            $textos->get(3)->texto_tipo,
             $textos->get(3)->conteudo,
         ]);
     }
@@ -743,13 +846,26 @@ class GerarTextoTest extends TestCase
         $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
 
         $this->get(route($textos->get(0)->tipo_doc, 22))
-        ->assertStatus(404);
+        ->assertNotFound();
     }
 
     /** @test */
     public function can_view_search_bar_when_published()
     {
         $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
+
+        $this->get(route($textos->get(0)->tipo_doc))
+        ->assertSee('<label for="buscaTextoSumario" class="mb-2 mr-sm-2">Buscar:</label>')
+        ->assertSee('name="buscaTexto"')
+        ->assertSee('<button type="submit" class="btn btn-sm btn-primary mb-2">');
+    }
+
+    /** @test */
+    public function authenticated_admin_can_view_search_bar_when_not_published()
+    {
+        $user = $this->signInAsAdmin();
+
+        $textos = factory('App\GerarTexto', 5)->create();
 
         $this->get(route($textos->get(0)->tipo_doc))
         ->assertSee('<label for="buscaTextoSumario" class="mb-2 mr-sm-2">Buscar:</label>')
@@ -775,8 +891,8 @@ class GerarTextoTest extends TestCase
 
         $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
             'buscaTexto' => $textos->get(0)->texto_tipo
-            ]))
-            ->assertSee('<strong>Ainda não consta a publicação atual.</strong>');
+        ]))
+        ->assertSee('<strong>Ainda não consta a publicação atual.</strong>');
     }
 
     /** @test */
@@ -789,21 +905,50 @@ class GerarTextoTest extends TestCase
         ]))
         ->assertSee('<p class="light">Busca por: <strong>'.$textos->get(0)->texto_tipo.'</strong>')
         ->assertSee('<div class="list-group list-group-flush">')
-        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(0)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(0)->indice.'. '.$textos->get(0)->texto_tipo.'</strong></a>');
+        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(0)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(0)->tituloFormatado().'</strong></a>');
 
         $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
             'buscaTexto' => $textos->get(1)->texto_tipo
         ]))
         ->assertSee('<p class="light">Busca por: <strong>'.$textos->get(1)->texto_tipo.'</strong>')
         ->assertSee('<div class="list-group list-group-flush">')
-        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(1)->indice.' - '.$textos->get(1)->texto_tipo.'</strong></a>');
+        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(1)->subtituloFormatado().'</strong></a>');
 
         $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
             'buscaTexto' => 'xxxxxx'
         ]))
         ->assertSee('<p class="light">Busca por: <strong>xxxxxx</strong>')
         ->assertDontSee('<div class="list-group list-group-flush">')
-        ->assertDontSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(1)->indice.' - '.$textos->get(1)->texto_tipo.'</strong></a>');
+        ->assertDontSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(1)->subtituloFormatado().'</strong></a>');
+    }
+
+    /** @test */
+    public function authenticated_admin_can_search_when_not_published()
+    {
+        $user = $this->signInAsAdmin();
+
+        $textos = factory('App\GerarTexto', 5)->create();
+
+        $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
+            'buscaTexto' => $textos->get(0)->texto_tipo
+        ]))
+        ->assertSee('<p class="light">Busca por: <strong>'.$textos->get(0)->texto_tipo.'</strong>')
+        ->assertSee('<div class="list-group list-group-flush">')
+        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(0)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(0)->tituloFormatado().'</strong></a>');
+
+        $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
+            'buscaTexto' => $textos->get(1)->texto_tipo
+        ]))
+        ->assertSee('<p class="light">Busca por: <strong>'.$textos->get(1)->texto_tipo.'</strong>')
+        ->assertSee('<div class="list-group list-group-flush">')
+        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(1)->tituloFormatado().'</strong></a>');
+
+        $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
+            'buscaTexto' => 'xxxxxx'
+        ]))
+        ->assertSee('<p class="light">Busca por: <strong>xxxxxx</strong>')
+        ->assertDontSee('<div class="list-group list-group-flush">')
+        ->assertDontSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(1)->tituloFormatado().'</strong></a>');
     }
 
     /** @test */
@@ -835,11 +980,10 @@ class GerarTextoTest extends TestCase
     /** @test */
     public function cannot_search_when_published_with_busca_texto_more_than_191_chars()
     {
-        $faker = \Faker\Factory::create();
         $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
 
         $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
-            'buscaTexto' => $faker->sentence(400)
+            'buscaTexto' => $this->faker()->sentence(400)
         ]))
         ->assertSessionHasErrors([
             'buscaTexto'

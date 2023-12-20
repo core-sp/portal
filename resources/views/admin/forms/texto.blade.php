@@ -39,12 +39,20 @@
         <input type="hidden" id="tipo_doc" value="{{ $tipo_doc }}" />
         <div id="accordion" class="mb-0 pl-0">
             @if(isset($can_update) && $can_update)
-            <button type="button" id="criarTexto" class="btn btn-success mb-3"><i class="fas fa-plus"></i>&nbsp;&nbsp;Texto</button>
+            <button type="button" class="btn btn-danger mb-3 excluirTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;<i class="fas fa-trash"></i></button>
+            <button type="button" class="btn btn-success mb-3 ml-2 criarTexto"><i class="fas fa-plus"></i>&nbsp;&nbsp;Texto</button>
             @endif
 
             @foreach($resultado as $texto)
             <div class="row homeimagens" id="lista-{{ $texto->id }}">
                 <input type="hidden" name="id-{{ $texto->id }}" value="{{ $texto->id }}" />
+
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" name="excluir_ids" value="{{ $texto->id }}">
+                    </label>
+                </div>
+
                 <div class="col">
                     <h5 class="border rounded bg-info p-2 {{ $loop->last ? '' : 'mb-3' }}">
                         <strong>&nbsp;&nbsp;
@@ -126,6 +134,10 @@
             </div>
             @endforeach
 
+            @if(isset($can_update) && $can_update)
+            <button type="button" class="btn btn-danger mt-3 excluirTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;<i class="fas fa-trash"></i></button>
+            <button type="button" class="btn btn-success mt-3 ml-2 criarTexto"><i class="fas fa-plus"></i>&nbsp;&nbsp;Texto</button>
+            @endif
         </div>
     </div>
     

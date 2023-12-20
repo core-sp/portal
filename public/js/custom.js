@@ -981,12 +981,13 @@ function crudGerarTexto(acao, objeto){
   $('#avisoTextos').modal({backdrop: 'static', keyboard: false, show: false});
   var token = $('meta[name="csrf-token"]').attr('content');
   var id = $(objeto).val();
-  var link = '/admin/textos/' + $('#tipo_doc').val() + '/' + id;
+  var link = '';
   var metodo = '';
   var dados = '';
 
   switch(acao) {
     case 'atualizar':
+      link = '/admin/textos/' + $('#tipo_doc').val() + '/' + id;
       metodo = 'POST';
       dados = {
         _token: token,
@@ -997,9 +998,13 @@ function crudGerarTexto(acao, objeto){
         conteudo: tinymce.get('conteudo-' + id).getContent(),
       }
       break;
-    case 'excluir':
+    case 'excluir_varios':
+      link = '/admin/textos/' + $('#tipo_doc').val() + '/excluir';
       metodo = 'DELETE';
-      dados = {_token: token};
+      dados = {
+        _token: token,
+        excluir_ids: objeto.val()
+      }
       break;
   }
 
@@ -1037,15 +1042,24 @@ function gerarTextoAvisosCrud(acao, response, valor){
   var title = acao == 'erro' ? '<i class="fas fa-times" style="color: #e70d0d;"></i> Erro!' : 
   '<i class="fas fa-check-circle" style="color: #40c011;"></i> Sucesso!';
 
-  if(acao == 'excluir')
-    texto = 'Texto foi excluído com sucesso!';
-  else if(acao == 'atualizar')
-    texto = 'Campos do texto foram atualizados!';
-  else if(acao == 'erro')
-    texto = response;
+  switch (acao) {
+    case 'excluir_varios':
+      texto = 'Exclusão realizada com sucesso!';
+      break;
+    case 'atualizar':
+      texto = 'Campos do texto foram atualizados!';
+      break;
+    case 'erro':
+      texto = response;
+      break;
+  }
 
-  if((acao == 'excluir') && (response == 1))
-    $('#lista-' + valor).remove();
+  if((acao == 'excluir_varios') && (response != null) && (typeof response == 'object')){
+    response.forEach(function(id, i){
+      $('#lista-' + id).remove();
+    });
+    response = 1;
+  }
 
   if((acao == 'erro') || (response == 1)){
     $('#avisoTextos').modal({backdrop: 'static', keyboard: false, show: true});
@@ -1057,13 +1071,22 @@ function gerarTextoAvisosCrud(acao, response, valor){
     return;
   }
 
-  if((acao == 'excluir') && (response == null)){
+  if((acao == 'excluir_varios') && (response == null)){
+    var textos_ids = '';
+    var valor_final = JSON.parse(valor);
+    var total = valor_final.length;
+    var text = total > 1 ? 'todos estes textos selecionados' : 'este texto';
+
+    valor_final.forEach(function(id, i){
+      textos_ids += '<strong>Texto: </strong><i>' + $('#texto_tipo-' + id).val() + '</i><br>';
+    });
+
     $('#avisoTextos').modal({backdrop: 'static', keyboard: false, show: true});
     $('#avisoTextos .modal-title')
       .html('<i class="fas fa-trash" style="color: #dc0909;"></i> Excluir');
 		$('#avisoTextos .modal-body')
-			.html('Tem certeza que deseja excluir este texto?<br>Esta ação não é reversível!');
-    $('#avisoTextos .modal-footer #excluirTexto').val(valor);
+			.html(textos_ids + 'Tem certeza que deseja excluir ' + text + '?<br>Esta ação não é reversível!');
+    $('#avisoTextos .modal-footer #excluirTexto').val(valor_final);
 		$('#avisoTextos .modal-footer').show();
     return;
   }
@@ -1100,7 +1123,7 @@ function hideShowOptions(objeto, id){
   }
 }
 
-$("#criarTexto").click(function(){
+$(".criarTexto").click(function(){
 	var token = $('meta[name="csrf-token"]').attr('content');
 	var link = '/admin/textos/' + $('#tipo_doc').val();
 	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
@@ -1122,11 +1145,21 @@ $(".updateCampos").click(function(){
 
 $(".deleteTexto").click(function(){
   if($(".deleteTexto").length > 1)
-	  gerarTextoAvisosCrud('excluir', null, $(this).val());
+    gerarTextoAvisosCrud('excluir_varios', null, JSON.stringify([$(this).val()]));
+});
+
+$(".excluirTextos").click(function(){
+  var excluirIds = [];
+  if($('[name="excluir_ids"]:checked').length > 0){
+    $('[name="excluir_ids"]:checked').each(function(){
+      excluirIds.push($(this).val());
+    });
+    gerarTextoAvisosCrud('excluir_varios', null, JSON.stringify(excluirIds));
+  }
 });
 
 $("#excluirTexto").click(function(){
-	crudGerarTexto('excluir', $(this));
+  crudGerarTexto('excluir_varios', $(this));
 });
 
 $(".textoTipo").change(function(){

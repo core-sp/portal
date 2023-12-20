@@ -76,13 +76,26 @@ class GerarTextoService implements GerarTextoServiceInterface {
         return $ok;
     }
 
-    public function excluir($tipo_doc, $id)
+    public function excluir($tipo_doc, $ids = array())
     {
-        $ok = 0;
-        if(GerarTexto::where('tipo_doc', $tipo_doc)->count() > 1)
+        // remover valores vazios
+        $ids = array_filter($ids);
+        $total = GerarTexto::where('tipo_doc', $tipo_doc)->count();
+
+        if(!empty($ids) && ($total > count($ids)))
         {
-            $ok = GerarTexto::where('tipo_doc', $tipo_doc)->where('id', $id)->firstOrFail()->delete();
-            $ok ? event(new CrudEvent('o texto do documento '.$tipo_doc, 'excluiu', $id)) : null;
+            $ok = array();
+            $textos = GerarTexto::where('tipo_doc', $tipo_doc)->whereIn('id', $ids)->get();
+            foreach($textos as $texto)
+            {
+                $nome_temp = $texto->texto_tipo;
+                $id_temp = $texto->id;
+                $temp = $texto->delete();
+                if($temp){
+                    event(new CrudEvent('o texto do documento '.$tipo_doc.' com o nome: '.$nome_temp, 'excluiu', $id_temp));
+                    array_push($ok, $id_temp);
+                }
+            }
         }else
             $ok = 'Deve existir no mínimo um texto.';
         

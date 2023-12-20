@@ -325,7 +325,7 @@ Route::middleware(['block_ip'])->group(function () {
       Route::post('/{tipo_doc}', 'GerarTextoController@create')->where('tipo_doc', 'carta-servicos')->name('textos.create');
       Route::post('/{tipo_doc}/{id}', 'GerarTextoController@updateCampos')->where('tipo_doc', 'carta-servicos')->name('textos.update.campos');
       Route::post('/publicar/{tipo_doc}', 'GerarTextoController@publicar')->where('tipo_doc', 'carta-servicos')->name('textos.publicar');
-      Route::delete('/{tipo_doc}/{id}', 'GerarTextoController@delete')->where('tipo_doc', 'carta-servicos')->name('textos.delete');
+      Route::delete('/{tipo_doc}/excluir', 'GerarTextoController@delete')->where('tipo_doc', 'carta-servicos')->name('textos.delete');
       Route::put('/{tipo_doc}', 'GerarTextoController@update')->where('tipo_doc', 'carta-servicos')->name('textos.update.indice');
     });
     

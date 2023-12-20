@@ -9,8 +9,23 @@ class GerarTextoRequest extends FormRequest
     private $niveis;
     private $comNumero;
 
+    public function authorize()
+    {
+        if(\Route::is('carta-servicos-buscar'))
+            return true;
+        
+        $user = auth()->user();
+        return $user->can('gerarTextoUpdate', $user);
+    }
+
     protected function prepareForValidation()
     {
+        if(\Route::is('textos.delete'))
+        {
+            $this->merge(['excluir_ids' => explode(',', $this->excluir_ids)]);
+            return;
+        }
+
         $this->niveis = '0,1,2,3';
         if(request()->filled('tipo'))
             $this->niveis = $this->tipo == 'Título' ? '0' : '1,2,3';
@@ -44,6 +59,11 @@ class GerarTextoRequest extends FormRequest
                 'buscaTexto' => 'required|min:3|max:191',
             ];
         }
+
+        if(\Route::is('textos.delete'))
+            return [
+                'excluir_ids' => 'required',
+            ];
     }
 
     public function messages()

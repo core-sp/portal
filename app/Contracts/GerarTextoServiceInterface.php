@@ -12,7 +12,7 @@ interface GerarTextoServiceInterface {
 
     public function publicar($tipo_doc, bool $publicar = false);
 
-    public function excluir($tipo_doc, $id);
+    public function excluir($tipo_doc, $ids = array());
 
     public function show($tipo_doc, $id = null, $user = null);
 
