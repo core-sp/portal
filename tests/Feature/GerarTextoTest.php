@@ -129,10 +129,10 @@ class GerarTextoTest extends TestCase
             ->assertSee('value="'.$txt->texto_tipo.'"')
             ->assertSee('<option value="Título" selected>Título</option>')
             ->assertSee('<option value="0" selected style="">0</option>')
-            ->assertSee('<p>'.$txt->tituloFormatado().'</p>')
+            ->assertSee('<button type="button" class="btn btn-link" id="abrir-'.$txt->id.'">'.$txt->tituloFormatado().'</button>')
             ->assertSeeInOrder([
                 '<textarea',
-                'class="form-control my-editor"',
+                'class="form-control"',
                 'id="conteudo-1"',
                 'rows="15"',
                 '>',

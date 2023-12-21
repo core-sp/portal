@@ -1167,4 +1167,28 @@ $(".textoTipo").change(function(){
   hideShowOptions($(this), id);
 });
 
+// link no sumário para abrir e ir no texto
+$('[id^="abrir-"]').click(function(){
+  var id_abrir = $(this).attr('id').replace('abrir-', '');
+  $("#accordion").accordion("option", "collapsible", true);
+  $('#span-texto_tipo-' + id_abrir).parents('h5').click();
+  $('#tipo-' + id_abrir).focus();
+});
+
+// carregar o TinyMCE somente quando abrir texto para editar e após fechar é removido o editor
+if($('#formGerarTexto').length > 0){
+  var id = null;
+
+  $('h5').click(function(){
+    id = $(this).parent().parent().attr('id').replace('lista-', '');
+  });
+
+  $("#accordion").on('accordionactivate', function( event, ui ) {
+    tinymce.remove();
+    $('textarea').removeClass('my-editor');
+    $('#conteudo-' + id).addClass('my-editor');
+    tinymce.init(editor_config);
+  });
+}
+
 // FIM da Funcionalidade GerarTexto ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

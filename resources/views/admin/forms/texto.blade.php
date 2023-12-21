@@ -8,7 +8,7 @@
 </div>
 @endif
 
-<form role="form" method="POST" autocomplete="false">
+<form role="form" method="POST" autocomplete="false" id="formGerarTexto">
     @csrf
     @method('PUT')
     <div class="card-body">
@@ -18,17 +18,18 @@
         @foreach($resultado as $texto)
             @switch($texto->nivel)
                 @case(1)
-                  <p>&nbsp;&nbsp;&nbsp;<strong>{{ $texto->subtituloFormatado() }}</strong></p>
+                  <button type="button" class="btn btn-link" id="abrir-{{ $texto->id }}">&nbsp;&nbsp;&nbsp;<strong>{{ $texto->subtituloFormatado() }}</strong></button>
                   @break
                 @case(2)
-                  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $texto->subtituloFormatado() }}</strong></p>
+                  <button type="button" class="btn btn-link" id="abrir-{{ $texto->id }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $texto->subtituloFormatado() }}</strong></button>
                   @break
                 @case(3)
-                  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $texto->subtituloFormatado() }}</strong></p>
+                  <button type="button" class="btn btn-link" id="abrir-{{ $texto->id }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $texto->subtituloFormatado() }}</strong></button>
                   @break
                 @default
-                  <p>{{ $texto->tituloFormatado() }}</p>
+                  <button type="button" class="btn btn-link" id="abrir-{{ $texto->id }}">{{ $texto->tituloFormatado() }}</button>
               @endswitch
+              <br>
         @endforeach
 
         <hr />
@@ -108,7 +109,7 @@
                                 <div class="col">
                                     <label for="conteudo-{{ $texto->id }}">Conteúdo do texto</label>
                                     <textarea 
-                                        class="form-control my-editor"
+                                        class="form-control"
                                         id="conteudo-{{ $texto->id }}"
                                         rows="15"
                                     >
