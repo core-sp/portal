@@ -38,7 +38,7 @@
             @if($i == 1)
             <div class="col">
             @endif            
-                <div class="form-check border border-left-0 border-info rounded-right mb-2">
+                <div class="form-check border border-left-0 border-info rounded-right mb-2 pr-4">
                     <label class="form-check-label">
                         <input type="hidden" name="id-{{ $texto->id }}" value="{{ $texto->id }}" />
                         <input type="checkbox" class="form-check-input" name="excluir_ids" value="{{ $texto->id }}">
