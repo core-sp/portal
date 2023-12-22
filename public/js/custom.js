@@ -144,26 +144,11 @@ $(document).ready(function(){
     header: "fas fa-angle-right",
     activeHeader: "fas fa-angle-down"
   };
-  $("#accordion")
-      .accordion({
-        header: "> div > div > h5",
-        collapsible: true,
-        heightStyle: "content",
-        icons: icons,
-        active: false
-      })
-      .sortable({
-        axis: "y",
-        handle: "h5",
-        stop: function(event, ui) {
-          // IE doesn't register the blur when sorting
-          // so trigger focusout handlers to remove .ui-state-focus
-          ui.item.children("h5").triggerHandler("focusout");
- 
-          // Refresh accordion to handle new order
-          $(this).accordion("refresh");
-        }
-      });
+
+  $(".textosSortable").sortable({
+    items: "> div > div.form-check",
+  });
+  $(".textosSortable").disableSelection();
 
   // Regra de data no filtro de agendamento +++ Será removido depois de refatorar todos que o utilizam 
   $('#filtroAgendamento').submit(function(e){
@@ -986,17 +971,22 @@ function crudGerarTexto(acao, objeto){
   var dados = '';
 
   switch(acao) {
+    case 'carregar':
+      link = '/admin/textos/' + $('#tipo_doc').val() + '/' + id;
+      metodo = 'GET';
+      dados = {};
+      break;
     case 'atualizar':
       link = '/admin/textos/' + $('#tipo_doc').val() + '/' + id;
       metodo = 'POST';
       dados = {
         _token: token,
-        tipo: $('#tipo-' + id).val(),
-        texto_tipo: $('#texto_tipo-' + id).val(),
-        com_numeracao: $('#com_numeracao-' + id).val(),
-        nivel: $('#nivel-' + id).val(),
-        conteudo: tinymce.get('conteudo-' + id).getContent(),
-      }
+        tipo: $('#tipo').val(),
+        texto_tipo: $('#texto_tipo').val(),
+        com_numeracao: $('#com_numeracao').val(),
+        nivel: $('#nivel').val(),
+        conteudo: tinymce.get('conteudo').getContent(),
+      };
       break;
     case 'excluir_varios':
       link = '/admin/textos/' + $('#tipo_doc').val() + '/excluir';
@@ -1004,7 +994,7 @@ function crudGerarTexto(acao, objeto){
       dados = {
         _token: token,
         excluir_ids: objeto.val()
-      }
+      };
       break;
   }
 
@@ -1014,7 +1004,9 @@ function crudGerarTexto(acao, objeto){
       dataType: "json",
       data: dados,
       success: function(response) {
-        atualizarTextoCrud(acao, id);
+        $('.updateCampos').val(id);
+        $('.deleteTexto').val(id);
+        atualizarTextoCrud(acao, response);
         gerarTextoAvisosCrud(acao, response, id);
       },
       error: function(erro, textStatus, errorThrown) {
@@ -1025,14 +1017,30 @@ function crudGerarTexto(acao, objeto){
   });
 }
 
-function atualizarTextoCrud(acao, valor){
+function atualizarTextoCrud(acao, response){
+  var texto_campo = acao == 'carregar' ? response[0].tipo : response.tipo;
+  var cor = texto_campo == 'Título' ? 'warning' : 'dark';
+  var upper = texto_campo == 'Título' ? 'text-uppercase' : '';
+
+  if(acao == 'carregar'){
+    var resultado = response[0];
+    var indice = resultado.indice != null ? resultado.indice : '';
+    $('#span-tipo').attr('class', 'text-' + cor).text(texto_campo);
+    $('#span-nivel').text(resultado.nivel);
+    $('#span-texto_tipo').attr('class', upper).text(indice + ' - ' + resultado.texto_tipo);
+    $('#texto_tipo').val(resultado.texto_tipo);
+    $('#tipo option[value="' + resultado.tipo + '"]').prop('selected', true);
+    $('#com_numeracao option[value="' + resultado.com_numeracao + '"]').prop('selected', true);
+    $('#nivel option[value="' + resultado.nivel + '"]').prop('selected', true);
+    resultado.conteudo != null ? tinymce.activeEditor.setContent(resultado.conteudo) : tinymce.activeEditor.setContent('');
+    hideShowOptions();
+  }
+
   if(acao == 'atualizar'){
-    var texto_campo = $('#tipo-' + valor).val();
-    var cor = texto_campo == 'Título' ? 'warning' : 'dark';
-    var upper = texto_campo == 'Título' ? 'text-uppercase' : '';
-    $('#span-tipo-' + valor).attr('class', 'text-' + cor).text(texto_campo);
-    $('#span-nivel-' + valor).text($('#nivel-' + valor).val());
-    $('#span-texto_tipo-' + valor).attr('class', upper).text($('#texto_tipo-' + valor).val());
+    $('#span-tipo').attr('class', 'text-' + cor).text(texto_campo);
+    $('#span-nivel').text(response.nivel);
+    $('#span-texto_tipo').attr('class', upper).text(response.texto_tipo);
+    $('button[value="' + response.id + '"] .indice-texto').text(response.texto_tipo);
   }
   return;
 }
@@ -1048,6 +1056,7 @@ function gerarTextoAvisosCrud(acao, response, valor){
       break;
     case 'atualizar':
       texto = 'Campos do texto foram atualizados!';
+      response = 1;
       break;
     case 'erro':
       texto = response;
@@ -1056,8 +1065,9 @@ function gerarTextoAvisosCrud(acao, response, valor){
 
   if((acao == 'excluir_varios') && (response != null) && (typeof response == 'object')){
     response.forEach(function(id, i){
-      $('#lista-' + id).remove();
+      $('button[value="' + id + '"]').parents('.form-check').remove();
     });
+    $('#lista').hide();
     response = 1;
   }
 
@@ -1078,7 +1088,7 @@ function gerarTextoAvisosCrud(acao, response, valor){
     var text = total > 1 ? 'todos estes textos selecionados' : 'este texto';
 
     valor_final.forEach(function(id, i){
-      textos_ids += '<strong>Texto: </strong><i>' + $('#texto_tipo-' + id).val() + '</i><br>';
+      textos_ids += '<strong>Texto: </strong><i>' + $('button[value="' + id + '"]').text() + '</i><br>';
     });
 
     $('#avisoTextos').modal({backdrop: 'static', keyboard: false, show: true});
@@ -1092,34 +1102,34 @@ function gerarTextoAvisosCrud(acao, response, valor){
   }
 }
 
-function hideShowOptions(objeto, id){
-  if(objeto.val() == 'Título'){
-    $('#nivel-' + id + ' option').hide();
-    $('#nivel-' + id + ' option').each(function(){
+function hideShowOptions(){
+  if($(".textoTipo").val() == 'Título'){
+    $('#nivel option').hide();
+    $('#nivel option').each(function(){
       if($(this).val() == '0')
         $(this).show();
     });
-    $('#nivel-' + id)[0].selectedIndex = 0;
-    $('#com_numeracao-' + id + ' option').hide();
-    $('#com_numeracao-' + id + ' option').each(function(){
+    $('#nivel')[0].selectedIndex = 0;
+    $('#com_numeracao option').hide();
+    $('#com_numeracao option').each(function(){
         $(this).show();
     });
-    if(!$('#texto_tipo-' + id).hasClass('text-uppercase'))
-      $('#texto_tipo-' + id).addClass('text-uppercase');
+    if(!$('#texto_tipo').hasClass('text-uppercase'))
+      $('#texto_tipo').addClass('text-uppercase');
   }else{
-    $('#nivel-' + id + ' option').show();
-    $('#nivel-' + id + ' option').each(function(){
+    $('#nivel option').show();
+    $('#nivel option').each(function(){
       if($(this).val() == '0')
         $(this).hide();
     });
-    $('#nivel-' + id)[0].selectedIndex = 1;
-    $('#com_numeracao-' + id + ' option').each(function(){
+    $('#nivel')[0].selectedIndex = 1;
+    $('#com_numeracao option').each(function(){
       if($(this).val() == '0')
         $(this).hide();
     });
-    $('#com_numeracao-' + id)[0].selectedIndex = 0;
-    if($('#texto_tipo-' + id).hasClass('text-uppercase'))
-      $('#texto_tipo-' + id).removeClass('text-uppercase');
+    $('#com_numeracao')[0].selectedIndex = 0;
+    if($('#texto_tipo').hasClass('text-uppercase'))
+      $('#texto_tipo').removeClass('text-uppercase');
   }
 }
 
@@ -1144,7 +1154,7 @@ $(".updateCampos").click(function(){
 });
 
 $(".deleteTexto").click(function(){
-  if($(".deleteTexto").length > 1)
+  if($(".deleteTexto").length > 0)
     gerarTextoAvisosCrud('excluir_varios', null, JSON.stringify([$(this).val()]));
 });
 
@@ -1163,32 +1173,19 @@ $("#excluirTexto").click(function(){
 });
 
 $(".textoTipo").change(function(){
-	var id = $(this).attr('id').replace(/[^0-9]/g,'');
-  hideShowOptions($(this), id);
+  hideShowOptions();
+});
+
+$("#updateIndice").click(function(){
+  $('#loadingIndice').modal({backdrop: 'static', keyboard: false, show: true});
 });
 
 // link no sumário para abrir e ir no texto
-$('[id^="abrir-"]').click(function(){
-  var id_abrir = $(this).attr('id').replace('abrir-', '');
-  $("#accordion").accordion("option", "collapsible", true);
-  $('#span-texto_tipo-' + id_abrir).parents('h5').click();
-  $('#tipo-' + id_abrir).focus();
+$('button.abrir').click(function(){
+  crudGerarTexto('carregar', $(this));
+  $('#lista').hide();
+  $('#lista').show();
+  $('#tipo').focus();
 });
-
-// carregar o TinyMCE somente quando abrir texto para editar e após fechar é removido o editor
-if($('#formGerarTexto').length > 0){
-  var id = null;
-
-  $('h5').click(function(){
-    id = $(this).parent().parent().attr('id').replace('lista-', '');
-  });
-
-  $("#accordion").on('accordionactivate', function( event, ui ) {
-    tinymce.remove();
-    $('textarea').removeClass('my-editor');
-    $('#conteudo-' + id).addClass('my-editor');
-    tinymce.init(editor_config);
-  });
-}
 
 // FIM da Funcionalidade GerarTexto ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

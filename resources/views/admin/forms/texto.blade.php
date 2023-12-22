@@ -15,130 +15,144 @@
 
         <p class="text-muted"><em>* Sumário após última atualização da índice.</em></p>
         <h4><strong>Sumário:</strong></h4>
-        @foreach($resultado as $texto)
-            @switch($texto->nivel)
-                @case(1)
-                  <button type="button" class="btn btn-link" id="abrir-{{ $texto->id }}">&nbsp;&nbsp;&nbsp;<strong>{{ $texto->subtituloFormatado() }}</strong></button>
-                  @break
-                @case(2)
-                  <button type="button" class="btn btn-link" id="abrir-{{ $texto->id }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $texto->subtituloFormatado() }}</strong></button>
-                  @break
-                @case(3)
-                  <button type="button" class="btn btn-link" id="abrir-{{ $texto->id }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $texto->subtituloFormatado() }}</strong></button>
-                  @break
-                @default
-                  <button type="button" class="btn btn-link" id="abrir-{{ $texto->id }}">{{ $texto->tituloFormatado() }}</button>
-              @endswitch
-              <br>
-        @endforeach
 
-        <hr />
-        <p class="mb-4">
-            <i>* Arraste as caixas para definir a ordem da índice</i>
+        @if(isset($can_update) && $can_update)
+        <div class="row mt-3">
+            <div class="col">
+            <button type="button" class="btn btn-danger excluirTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;<i class="fas fa-trash"></i></button>
+            <button type="button" class="btn btn-success ml-2 criarTexto"><i class="fas fa-plus"></i>&nbsp;&nbsp;Texto</button>
+            </div>
+        </div>
+        @endif
+        
+        <p class="mb-4 mt-3">
+            <i>* Arraste as caixas com o cursor <i class="fas fa-arrows-alt"></i> para definir a ordem da índice</i>
         </p>
 
-        <input type="hidden" id="tipo_doc" value="{{ $tipo_doc }}" />
-        <div id="accordion" class="mb-0 pl-0">
-            @if(isset($can_update) && $can_update)
-            <button type="button" class="btn btn-danger mb-3 excluirTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;<i class="fas fa-trash"></i></button>
-            <button type="button" class="btn btn-success mb-3 ml-2 criarTexto"><i class="fas fa-plus"></i>&nbsp;&nbsp;Texto</button>
-            @endif
+        @php
+        $i = 1;
+        @endphp
+        <div class="row textosSortable">
 
-            @foreach($resultado as $texto)
-            <div class="row homeimagens" id="lista-{{ $texto->id }}">
-                <input type="hidden" name="id-{{ $texto->id }}" value="{{ $texto->id }}" />
-
-                <div class="form-check">
+        @foreach($resultado as $texto)
+            @if($i == 1)
+            <div class="col">
+            @endif            
+                <div class="form-check border border-left-0 border-info rounded-right mb-2">
                     <label class="form-check-label">
+                        <input type="hidden" name="id-{{ $texto->id }}" value="{{ $texto->id }}" />
                         <input type="checkbox" class="form-check-input" name="excluir_ids" value="{{ $texto->id }}">
+                        <button type="button" class="btn btn-link btn-sm abrir" value="{{ $texto->id }}">
+                    @if($texto->tipoTitulo())
+                    <span 
+                    class="indice-texto {{ session()->exists('novo_texto') && ($texto->id == session()->get('novo_texto')) ? 'text-danger' : '' }}"
+                    >{{ $texto->tituloFormatado() }}</span>
+                    @else
+                    <strong><span 
+                    class="indice-texto {{ session()->exists('novo_texto') && ($texto->id == session()->get('novo_texto')) ? 'text-danger' : '' }}"
+                    >{{ $texto->subtituloFormatado() }}</span></strong>
+                    @endif
+                        </button>
                     </label>
                 </div>
+            @if(($i == 50) || $loop->last)
+            </div>
+            @endif
+            @php
+            $i = ($i == 50) ? 1 : $i + 1;
+            @endphp
+        @endforeach
+        </div>
 
-                <div class="col">
-                    <h5 class="border rounded bg-info p-2 {{ $loop->last ? '' : 'mb-3' }}">
-                        <strong>&nbsp;&nbsp;
-                            <em><span id="span-texto_tipo-{{ $texto->id }}">{{ $texto->texto_tipo }}</span></em>:&nbsp;
-                            <span id="span-tipo-{{ $texto->id }}" class="text-{{ $texto->tipoTitulo() ? 'warning' : 'dark' }}">{{ $texto->tipo }}</span>&nbsp;
-                            <small>(nível <span id="span-nivel-{{ $texto->id }}">{{ $texto->nivel }}</span>)</small>
-                        </strong>
-                    </h5>
-                    <div class="card card-default bg-light">
-                        <div class="card-body">
+        @if(isset($can_update) && $can_update)
+        <div class="row mt-3">
+            <div class="col">
+            <button type="button" class="btn btn-danger excluirTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;<i class="fas fa-trash"></i></button>
+            <button type="button" class="btn btn-success ml-2 criarTexto"><i class="fas fa-plus"></i>&nbsp;&nbsp;Texto</button>
+            </div>
+        </div>
+        @endif
 
-                            <div class="form-row mb-2">
-                                <div class="col">
-                                    <label for="tipo-{{ $texto->id }}">Tipo do texto</label>
-                                    <select class="form-control form-control-sm textoTipo" id="tipo-{{ $texto->id }}">
-                                        <option value="Título" {{ $texto->tipo === 'Título' ? 'selected' : '' }}>Título</option>
-                                        <option value="Subtítulo" {{ $texto->tipo === 'Subtítulo' ? 'selected' : '' }}>Subtítulo</option>
-                                    </select>
-                                </div>
+        <hr />
 
-                                <div class="col">
-                                    <label for="com_numeracao-{{ $texto->id }}">Possui numeração na índice?</label>
-                                    <select class="form-control form-control-sm comNumero" id="com_numeracao-{{ $texto->id }}">
-                                        <option value="1" {{ $texto->com_numeracao == 1 ? 'selected' : '' }}>Sim</option>
-                                        <option value="0" {{ $texto->com_numeracao == 0 ? 'selected' : '' }} style="{{ $texto->tipo == 'Subtítulo' ? 'display: none;' : '' }}">Não</option>
-                                    </select>
-                                </div>
+        <input type="hidden" id="tipo_doc" value="{{ $tipo_doc }}" />
 
-                                <div class="col">
-                                    <label for="nivel-{{ $texto->id }}">Nível <small>(0 para título)</small></label>
-                                    <select class="form-control form-control-sm comNivel" id="nivel-{{ $texto->id }}">
-                                        <option value="0" {{ $texto->nivel == 0 ? 'selected' : '' }} style="{{ $texto->tipo == 'Subtítulo' ? 'display: none;' : '' }}">0</option>
-                                        <option value="1" {{ $texto->nivel == 1 ? 'selected' : '' }} style="{{ $texto->tipo == 'Título' ? 'display: none;' : '' }}">1 (1.1)</option>
-                                        <option value="2" {{ $texto->nivel == 2 ? 'selected' : '' }} style="{{ $texto->tipo == 'Título' ? 'display: none;' : '' }}">2 (1.1.1)</option>
-                                        <option value="3" {{ $texto->nivel == 3 ? 'selected' : '' }} style="{{ $texto->tipo == 'Título' ? 'display: none;' : '' }}">3 (1.1.1.1)</option>
-                                    </select>
-                                </div>
+        <div class="row" id="lista" style="display: none;">
+            <div class="col">
+                <h5 class="border rounded bg-info p-2">
+                    <strong>&nbsp;&nbsp;
+                        <em><span id="span-texto_tipo"></span></em>:&nbsp;
+                        <span id="span-tipo" class=""></span>&nbsp;
+                        <small>(nível <span id="span-nivel"></span>)</small>
+                    </strong>
+                </h5>
+                <div class="card card-default bg-light">
+                    <div class="card-body">
 
+                        <div class="form-row mb-2">
+                            <div class="col">
+                                <label for="tipo">Tipo do texto</label>
+                                <select class="form-control form-control-sm textoTipo" id="tipo">
+                                    <option value="Título">Título</option>
+                                    <option value="Subtítulo">Subtítulo</option>
+                                </select>
                             </div>
 
-                            <div class="form-row mb-2">
-                                <div class="col">
-                                    <label for="texto_tipo-{{ $texto->id }}">Título do tipo do texto</label>
-                                    <input id="texto_tipo-{{ $texto->id }}"
-                                        class="form-control text-uppercase"
-                                        type="text"
-                                        value="{{ $texto->texto_tipo }}"
-                                    />
-                                </div>
+                            <div class="col">
+                                <label for="com_numeracao-">Possui numeração na índice?</label>
+                                <select class="form-control form-control-sm comNumero" id="com_numeracao">
+                                    <option value="1">Sim</option>
+                                    <option value="0" style="">Não</option>
+                                </select>
                             </div>
 
-                            <div class="form-row">
-                                <div class="col">
-                                    <label for="conteudo-{{ $texto->id }}">Conteúdo do texto</label>
-                                    <textarea 
-                                        class="form-control"
-                                        id="conteudo-{{ $texto->id }}"
-                                        rows="15"
-                                    >
-                                        {!! empty(old('conteudo')) && isset($texto->conteudo) ? $texto->conteudo : old('conteudo') !!}
-                                    </textarea>
-                                </div>
+                            <div class="col">
+                                <label for="nivel-">Nível <small>(0 para título)</small></label>
+                                <select class="form-control form-control-sm comNivel" id="nivel">
+                                    <option value="0" style="">0</option>
+                                    <option value="1" style="">1 (1.1)</option>
+                                    <option value="2" style="">2 (1.1.1)</option>
+                                    <option value="3" style="">3 (1.1.1.1)</option>
+                                </select>
                             </div>
 
                         </div>
 
-                        @if(isset($can_update) && $can_update)
-                        <div class="card-footer">
-                            <div class="float-right">
-                                <button type="button" value="{{ $texto->id }}" class="btn btn-primary updateCampos mr-2"><i class="fas fa-save"></i></button>
-                                <button type="button" value="{{ $texto->id }}" class="btn btn-danger deleteTexto"><i class="fas fa-trash"></i></button>
+                        <div class="form-row mb-2">
+                            <div class="col">
+                                <label for="texto_tipo-">Título do tipo do texto</label>
+                                <input id="texto_tipo"
+                                    class="form-control text-uppercase"
+                                    type="text"
+                                    value=""
+                                />
                             </div>
                         </div>
-                        @endif
+
+                        <div class="form-row">
+                            <div class="col">
+                                <label for="conteudo-">Conteúdo do texto</label>
+                                <textarea 
+                                    class="form-control my-editor"
+                                    id="conteudo"
+                                    rows="15"
+                                ></textarea>
+                            </div>
+                        </div>
 
                     </div>
+
+                    @if(isset($can_update) && $can_update)
+                    <div class="card-footer">
+                        <div class="float-right">
+                            <button type="button" value="" class="btn btn-primary updateCampos mr-2"><i class="fas fa-save"></i></button>
+                            <button type="button" value="" class="btn btn-danger deleteTexto"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    @endif
+
                 </div>
-
             </div>
-            @endforeach
-
-            @if(isset($can_update) && $can_update)
-            <button type="button" class="btn btn-danger mt-3 excluirTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;<i class="fas fa-trash"></i></button>
-            <button type="button" class="btn btn-success mt-3 ml-2 criarTexto"><i class="fas fa-plus"></i>&nbsp;&nbsp;Texto</button>
-            @endif
         </div>
     </div>
     
@@ -147,10 +161,10 @@
             <a href="/admin" class="btn btn-default">Cancelar</a>
             <a href="{{ route($tipo_doc) }}" target="_blank" class="btn btn-secondary ml-1">Ver</a>
 
-            @if(isset($resultado) && isset($texto))
+            @if(isset($resultado))
                 @if(isset($can_update) && $can_update)
-                <button type="submit" class="btn btn-primary ml-1">Atualizar índice</button>
-                <button type="button" id="publicarTexto" value="{{ $resultado->get(0)->publicar ? '0' : '1' }}" class="btn btn-{{ $resultado->get(0)->publicar ? 'danger' : 'success' }} ml-1">{{ $texto->publicar ? 'Reverter publicação' : 'Publicar' }}</button>
+                <button type="submit" class="btn btn-primary ml-1" id="updateIndice">Atualizar índice</button>
+                <button type="button" id="publicarTexto" value="{{ $resultado->get(0)->publicar ? '0' : '1' }}" class="btn btn-{{ $resultado->get(0)->publicar ? 'danger' : 'success' }} ml-1">{{ $resultado->get(0)->publicar ? 'Reverter publicação' : 'Publicar' }}</button>
                 @endif
             @endif
 
@@ -177,3 +191,13 @@
       </div>
     </div>
   </div>
+
+  <!-- The Modal -->
+<div class="modal" id="loadingIndice">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center">
+            <!-- Modal body -->
+            <div class="modal-body"><div class="spinner-border text-primary"></div>&nbsp;&nbsp;Atualizando a índice...</div>
+        </div>
+    </div>
+</div>

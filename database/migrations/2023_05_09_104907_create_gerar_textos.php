@@ -19,7 +19,7 @@ class CreateGerarTextos extends Migration
             $table->string('texto_tipo');
             $table->text('conteudo')->nullable();
             $table->boolean('com_numeracao')->default(true);
-            $table->unsignedTinyInteger('ordem')->default(1);
+            $table->unsignedInteger('ordem')->default(1);
             $table->string('nivel')->default(0);
             $table->string('tipo_doc')->default('carta-servicos');
             $table->string('indice')->nullable();

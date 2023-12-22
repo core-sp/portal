@@ -28,8 +28,9 @@ class GerarTextoController extends Controller
         }
 
         return redirect()->route('textos.view', $tipo_doc)
-            ->with('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "'.$texto->texto_tipo.'" foi criado com sucesso e inserido no final do documento!')
-            ->with('class', 'alert-success');
+            ->with('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "'.$texto->texto_tipo.'" foi criado com sucesso e inserido no final do sumário em vermelho!')
+            ->with('class', 'alert-success')
+            ->with('novo_texto', $texto->id);
     }
 
     public function updateCampos($tipo_doc, $id, GerarTextoRequest $request)
@@ -62,13 +63,13 @@ class GerarTextoController extends Controller
         return response()->json($ok);
     }
 
-    public function view($tipo_doc)
+    public function view($tipo_doc, $id = null)
     {
         $user = auth()->user();
         $this->authorize('gerarTextoView', $user);
 
         try{
-            $dados = $this->service->getService('GerarTexto')->view($tipo_doc);
+            $dados = $this->service->getService('GerarTexto')->view($tipo_doc, $id);
             $dados['tipo_doc'] = $tipo_doc;
             $dados['can_update'] = $user->can('gerarTextoUpdate', $user);
         } catch (\Exception $e) {
@@ -76,7 +77,7 @@ class GerarTextoController extends Controller
             abort(500, "Erro ao carregar os textos de ".$tipo_doc.".");
         }
 
-        return view('admin.crud.editar', $dados);
+        return isset($id) ? response()->json($dados['resultado']) : view('admin.crud.editar', $dados);
     }
 
     public function update($tipo_doc, Request $request)

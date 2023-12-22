@@ -23,9 +23,13 @@ class GerarTextoService implements GerarTextoServiceInterface {
         ];
     }
 
-    public function view($tipo_doc)
+    public function view($tipo_doc, $id = null)
     {
-        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)
+        $resultado = GerarTexto::select('id', 'tipo', 'texto_tipo', 'com_numeracao', 'ordem', 'nivel', 'indice', 'publicar')
+        ->where('tipo_doc', $tipo_doc)
+        ->when(isset($id), function($query) use($id){
+            $query->select('tipo', 'texto_tipo', 'com_numeracao', 'nivel', 'indice', 'conteudo')->where('id', $id);
+        })
         ->orderBy('ordem','ASC')
         ->get();
 
@@ -50,10 +54,11 @@ class GerarTextoService implements GerarTextoServiceInterface {
         {
             $dados['texto_tipo'] = $dados['tipo'] == GerarTexto::TIPO_TITULO ? mb_strtoupper($dados['texto_tipo'], 'UTF-8') : $dados['texto_tipo'];
             $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->where('id', $id)->firstOrFail();
-            $ok = $resultado->update($dados);
+            $resultado->update($dados);
             event(new CrudEvent('campos do texto do documento '.$tipo_doc, 'atualizou', $id));
+            $resultado->texto_tipo = $resultado->tipoTitulo() ? $resultado->tituloFormatado() : $resultado->subtituloFormatado();
     
-            return $ok;
+            return $resultado;
         }
 
         // Somente atualiza ordem e indice
@@ -104,7 +109,7 @@ class GerarTextoService implements GerarTextoServiceInterface {
 
     public function show($tipo_doc, $id = null, $user = null)
     {
-        $resultado = GerarTexto::resultadoByDoc($tipo_doc, $user);
+        $resultado = GerarTexto::resultadoByDoc($tipo_doc, $user)->except(['conteudo']);
 
         $textos = array();
         if(isset($id))
