@@ -25,41 +25,58 @@
         </div>
         @endif
         
-        <p class="mb-4 mt-3">
+        <p class="mt-3">
             <i>* Arraste as caixas com o cursor <i class="fas fa-arrows-alt"></i> para definir a ordem da índice</i>
         </p>
+        <p>
+            <i>* Clique sobre o título com o cursor <i class="far fa-hand-pointer"></i> para editar o item</i>
+        </p>
+        <p class="mb-4">
+            <i>* Clique na caixinha <i class="fas fa-check-square"></i> para selecionar o item a ser excluído</i>
+        </p>
 
+        <button type="button" class="btn btn-info selecionarTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;Selecionar Todos</button>
+        <div class="textosSortable">
         @php
-        $i = 1;
+        $col = 1;
+        $row = 1;
         @endphp
-        <div class="row textosSortable">
 
         @foreach($resultado as $texto)
-            @if($i == 1)
-            <div class="col">
-            @endif            
-                <div class="form-check border border-left-0 border-info rounded-right mb-2 pr-4">
-                    <label class="form-check-label">
-                        <input type="hidden" name="id-{{ $texto->id }}" value="{{ $texto->id }}" />
-                        <input type="checkbox" class="form-check-input" name="excluir_ids" value="{{ $texto->id }}">
-                        <button type="button" class="btn btn-link btn-sm abrir" value="{{ $texto->id }}">
-                    @if($texto->tipoTitulo())
-                    <span 
-                    class="indice-texto {{ session()->exists('novo_texto') && ($texto->id == session()->get('novo_texto')) ? 'text-danger' : '' }}"
-                    >{{ $texto->tituloFormatado() }}</span>
-                    @else
-                    <strong><span 
-                    class="indice-texto {{ session()->exists('novo_texto') && ($texto->id == session()->get('novo_texto')) ? 'text-danger' : '' }}"
-                    >{{ $texto->subtituloFormatado() }}</span></strong>
-                    @endif
-                        </button>
-                    </label>
+            @if($row == 1)
+            <hr />
+            <div class="row">
+            @endif
+                @if($col == 1)
+                <div class="col-2">
+                @endif            
+                    <div class="form-check border border-left-0 border-info rounded-right mb-2 pr-4">
+                        <label class="form-check-label">
+                            <input type="hidden" name="id-{{ $texto->id }}" value="{{ $texto->id }}" />
+                            <input type="checkbox" class="form-check-input" name="excluir_ids" value="{{ $texto->id }}">
+                            <button type="button" class="btn btn-link btn-sm abrir" value="{{ $texto->id }}">
+                        @if($texto->tipoTitulo())
+                        <span 
+                        class="indice-texto {{ session()->exists('novo_texto') && ($texto->id == session()->get('novo_texto')) ? 'text-danger' : '' }}"
+                        >{{ $texto->tituloFormatado() }}</span>
+                        @else
+                        <strong><span 
+                        class="indice-texto {{ session()->exists('novo_texto') && ($texto->id == session()->get('novo_texto')) ? 'text-danger' : '' }}"
+                        >{{ $texto->subtituloFormatado() }}</span></strong>
+                        @endif
+                            </button>
+                        </label>
+                    </div>
+                @if(($col == 50) || $loop->last)
                 </div>
-            @if(($i == 50) || $loop->last)
+                @endif
+            @if(($row == 300) || $loop->last)
             </div>
             @endif
+
             @php
-            $i = ($i == 50) ? 1 : $i + 1;
+            $col = ($col == 50) ? 1 : $col + 1;
+            $row = ($row == 300) ? 1 : $row + 1;
             @endphp
         @endforeach
         </div>
@@ -161,7 +178,7 @@
             <a href="/admin" class="btn btn-default">Cancelar</a>
             <a href="{{ route($tipo_doc) }}" target="_blank" class="btn btn-secondary ml-1">Ver</a>
 
-            @if(isset($resultado))
+            @if(isset($resultado) && $resultado->isNotEmpty())
                 @if(isset($can_update) && $can_update)
                 <button type="submit" class="btn btn-primary ml-1" id="updateIndice">Atualizar índice</button>
                 <button type="button" id="publicarTexto" value="{{ $resultado->get(0)->publicar ? '0' : '1' }}" class="btn btn-{{ $resultado->get(0)->publicar ? 'danger' : 'success' }} ml-1">{{ $resultado->get(0)->publicar ? 'Reverter publicação' : 'Publicar' }}</button>

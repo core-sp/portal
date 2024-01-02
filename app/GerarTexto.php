@@ -9,6 +9,7 @@ class GerarTexto extends Model
     protected $table = 'gerar_textos';
     protected $guarded = [];
 
+    const SEPARADOR = '.';
     const TIPO_TITULO = 'Título';
     const TIPO_SUBTITULO = 'Subtítulo';
 
@@ -45,19 +46,20 @@ class GerarTexto extends Model
 
     public static function updateIndice($array, $resultado)
     {
-        // Somente atualiza ordem e indice
-        $chunk = array_chunk($array, 1, true);
+        // Somente atualiza ordem e índice
+        $chunk = array_values($array);
+        $array = null;
         $indice = '0';
 
         foreach($chunk as $key => $valor)
         {
             $ordem = $key + 1;
-            $indice_array = explode('.', $indice);
-            $id = (int) apenasNumeros(array_values($valor)[0]);
+            $indice_array = explode(self::SEPARADOR, $indice);
+            $id = (int) apenasNumeros($valor);
             $final = $resultado->find($id);
             if(isset($final))
             {
-                $nivel = $final->nivel;
+                $nivel = (int) $final->nivel;
                 $com_num = $final->com_numeracao;
 
                 if($com_num)
@@ -65,31 +67,30 @@ class GerarTexto extends Model
                     if($nivel == 0)
                     {
                         $indice = (int) substr($indice, 0, $indice_array[0]);
-                        $indice++;
-                        $indice = (string) $indice;
+                        $indice = (string) ++$indice;
                     }
                     else{
-                        $total = substr_count($indice, '.');
+                        $total = substr_count($indice, self::SEPARADOR);
                         if($total < $nivel)
-                            $indice .= '.1';
+                            $indice = $indice . self::SEPARADOR . '1';
                         elseif($total >= $nivel)
                         {
                             $temp = (int) $indice_array[$nivel];
-                            $temp++;
-                            $indice_array[$nivel] = $temp;
+                            $indice_array[$nivel] = ++$temp;
                             foreach($indice_array as $key_1 => $val){
                                 if($key_1 > $nivel)
                                     unset($indice_array[$key_1]);
                             }
-                            $indice = implode('.', $indice_array);
+                            $indice = implode(self::SEPARADOR, $indice_array);
                         }
                     }
                 }
-            
-                $final->update([
-                    'ordem' => $ordem,
-                    'indice' => $com_num ? $indice : null,
-                ]);
+                
+                $final->ordem = $ordem;
+                $final->indice = $com_num ? $indice : null;
+                // Somente salva o registro que foi alterado
+                if($final->isDirty('ordem') || $final->isDirty('indice'))
+                    $final->save();
             }
         }
     }

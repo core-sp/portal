@@ -146,7 +146,7 @@ $(document).ready(function(){
   };
 
   $(".textosSortable").sortable({
-    items: "> div > div.form-check",
+    items: "> div > div > div.form-check",
   });
   $(".textosSortable").disableSelection();
 
@@ -1186,6 +1186,21 @@ $('button.abrir').click(function(){
   $('#lista').hide();
   $('#lista').show();
   $('#tipo').focus();
+});
+
+$('[name="excluir_ids"]').change(function(){
+  var texto = $('[name="excluir_ids"]:checked').length == 0 ? 'Selecionar Todos' : 'Limpar seleção';
+  var quadrado = $('[name="excluir_ids"]:checked').length == 0 ? '<i class="fas fa-check-square"></i>' : '<i class="fas fa-square"></i>';
+  $('.selecionarTextos').html(quadrado + '&nbsp;&nbsp;' + texto);
+});
+
+$('.selecionarTextos').click(function(){
+  var selecionados = $('[name="excluir_ids"]:checked').length > 0 ? false : true;
+  var texto = $('[name="excluir_ids"]:checked').length == 0 ? 'Limpar seleção' : 'Selecionar Todos';
+  var quadrado = $('[name="excluir_ids"]:checked').length == 0 ? '<i class="fas fa-square"></i>' : '<i class="fas fa-check-square"></i>';
+  $('[name="excluir_ids"]').prop('checked', selecionados);
+  $('[name="excluir_ids"]:first').prop('checked', false);
+  $(this).html(quadrado + '&nbsp;&nbsp;' + texto);
 });
 
 // FIM da Funcionalidade GerarTexto ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

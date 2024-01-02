@@ -59,7 +59,7 @@ class GerarTextoTest extends TestCase
         $this->get(route('textos.view', $tipo))->assertOk();
         $this->post(route('textos.create', $tipo))
         ->assertRedirect(route('textos.view', $tipo))
-        ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "TÍTULO DO TEXTO..." foi criado com sucesso e inserido no final do documento!');
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "'.GerarTexto::first()->texto_tipo.'" foi criado com sucesso e inserido no final do sumário em vermelho!');
 
         $this->get(route('textos.view', $tipo))
         ->assertSee(GerarTexto::first()->tipo)
@@ -88,17 +88,17 @@ class GerarTextoTest extends TestCase
         $user = $this->signInAsAdmin();
         $tipo = array_keys(GerarTexto::tiposDoc())[0];
 
-        for($cont = 0; $cont < 5; $cont++){
+        for($cont = 1; $cont <= 5; $cont++){
             $this->get(route('textos.view', $tipo))->assertOk();
             $this->post(route('textos.create', $tipo))
             ->assertRedirect(route('textos.view', $tipo))
-            ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "TÍTULO DO TEXTO..." foi criado com sucesso e inserido no final do documento!');
+            ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "'.GerarTexto::find($cont)->texto_tipo.'" foi criado com sucesso e inserido no final do sumário em vermelho!');
     
             $this->get(route('textos.view', $tipo))
-            ->assertSee(GerarTexto::all()->get($cont)->conteudo)
-            ->assertSee('id="conteudo-'.GerarTexto::all()->get($cont)->id.'"');
+            ->assertSee('<button type="button" class="btn btn-link btn-sm abrir" value="'.$cont.'">')
+            ->assertSee('<input type="hidden" name="id-'.$cont.'" value="'.$cont.'" />');
     
-            $this->assertDatabaseHas('gerar_textos', GerarTexto::all()->get($cont)->toArray());
+            $this->assertDatabaseHas('gerar_textos', GerarTexto::find($cont)->toArray());
         }
 
         $this->assertEquals(5, GerarTexto::count());
@@ -126,19 +126,10 @@ class GerarTextoTest extends TestCase
         $txt = factory('App\GerarTexto')->create();
         
         $this->get(route('textos.view', $tipo))
-            ->assertSee('value="'.$txt->texto_tipo.'"')
-            ->assertSee('<option value="Título" selected>Título</option>')
-            ->assertSee('<option value="0" selected style="">0</option>')
-            ->assertSee('<button type="button" class="btn btn-link" id="abrir-'.$txt->id.'">'.$txt->tituloFormatado().'</button>')
-            ->assertSeeInOrder([
-                '<textarea',
-                'class="form-control"',
-                'id="conteudo-1"',
-                'rows="15"',
-                '>',
-                $txt->conteudo,
-                '</textarea>'
-            ]);
+            ->assertSee('>'.$txt->tituloFormatado().'</span>')
+            ->assertSee('<input type="hidden" name="id-'.$txt->id.'" value="'.$txt->id.'" />')
+            ->assertSee('<input type="checkbox" class="form-check-input" name="excluir_ids" value="'.$txt->id.'">')
+            ->assertSee('<button type="button" class="btn btn-link btn-sm abrir" value="'.$txt->id.'">');
     }
 
     /** @test */
@@ -568,6 +559,25 @@ class GerarTextoTest extends TestCase
     }
 
     /** @test */
+    public function can_be_update_indice_with_count_300()
+    {
+        $user = $this->signInAsAdmin();
+        $textos = factory('App\GerarTexto', 300)->create();
+        $dados = array();
+        foreach($textos as $key => $val)
+            $dados['id-'.$val->id] = $val->id;
+
+        $this->get(route('textos.view', $textos->get(0)->tipo_doc))->assertOk();
+
+        $this->put(route('textos.update.indice', $textos->get(0)->tipo_doc), array_reverse($dados))
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Índice atualizada com sucesso!')
+        ->assertRedirect(route('textos.view', $textos->get(0)->tipo_doc));
+
+        $this->get(route('textos.view', $textos->get(0)->tipo_doc))
+        ->assertSeeInOrder(array_keys(array_reverse($dados)));
+    }
+
+    /** @test */
     public function log_is_generated_when_sumario_is_updated()
     {
         $user = $this->signInAsAdmin();
@@ -578,14 +588,10 @@ class GerarTextoTest extends TestCase
         
         $this->put(route('textos.update.indice', $textos->get(0)->tipo_doc), array_reverse($dados));
 
-        $log = explode(PHP_EOL, tailCustom(storage_path($this->pathLogInterno()), 5));
-        foreach($log as $key => $val)
-        {
-            $id = $key + 1;
-            $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
-            $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') atualizou *índice do texto do documento '.$textos->get(0)->tipo_doc.'* (id: '.$id.')';
-            $this->assertStringContainsString($txt, $val);
-        }
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') atualizou *índice do texto do documento '.$textos->get(0)->tipo_doc.'* (id: ----)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */

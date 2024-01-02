@@ -62,10 +62,9 @@ class GerarTextoService implements GerarTextoServiceInterface {
         }
 
         // Somente atualiza ordem e indice
-        $resultado = GerarTexto::select('nivel', 'com_numeracao', 'id')->where('tipo_doc', $tipo_doc)->orderBy('ordem','ASC')->get();
+        $resultado = GerarTexto::select('nivel', 'com_numeracao', 'ordem', 'indice', 'id')->where('tipo_doc', $tipo_doc)->orderBy('ordem','ASC')->get();
         GerarTexto::updateIndice($dados, $resultado);
-        foreach($resultado as $val)
-            event(new CrudEvent('índice do texto do documento '.$tipo_doc, 'atualizou', $val->id));
+        event(new CrudEvent('índice do texto do documento '.$tipo_doc, 'atualizou', '----'));
 
         return true;
     }
