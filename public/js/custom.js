@@ -963,20 +963,23 @@ $('#deleteFileStorage').on('click', function(){
 
 function crudGerarTexto(acao, objeto){
 
-  $('#avisoTextos').modal({backdrop: 'static', keyboard: false, show: false});
+  $('#avisoTextos').modal('hide');
   var token = $('meta[name="csrf-token"]').attr('content');
   var id = $(objeto).val();
+  var textoLoading = '';
   var link = '';
   var metodo = '';
   var dados = '';
 
   switch(acao) {
     case 'carregar':
+      textoLoading = '<div class="spinner-border text-primary"></div>&nbsp;&nbsp;Carregando texto...';
       link = '/admin/textos/' + $('#tipo_doc').val() + '/' + id;
       metodo = 'GET';
       dados = {};
       break;
     case 'atualizar':
+      textoLoading = '<div class="spinner-border text-primary"></div>&nbsp;&nbsp;Atualizando campos...';
       link = '/admin/textos/' + $('#tipo_doc').val() + '/' + id;
       metodo = 'POST';
       dados = {
@@ -989,6 +992,7 @@ function crudGerarTexto(acao, objeto){
       };
       break;
     case 'excluir_varios':
+      textoLoading = '<div class="spinner-border text-primary"></div>&nbsp;&nbsp;Excluindo textos...';
       link = '/admin/textos/' + $('#tipo_doc').val() + '/excluir';
       metodo = 'DELETE';
       dados = {
@@ -1003,6 +1007,13 @@ function crudGerarTexto(acao, objeto){
       method: metodo,
       dataType: "json",
       data: dados,
+      beforeSend: function(){
+        $('#loadingIndice').modal({backdrop: 'static', keyboard: false, show: true});
+        $('#loadingIndice .modal-body').html(textoLoading);
+      },
+      complete: function(){
+        $('#loadingIndice').modal('hide');
+      },
       success: function(response) {
         $('.updateCampos').val(id);
         $('.deleteTexto').val(id);
@@ -1073,11 +1084,13 @@ function gerarTextoAvisosCrud(acao, response, valor){
 
   if((acao == 'erro') || (response == 1)){
     $('#avisoTextos').modal({backdrop: 'static', keyboard: false, show: true});
-    $('#avisoTextos .modal-title')
-      .html(title);
-		$('#avisoTextos .modal-body')
-			.html(texto);
+    $('#avisoTextos .modal-title').html(title);
+		$('#avisoTextos .modal-body').html(texto);
 		$('#avisoTextos .modal-footer').hide();
+    if(response == 1)
+      setTimeout(function(){
+        $('#avisoTextos').modal('hide');
+      }, 2000);
     return;
   }
 
@@ -1133,6 +1146,20 @@ function hideShowOptions(){
   }
 }
 
+function selecionarTodos(inverso){
+  var texto, quadrado;
+
+  if(!inverso){
+    texto = $('[name="excluir_ids"]:checked').length == 0 ? 'Selecionar Todos' : 'Limpar Seleção';
+    quadrado = $('[name="excluir_ids"]:checked').length == 0 ? '<i class="fas fa-check-square"></i>' : '<i class="fas fa-square"></i>';
+  }else{
+    texto = $('[name="excluir_ids"]:checked').length == 0 ? 'Limpar Seleção' : 'Selecionar Todos';
+    quadrado = $('[name="excluir_ids"]:checked').length == 0 ? '<i class="fas fa-square"></i>' : '<i class="fas fa-check-square"></i>';
+  }
+  
+  $('.selecionarTextos').html(quadrado + '&nbsp;&nbsp;' + texto);
+}
+
 $(".criarTexto").click(function(){
 	var token = $('meta[name="csrf-token"]').attr('content');
 	var link = '/admin/textos/' + $('#tipo_doc').val();
@@ -1178,6 +1205,7 @@ $(".textoTipo").change(function(){
 
 $("#updateIndice").click(function(){
   $('#loadingIndice').modal({backdrop: 'static', keyboard: false, show: true});
+  $('#loadingIndice .modal-body').html('<div class="spinner-border text-primary"></div>&nbsp;&nbsp;Atualizando a índice...');
 });
 
 // link no sumário para abrir e ir no texto
@@ -1189,18 +1217,14 @@ $('button.abrir').click(function(){
 });
 
 $('[name="excluir_ids"]').change(function(){
-  var texto = $('[name="excluir_ids"]:checked').length == 0 ? 'Selecionar Todos' : 'Limpar seleção';
-  var quadrado = $('[name="excluir_ids"]:checked').length == 0 ? '<i class="fas fa-check-square"></i>' : '<i class="fas fa-square"></i>';
-  $('.selecionarTextos').html(quadrado + '&nbsp;&nbsp;' + texto);
+  selecionarTodos(false);
 });
 
 $('.selecionarTextos').click(function(){
+  selecionarTodos(true);
   var selecionados = $('[name="excluir_ids"]:checked').length > 0 ? false : true;
-  var texto = $('[name="excluir_ids"]:checked').length == 0 ? 'Limpar seleção' : 'Selecionar Todos';
-  var quadrado = $('[name="excluir_ids"]:checked').length == 0 ? '<i class="fas fa-square"></i>' : '<i class="fas fa-check-square"></i>';
   $('[name="excluir_ids"]').prop('checked', selecionados);
   $('[name="excluir_ids"]:first').prop('checked', false);
-  $(this).html(quadrado + '&nbsp;&nbsp;' + texto);
 });
 
 // FIM da Funcionalidade GerarTexto ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

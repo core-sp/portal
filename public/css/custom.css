@@ -167,3 +167,10 @@ img {
 .custom-file-input ~ .custom-file-label::after {
   content: "Pesquisar";
 }
+
+#formGerarTexto div.form-check {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: ltr;
+}

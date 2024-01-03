@@ -59,10 +59,9 @@ class GerarTexto extends Model
             $final = $resultado->find($id);
             if(isset($final))
             {
-                $nivel = (int) $final->nivel;
-                $com_num = $final->com_numeracao;
+                $nivel = $final->nivel;
 
-                if($com_num)
+                if($final->com_numeracao)
                 {
                     if($nivel == 0)
                     {
@@ -86,11 +85,7 @@ class GerarTexto extends Model
                     }
                 }
                 
-                $final->ordem = $ordem;
-                $final->indice = $com_num ? $indice : null;
-                // Somente salva o registro que foi alterado
-                if($final->isDirty('ordem') || $final->isDirty('indice'))
-                    $final->save();
+                $final->atualizaOrdemIndice($ordem, $indice);
             }
         }
     }
@@ -103,6 +98,16 @@ class GerarTexto extends Model
             })
             ->orderBy('ordem', 'ASC')
             ->get();
+    }
+
+    private function atualizaOrdemIndice($ordem, $indice)
+    {
+        $this->ordem = $ordem;
+        $this->indice = $this->com_numeracao ? $indice : null;
+
+        // Somente salva o registro que foi alterado
+        if($this->isDirty('ordem') || $this->isDirty('indice'))
+            $this->save();
     }
 
     public function getCorTituloSub()

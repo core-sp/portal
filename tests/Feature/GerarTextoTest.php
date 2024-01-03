@@ -128,7 +128,7 @@ class GerarTextoTest extends TestCase
         $this->get(route('textos.view', $tipo))
             ->assertSee('>'.$txt->tituloFormatado().'</span>')
             ->assertSee('<input type="hidden" name="id-'.$txt->id.'" value="'.$txt->id.'" />')
-            ->assertSee('<input type="checkbox" class="form-check-input" name="excluir_ids" value="'.$txt->id.'">')
+            ->assertSee('<input type="checkbox" class="form-check-input mt-2" name="excluir_ids" value="'.$txt->id.'">')
             ->assertSee('<button type="button" class="btn btn-link btn-sm abrir" value="'.$txt->id.'">');
     }
 

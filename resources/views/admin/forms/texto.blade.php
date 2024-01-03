@@ -35,7 +35,7 @@
             <i>* Clique na caixinha <i class="fas fa-check-square"></i> para selecionar o item a ser excluído</i>
         </p>
 
-        <button type="button" class="btn btn-info selecionarTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;Selecionar Todos</button>
+        <button type="button" class="btn btn-info btn-sm selecionarTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;Selecionar Todos</button>
         <div class="textosSortable">
         @php
         $col = 1;
@@ -48,12 +48,12 @@
             <div class="row">
             @endif
                 @if($col == 1)
-                <div class="col-2">
+                <div class="col-3">
                 @endif            
                     <div class="form-check border border-left-0 border-info rounded-right mb-2 pr-4">
-                        <label class="form-check-label">
+                        <label class="form-check-label pl-4">
                             <input type="hidden" name="id-{{ $texto->id }}" value="{{ $texto->id }}" />
-                            <input type="checkbox" class="form-check-input" name="excluir_ids" value="{{ $texto->id }}">
+                            <input type="checkbox" class="form-check-input mt-2" name="excluir_ids" value="{{ $texto->id }}">
                             <button type="button" class="btn btn-link btn-sm abrir" value="{{ $texto->id }}">
                         @if($texto->tipoTitulo())
                         <span 
@@ -67,19 +67,21 @@
                             </button>
                         </label>
                     </div>
-                @if(($col == 50) || $loop->last)
+                @if(($col == 25) || $loop->last)
                 </div>
                 @endif
-            @if(($row == 300) || $loop->last)
+            @if((in_array($row, [100, 200, 300])) || $loop->last)
             </div>
             @endif
 
             @php
-            $col = ($col == 50) ? 1 : $col + 1;
-            $row = ($row == 300) ? 1 : $row + 1;
+            $col = ($col == 25) ? 1 : $col + 1;
+            $row = (in_array($row, [100, 200, 300])) ? 1 : $row + 1;
             @endphp
         @endforeach
         </div>
+
+        <button type="button" class="btn btn-info btn-sm selecionarTextos mt-2 mb-2"><i class="fas fa-check-square"></i>&nbsp;&nbsp;Selecionar Todos</button>
 
         @if(isset($can_update) && $can_update)
         <div class="row mt-3">
@@ -190,7 +192,7 @@
 </form>
 
 <!-- The Modal -->
-<div class="modal fade" id="avisoTextos">
+<div class="modal" id="avisoTextos">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <!-- Modal Header -->
@@ -214,7 +216,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-center">
             <!-- Modal body -->
-            <div class="modal-body"><div class="spinner-border text-primary"></div>&nbsp;&nbsp;Atualizando a índice...</div>
+            <div class="modal-body"></div>
         </div>
     </div>
 </div>
