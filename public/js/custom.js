@@ -1079,6 +1079,7 @@ function gerarTextoAvisosCrud(acao, response, valor){
       $('button[value="' + id + '"]').parents('.form-check').remove();
     });
     $('#lista').hide();
+    selecionarTodos(false);
     response = 1;
   }
 
@@ -1214,6 +1215,11 @@ $('button.abrir').click(function(){
   $('#lista').hide();
   $('#lista').show();
   $('#tipo').focus();
+});
+
+$('#formGerarTexto').ready(function(){
+  if($('button.abrir .badge').length > 0)
+    $('button.abrir .badge').click();
 });
 
 $('[name="excluir_ids"]').change(function(){

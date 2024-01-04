@@ -59,7 +59,7 @@ class GerarTextoTest extends TestCase
         $this->get(route('textos.view', $tipo))->assertOk();
         $this->post(route('textos.create', $tipo))
         ->assertRedirect(route('textos.view', $tipo))
-        ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "'.GerarTexto::first()->texto_tipo.'" foi criado com sucesso e inserido no final do sumário em vermelho!');
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "'.GerarTexto::first()->texto_tipo.'" foi criado com sucesso e inserido no final do sumário!');
 
         $this->get(route('textos.view', $tipo))
         ->assertSee(GerarTexto::first()->tipo)
@@ -92,10 +92,10 @@ class GerarTextoTest extends TestCase
             $this->get(route('textos.view', $tipo))->assertOk();
             $this->post(route('textos.create', $tipo))
             ->assertRedirect(route('textos.view', $tipo))
-            ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "'.GerarTexto::find($cont)->texto_tipo.'" foi criado com sucesso e inserido no final do sumário em vermelho!');
+            ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "'.GerarTexto::find($cont)->texto_tipo.'" foi criado com sucesso e inserido no final do sumário!');
     
             $this->get(route('textos.view', $tipo))
-            ->assertSee('<button type="button" class="btn btn-link btn-sm abrir" value="'.$cont.'">')
+            ->assertSee('<button type="button" class="btn btn-link btn-sm pl-0 abrir" value="'.$cont.'">')
             ->assertSee('<input type="hidden" name="id-'.$cont.'" value="'.$cont.'" />');
     
             $this->assertDatabaseHas('gerar_textos', GerarTexto::find($cont)->toArray());
@@ -129,7 +129,7 @@ class GerarTextoTest extends TestCase
             ->assertSee('>'.$txt->tituloFormatado().'</span>')
             ->assertSee('<input type="hidden" name="id-'.$txt->id.'" value="'.$txt->id.'" />')
             ->assertSee('<input type="checkbox" class="form-check-input mt-2" name="excluir_ids" value="'.$txt->id.'">')
-            ->assertSee('<button type="button" class="btn btn-link btn-sm abrir" value="'.$txt->id.'">');
+            ->assertSee('<button type="button" class="btn btn-link btn-sm pl-0 abrir" value="'.$txt->id.'">');
     }
 
     /** @test */

@@ -28,7 +28,7 @@ class GerarTextoController extends Controller
         }
 
         return redirect()->route('textos.view', $tipo_doc)
-            ->with('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "'.$texto->texto_tipo.'" foi criado com sucesso e inserido no final do sumário em vermelho!')
+            ->with('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "'.$texto->texto_tipo.'" foi criado com sucesso e inserido no final do sumário!')
             ->with('class', 'alert-success')
             ->with('novo_texto', $texto->id);
     }
