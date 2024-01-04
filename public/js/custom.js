@@ -1090,7 +1090,7 @@ function gerarTextoAvisosCrud(acao, response, valor){
     if(response == 1)
       setTimeout(function(){
         $('#avisoTextos').modal('hide');
-      }, 2000);
+      }, 1500);
     return;
   }
 

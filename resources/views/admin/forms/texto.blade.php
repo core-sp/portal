@@ -70,13 +70,13 @@
                 @if(($col == 25) || $loop->last)
                 </div>
                 @endif
-            @if((in_array($row, [100, 200, 300])) || $loop->last)
+            @if(($row == 100) || $loop->last)
             </div>
             @endif
 
             @php
             $col = ($col == 25) ? 1 : $col + 1;
-            $row = (in_array($row, [100, 200, 300])) ? 1 : $row + 1;
+            $row = ($row == 100) ? 1 : $row + 1;
             @endphp
         @endforeach
         </div>
