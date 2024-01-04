@@ -340,7 +340,7 @@ class GerarTextoTest extends TestCase
     public function textos_cannot_be_deleted_with_invalid_id()
     {
         $user = $this->signInAsAdmin();
-        $textos = factory('App\GerarTexto', 3)->create();
+        $textos = factory('App\GerarTexto', 4)->create();
 
         $ids = '1,22';
         $this->get(route('textos.view', $textos->get(0)->tipo_doc))->assertOk();
@@ -352,7 +352,7 @@ class GerarTextoTest extends TestCase
         ]);
 
         $this->assertDatabaseMissing('gerar_textos', $textos->get(0)->toArray());
-        $this->assertEquals(GerarTexto::count(), 2);
+        $this->assertEquals(GerarTexto::count(), 3);
 
         $ids = 'ddd,2d';
         $this->get(route('textos.view', $textos->get(0)->tipo_doc))->assertOk();
@@ -363,7 +363,7 @@ class GerarTextoTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('gerar_textos', $textos->get(1)->toArray());
-        $this->assertEquals(GerarTexto::count(), 2);
+        $this->assertEquals(GerarTexto::count(), 3);
     }
 
     /** @test */
@@ -374,7 +374,7 @@ class GerarTextoTest extends TestCase
 
         $this->get(route('textos.view', $texto->tipo_doc))->assertOk();
         $this->delete(route('textos.delete', $texto->tipo_doc), ['excluir_ids' => $texto->id])
-        ->assertJsonFragment(["Deve existir no mínimo um texto."]);
+        ->assertStatus(400);
 
         $this->assertDatabaseHas('gerar_textos', $texto->toArray());
     }

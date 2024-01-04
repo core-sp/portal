@@ -57,6 +57,7 @@ class GerarTextoController extends Controller
             $ok = $this->service->getService('GerarTexto')->excluir($tipo_doc, $dados['excluir_ids']);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [400]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao excluir o texto do documento ".$tipo_doc.".");
         }
 

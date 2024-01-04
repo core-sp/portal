@@ -101,7 +101,7 @@ class GerarTextoService implements GerarTextoServiceInterface {
                 }
             }
         }else
-            $ok = 'Deve existir no mínimo um texto.';
+            throw new \Exception('Deve existir no mínimo um texto.', 400);
         
         return $ok;
     }
