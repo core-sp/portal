@@ -37,7 +37,6 @@ class GerarTexto extends Model
 
         return self::create([
             'texto_tipo' => mb_strtoupper('Título do texto...', 'UTF-8'),
-            'conteudo' => '<p>Texto...</p>',
             'ordem' => $total,
             'tipo_doc' => $tipo_doc,
             'publicar' => $publicada,
