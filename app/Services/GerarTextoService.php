@@ -54,10 +54,20 @@ class GerarTextoService implements GerarTextoServiceInterface {
         {
             $dados['texto_tipo'] = $dados['tipo'] == GerarTexto::TIPO_TITULO ? mb_strtoupper($dados['texto_tipo'], 'UTF-8') : $dados['texto_tipo'];
             $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->where('id', $id)->firstOrFail();
-            $resultado->update($dados);
-            event(new CrudEvent('campos do texto do documento '.$tipo_doc, 'atualizou', $id));
-            $resultado->texto_tipo = $resultado->tipoTitulo() ? $resultado->tituloFormatado() : $resultado->subtituloFormatado();
-    
+
+            $resultado->tipo = $dados['tipo'];
+            $resultado->texto_tipo = $dados['texto_tipo'];
+            $resultado->conteudo = $dados['conteudo'];
+            $resultado->com_numeracao = $dados['com_numeracao'];
+            $resultado->nivel = $dados['nivel'];
+
+            if($resultado->isDirty())
+            {
+                $resultado->save();
+                event(new CrudEvent('campos do texto do documento '.$tipo_doc, 'atualizou', $id));
+                $resultado->texto_tipo = $resultado->tipoTitulo() ? $resultado->tituloFormatado() : $resultado->subtituloFormatado();
+            }
+            
             return $resultado;
         }
 
@@ -109,6 +119,7 @@ class GerarTextoService implements GerarTextoServiceInterface {
     public function show($tipo_doc, $id = null, $user = null)
     {
         $resultado = GerarTexto::resultadoByDoc($tipo_doc, $user)->except(['conteudo']);
+        $dt_atualizacao = onlyDate(GerarTexto::ultimaAtualizacao($tipo_doc));
 
         $textos = array();
         if(isset($id))
@@ -142,6 +153,7 @@ class GerarTextoService implements GerarTextoServiceInterface {
             'textos' => $textos,
             'btn_anterior' => isset($btn_anterior) ? route($tipo_doc, $btn_anterior->id) : null,
             'btn_proximo' => isset($btn_proximo) ? route($tipo_doc, $btn_proximo->id) : null,
+            'dt_atualizacao' => $dt_atualizacao,
         ];
     }
 

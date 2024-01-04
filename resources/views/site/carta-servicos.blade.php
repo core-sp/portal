@@ -130,6 +130,10 @@
           <img src="{{ asset('img/base_carta_servicos.png') }}" />
         </div>
 
+        <div class="float-right mr-1 mt-3">
+          <small><i>Última atualização: {{ $dt_atualizacao }}</i></small>
+        </div>
+
         <ul class="pagination p-0 mt-2 mb-0">
           <li class="page-item {{ isset($btn_anterior) ? '' : 'disabled' }}"><a class="page-link" href="{{ isset($btn_anterior) ? $btn_anterior : '#' }}"><i class="fas fa-angle-double-left"></i></a></li>
           <li class="page-item {{ isset($btn_proximo) ? '' : 'disabled' }}"><a class="page-link" href="{{ isset($btn_proximo) ? $btn_proximo : '#' }}"><i class="fas fa-angle-double-right"></i></a></li>

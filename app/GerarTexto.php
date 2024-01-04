@@ -99,6 +99,11 @@ class GerarTexto extends Model
             ->get();
     }
 
+    public static function ultimaAtualizacao($tipo_doc)
+    {
+        return self::where('tipo_doc', $tipo_doc)->max('updated_at');
+    }
+
     private function atualizaOrdemIndice($ordem, $indice)
     {
         $this->ordem = $ordem;

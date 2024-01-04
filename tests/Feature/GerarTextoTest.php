@@ -145,10 +145,37 @@ class GerarTextoTest extends TestCase
 
         $this->get(route('textos.view', $texto->tipo_doc))->assertOk();
         $this->post(route('textos.update.campos', [$texto->tipo_doc, $texto->id]), $dados)
-        ->assertJsonFragment([true]);
+        ->assertJsonFragment([
+            'nivel' => $dados['nivel'],
+            'tipo' => $dados['tipo'],
+            'conteudo' => $dados['conteudo'],
+        ]);
 
         $this->assertDatabaseHas('gerar_textos', GerarTexto::first()->toArray());
         $this->assertDatabaseMissing('gerar_textos', $texto->toArray());
+    }
+
+    /** @test */
+    public function texto_cannot_be_updated_without_changes()
+    {
+        $user = $this->signInAsAdmin();
+        $texto = factory('App\GerarTexto')->create([
+            'texto_tipo' => mb_strtoupper('Texto Fixo', 'UTF-8'),
+            'updated_at' => now()->subDays(3)->format('Y-m-d H:i:s')
+        ])->toArray();
+
+        $this->get(route('textos.view', $texto['tipo_doc']))->assertOk();
+        $this->post(route('textos.update.campos', [$texto['tipo_doc'], $texto['id']]), $texto)
+        ->assertJsonFragment([
+            'nivel' => $texto['nivel'],
+            'tipo' => $texto['tipo'],
+            'conteudo' => $texto['conteudo'],
+            'updated_at' => $texto['updated_at']
+        ]);
+
+        $this->assertDatabaseMissing('gerar_textos', [
+            'updated_at' => now()->format('Y-m-d H:i:s')
+        ]);
     }
 
     /** @test */
