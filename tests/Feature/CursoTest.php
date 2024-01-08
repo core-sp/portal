@@ -1445,6 +1445,125 @@ class CursoTest extends TestCase
     }
 
     /** @test */
+    public function inscrito_presenca_sim_can_be_updated_by_an_user()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create();
+        $inscrito->curso->update([
+            'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+            'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+        ]);
+
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = 'Sim';
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.edit', $inscrito->idcursoinscrito))->assertOk();
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes)
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Inscrição com ID 1 teve a presença atualizada com sucesso!');
+
+        $this->assertDatabaseHas('curso_inscritos', [
+            'cpf' => $inscrito->cpf,
+            'presenca' => "Sim",
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_inscrito_presenca_sim_is_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create();
+        $inscrito->curso->update([
+            'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+            'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+        ]);
+
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = 'Sim';
+        unset($attributes['idcurso']);
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') confirmou presença do participante 1 *no curso* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function inscrito_presenca_nao_can_be_updated_by_an_user()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create();
+        $inscrito->curso->update([
+            'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+            'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+        ]);
+
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = 'Não';
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.edit', $inscrito->idcursoinscrito))->assertOk();
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes)
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Inscrição com ID 1 teve a presença atualizada com sucesso!');
+
+        $this->assertDatabaseHas('curso_inscritos', [
+            'cpf' => $inscrito->cpf,
+            'presenca' => "Não",
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_inscrito_presenca_nao_is_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create();
+        $inscrito->curso->update([
+            'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+            'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+        ]);
+
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = 'Não';
+        unset($attributes['idcurso']);
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') confirmou falta do participante 1 *no curso* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function inscrito_presenca_cannot_be_updated_by_an_user_if_can_to_cancel()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create();
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = 'Não';
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.edit', $inscrito->idcursoinscrito))->assertOk();
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes)
+        ->assertStatus(400);
+
+        $this->assertDatabaseMissing('curso_inscritos', [
+            'cpf' => $inscrito->cpf,
+            'presenca' => "Não",
+        ]);
+    }
+
+    /** @test */
     public function inscrito_cannot_be_cpf_when_updated()
     {
         $user = $this->signInAsAdmin();
@@ -2176,6 +2295,49 @@ class CursoTest extends TestCase
 
         $this->post(route('cursos.inscricao', $curso->idcurso), $attributes)
         ->assertNotFound();
+    }
+
+    /** @test */
+    public function download_csv_inscritos()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'presenca' => 'Sim',
+            'registrocore' => '000001/2023'
+        ]);
+        $inscrito2 = factory('App\CursoInscrito')->create([
+            'cpf' => '111.111.111-11',
+            'idcurso' => 1,
+            'presenca' => 'Não',
+            'registrocore' => '000001/2024'
+        ]);
+        $inscrito3 = factory('App\CursoInscrito')->create([
+            'cpf' => '211.111.111-11',
+            'idcurso' => 1,
+            'registrocore' => '000001/2021',
+            'created_at' => now()->subDay()->format('Y-m-d H:i:s')
+        ]);
+
+        $r = $this->get(route('inscritos.download', 1));
+
+        $r->assertHeader('Content-Disposition', 'attachment; filename=inscritos-1.csv');
+        $conteudo_csv = $r->streamedContent();
+
+        $cabecalho = 'E-mail;CPF;Nome;Telefone;"Registro Core";"Tipo da Inscrição";"Campo Adicional";Compareceu;"Data da Inscrição";curso';
+        $this->assertStringContainsString($cabecalho, $conteudo_csv);
+
+        $registro1 = $inscrito->email.';'.$inscrito->cpf.';"'.$inscrito->nome.'";"'.$inscrito->telefone.'";'.$inscrito->registrocore.';'.$inscrito->tipo_inscrito.';';
+        $registro1 .= ';'.$inscrito->presenca.';"'.$inscrito->created_at.'";';
+        $this->assertStringContainsString($registro1, $conteudo_csv);
+
+        $registro2 = $inscrito2->email.';'.$inscrito2->cpf.';"'.$inscrito2->nome.'";"'.$inscrito2->telefone.'";'.$inscrito2->registrocore.';'.$inscrito2->tipo_inscrito.';';
+        $registro2 .= ';'.$inscrito2->presenca.';"'.$inscrito2->created_at.'";';
+        $this->assertStringContainsString($registro2, $conteudo_csv);
+
+        $registro3 = $inscrito3->email.';'.$inscrito3->cpf.';"'.$inscrito3->nome.'";"'.$inscrito3->telefone.'";'.$inscrito3->registrocore.';'.$inscrito3->tipo_inscrito.';';
+        $registro3 .= ';;"'.$inscrito3->created_at.'";';
+        $this->assertStringContainsString($registro3, $conteudo_csv);
     }
 
     /** 
