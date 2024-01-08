@@ -229,6 +229,10 @@ class CursoSubService implements CursoSubServiceInterface {
     public function updatePresenca($id, $validated)
     {
         $inscrito = CursoInscrito::findOrFail($id);
+
+        if($inscrito->podeCancelar())
+            throw new \Exception('Não pode atualizar presença da inscrição (id: '.$id.') se ainda pode cancelar a inscrição.', 400);
+
         $acao = $validated['presenca'] == 'Sim' ? 'presença' : 'falta';
 
         $inscrito->update(['presenca' => $validated['presenca']]);

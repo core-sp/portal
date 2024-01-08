@@ -229,7 +229,7 @@ class CursoService implements CursoServiceInterface {
     public function downloadInscricoes($id)
     {
         $resultado = Curso::findOrFail($id)->cursoinscrito()
-        ->select('email','cpf','nome','telefone','registrocore','tipo_inscrito','campo_adicional','created_at')
+        ->selectRaw('email AS "E-mail", cpf AS "CPF", nome AS "Nome", telefone AS "Telefone", registrocore AS "Registro Core", tipo_inscrito AS "Tipo da Inscrição", campo_adicional AS "Campo Adicional", presenca AS "Compareceu", created_at AS "Data da Inscrição"')
         ->orderBy('created_at', 'desc')
         ->get();
         
@@ -239,7 +239,7 @@ class CursoService implements CursoServiceInterface {
             $fh = fopen('php://output','w');
             fprintf($fh, chr(0xEF).chr(0xBB).chr(0xBF));
             foreach($lista as $key => $linha) {
-                if($key != 'curso')
+                // if($key != 'curso')
                     fputcsv($fh,$linha,';');
             }
             fclose($fh);
