@@ -53,24 +53,31 @@ class CursoSubService implements CursoSubServiceInterface {
                 $acoes .= '<form method="POST" action="'.route('inscritos.destroy', $resultado->idcursoinscrito).'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar Inscrição" onclick="return confirm(\'Tem certeza que deseja cancelar a inscrição?\')" />';
+                $acoes .= '<button type="submit" class="btn btn-sm btn-danger" value="Cancelar Inscrição" onclick="return confirm(\'Tem certeza que deseja cancelar a inscrição?\')" >Cancelar Inscrição</button>';
                 $acoes .= '</form>';
             }elseif(!$resultado->possuiPresenca()){
                 $acoes .= '<form method="POST" action="'.route('inscritos.update.presenca', $resultado->idcursoinscrito).'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="put" />';
                 $acoes .= '<input type="hidden" name="presenca" value="Sim" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-success" value="Confirmar presença" />';
+                $acoes .= '<button type="submit" class="btn btn-sm btn-success" value="Confirmar presença">Confirmar presença</button>';
                 $acoes .= '</form> ';
                 $acoes .= '<form method="POST" action="'.route('inscritos.update.presenca', $resultado->idcursoinscrito).'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="put" />';
                 $acoes .= '<input type="hidden" name="presenca" value="Não" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-warning" value="Dar falta" />';
+                $acoes .= '<button type="submit" class="btn btn-sm btn-warning" value="Dar falta">Dar falta</button>';
                 $acoes .= '</form>';
-            }elseif($resultado->possuiPresenca())
-                $acoes .= $resultado->compareceu() ? "<p class='d-inline text-success'><strong><i class='fas fa-check checkIcone'></i> Compareceu&nbsp;</strong></p>" :
-                "<p class='d-inline text-danger'><strong><i class='fas fa-ban checkIcone'></i> Não Compareceu&nbsp;</strong></p>";
+            }elseif($resultado->possuiPresenca()){
+                $acoes .= $resultado->compareceu() ? '<p class="d-inline text-success ml-1"><strong><i class="fas fa-check checkIcone"></i> Compareceu&nbsp;</strong></p>' :
+                '<p class="d-inline text-danger ml-1"><strong><i class="fas fa-ban checkIcone"></i> Não Compareceu&nbsp;</strong></p>';
+                $acoes .= '<form method="POST" action="'.route('inscritos.update.presenca', $resultado->idcursoinscrito).'" class="d-inline">';
+                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+                $acoes .= '<input type="hidden" name="_method" value="put" />';
+                $acoes .= '<input type="hidden" name="presenca" value="Reverter" />';
+                $acoes .= '<button type="submit" class="btn btn-sm btn-info ml-1" value="Reverter Presença"><i class="fas fa-undo-alt"></i></button>';
+                $acoes .= '</form>';
+            }
 
             if(empty($acoes))
                 $acoes = '<i class="fas fa-lock text-muted"></i>';
@@ -230,14 +237,31 @@ class CursoSubService implements CursoSubServiceInterface {
     {
         $inscrito = CursoInscrito::findOrFail($id);
 
+        $possuiPresenca = $inscrito->possuiPresenca() && in_array($validated['presenca'], ['Sim', 'Não']);
+        $naoPossuiPresenca = !$inscrito->possuiPresenca() && in_array($validated['presenca'], ['Reverter']);
+        if($possuiPresenca || $naoPossuiPresenca)
+            return [
+                'message' => '<i class="icon fas fa-info-circle"></i>Não houve alteração da inscrição com ID '.$id.'.',
+                'class' => 'alert-info'
+            ];
+
         if($inscrito->podeCancelar())
             throw new \Exception('Não pode atualizar presença da inscrição (id: '.$id.') se ainda pode cancelar a inscrição.', 400);
 
-        $acao = $validated['presenca'] == 'Sim' ? 'presença' : 'falta';
+        if(!in_array($validated['presenca'], ['Sim', 'Não']))
+            $acao = 'a anulação da presença atualizada anteriormente';
+        else
+            $acao = $validated['presenca'] == 'Sim' ? 'presença' : 'falta';
 
-        $inscrito->update(['presenca' => $validated['presenca']]);
+        $inscrito->presenca = in_array($validated['presenca'], ['Sim', 'Não']) ? $validated['presenca'] : null;
+        $inscrito->save();
 
         event(new CrudEvent('no curso', 'confirmou '.$acao.' do participante '.$id, $inscrito->idcurso));
+
+        return [
+            'message' => '<i class="icon fa fa-check"></i>Inscrição com ID '.$id.' teve a presença atualizada com sucesso!',
+            'class' => 'alert-success'
+        ];
     }
 
     public function liberarInscricao($curso, $rep = null, $situacao = '')

@@ -62,7 +62,7 @@ class CursoInscricaoRequest extends FormRequest
 
         if(\Route::is('inscritos.update.presenca'))
             return [
-                'presenca' => 'required|in:Sim,Não',
+                'presenca' => 'required|in:Sim,Não,Reverter',
             ];
             
         if(\Route::is('cursos.inscricao') && auth()->guard('representante')->check())

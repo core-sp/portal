@@ -1543,6 +1543,172 @@ class CursoTest extends TestCase
     }
 
     /** @test */
+    public function inscrito_presenca_reverter_can_be_updated_by_an_user()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'presenca' => 'Sim'
+        ]);
+        $inscrito->curso->update([
+            'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+            'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+        ]);
+
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = 'Reverter';
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.edit', $inscrito->idcursoinscrito))->assertOk();
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes)
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Inscrição com ID 1 teve a presença atualizada com sucesso!');
+
+        $this->assertDatabaseHas('curso_inscritos', [
+            'cpf' => $inscrito->cpf,
+            'presenca' => null,
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_inscrito_presenca_reverter_is_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'presenca' => 'Não'
+        ]);
+        $inscrito->curso->update([
+            'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+            'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+        ]);
+
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = 'Reverter';
+        unset($attributes['idcurso']);
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') confirmou a anulação da presença atualizada anteriormente do participante 1 *no curso* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function inscrito_presenca_sim_cannot_be_updated_by_an_user_without_changes()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'presenca' => 'Sim'
+        ]);
+        $inscrito->curso->update([
+            'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+            'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+        ]);
+
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = 'Sim';
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.edit', $inscrito->idcursoinscrito))->assertOk();
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes)
+        ->assertSessionHas('message', '<i class="icon fas fa-info-circle"></i>Não houve alteração da inscrição com ID 1.');
+    }
+
+    /** @test */
+    public function inscrito_presenca_nao_cannot_be_updated_by_an_user_without_changes()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'presenca' => 'Não'
+        ]);
+        $inscrito->curso->update([
+            'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+            'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+        ]);
+
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = 'Não';
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.edit', $inscrito->idcursoinscrito))->assertOk();
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes)
+        ->assertSessionHas('message', '<i class="icon fas fa-info-circle"></i>Não houve alteração da inscrição com ID 1.');
+    }
+
+    /** @test */
+    public function inscrito_presenca_reverter_cannot_be_updated_by_an_user_without_changes()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create();
+        $inscrito->curso->update([
+            'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+            'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+        ]);
+
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = 'Reverter';
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.edit', $inscrito->idcursoinscrito))->assertOk();
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes)
+        ->assertSessionHas('message', '<i class="icon fas fa-info-circle"></i>Não houve alteração da inscrição com ID 1.');
+    }
+
+    /** @test */
+    public function inscrito_presenca_sim_cannot_be_updated_by_an_user_with_presenca_nao()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'presenca' => 'Sim'
+        ]);
+        $inscrito->curso->update([
+            'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+            'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+        ]);
+
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = 'Não';
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.edit', $inscrito->idcursoinscrito))->assertOk();
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes)
+        ->assertSessionHas('message', '<i class="icon fas fa-info-circle"></i>Não houve alteração da inscrição com ID 1.');
+    }
+
+    /** @test */
+    public function inscrito_presenca_nao_cannot_be_updated_by_an_user_with_presenca_sim()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'presenca' => 'Não'
+        ]);
+        $inscrito->curso->update([
+            'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+            'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+        ]);
+
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = 'Sim';
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.edit', $inscrito->idcursoinscrito))->assertOk();
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes)
+        ->assertSessionHas('message', '<i class="icon fas fa-info-circle"></i>Não houve alteração da inscrição com ID 1.');
+    }
+
+    /** @test */
     public function inscrito_presenca_cannot_be_updated_by_an_user_if_can_to_cancel()
     {
         $user = $this->signInAsAdmin();
@@ -1561,6 +1727,38 @@ class CursoTest extends TestCase
             'cpf' => $inscrito->cpf,
             'presenca' => "Não",
         ]);
+    }
+
+    /** @test */
+    public function inscrito_presenca_cannot_be_updated_by_an_user_with_invalid_presenca()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create();
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = 'No';
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.edit', $inscrito->idcursoinscrito))->assertOk();
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes)
+        ->assertSessionHasErrors('presenca');
+    }
+
+    /** @test */
+    public function inscrito_presenca_cannot_be_updated_by_an_user_without_presenca()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create();
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = null;
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.edit', $inscrito->idcursoinscrito))->assertOk();
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes)
+        ->assertSessionHasErrors('presenca');
     }
 
     /** @test */
