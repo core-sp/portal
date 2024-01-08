@@ -230,6 +230,7 @@ class CursoInscritoController extends Controller
             $this->service->getService('Curso')->inscritos()->updatePresenca($id, $validated);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [400]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao atualizar a presença da inscrição com ID ".$id.".");
         }
 
