@@ -265,7 +265,7 @@ class GerentiRepository implements GerentiRepositoryInterface
         $run->execute([
             'ass_id' => $ass_id
         ]);
-        return $run->fetchAll(PDO::FETCH_ASSOC)[0];
+        return utf8_converter($run->fetchAll(PDO::FETCH_ASSOC)[0]);
     }
 
     public function gerentiInserirEndereco($ass_id, $infos)
