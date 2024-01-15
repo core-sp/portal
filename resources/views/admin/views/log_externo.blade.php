@@ -133,6 +133,16 @@
 						<label for="n_linhas_mes" class="text-justify mr-sm-2">
 							total de ocorrências por log
 						</label>
+
+                        <input type="checkbox"
+							name="distintos"
+							class="form-check-input {{ $errors->has('distintos') ? 'is-invalid' : '' }} ml-sm-2"
+							id="distintos_mes"
+                            {{ isset(request()->query()['mes']) && isset(request()->query()['distintos']) ? 'checked' : '' }}
+						/> 
+						<label for="distintos_mes" class="text-justify mr-sm-2">
+							somente registros distintos
+						</label>
                         
                         <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">Buscar</button>
                         @if($errors->has('mes') || $errors->has('tipo') || $errors->has('texto'))
@@ -193,6 +203,16 @@
 						<label for="n_linhas_ano" class="text-justify mr-sm-2">
 							total de ocorrências por log
 						</label>
+
+                        <input type="checkbox"
+							name="distintos"
+							class="form-check-input {{ $errors->has('distintos') ? 'is-invalid' : '' }} ml-sm-2"
+							id="distintos_ano"
+                            {{ isset(request()->query()['ano']) && isset(request()->query()['distintos']) ? 'checked' : '' }}
+						/> 
+						<label for="distintos_ano" class="text-justify mr-sm-2">
+							somente registros distintos
+						</label>
                         
                         <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">Buscar</button>
                         @if($errors->has('ano') || $errors->has('tipo') || $errors->has('texto'))
@@ -222,7 +242,7 @@
     @endphp
     <div class="mt-4 mb-4">
         <h4>Resultado da busca "<i>{{ $busca }}</i>" para o log <strong>{{ $textoTipo }}</strong></h4>
-        @if(!isset(request()->query()['data']) && isset(request()->query()['n_linhas']))
+        @if(!isset(request()->query()['data']) && (isset(request()->query()['n_linhas']) || isset(request()->query()['distintos'])))
         <h5>Total de ocorrências: {{ number_format($totalFinal, 0, ",", ".") }}</h5>
         @endif
     </div>

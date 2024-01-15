@@ -25,6 +25,7 @@ class SuporteRequest extends FormRequest
             'ano' => 'required_without_all:data,mes,file|date_format:Y|before_or_equal:'.date('Y').'|after:2018',
             'texto' => 'required_with:mes,ano|min:3|max:191',
             'n_linhas' => 'nullable',
+            'distintos' => 'nullable',
             'file' => 'file|mimetypes:text/plain',
         ];
     }

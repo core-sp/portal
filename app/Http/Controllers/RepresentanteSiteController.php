@@ -72,6 +72,8 @@ class RepresentanteSiteController extends Controller
             $nome && $id ? $rep->update(['nome' => mb_strtoupper($dados['NOME'], 'UTF-8')]) : null;
         }
 
+        event(new ExternoEvent('.', 'Home'));
+
         return view('site.representante.home', compact("nrBoleto", "status", "ano"));
     }
 
@@ -82,6 +84,7 @@ class RepresentanteSiteController extends Controller
         $cpfCnpj = Auth::guard('representante')->user()->cpf_cnpj;
         $tipoPessoa = Auth::guard('representante')->user()->tipoPessoa();
         $dadosGerais = $this->gerentiRepository->gerentiDadosGerais(Auth::guard('representante')->user()->tipoPessoa(), Auth::guard('representante')->user()->ass_id);
+        event(new ExternoEvent('.', 'Dados Gerais'));
 
         return view('site.representante.dados-gerais', compact("nome", "registroCore", "cpfCnpj", "tipoPessoa", "dadosGerais"));
     }
@@ -90,6 +93,7 @@ class RepresentanteSiteController extends Controller
     {
         $contatos = $this->gerentiRepository->gerentiContatos(Auth::guard('representante')->user()->ass_id);
         $gerentiTiposContatos = gerentiTiposContatos();
+        event(new ExternoEvent('.', 'Contatos'));
 
         return view('site.representante.contatos', compact("contatos", "gerentiTiposContatos"));
     }
@@ -99,6 +103,7 @@ class RepresentanteSiteController extends Controller
         $solicitacoesEnderecos = Auth::guard('representante')->user()->solicitacoesEnderecos();
         $possuiSolicitacaoEnderecos = $solicitacoesEnderecos->isNotEmpty();
         $endereco = $this->gerentiRepository->gerentiEnderecos(Auth::guard('representante')->user()->ass_id);
+        event(new ExternoEvent('.', 'End. de Correspondência'));
 
         return view('site.representante.enderecos', compact("possuiSolicitacaoEnderecos", "solicitacoesEnderecos", "endereco"));
     }
@@ -106,6 +111,7 @@ class RepresentanteSiteController extends Controller
     public function listaCobrancas()
     {
         $cobrancas = $this->gerentiRepository->gerentiCobrancas(Auth::guard('representante')->user()->ass_id);
+        event(new ExternoEvent('.', 'Situação Financeira'));
 
         return view('site.representante.lista-cobrancas', compact("cobrancas"));
     }
@@ -252,6 +258,7 @@ class RepresentanteSiteController extends Controller
 
     public function inserirContatoView()
     {
+        event(new ExternoEvent(' para incluir.', 'Contatos'));
         return view('site.representante.inserir-contato');
     }
 
@@ -297,6 +304,7 @@ class RepresentanteSiteController extends Controller
                     'class' => 'alert-danger'
                 ]);
         }
+        event(new ExternoEvent(' para incluir.', 'End. de Correspondência'));
 
         return view('site.representante.inserir-endereco');
     }
@@ -390,6 +398,8 @@ class RepresentanteSiteController extends Controller
         if($hasEmitido) {
             $mensagem .='<strong>Atenção, existem certidões que ainda estão válidas, caso opte em emitir uma nova, essas serão canceladas.</strong></br>';
         }
+
+        event(new ExternoEvent('.', 'Emitir Certidão'));
 
         return view('site.representante.emitir-certidao', compact('titulo', 'mensagem', 'emitir', 'certidoes'));
     }
@@ -506,6 +516,8 @@ class RepresentanteSiteController extends Controller
             abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente mais tarde.');
         }
         
+        event(new ExternoEvent('.', 'Oportunidades'));
+
         return view('site.representante.bdo', compact('bdo', 'segmento', 'seccional'));
     }
 
@@ -518,6 +530,8 @@ class RepresentanteSiteController extends Controller
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar as solicitações de cédula do representante.");
         }
+
+        event(new ExternoEvent('.', 'Solicitação de Cédula'));
 
         return view('site.representante.cedulas')->with($dados);
     }
@@ -535,6 +549,8 @@ class RepresentanteSiteController extends Controller
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os dados para realizar a solicitação de cédula do representante.");
         }
+
+        event(new ExternoEvent(' para incluir.', 'Solicitação de Cédula'));
 
         return view('site.representante.inserir-solicita-cedula')->with($dados);
     }
@@ -568,6 +584,8 @@ class RepresentanteSiteController extends Controller
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os cursos.");
         }
+
+        event(new ExternoEvent('.', 'Cursos'));
 
         return view('site.representante.cursos', ['cursos' => $cursos]);
     }
@@ -624,6 +642,8 @@ class RepresentanteSiteController extends Controller
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar as opções de agendamento das salas.");
         }
+
+        event(new ExternoEvent(isset($acao) ? ' para '.$acao.'.' : '.', 'Agendar Salas'));
 
         return isset($erro) ? redirect()->route('representante.agendar.inserir.view')->with($erro) : 
         view('site.representante.'. $view, $dados);

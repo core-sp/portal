@@ -120,6 +120,8 @@ class SuporteService implements SuporteServiceInterface {
             $diretorio = isset($request['mes']) ? $this->getPathsLogsMonth($request['mes']) : $request['ano'];
             $all = Storage::disk('log_'.$request['tipo'])->allFiles($diretorio);
             $com_total_linhas = isset($request['n_linhas']) && ($request['n_linhas'] == 'on');
+            $distintos = isset($request['distintos']) && ($request['distintos'] == 'on');
+            $array_unique = array();
 
             foreach($all as $key => $file)
             {
@@ -133,9 +135,21 @@ class SuporteService implements SuporteServiceInterface {
                 {
                     if(stripos($line, $request['texto']) !== false)
                     {
-                        if($com_total_linhas)
+                        if($distintos)
+                        {
+                            $pos = stripos($line, '] - ') + 4;
+                            $txt = trim(substr($line, $pos));
+                            if(!in_array($txt, $array_unique))
+                            {
+                                array_push($array_unique, $txt);
+                                $total++;
+                            }
+                        }
+
+                        if(!$distintos && $com_total_linhas)
                             $total++;
-                        else
+
+                        if(!$com_total_linhas && !$distintos)
                         {
                             array_push($array, str_replace('.log', '', substr($file, 16)) . ';' . $size);
                             break;
@@ -144,6 +158,9 @@ class SuporteService implements SuporteServiceInterface {
                 }
                 fclose($f);
                 unset($f);
+
+                if(($distintos && !$com_total_linhas) && ($total > 0))
+                    array_push($array, str_replace('.log', '', substr($file, 16)) . ';' . $size);
 
                 if($com_total_linhas && ($total > 0))
                     array_push($array, str_replace('.log', '', substr($file, 16)) . ';' . $size . ';' . $total);
