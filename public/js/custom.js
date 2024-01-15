@@ -460,11 +460,28 @@ $('#statusAgendamentoAdmin').ready(function(){
 		$('#parcelamento' + id).html('R$ ' + valorParcelado.replace('.', ','));
 	});
 
+  // Funcionalidade Suporte / Logs
   $(document).on('keydown', function(e) {
     if((e.keyCode == 27) && (window.location.href.indexOf('/admin/suporte/logs'))){
       $("#modalSuporte").modal('hide');
     }
   });
+
+  $('#buscar-mes [type="radio"]').change(function(){
+    if(this.checked){
+      $('#buscar-mes [name="mes"]').prop('disabled', false);
+      $('#buscar-ano [name="ano"]').prop('disabled', true);
+    }
+  });
+
+  $('#buscar-ano [type="radio"]').change(function(){
+    if(this.checked){
+      $('#buscar-mes [name="mes"]').prop('disabled', true);
+      $('#buscar-ano [name="ano"]').prop('disabled', false);
+    }
+  });
+
+  // FIM Funcionalidade Suporte / Logs
 
 })(jQuery);
 
