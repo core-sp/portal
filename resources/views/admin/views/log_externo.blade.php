@@ -58,7 +58,111 @@
 
     @php
         $valoresTipo = ['Site' => "externo", 'Admin' => "interno", 'Erros' => "erros"];
+        $valoresOpcoes = ['acessos' => 'Total de acessos (logins)'];
+        $relatorios = array_filter(session()->all(), function($key) {
+            return strpos($key, 'relatorio_') !== false;
+        }, ARRAY_FILTER_USE_KEY);
     @endphp
+
+    <!-- RELATÓRIOS -->
+    <div class="row mb-4">
+        <div class="col">
+            <fieldset class="border border-secondary p-3">
+                <legend>Relatórios</legend>
+
+                @if(!empty($relatorios))
+                <p><strong>Relatórios salvos temporariamente:</strong>
+                @foreach($relatorios as $relat => $r)
+                <span>{{ $relat }} | </span>
+                @endforeach
+                <a class="btn btn-success btn-sm ml-3" href="{{ route('suporte.log.externo.relatorios.final') }}">Gerar relatório final</a>
+                </p>
+                @endif
+
+                <form action="{{ route('suporte.log.externo.relatorios') }}">
+                    <div class="form-row d-flex align-items-end">
+                        <div class="col">
+                            <label for="relat_tipo" class="mr-sm-2">Tipo:</label>
+                            <select name="relat_tipo" class="form-control {{ $errors->has('relat_tipo') ? 'is-invalid' : '' }}" id="relat_tipo">
+                            @foreach($valoresTipo as $k => $val)
+                                @if($k != 'Erros')
+                                <option value="{{ $val }}" {{ old('relat_tipo') == $val ? 'selected' : '' }}>{{ $k }}</option>
+                                @endif
+                            @endforeach
+                            </select>
+                            @if($errors->has('relat_tipo'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('relat_tipo') }}
+                            </div>
+                            @endif
+                        </div>
+
+                        <div class="col">
+                            <label for="relat_opcoes" class="mr-sm-2">Opções:</label>
+                            <select name="relat_opcoes" class="form-control {{ $errors->has('relat_opcoes') ? 'is-invalid' : '' }}" id="relat_opcoes">
+                            @foreach($valoresOpcoes as $tipoOpcao => $opcao)
+                                <option value="{{ $tipoOpcao }}" {{ old('relat_opcoes') == $tipoOpcao ? 'selected' : '' }}>{{ $opcao }}</option>
+                            @endforeach
+                            </select>
+                            @if($errors->has('relat_opcoes'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('relat_opcoes') }}
+                            </div>
+                            @endif
+                        </div>
+
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="radio" class="mr-1" name="relat_data" value="mes"><strong>Mês/Ano:</strong>
+                                    </div>
+                                </div>
+                                <input type="month" 
+                                    name="relat_mes" 
+                                    class="form-control {{ $errors->has('relat_mes') ? 'is-invalid' : '' }}" 
+                                    value="{{ date('Y-m') }}"
+                                    min="2019-01"
+                                    max="{{ date('Y-m') }}"
+                                />
+                                @if($errors->has('relat_mes'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('relat_mes') }}
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="input-group" id="relat-buscar-ano">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="radio" class="mr-1" name="relat_data" value="ano"><strong>Ano:</strong>
+                                    </div>
+                                </div>
+                                <input type="number" 
+                                    name="relat_ano" 
+                                    class="form-control {{ $errors->has('relat_ano') ? 'is-invalid' : '' }}" 
+                                    value="{{ date('Y') }}"
+                                    min="2019"
+                                    max="{{ date('Y') }}"
+                                    step="1"
+                                />
+                                @if($errors->has('relat_ano'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('relat_ano') }}
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary btn-sm mt-2 float-right" type="submit" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">Gerar</button>
+                </form>
+            </fieldset>
+        </div>
+    </div>
+
     <!-- BUSCA POR DATA -->
     <div class="row mb-4">
         <div class="col">

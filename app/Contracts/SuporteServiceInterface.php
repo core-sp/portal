@@ -10,6 +10,10 @@ interface SuporteServiceInterface {
 
     public function logPorData($data, $tipo);
 
+    public function relatorios($dados);
+
+    public function relatorioFinal($dados);
+
     public function indexErros();
 
     public function uploadFileErros($file);

@@ -139,6 +139,49 @@ class SuporteController extends Controller
         ]);
     }
 
+    public function relatorios(SuporteRequest $request)
+    {
+        $this->authorize('onlyAdmin', auth()->user());
+
+        try{
+            $dados = $request->validated();
+            $dados = $this->service->getService('Suporte')->relatorios($dados);
+            $headers = [
+                'Content-Type' => 'text/html; charset=UTF-8',
+                'Cache-Control' => 'no-cache, no-store',
+                'Content-Disposition' => 'inline; filename="relatorio.html"'
+            ];
+            session(['relatorio_'.$dados['relatorio']['data'] => $dados]);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao gerar relatório.");
+        }
+
+        return response($dados['log'])->withHeaders($headers);
+    }
+
+    public function relatorioFinal()
+    {
+        $this->authorize('onlyAdmin', auth()->user());
+
+        try{
+            $dados = array_filter(session()->all(), function($key) {
+                return strpos($key, 'relatorio_') !== false;
+            }, ARRAY_FILTER_USE_KEY);
+            $dados = $this->service->getService('Suporte')->relatorioFinal($dados);
+            $headers = [
+                'Content-Type' => 'text/html; charset=UTF-8',
+                'Cache-Control' => 'no-cache, no-store',
+                'Content-Disposition' => 'inline; filename="relatorio-final.html"'
+            ];
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao gerar relatório.");
+        }
+
+        return response($dados['log'])->withHeaders($headers);
+    }
+
     public function errosIndex()
     {
         $this->authorize('onlyAdmin', auth()->user());

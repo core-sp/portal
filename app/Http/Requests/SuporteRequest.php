@@ -10,7 +10,7 @@ class SuporteRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        if(request()->filled('mes') || request()->filled('ano'))
+        if(request()->filled('mes') || request()->filled('ano') || request()->filled('relat_mes') || request()->filled('relat_ano'))
             $this->tiposAceitos = 'interno,externo';
         else
             $this->tiposAceitos = 'erros,interno,externo';
@@ -18,6 +18,15 @@ class SuporteRequest extends FormRequest
 
     public function rules()
     {
+        if(\Route::is('suporte.log.externo.relatorios'))
+            return [
+                'relat_tipo' => 'required|in:'.$this->tiposAceitos,
+                'relat_data' => 'required|in:mes,ano',
+                'relat_mes' => 'exclude_if:relat_data,ano|required_if:relat_data,mes|date_format:Y-m|before_or_equal:'.date('Y-m').'|after:2018-12',
+                'relat_ano' => 'exclude_if:relat_data,mes|required_if:relat_data,ano|date_format:Y|before_or_equal:'.date('Y').'|after:2018',
+                'relat_opcoes' => 'required|in:acessos',
+            ];
+
         return [
             'tipo' => 'required_with:data,mes,ano,texto|in:'.$this->tiposAceitos,
             'data' => 'required_without_all:mes,ano,file|date|before_or_equal:'.date('Y-m-d', strtotime('yesterday')).'|after:2018-12-31',
