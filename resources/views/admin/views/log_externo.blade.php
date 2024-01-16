@@ -56,6 +56,9 @@
 
     <hr />
 
+    @php
+        $valoresTipo = ['Site' => "externo", 'Admin' => "interno", 'Erros' => "erros"];
+    @endphp
     <!-- BUSCA POR DATA -->
     <div class="row mb-4">
         <div class="col">
@@ -65,9 +68,9 @@
                     <div class="form-inline">
                         <label for="tipo" class="mr-sm-2">Tipo de log:</label>
                         <select name="tipo" class="form-control mb-2 mr-sm-3 {{ isset(request()->query()['data']) && $errors->has('tipo') ? 'is-invalid' : '' }}">
-                            <option value="externo" {{ (isset(request()->query()['data']) && (request()->query()['tipo'] == 'externo')) || (old('tipo') == 'externo') ? 'selected' : '' }}>Site</option>
-                            <option value="interno" {{ (isset(request()->query()['data']) && (request()->query()['tipo'] == 'interno')) || (old('tipo') == 'interno') ? 'selected' : '' }}>Admin</option>
-                            <option value="erros" {{ (isset(request()->query()['data']) && (request()->query()['tipo'] == 'erros')) || (old('tipo') == 'erros') ? 'selected' : '' }}>Erros</option>
+                            @foreach($valoresTipo as $k => $val)
+                            <option value="{{ $val }}" {{ (isset(request()->query()['data']) && isset(request()->query()['tipo']) && (request()->query()['tipo'] == $val)) || (old('tipo') == $val) ? 'selected' : '' }}>{{ $k }}</option>
+                            @endforeach
                         </select>
                         @if(isset(request()->query()['data']) && $errors->has('tipo'))
                         <div class="invalid-feedback">
@@ -151,8 +154,11 @@
                     <div class="form-inline">
                         <label for="tipo" class="mr-sm-2">Tipo de log:</label>
                         <select name="tipo" class="form-control mb-2 mr-sm-2 {{ !isset(request()->query()['data']) && $errors->has('tipo') ? 'is-invalid' : '' }}">
-                            <option value="externo" {{ (!isset(request()->query()['data']) && (request()->query()['tipo'] == 'externo')) || old('tipo') == 'externo' ? 'selected' : '' }}>Site</option>
-                            <option value="interno" {{ (!isset(request()->query()['data']) && (request()->query()['tipo'] == 'interno')) || old('tipo') == 'interno' ? 'selected' : '' }}>Admin</option>
+                        @foreach($valoresTipo as $k => $val)
+                            @if($k != 'Erros')
+                            <option value="{{ $val }}" {{ (!isset(request()->query()['data']) && isset(request()->query()['tipo']) && (request()->query()['tipo'] == $val)) || old('tipo') == $val ? 'selected' : '' }}>{{ $k }}</option>
+                            @endif
+                        @endforeach
                         </select>
                         @if(!isset(request()->query()['data']) && $errors->has('tipo'))
                         <div class="invalid-feedback mr-sm-2">
