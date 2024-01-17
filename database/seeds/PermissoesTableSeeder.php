@@ -301,6 +301,14 @@ class PermissoesTableSeeder extends Seeder
                 'controller' => 'AgendamentoController',
                 'metodo' => 'create',
                 'perfis' => '1,'
+            ], [
+                'controller' => 'CartaServicos',
+                'metodo' => 'index',
+                'perfis' => '1,'
+            ], [
+                'controller' => 'CartaServicos',
+                'metodo' => 'edit',
+                'perfis' => '1,'
             ],
         ]);
     }

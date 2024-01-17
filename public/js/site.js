@@ -1417,3 +1417,15 @@ $('#btnPrintSimulador').click(function(){
 	myWindow.document.write(final + $('#simuladorTxt').html());
 	myWindow.print();
 });
+
+// Carta-serviços ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+$('#textosSumario').change(function(){
+	var id = $('#textosSumario').val();
+	var link = "/carta-de-servicos-ao-usuario/" + id;
+	window.location.replace(window.location.protocol + "//" + window.location.host + link);
+});
+
+if($('#corpoTexto').length > 0)
+	$('#corpoTexto').focus();
+
+// FIM Carta-serviços ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
