@@ -80,7 +80,7 @@ img {
   margin-left: .25rem;
 }
 
-.homeimagens:hover {
+.homeimagens:hover, .textosSortable .form-check:hover {
   cursor: move;
 }
 
@@ -166,4 +166,11 @@ img {
 
 .custom-file-input ~ .custom-file-label::after {
   content: "Pesquisar";
+}
+
+#formGerarTexto div.form-check {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: ltr;
 }
