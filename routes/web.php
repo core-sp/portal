@@ -319,6 +319,16 @@ Route::middleware(['block_ip'])->group(function () {
     Route::post('/termo-de-consentimento/upload/{tipo_servico}', 'TermoConsentimentoController@uploadTermo')
     ->where('tipo_servico', 'sala-reuniao')->name('termo.consentimento.upload')->middleware('auth');
 
+    // Rota para Gerar Textos
+    Route::prefix('textos')->group(function(){
+      Route::get('/{tipo_doc}/{id?}', 'GerarTextoController@view')->where('tipo_doc', 'carta-servicos')->name('textos.view');
+      Route::post('/{tipo_doc}', 'GerarTextoController@create')->where('tipo_doc', 'carta-servicos')->name('textos.create');
+      Route::post('/{tipo_doc}/{id}', 'GerarTextoController@updateCampos')->where('tipo_doc', 'carta-servicos')->name('textos.update.campos');
+      Route::post('/publicar/{tipo_doc}', 'GerarTextoController@publicar')->where('tipo_doc', 'carta-servicos')->name('textos.publicar');
+      Route::delete('/{tipo_doc}/excluir', 'GerarTextoController@delete')->where('tipo_doc', 'carta-servicos')->name('textos.delete');
+      Route::put('/{tipo_doc}', 'GerarTextoController@update')->where('tipo_doc', 'carta-servicos')->name('textos.update.indice');
+    });
+    
   });
 
   /*
@@ -422,6 +432,9 @@ Route::middleware(['block_ip'])->group(function () {
     Route::post('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimento')->name('termo.consentimento.post');
     Route::get('/termo-consentimento-pdf/{tipo_servico?}', 'TermoConsentimentoController@termoConsentimentoPdf')
     ->where('tipo_servico', 'sala-reuniao')->name('termo.consentimento.pdf');
+
+    Route::get('/carta-de-servicos-ao-usuario/buscar', 'GerarTextoController@buscar')->name('carta-servicos-buscar');
+    Route::get('/carta-de-servicos-ao-usuario/{id?}', 'GerarTextoController@show')->name('carta-servicos');
 
     // Páginas (deve ser inserido no final do arquivo de rotas)
     Route::get('{slug}', 'PaginaController@show')->name('paginas.site');
