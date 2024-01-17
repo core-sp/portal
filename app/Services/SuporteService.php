@@ -92,7 +92,10 @@ class SuporteService implements SuporteServiceInterface {
         return [
             'info' => $infos,
             'size' => $size,
-            'variaveis' => (object) $this->variaveisLog
+            'variaveis' => (object) $this->variaveisLog,
+            'tipos' => Suporte::tipos(),
+            'tipos_textos' => Suporte::tiposTextos(),
+            'filtros' => Suporte::filtros(),
         ];
     }
 
@@ -203,8 +206,23 @@ class SuporteService implements SuporteServiceInterface {
         return isset($conteudo) ? $conteudo : null;
     }
 
-    public function relatorios($dados)
+    public function relatorios($dados, $acao = null)
     {
+        if(isset($acao))
+        {
+            $final = null;
+            switch ($acao) {
+                case 'remover':
+                    session()->forget($dados);
+                    break;
+                case 'visualizar':
+                    $final = session($dados);
+                    break;
+            }
+
+            return $final;
+        }
+
         $textos = Suporte::textosFiltros();
 
         $data = 'relat_' . $dados['relat_data'];
@@ -223,15 +241,18 @@ class SuporteService implements SuporteServiceInterface {
         $dados_final['opcoes'] = $dados['relat_opcoes'];
 
         return [
-            'log' => Suporte::getRelatorioHTML($dados_final),
+            'tabela' => Suporte::getRelatorioHTML($dados_final),
             'relatorio' => $dados_final,
         ];
     }
 
-    public function relatorioFinal($dados)
+    public function relatorioFinal()
     {
-        // comparar dados...
-        dd($dados);
+        $dados_finais = array_filter(session()->all(), function($key) {
+            return strpos($key, 'relatorio_') !== false;
+        }, ARRAY_FILTER_USE_KEY);
+
+        return Suporte::getRelatorioFinalHTML($dados_finais);
     }
 
     public function indexErros()

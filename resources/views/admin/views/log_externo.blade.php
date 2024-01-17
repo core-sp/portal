@@ -57,8 +57,6 @@
     <hr />
 
     @php
-        $valoresTipo = ['Site' => "externo", 'Admin' => "interno", 'Erros' => "erros"];
-        $valoresOpcoes = ['acessos' => 'Total de acessos (logins)'];
         $relatorios = array_filter(session()->all(), function($key) {
             return strpos($key, 'relatorio_') !== false;
         }, ARRAY_FILTER_USE_KEY);
@@ -71,9 +69,13 @@
                 <legend>Relatórios</legend>
 
                 @if(!empty($relatorios))
-                <p><strong>Relatórios salvos temporariamente:</strong>
+                <p><strong>Relatórios salvos temporariamente:</strong></p>
+                <p>
                 @foreach($relatorios as $relat => $r)
-                <span>{{ $relat }} | </span>
+                <span class="text-nowrap">
+                    <a href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']) }}">
+                        {{ $tipos[$r['relatorio']['tipo']] }} {{ Carbon\Carbon::hasFormat($r['relatorio']['data'], 'Y-m') ? Carbon\Carbon::parse($r['relatorio']['data'])->format('m\/Y') : $r['relatorio']['data'] }}</a>
+                    <a class="btn btn-link btn-sm" href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'remover']) }}"><i class="fas fa-times text-danger"></i></a>| </span>
                 @endforeach
                 <a class="btn btn-success btn-sm ml-3" href="{{ route('suporte.log.externo.relatorios.final') }}">Gerar relatório final</a>
                 </p>
@@ -84,9 +86,9 @@
                         <div class="col">
                             <label for="relat_tipo" class="mr-sm-2">Tipo:</label>
                             <select name="relat_tipo" class="form-control {{ $errors->has('relat_tipo') ? 'is-invalid' : '' }}" id="relat_tipo">
-                            @foreach($valoresTipo as $k => $val)
-                                @if($k != 'Erros')
-                                <option value="{{ $val }}" {{ old('relat_tipo') == $val ? 'selected' : '' }}>{{ $k }}</option>
+                            @foreach($tipos as $k => $val)
+                                @if($val != 'Erros')
+                                <option value="{{ $k }}" {{ old('relat_tipo') == $k ? 'selected' : '' }}>{{ $val }}</option>
                                 @endif
                             @endforeach
                             </select>
@@ -98,9 +100,9 @@
                         </div>
 
                         <div class="col">
-                            <label for="relat_opcoes" class="mr-sm-2">Opções:</label>
+                            <label for="relat_opcoes" class="mr-sm-2">Filtros:</label>
                             <select name="relat_opcoes" class="form-control {{ $errors->has('relat_opcoes') ? 'is-invalid' : '' }}" id="relat_opcoes">
-                            @foreach($valoresOpcoes as $tipoOpcao => $opcao)
+                            @foreach($filtros as $tipoOpcao => $opcao)
                                 <option value="{{ $tipoOpcao }}" {{ old('relat_opcoes') == $tipoOpcao ? 'selected' : '' }}>{{ $opcao }}</option>
                             @endforeach
                             </select>
@@ -112,22 +114,22 @@
                         </div>
 
                         <div class="col">
-                            <div class="input-group">
+                            <div class="input-group" id="relat-buscar-mes">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text">
-                                        <input type="radio" class="mr-1" name="relat_data" value="mes"><strong>Mês/Ano:</strong>
+                                        <input type="radio" class="mr-1" name="relat_data" value="mes" checked><strong>Mês/Ano:</strong>
                                     </div>
                                 </div>
                                 <input type="month" 
                                     name="relat_mes" 
-                                    class="form-control {{ $errors->has('relat_mes') ? 'is-invalid' : '' }}" 
+                                    class="form-control {{ $errors->has('relat_mes') || $errors->has('relat_data') ? 'is-invalid' : '' }}" 
                                     value="{{ date('Y-m') }}"
                                     min="2019-01"
                                     max="{{ date('Y-m') }}"
                                 />
-                                @if($errors->has('relat_mes'))
+                                @if($errors->has('relat_mes') || $errors->has('relat_data'))
                                 <div class="invalid-feedback">
-                                    {{ $errors->first('relat_mes') }}
+                                    {{ $errors->has('relat_data') ? $errors->first('relat_data') : $errors->first('relat_mes') }}
                                 </div>
                                 @endif
                             </div>
@@ -142,15 +144,15 @@
                                 </div>
                                 <input type="number" 
                                     name="relat_ano" 
-                                    class="form-control {{ $errors->has('relat_ano') ? 'is-invalid' : '' }}" 
+                                    class="form-control {{ $errors->has('relat_ano') || $errors->has('relat_data') ? 'is-invalid' : '' }}" 
                                     value="{{ date('Y') }}"
                                     min="2019"
                                     max="{{ date('Y') }}"
                                     step="1"
                                 />
-                                @if($errors->has('relat_ano'))
+                                @if($errors->has('relat_ano') || $errors->has('relat_data'))
                                 <div class="invalid-feedback">
-                                    {{ $errors->first('relat_ano') }}
+                                    {{ $errors->has('relat_data') ? $errors->first('relat_data') : $errors->first('relat_ano') }}
                                 </div>
                                 @endif
                             </div>
@@ -172,8 +174,8 @@
                     <div class="form-inline">
                         <label for="tipo" class="mr-sm-2">Tipo de log:</label>
                         <select name="tipo" class="form-control mb-2 mr-sm-3 {{ isset(request()->query()['data']) && $errors->has('tipo') ? 'is-invalid' : '' }}">
-                            @foreach($valoresTipo as $k => $val)
-                            <option value="{{ $val }}" {{ (isset(request()->query()['data']) && isset(request()->query()['tipo']) && (request()->query()['tipo'] == $val)) || (old('tipo') == $val) ? 'selected' : '' }}>{{ $k }}</option>
+                            @foreach($tipos as $k => $val)
+                            <option value="{{ $k }}" {{ (isset(request()->query()['data']) && isset(request()->query()['tipo']) && (request()->query()['tipo'] == $k)) || (old('tipo') == $k) ? 'selected' : '' }}>{{ $val }}</option>
                             @endforeach
                         </select>
                         @if(isset(request()->query()['data']) && $errors->has('tipo'))
@@ -258,9 +260,9 @@
                     <div class="form-inline">
                         <label for="tipo" class="mr-sm-2">Tipo de log:</label>
                         <select name="tipo" class="form-control mb-2 mr-sm-2 {{ !isset(request()->query()['data']) && $errors->has('tipo') ? 'is-invalid' : '' }}">
-                        @foreach($valoresTipo as $k => $val)
-                            @if($k != 'Erros')
-                            <option value="{{ $val }}" {{ (!isset(request()->query()['data']) && isset(request()->query()['tipo']) && (request()->query()['tipo'] == $val)) || old('tipo') == $val ? 'selected' : '' }}>{{ $k }}</option>
+                        @foreach($tipos as $k => $val)
+                            @if($val != 'Erros')
+                            <option value="{{ $k }}" {{ (!isset(request()->query()['data']) && isset(request()->query()['tipo']) && (request()->query()['tipo'] == $k)) || (old('tipo') == $k) ? 'selected' : '' }}>{{ $val }}</option>
                             @endif
                         @endforeach
                         </select>
@@ -328,8 +330,7 @@
     <hr />
 
     @php
-        $tipos = ['erros' => 'de Erros', 'interno' => 'do Admin', 'externo' => 'do Site'];
-        $textoTipo = $tipos[request()->query('tipo')];
+        $textoTipo = $tipos_textos[request()->query('tipo')];
     @endphp
     <div class="mt-4 mb-4">
         <h4>Resultado da busca "<i>{{ $busca }}</i>" para o log <strong>{{ $textoTipo }}</strong></h4>

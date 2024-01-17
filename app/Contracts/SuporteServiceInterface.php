@@ -10,9 +10,9 @@ interface SuporteServiceInterface {
 
     public function logPorData($data, $tipo);
 
-    public function relatorios($dados);
+    public function relatorios($dados, $acao = null);
 
-    public function relatorioFinal($dados);
+    public function relatorioFinal();
 
     public function indexErros();
 

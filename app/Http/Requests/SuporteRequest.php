@@ -50,11 +50,15 @@ class SuporteRequest extends FormRequest
             'in' => 'Tipo de log não existente',
             'required_without_all' => 'Campo obrigatório',
             'required_with' => 'Campo obrigatório',
+            'relat_mes.required_if' => 'Campo obrigatório se o mês foi escolhido',
+            'relat_ano.required_if' => 'Campo obrigatório se o ano foi escolhido',
+            'required' => 'Campo obrigatório',
             'mes.before_or_equal' => 'Deve selecionar um mês e ano anterior ou igual a hoje',
             'ano.before_or_equal' => 'Deve selecionar um ano anterior ou igual a hoje',
             'date' => 'Formato de data inválido',
             'date_format' => 'Formato de período inválido',
-            'after' => 'Data deve ser a partir de 2019'
+            'after' => 'Data deve ser a partir de 2019',
+            'relat_data.in' => 'Deve ser mês ou ano',
         ];
     }
 }

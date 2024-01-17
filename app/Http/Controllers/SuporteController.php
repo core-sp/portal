@@ -23,14 +23,7 @@ class SuporteController extends Controller
         if(isset($service) && \Route::is('suporte.log.externo.*'))
         {
             $dados = $this->service->getService('Suporte')->indexLog();
-            $info = $dados['info'];
-            $size = $dados['size'];
-            $variaveis = $dados['variaveis'];
-            View::share([
-                'info' => $info, 
-                'size' => $size,
-                'variaveis' => $variaveis
-            ]);
+            View::share($dados);
         }
     }
 
@@ -146,18 +139,27 @@ class SuporteController extends Controller
         try{
             $dados = $request->validated();
             $dados = $this->service->getService('Suporte')->relatorios($dados);
-            $headers = [
-                'Content-Type' => 'text/html; charset=UTF-8',
-                'Cache-Control' => 'no-cache, no-store',
-                'Content-Disposition' => 'inline; filename="relatorio.html"'
-            ];
-            session(['relatorio_'.$dados['relatorio']['data'] => $dados]);
+            session(['relatorio_'.$dados['relatorio']['data'].'-'.$dados['relatorio']['tipo'] => $dados]);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao gerar relatório.");
         }
 
-        return response($dados['log'])->withHeaders($headers);
+        return view('admin.views.log_relatorio', ['tabela' => $dados['tabela']]);
+    }
+
+    public function relatoriosAcoes($relat, $acao)
+    {
+        $this->authorize('onlyAdmin', auth()->user());
+
+        try{
+            $dados = $this->service->getService('Suporte')->relatorios($relat, $acao);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao realizar ação com o relatório.");
+        }
+
+        return isset($dados) ? view('admin.views.log_relatorio', ['tabela' => $dados['tabela']]) : redirect()->back();
     }
 
     public function relatorioFinal()
@@ -165,21 +167,13 @@ class SuporteController extends Controller
         $this->authorize('onlyAdmin', auth()->user());
 
         try{
-            $dados = array_filter(session()->all(), function($key) {
-                return strpos($key, 'relatorio_') !== false;
-            }, ARRAY_FILTER_USE_KEY);
-            $dados = $this->service->getService('Suporte')->relatorioFinal($dados);
-            $headers = [
-                'Content-Type' => 'text/html; charset=UTF-8',
-                'Cache-Control' => 'no-cache, no-store',
-                'Content-Disposition' => 'inline; filename="relatorio-final.html"'
-            ];
+            $dados = $this->service->getService('Suporte')->relatorioFinal();
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            abort(500, "Erro ao gerar relatório.");
+            abort(500, "Erro ao gerar relatório final.");
         }
 
-        return response($dados['log'])->withHeaders($headers);
+        return view('admin.views.log_relatorio', ['tabela' => $dados]);
     }
 
     public function errosIndex()
