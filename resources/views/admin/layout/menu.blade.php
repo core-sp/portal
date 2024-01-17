@@ -92,9 +92,10 @@
             $home = in_array($idperfil, $permitidos->find(42)['perfis']);
             $compromisso = in_array($idperfil, $permitidos->find(53)['perfis']);
             $aviso = in_array($idperfil, $permitidos->find(57)['perfis']);
+            $cartaServicos = in_array($idperfil, $permitidos->find(73)['perfis']);
         @endphp
 
-        @if($pagina || $noticia || $posts || $curso || $bdoEmpresa || $bdoOportunidade || $home || $compromisso || $aviso)
+        @if($pagina || $noticia || $posts || $curso || $bdoEmpresa || $bdoOportunidade || $home || $compromisso || $aviso || $cartaServicos)
         <li class="nav-header">CONTEÚDO</li>
 
         @if($pagina)
@@ -295,6 +296,15 @@
             <a href="{{ route('avisos.index') }}" class="nav-link">
                 <i class="nav-icon fas fa-info-circle"></i>
                 <p>Avisos &nbsp;&nbsp;{!! $ativado !!}</p>
+            </a>
+        </li>
+        @endif
+
+        @if($cartaServicos)
+        <li class="nav-item">
+            <a href="{{ route('textos.view', 'carta-servicos') }}" class="nav-link">
+                <i class="nav-icon fas fa-envelope"></i>
+                <p>Carta de Serviços</p>
             </a>
         </li>
         @endif

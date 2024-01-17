@@ -136,9 +136,19 @@ $(document).ready(function(){
 
   $('.timeInput').mask('00:00');
   $('.vagasInput').mask('000');
+
   // Draggable
   $("#sortable").sortable();
   $( "#sortable" ).disableSelection();
+  var icons = {
+    header: "fas fa-angle-right",
+    activeHeader: "fas fa-angle-down"
+  };
+
+  $(".textosSortable").sortable({
+    items: "> div > div > div.form-check",
+  });
+  $(".textosSortable").disableSelection();
 
   // Regra de data no filtro de agendamento +++ Será removido depois de refatorar todos que o utilizam 
   $('#filtroAgendamento').submit(function(e){
@@ -601,7 +611,7 @@ $('#form_salaReuniao #horarios_reuniao, #form_salaReuniao #horarios_coworking').
   ajaxHorariosViewSala(this.id);
 });
 
-// Fim da Funcionalidade Sala de Reunião +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// FIM da Funcionalidade Sala de Reunião ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 // Funcionalidade Curso +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -950,6 +960,282 @@ $('#deleteFileStorage').on('click', function(){
 });
 
 // FIM Funcionalidade Home Imagem / Itens Home
+
+// Funcionalidade GerarTexto ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function crudGerarTexto(acao, objeto){
+
+  $('#avisoTextos').modal('hide');
+  var token = $('meta[name="csrf-token"]').attr('content');
+  var id = $(objeto).val();
+  var textoLoading = '';
+  var link = '';
+  var metodo = '';
+  var dados = '';
+
+  switch(acao) {
+    case 'carregar':
+      textoLoading = '<div class="spinner-border text-primary"></div>&nbsp;&nbsp;Carregando texto...';
+      link = '/admin/textos/' + $('#tipo_doc').val() + '/' + id;
+      metodo = 'GET';
+      dados = {};
+      break;
+    case 'atualizar':
+      textoLoading = '<div class="spinner-border text-primary"></div>&nbsp;&nbsp;Atualizando campos...';
+      link = '/admin/textos/' + $('#tipo_doc').val() + '/' + id;
+      metodo = 'POST';
+      dados = {
+        _token: token,
+        tipo: $('#tipo').val(),
+        texto_tipo: $('#texto_tipo').val(),
+        com_numeracao: $('#com_numeracao').val(),
+        nivel: $('#nivel').val(),
+        conteudo: tinymce.get('conteudo').getContent(),
+      };
+      break;
+    case 'excluir_varios':
+      textoLoading = '<div class="spinner-border text-primary"></div>&nbsp;&nbsp;Excluindo textos...';
+      link = '/admin/textos/' + $('#tipo_doc').val() + '/excluir';
+      metodo = 'DELETE';
+      dados = {
+        _token: token,
+        excluir_ids: objeto.val()
+      };
+      break;
+  }
+
+	$.ajax({
+      url: link,
+      method: metodo,
+      dataType: "json",
+      data: dados,
+      beforeSend: function(){
+        $('#loadingIndice').modal({backdrop: 'static', keyboard: false, show: true});
+        $('#loadingIndice .modal-body').html(textoLoading);
+      },
+      complete: function(){
+        $('#loadingIndice').modal('hide');
+      },
+      success: function(response) {
+        $('.updateCampos').val(id);
+        $('.deleteTexto').val(id);
+        atualizarTextoCrud(acao, response);
+        gerarTextoAvisosCrud(acao, response, id);
+      },
+      error: function(erro, textStatus, errorThrown) {
+        var resposta = erro.status == 422 ? JSON.stringify(erro.responseJSON.errors) : 
+        'Código: ' + erro.status + ' | Mensagem: ' + erro.responseJSON.message;
+        gerarTextoAvisosCrud('erro', resposta, null);
+      }
+  });
+}
+
+function atualizarTextoCrud(acao, response){
+  var texto_campo = acao == 'carregar' ? response[0].tipo : response.tipo;
+  var cor = texto_campo == 'Título' ? 'warning' : 'dark';
+  var upper = texto_campo == 'Título' ? 'text-uppercase' : '';
+
+  if(acao == 'carregar'){
+    var resultado = response[0];
+    var indice = resultado.indice != null ? resultado.indice : '';
+    $('#span-tipo').attr('class', 'text-' + cor).text(texto_campo);
+    $('#span-nivel').text(resultado.nivel);
+    $('#span-texto_tipo').attr('class', upper).text(indice + ' - ' + resultado.texto_tipo);
+    $('#texto_tipo').val(resultado.texto_tipo);
+    $('#tipo option[value="' + resultado.tipo + '"]').prop('selected', true);
+    $('#com_numeracao option[value="' + resultado.com_numeracao + '"]').prop('selected', true);
+    $('#nivel option[value="' + resultado.nivel + '"]').prop('selected', true);
+    resultado.conteudo != null ? tinymce.activeEditor.setContent(resultado.conteudo) : tinymce.activeEditor.setContent('');
+    hideShowOptions();
+  }
+
+  if(acao == 'atualizar'){
+    $('#span-tipo').attr('class', 'text-' + cor).text(texto_campo);
+    $('#span-nivel').text(response.nivel);
+    $('#span-texto_tipo').attr('class', upper).text(response.texto_tipo);
+    $('button[value="' + response.id + '"] .indice-texto').text(response.texto_tipo);
+  }
+  return;
+}
+
+function gerarTextoAvisosCrud(acao, response, valor){
+  var texto = '';
+  var title = acao == 'erro' ? '<i class="fas fa-times" style="color: #e70d0d;"></i> Erro!' : 
+  '<i class="fas fa-check-circle" style="color: #40c011;"></i> Sucesso!';
+
+  switch (acao) {
+    case 'excluir_varios':
+      texto = 'Exclusão realizada com sucesso!';
+      break;
+    case 'atualizar':
+      texto = 'Campos do texto foram atualizados!';
+      response = 1;
+      break;
+    case 'erro':
+      texto = response;
+      break;
+  }
+
+  if((acao == 'excluir_varios') && (response != null) && (typeof response == 'object')){
+    response.forEach(function(id, i){
+      $('button[value="' + id + '"]').parents('.form-check').remove();
+    });
+    $('#lista').hide();
+    selecionarTodos(false);
+    response = 1;
+  }
+
+  if((acao == 'erro') || (response == 1)){
+    $('#avisoTextos').modal({backdrop: 'static', keyboard: false, show: true});
+    $('#avisoTextos .modal-title').html(title);
+		$('#avisoTextos .modal-body').html(texto);
+		$('#avisoTextos .modal-footer').hide();
+    if(response == 1)
+      setTimeout(function(){
+        $('#avisoTextos').modal('hide');
+      }, 1500);
+    return;
+  }
+
+  if((acao == 'excluir_varios') && (response == null)){
+    var textos_ids = '';
+    var valor_final = JSON.parse(valor);
+    var total = valor_final.length;
+    var text = total > 1 ? 'todos estes textos selecionados' : 'este texto';
+
+    valor_final.forEach(function(id, i){
+      textos_ids += '<strong>Texto: </strong><i>' + $('button[value="' + id + '"]').text() + '</i><br>';
+    });
+
+    $('#avisoTextos').modal({backdrop: 'static', keyboard: false, show: true});
+    $('#avisoTextos .modal-title')
+      .html('<i class="fas fa-trash" style="color: #dc0909;"></i> Excluir');
+		$('#avisoTextos .modal-body')
+			.html(textos_ids + 'Tem certeza que deseja excluir ' + text + '?<br>Esta ação não é reversível!');
+    $('#avisoTextos .modal-footer #excluirTexto').val(valor_final);
+		$('#avisoTextos .modal-footer').show();
+    return;
+  }
+}
+
+function hideShowOptions(){
+  if($(".textoTipo").val() == 'Título'){
+    $('#nivel option').hide();
+    $('#nivel option').each(function(){
+      if($(this).val() == '0')
+        $(this).show();
+    });
+    $('#nivel')[0].selectedIndex = 0;
+    $('#com_numeracao option').hide();
+    $('#com_numeracao option').each(function(){
+        $(this).show();
+    });
+    if(!$('#texto_tipo').hasClass('text-uppercase'))
+      $('#texto_tipo').addClass('text-uppercase');
+  }else{
+    $('#nivel option').show();
+    $('#nivel option').each(function(){
+      if($(this).val() == '0')
+        $(this).hide();
+    });
+    $('#nivel')[0].selectedIndex = 1;
+    $('#com_numeracao option').each(function(){
+      if($(this).val() == '0')
+        $(this).hide();
+    });
+    $('#com_numeracao')[0].selectedIndex = 0;
+    if($('#texto_tipo').hasClass('text-uppercase'))
+      $('#texto_tipo').removeClass('text-uppercase');
+  }
+}
+
+function selecionarTodos(inverso){
+  var texto, quadrado;
+
+  if(!inverso){
+    texto = $('[name="excluir_ids"]:checked').length == 0 ? 'Selecionar Todos' : 'Limpar Seleção';
+    quadrado = $('[name="excluir_ids"]:checked').length == 0 ? '<i class="fas fa-check-square"></i>' : '<i class="fas fa-square"></i>';
+  }else{
+    texto = $('[name="excluir_ids"]:checked').length == 0 ? 'Limpar Seleção' : 'Selecionar Todos';
+    quadrado = $('[name="excluir_ids"]:checked').length == 0 ? '<i class="fas fa-square"></i>' : '<i class="fas fa-check-square"></i>';
+  }
+  
+  $('.selecionarTextos').html(quadrado + '&nbsp;&nbsp;' + texto);
+}
+
+$(".criarTexto").click(function(){
+	var token = $('meta[name="csrf-token"]').attr('content');
+	var link = '/admin/textos/' + $('#tipo_doc').val();
+	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
+	$('body').append(form);
+	$(form).submit();
+});
+
+$("#publicarTexto").click(function(){
+  var token = $('meta[name="csrf-token"]').attr('content');
+	var link = '/admin/textos/publicar/' + $('#tipo_doc').val();
+	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"><input type="hidden" name="publicar" value="' + $(this).val() + '"></form>');
+	$('body').append(form);
+	$(form).submit();
+});
+
+$(".updateCampos").click(function(){
+	crudGerarTexto('atualizar', $(this));
+});
+
+$(".deleteTexto").click(function(){
+  if($(".deleteTexto").length > 0)
+    gerarTextoAvisosCrud('excluir_varios', null, JSON.stringify([$(this).val()]));
+});
+
+$(".excluirTextos").click(function(){
+  var excluirIds = [];
+  if($('[name="excluir_ids"]:checked').length > 0){
+    $('[name="excluir_ids"]:checked').each(function(){
+      excluirIds.push($(this).val());
+    });
+    gerarTextoAvisosCrud('excluir_varios', null, JSON.stringify(excluirIds));
+  }
+});
+
+$("#excluirTexto").click(function(){
+  crudGerarTexto('excluir_varios', $(this));
+});
+
+$(".textoTipo").change(function(){
+  hideShowOptions();
+});
+
+$("#updateIndice").click(function(){
+  $('#loadingIndice').modal({backdrop: 'static', keyboard: false, show: true});
+  $('#loadingIndice .modal-body').html('<div class="spinner-border text-primary"></div>&nbsp;&nbsp;Atualizando a índice...');
+});
+
+// link no sumário para abrir e ir no texto
+$('button.abrir').click(function(){
+  crudGerarTexto('carregar', $(this));
+  $('#lista').hide();
+  $('#lista').show();
+  $('#tipo').focus();
+});
+
+$('#formGerarTexto').ready(function(){
+  if($('button.abrir .badge').length > 0)
+    $('button.abrir .badge').click();
+});
+
+$('[name="excluir_ids"]').change(function(){
+  selecionarTodos(false);
+});
+
+$('.selecionarTextos').click(function(){
+  selecionarTodos(true);
+  var selecionados = $('[name="excluir_ids"]:checked').length > 0 ? false : true;
+  $('[name="excluir_ids"]').prop('checked', selecionados);
+  $('[name="excluir_ids"]:first').prop('checked', false);
+});
+
+// FIM da Funcionalidade GerarTexto ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 // Funcionalidade Pre-Registro
 function putDadosPreRegistro(campo, valor, acao)

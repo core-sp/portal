@@ -38,6 +38,7 @@ class Permissao extends Model
             'PlantaoJuridicoBloqueioController' => 'Plantão Jurídico Bloqueio',
             'SalaReuniaoController' => 'Sala Reunião',
             'SuspensaoExcecaoController' => 'Sala Reunião - Suspensos / Exceções',
+            'CartaServicos' => 'Carta de Serviços',
             'PreRegistroController' => 'Pré-registro',
         ];
     }
