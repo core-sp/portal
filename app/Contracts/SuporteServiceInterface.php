@@ -14,6 +14,8 @@ interface SuporteServiceInterface {
 
     public function relatorioFinal();
 
+    public function filtros();
+
     public function indexErros();
 
     public function uploadFileErros($file);

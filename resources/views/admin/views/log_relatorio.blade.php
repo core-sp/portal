@@ -38,6 +38,9 @@
             @endif
             <hr />
             <a class="btn btn-primary" href="{{ route('suporte.log.externo.index') }}">Voltar</a>
+            @if(isset($relat))
+            <a class="btn btn-success float-right" href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'exportar-csv']) }}">Exportar .csv</a>
+            @endif
         </div>
     </body>
 </html>

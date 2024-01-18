@@ -58,7 +58,7 @@
 
     @php
         $relatorios = array_filter(session()->all(), function($key) {
-            return strpos($key, 'relatorio_') !== false;
+            return (strpos($key, 'relatorio_') !== false) && ($key != 'relatorio_final');
         }, ARRAY_FILTER_USE_KEY);
     @endphp
 
@@ -70,18 +70,38 @@
 
                 @if(!empty($relatorios))
                 <p><strong>Relatórios salvos temporariamente:</strong></p>
-                <p>
                 @foreach($relatorios as $relat => $r)
-                <span class="text-nowrap">
-                    <a href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']) }}">
-                        {{ $tipos[$r['relatorio']['tipo']] }} {{ Carbon\Carbon::hasFormat($r['relatorio']['data'], 'Y-m') ? Carbon\Carbon::parse($r['relatorio']['data'])->format('m\/Y') : $r['relatorio']['data'] }}</a>
-                    <a class="btn btn-link btn-sm" href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'remover']) }}"><i class="fas fa-times text-danger"></i></a>| </span>
+                <span>
+                    @if(isset($r['relatorio']))
+                    <span class="text-nowrap">
+                        <a href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']) }}">
+                            {{ $tipos[$r['relatorio']['tipo']] }} - {{ $filtros[$r['relatorio']['opcoes']] }} - {{ Carbon\Carbon::hasFormat($r['relatorio']['data'], 'Y-m') ? Carbon\Carbon::parse($r['relatorio']['data'])->format('m\/Y') : $r['relatorio']['data'] }}</a>
+                            <a class="btn btn-link btn-sm" href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'exportar-csv']) }}"><i class="fas fa-download"></i></a>
+                        <a class="btn btn-link btn-sm" href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'remover']) }}"><i class="fas fa-times text-danger"></i></a></span>
+                    @endif
+                </span><br>
                 @endforeach
-                <a class="btn btn-success btn-sm ml-3" href="{{ route('suporte.log.externo.relatorios.final') }}">Gerar relatório final</a>
-                </p>
+                <a class="btn btn-success btn-sm mt-2" href="{{ route('suporte.log.externo.relatorios.final') }}">Gerar relatório final</a>
+                <hr>
                 @endif
 
                 <form action="{{ route('suporte.log.externo.relatorios') }}">
+                    <div class="form-row mb-2">
+                        <div class="col">
+                            <label for="relat_opcoes" class="mr-sm-2">Filtros:</label>
+                            <select name="relat_opcoes" class="form-control {{ $errors->has('relat_opcoes') ? 'is-invalid' : '' }}" id="relat_opcoes">
+                            @foreach($filtros as $tipoOpcao => $opcao)
+                                <option value="{{ $tipoOpcao }}" {{ old('relat_opcoes') == $tipoOpcao ? 'selected' : '' }}>{{ $opcao }}</option>
+                            @endforeach
+                            </select>
+                            @if($errors->has('relat_opcoes'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('relat_opcoes') }}
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
                     <div class="form-row d-flex align-items-end">
                         <div class="col">
                             <label for="relat_tipo" class="mr-sm-2">Tipo:</label>
@@ -95,20 +115,6 @@
                             @if($errors->has('relat_tipo'))
                             <div class="invalid-feedback">
                                 {{ $errors->first('relat_tipo') }}
-                            </div>
-                            @endif
-                        </div>
-
-                        <div class="col">
-                            <label for="relat_opcoes" class="mr-sm-2">Filtros:</label>
-                            <select name="relat_opcoes" class="form-control {{ $errors->has('relat_opcoes') ? 'is-invalid' : '' }}" id="relat_opcoes">
-                            @foreach($filtros as $tipoOpcao => $opcao)
-                                <option value="{{ $tipoOpcao }}" {{ old('relat_opcoes') == $tipoOpcao ? 'selected' : '' }}>{{ $opcao }}</option>
-                            @endforeach
-                            </select>
-                            @if($errors->has('relat_opcoes'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('relat_opcoes') }}
                             </div>
                             @endif
                         </div>

@@ -139,13 +139,14 @@ class SuporteController extends Controller
         try{
             $dados = $request->validated();
             $dados = $this->service->getService('Suporte')->relatorios($dados);
-            session(['relatorio_'.$dados['relatorio']['data'].'-'.$dados['relatorio']['tipo'] => $dados]);
+            $relat = 'relatorio_'.$dados['relatorio']['data'].'-'.$dados['relatorio']['tipo'].'-'.$dados['relatorio']['opcoes'];
+            session([$relat => $dados]);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao gerar relatório.");
         }
 
-        return view('admin.views.log_relatorio', ['tabela' => $dados['tabela']]);
+        return view('admin.views.log_relatorio', ['tabela' => $dados['tabela'], 'relat' => $relat]);
     }
 
     public function relatoriosAcoes($relat, $acao)
@@ -159,7 +160,9 @@ class SuporteController extends Controller
             abort(500, "Erro ao realizar ação com o relatório.");
         }
 
-        return isset($dados) ? view('admin.views.log_relatorio', ['tabela' => $dados['tabela']]) : redirect()->back();
+        if($acao == 'exportar-csv')
+            return response()->stream($dados['final'], 200, $dados['headers']);
+        return isset($dados) ? view('admin.views.log_relatorio', ['tabela' => $dados['tabela'], 'relat' => $relat]) : redirect()->back();
     }
 
     public function relatorioFinal()
@@ -168,12 +171,13 @@ class SuporteController extends Controller
 
         try{
             $dados = $this->service->getService('Suporte')->relatorioFinal();
+            session(['relatorio_final' => ['tabela' => $dados]]);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao gerar relatório final.");
         }
 
-        return view('admin.views.log_relatorio', ['tabela' => $dados]);
+        return view('admin.views.log_relatorio', ['tabela' => $dados, 'relat' => 'relatorio_final']);
     }
 
     public function errosIndex()

@@ -17,12 +17,9 @@ class SuporteService implements SuporteServiceInterface {
     private $variaveisLog;
     private $variaveisErros;
     private $nomeFileErros;
-    private $suporte;
 
     public function __construct()
     {
-        $this->suporte = new Suporte;
-
         $this->variaveisLog = [
             'mostra' => 'log_externo',
             'singular' => 'Logs',
@@ -210,13 +207,29 @@ class SuporteService implements SuporteServiceInterface {
     {
         if(isset($acao))
         {
+            if(gettype($dados) != 'string')
+                throw new \Exception('Formato de relatório não existe', 404);
+
             $final = null;
             switch ($acao) {
                 case 'remover':
                     session()->forget($dados);
                     break;
                 case 'visualizar':
+                    if(!session()->exists($dados))
+                        throw new \Exception('Relatório não existe', 404);
                     $final = session($dados);
+                    break;
+                case 'exportar-csv':
+                    if(!session()->exists($dados))
+                        throw new \Exception('Relatório não existe', 404);
+                    $final['final'] = Suporte::exportarCsv($dados, session($dados));
+                    $final['headers'] = [
+                        'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                        'Content-type' => 'text/csv; charset=UTF-8',
+                        'Content-Disposition' => 'attachment; filename='.$dados.'-'.date('Ymd').'.csv',
+                        'Expires' => '0',
+                    ];
                     break;
             }
 
@@ -253,6 +266,11 @@ class SuporteService implements SuporteServiceInterface {
         }, ARRAY_FILTER_USE_KEY);
 
         return Suporte::getRelatorioFinalHTML($dados_finais);
+    }
+
+    public function filtros()
+    {
+        return Suporte::filtros();
     }
 
     public function indexErros()

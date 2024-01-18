@@ -3,10 +3,17 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Contracts\MediadorServiceInterface;
 
 class SuporteRequest extends FormRequest
 {
     private $tiposAceitos;
+    private $service;
+
+    public function __construct(MediadorServiceInterface $service)
+    {
+        $this->service = $service->getService('Suporte');
+    }
 
     protected function prepareForValidation()
     {
@@ -24,7 +31,7 @@ class SuporteRequest extends FormRequest
                 'relat_data' => 'required|in:mes,ano',
                 'relat_mes' => 'exclude_if:relat_data,ano|required_if:relat_data,mes|date_format:Y-m|before_or_equal:'.date('Y-m').'|after:2018-12',
                 'relat_ano' => 'exclude_if:relat_data,mes|required_if:relat_data,ano|date_format:Y|before_or_equal:'.date('Y').'|after:2018',
-                'relat_opcoes' => 'required|in:acessos',
+                'relat_opcoes' => 'required|in:'.implode(',', array_keys($this->service->filtros())),
             ];
 
         return [
