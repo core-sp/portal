@@ -19,9 +19,9 @@ class PeriodoFiscalizacao extends Model
 
     public function somaTotal()
     {
-        return $this->dadoFiscalizacao()->get()
-        ->makeHidden(['id', 'idregional', 'regional', 'idperiodo', 'created_at', 'updated_at'])->sum(function ($value) {
-            return $value->somaTotal();
-        });
+        if(isset($this->dadoFiscalizacao))
+            return $this->dadoFiscalizacao->makeHidden(['id', 'idregional', 'regional', 'idperiodo', 'created_at', 'updated_at'])->sum(function ($value) {
+                return $value->somaTotal();
+            });
     }
 }
