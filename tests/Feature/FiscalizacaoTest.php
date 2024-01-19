@@ -168,6 +168,45 @@ class FiscalizacaoTest extends TestCase
         $this->assertEquals(DadoFiscalizacao::count(), 1);
     }
 
+    /** @test */
+    public function sum_periodo_fiscalizacao()
+    {
+        $this->signInAsAdmin();
+
+        $periodo = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            'idperiodo' => $periodo->id
+        ])->makeHidden(['id', 'idperiodo', 'idregional', 'regional', 'created_at', 'updated_at']);
+
+        $totalFinal = 0;
+        foreach($dadoFiscalizacao as $val)
+        {
+            $total = 0;
+
+            $total += $val->processofiscalizacaopf;
+            $total += $val->processofiscalizacaopj;
+            $total += $val->registroconvertidopf;
+            $total += $val->registroconvertidopj;
+            $total += $val->processoverificacao;
+            $total += $val->dispensaregistro;
+            $total += $val->notificacaort;
+            $total += $val->orientacaorepresentada;
+            $total += $val->orientacaorepresentante;
+            $total += $val->cooperacaoinstitucional;
+            $total += $val->autoconstatacao;
+            $total += $val->autosdeinfracao;
+            $total += $val->multaadministrativa;
+            $total += $val->orientacaocontabil;
+            $total += $val->oficioprefeitura;
+            $total += $val->oficioincentivo;
+
+            $totalFinal += $total;
+            $this->assertEquals($val->somaTotal(), $total);
+        }
+
+        $this->assertEquals($periodo->somaTotal(), $totalFinal);
+    }
+
     /** @test 
      * 
      * Usuário com autorização pode editar periodo de fiscalização.
