@@ -1476,6 +1476,7 @@ class FiscalizacaoTest extends TestCase
         $this->get(route("fiscalizacao.mapa"))
         ->assertOk()
         ->assertSeeText($periodo->periodo)
+        ->assertSee('<p><strong>Total em '.$periodo->periodo.':</strong><i> '.$periodo->somaTotal().'</i></p>')
         ->assertSeeText('Clique em uma das regionais para obter mais detalhes sobre fiscalização do ano ' . $periodo->periodo)
         ->assertSeeText(onlyDate($periodo->dadoFiscalizacao->get(0)->updated_at));
     }
@@ -1537,6 +1538,7 @@ class FiscalizacaoTest extends TestCase
 
         $this->get(route("fiscalizacao.mapaperiodo", $fiscal->id))
             ->assertOk()
+            ->assertSee('<p><strong>Total em '.$fiscal->periodo.':</strong><i> '.$fiscal->somaTotal().'</i></p>')
             ->assertDontSeeText($dados->processofiscalizacaopf)
             ->assertDontSeeText($dados->processofiscalizacaopj)
             ->assertDontSeeText($dados->registroconvertidopf)
@@ -1579,11 +1581,15 @@ class FiscalizacaoTest extends TestCase
 
         $this->get(route("fiscalizacao.mapaperiodo", $periodo2020->id))
             ->assertOk()
+            ->assertSee('<p><strong>Total em '.$periodo2020->periodo.':</strong><i> '.$periodo2020->somaTotal().'</i></p>')
+            ->assertDontSee('<p><strong>Total em '.$periodo2021->periodo.':</strong><i> '.$periodo2021->somaTotal().'</i></p>')
             ->assertSee("11111")
             ->assertDontSee("22222");
 
         $this->get(route("fiscalizacao.mapaperiodo", $periodo2021->id))
             ->assertOk()
+            ->assertDontSee('<p><strong>Total em '.$periodo2020->periodo.':</strong><i> '.$periodo2020->somaTotal().'</i></p>')
+            ->assertSee('<p><strong>Total em '.$periodo2021->periodo.':</strong><i> '.$periodo2021->somaTotal().'</i></p>')
             ->assertDontSee("11111")
             ->assertSee("22222");
     }

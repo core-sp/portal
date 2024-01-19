@@ -18,4 +18,9 @@ class DadoFiscalizacao extends Model
     {
     	return $this->belongsTo('App\PeriodoFiscalizacao', 'idperiodo');
     }
+
+    public function somaTotal()
+    {
+    	return collect($this->toArray())->values()->sum();
+    }
 }

@@ -55,7 +55,10 @@
       @if(isset($periodoSelecionado))
       <div id="dados-fiscalizacao" class="col-lg-5 align-self-center text-center">
         <div id="instrucao-mapa" class="conteudo-txt">
-          <p>Clique em uma das regionais para obter mais detalhes sobre fiscalização do ano {{ $periodoSelecionado->periodo }}.<p>
+        @if(isset($somaTotal))
+          <p><strong>Total em {{ $periodoSelecionado->periodo }}:</strong><i> {{ $somaTotal }}</i></p>
+        @endif
+          <p>Clique em uma das regionais para obter mais detalhes sobre fiscalização do ano {{ $periodoSelecionado->periodo }}.</p>
         </div>
 
         @foreach($periodoSelecionado->dadoFiscalizacao as $r)

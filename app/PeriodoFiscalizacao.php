@@ -16,4 +16,12 @@ class PeriodoFiscalizacao extends Model
     {
     	return $this->hasMany('App\DadoFiscalizacao', 'idperiodo');
     }
+
+    public function somaTotal()
+    {
+        return $this->dadoFiscalizacao()->get()
+        ->makeHidden(['id', 'idregional', 'regional', 'idperiodo', 'created_at', 'updated_at'])->sum(function ($value) {
+            return $value->somaTotal();
+        });
+    }
 }

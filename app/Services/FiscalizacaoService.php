@@ -146,12 +146,14 @@ class FiscalizacaoService implements FiscalizacaoServiceInterface {
         if(isset($id))
             $periodoSelecionado = $todosPeriodos->find($id);
 
+        $somaTotal = isset($periodoSelecionado) ? $periodoSelecionado->somaTotal() : null;
         $dataAtualizacao = isset($periodoSelecionado) ? onlyDate($periodoSelecionado->dadoFiscalizacao->sortByDesc("updated_at")->first()->updated_at) : null;
 
         return [
             'todosPeriodos' => $todosPeriodos->total() == 0 ? null : $todosPeriodos,
             'periodoSelecionado' => $periodoSelecionado,
-            'dataAtualizacao' => $dataAtualizacao
+            'dataAtualizacao' => $dataAtualizacao,
+            'somaTotal' => $somaTotal,
         ];
     }
 }
