@@ -21,12 +21,9 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Área</th>
-                        <th>Filtro</th>
-                        <th>Período</th>
-                        <th>Total geral</th>
-                        <th>Total distintos</th>
-                        <th>Gerado em</th>
+                    @foreach($tabelaRelatorio as $campo)
+                        <th>{{ $campo }}</th>
+                    @endforeach
                     </tr>
                 </thead>
                 <tbody>

@@ -11,6 +11,10 @@ class Suporte
     const EXTERNO = 'externo';
 
     const FILTRO_ACESSO = 'acessos';
+    const FILTRO_BOLETOS = 'boletos';
+    const FILTRO_CERTIDAO_GERADA = 'certidao_gerada';
+    const FILTRO_CERTIDAO_BAIXADA = 'certidao_baixada';
+    const FILTRO_NOVO_ACESSO = 'novo_acesso';
     const FILTRO_ABA_TODAS = 'aba_todas';
     const FILTRO_ABA_HOME = 'aba_home';
     const FILTRO_ABA_DADOS = 'aba_dados-gerais';
@@ -44,6 +48,11 @@ class Suporte
         return $array;
     }
 
+    public static function camposTabelaRelatorio()
+    {
+        return ['Área', 'Filtro', 'Período', 'Total geral', 'Total distintos', 'Gerado em'];
+    }
+
     public static function tipos()
     {
         return [
@@ -66,6 +75,10 @@ class Suporte
     {
         return [
             self::FILTRO_ACESSO => 'Acessos na área restrita (logins)',
+            self::FILTRO_BOLETOS => 'Download de boletos na área do RC',
+            self::FILTRO_CERTIDAO_GERADA => 'Novas certidões geradas na área do RC',
+            self::FILTRO_CERTIDAO_BAIXADA => 'Downloads das certidões na área do RC',
+            self::FILTRO_NOVO_ACESSO => 'Novos acessos na área do RC',
             self::FILTRO_ABA_TODAS => 'Acessos em todas as seções do RC',
             self::FILTRO_ABA_HOME => 'Acessos na seção Home do RC',
             self::FILTRO_ABA_DADOS => 'Acessos na seção Dados Gerais do RC',
@@ -85,6 +98,10 @@ class Suporte
         return [
             self::FILTRO_ACESSO . '_externo' => 'conectou-se à Área do Representante.',
             self::FILTRO_ACESSO . '_interno' => 'conectou-se ao Painel Administrativo.',
+            self::FILTRO_BOLETOS . '_externo' => 'baixou o boleto ',
+            self::FILTRO_CERTIDAO_GERADA . '_externo' => 'gerou certidão com código: ',
+            self::FILTRO_CERTIDAO_BAIXADA . '_externo' => 'acessou a aba "Emitir Certidão" e realizou download.',
+            self::FILTRO_NOVO_ACESSO . '_externo' => 'verificou o email após o cadastro.',
             self::FILTRO_ABA_TODAS . '_externo' => 'acessou a aba ',
             self::FILTRO_ABA_HOME . '_externo' => 'acessou a aba "Home"',
             self::FILTRO_ABA_DADOS . '_externo' => 'acessou a aba "Dados Gerais"',
@@ -147,7 +164,7 @@ class Suporte
     {
         $array = self::formatarExportar($relat, $relatorioHTML['tabela']);
 
-        array_unshift($array, ['Área', 'Filtro', 'Período', 'Total geral', 'Total distintos', 'Gerado em']);
+        array_unshift($array, self::camposTabelaRelatorio());
         $callback = function() use($array) {
             $fh = fopen('php://output','w');
             fprintf($fh, chr(0xEF).chr(0xBB).chr(0xBF));

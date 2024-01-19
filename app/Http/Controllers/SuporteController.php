@@ -157,6 +157,8 @@ class SuporteController extends Controller
             $dados = $this->service->getService('Suporte')->relatorios($relat, $acao);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            if(in_array($e->getCode(), [404]))
+                return redirect()->route('suporte.log.externo.index')->with(['message' => $e->getMessage(), 'class' => 'alert-danger']);
             abort(500, "Erro ao realizar ação com o relatório.");
         }
 

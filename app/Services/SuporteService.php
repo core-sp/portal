@@ -93,6 +93,7 @@ class SuporteService implements SuporteServiceInterface {
             'tipos' => Suporte::tipos(),
             'tipos_textos' => Suporte::tiposTextos(),
             'filtros' => Suporte::filtros(),
+            'tabelaRelatorio' => Suporte::camposTabelaRelatorio(),
         ];
     }
 
@@ -208,21 +209,23 @@ class SuporteService implements SuporteServiceInterface {
         if(isset($acao))
         {
             if(gettype($dados) != 'string')
-                throw new \Exception('Formato de relatório não existe', 404);
+                throw new \Exception('Formato de relatório não existe.', 404);
 
             $final = null;
             switch ($acao) {
                 case 'remover':
+                    if(!session()->exists($dados))
+                        throw new \Exception('Relatório não existe para remover.', 404);
                     session()->forget($dados);
                     break;
                 case 'visualizar':
                     if(!session()->exists($dados))
-                        throw new \Exception('Relatório não existe', 404);
+                        throw new \Exception('Relatório não existe para visualizar.', 404);
                     $final = session($dados);
                     break;
                 case 'exportar-csv':
                     if(!session()->exists($dados))
-                        throw new \Exception('Relatório não existe', 404);
+                        throw new \Exception('Relatório não existe para exportar em .csv.', 404);
                     $final['final'] = Suporte::exportarCsv($dados, session($dados));
                     $final['headers'] = [
                         'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',

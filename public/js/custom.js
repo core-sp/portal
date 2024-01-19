@@ -477,17 +477,32 @@ $('#statusAgendamentoAdmin').ready(function(){
     }
   });
 
-  $('#buscar-mes [type="radio"]').change(function(){
+  $('[name="relat_opcoes"]').change(function(){
+    var somente_rc = $('[name="relat_opcoes"] option[value="' + $(this).val() + '"]').text().search('do RC') > -1;
+    if(somente_rc){
+      $('[name="relat_tipo"] option[value="externo"]').prop('selected', true);
+      $('[name="relat_tipo"] option[value="interno"]').hide();
+    }else
+      $('[name="relat_tipo"] option[value="interno"]').show();
+  });
+
+  $('#buscar-mes [type="radio"], #relat-buscar-mes [type="radio"]').change(function(){
+    var id = $(this).parents('.input-group').attr('id');
+    var nome = id == 'relat-buscar-mes' ? 'relat_' : '';
+    var outra_id = id == 'relat-buscar-mes' ? 'relat-' : '';
     if(this.checked){
-      $('#buscar-mes [name="mes"]').prop('disabled', false);
-      $('#buscar-ano [name="ano"]').prop('disabled', true);
+      $('#' + outra_id + 'buscar-mes [name="' + nome + 'mes"]').prop('disabled', false);
+      $('#' + outra_id + 'buscar-ano [name="' + nome + 'ano"]').prop('disabled', true);
     }
   });
 
-  $('#buscar-ano [type="radio"]').change(function(){
+  $('#buscar-ano [type="radio"], #relat-buscar-ano [type="radio"]').change(function(){
+    var id = $(this).parents('.input-group').attr('id');
+    var nome = id == 'relat-buscar-ano' ? 'relat_' : '';
+    var outra_id = id == 'relat-buscar-ano' ? 'relat-' : '';
     if(this.checked){
-      $('#buscar-mes [name="mes"]').prop('disabled', true);
-      $('#buscar-ano [name="ano"]').prop('disabled', false);
+      $('#' + outra_id + 'buscar-mes [name="' + nome + 'mes"]').prop('disabled', true);
+      $('#' + outra_id + 'buscar-ano [name="' + nome + 'ano"]').prop('disabled', false);
     }
   });
 

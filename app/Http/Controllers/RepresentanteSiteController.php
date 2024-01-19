@@ -479,6 +479,8 @@ class RepresentanteSiteController extends Controller
                 'Pragma' => 'public',
             ];
 
+            event(new ExternoEvent(' e realizou download.', 'Emitir Certidão'));
+
             return response()->streamDownload(function () use ($pdfBase64){
                 echo base64_decode($pdfBase64);
             }, 'certidao.pdf', $headers);

@@ -155,6 +155,7 @@
                                     min="2019"
                                     max="{{ date('Y') }}"
                                     step="1"
+                                    disabled
                                 />
                                 @if($errors->has('relat_ano') || $errors->has('relat_data'))
                                 <div class="invalid-feedback">
