@@ -169,7 +169,7 @@ class FiscalizacaoTest extends TestCase
     }
 
     /** @test */
-    public function sum_periodo_fiscalizacao()
+    public function sum_total_periodo_fiscalizacao()
     {
         $this->signInAsAdmin();
 
@@ -205,6 +205,46 @@ class FiscalizacaoTest extends TestCase
         }
 
         $this->assertEquals($periodo->somaTotal(), $totalFinal);
+    }
+
+    /** @test */
+    public function sum_by_actions_periodo_fiscalizacao()
+    {
+        $this->signInAsAdmin();
+
+        $periodo = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            'idperiodo' => $periodo->id
+        ])->makeHidden(['id', 'idperiodo', 'idregional', 'regional', 'created_at', 'updated_at']);
+
+        $acoes = array_fill_keys(DadoFiscalizacao::campos(), 0);
+        unset($acoes['Processos de Fiscalização<span class="invisible">F</span>']);
+        unset($acoes['Processos de Fiscalização<span class="invisible">J</span>']);
+        unset($acoes['Registros Convertidos<span class="invisible">F</span>']);
+        unset($acoes['Dispensa de Registro (de ofício)']);
+        unset($acoes['Orientações aos representantes']);
+
+        foreach($dadoFiscalizacao as $val)
+        {
+            // $acoes['Processos de Fiscalização<span class="invisible">F</span>'] += $val->processofiscalizacaopf;
+            // $acoes['Processos de Fiscalização<span class="invisible">J</span>'] += $val->processofiscalizacaopj;
+            // $acoes['Registros Convertidos<span class="invisible">F</span>'] += $val->registroconvertidopf;
+            $acoes['Registros Convertidos<span class="invisible">J</span>'] += $val->registroconvertidopj;
+            $acoes['Processos de Verificação'] += $val->processoverificacao;
+            // $acoes['Dispensa de Registro (de ofício)'] += $val->dispensaregistro;
+            $acoes['Notificações de RT'] += $val->notificacaort;
+            $acoes['Orientações às representadas'] += $val->orientacaorepresentada;
+            // $acoes['Orientações aos representantes'] += $val->orientacaorepresentante;
+            $acoes['Diligências externas'] += $val->cooperacaoinstitucional;
+            $acoes['Auto de Constatação'] += $val->autoconstatacao;
+            $acoes['Autos de Infração'] += $val->autosdeinfracao;
+            $acoes['Multa Administrativa'] += $val->multaadministrativa;
+            $acoes['Orientação às contabilidades'] += $val->orientacaocontabil;
+            $acoes['Ofício às prefeituras'] += $val->oficioprefeitura;
+            $acoes['Ofício de incentivo a contratação de representantes comerciais'] += $val->oficioincentivo;
+        }
+
+        $this->assertEquals($periodo->somaTotalPorAcao(), $acoes);
     }
 
     /** @test 
@@ -1515,7 +1555,7 @@ class FiscalizacaoTest extends TestCase
         $this->get(route("fiscalizacao.mapa"))
         ->assertOk()
         ->assertSeeText($periodo->periodo)
-        ->assertSee('<p><strong>Total em '.$periodo->periodo.':</strong><i> '.$periodo->somaTotal().'</i></p>')
+        ->assertSee('<h5 class="p-0">Total em '.$periodo->periodo.' - <span class="font-weight-normal">')
         ->assertSeeText('Clique em uma das regionais para obter mais detalhes sobre fiscalização do ano ' . $periodo->periodo)
         ->assertSeeText(onlyDate($periodo->dadoFiscalizacao->get(0)->updated_at));
     }
@@ -1577,7 +1617,7 @@ class FiscalizacaoTest extends TestCase
 
         $this->get(route("fiscalizacao.mapaperiodo", $fiscal->id))
             ->assertOk()
-            ->assertSee('<p><strong>Total em '.$fiscal->periodo.':</strong><i> '.$fiscal->somaTotal().'</i></p>')
+            ->assertSee('<h5 class="p-0">Total em '.$fiscal->periodo.' - <span class="font-weight-normal">')
             ->assertDontSeeText($dados->processofiscalizacaopf)
             ->assertDontSeeText($dados->processofiscalizacaopj)
             ->assertDontSeeText($dados->registroconvertidopf)
@@ -1620,15 +1660,15 @@ class FiscalizacaoTest extends TestCase
 
         $this->get(route("fiscalizacao.mapaperiodo", $periodo2020->id))
             ->assertOk()
-            ->assertSee('<p><strong>Total em '.$periodo2020->periodo.':</strong><i> '.$periodo2020->somaTotal().'</i></p>')
-            ->assertDontSee('<p><strong>Total em '.$periodo2021->periodo.':</strong><i> '.$periodo2021->somaTotal().'</i></p>')
+            ->assertSee('<h5 class="p-0">Total em '.$periodo2020->periodo.' - <span class="font-weight-normal">')
+            ->assertDontSee('<h5 class="p-0">Total em '.$periodo2021->periodo.' - <span class="font-weight-normal">')
             ->assertSee("11111")
             ->assertDontSee("22222");
 
         $this->get(route("fiscalizacao.mapaperiodo", $periodo2021->id))
             ->assertOk()
-            ->assertDontSee('<p><strong>Total em '.$periodo2020->periodo.':</strong><i> '.$periodo2020->somaTotal().'</i></p>')
-            ->assertSee('<p><strong>Total em '.$periodo2021->periodo.':</strong><i> '.$periodo2021->somaTotal().'</i></p>')
+            ->assertDontSee('<h5 class="p-0">Total em '.$periodo2020->periodo.' - <span class="font-weight-normal">')
+            ->assertSee('<h5 class="p-0">Total em '.$periodo2021->periodo.' - <span class="font-weight-normal">')
             ->assertDontSee("11111")
             ->assertSee("22222");
     }

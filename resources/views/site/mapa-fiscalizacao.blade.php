@@ -56,7 +56,30 @@
       <div id="dados-fiscalizacao" class="col-lg-5 align-self-center text-center">
         <div id="instrucao-mapa" class="conteudo-txt">
         @if(isset($somaTotal))
-          <p><strong>Total em {{ $periodoSelecionado->periodo }}:</strong><i> {{ $somaTotal }}</i></p>
+        <div class="card bg-light">
+          <div class="card-header">
+            <h5 class="p-0">Total em {{ $periodoSelecionado->periodo }} - <span class="font-weight-normal">{{ $somaTotal['Total'] }}</span></h5>
+          </div>
+          <div class="card-body">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th style="width:50%">Ação</th>
+                  <th style="width:50%" class="text-nowrap">Resultados em {{ $periodoSelecionado->periodo }}</th>
+                <tr>
+              </thead>
+              <tbody>
+              @foreach($somaTotal as $acao => $valor)
+                @break($loop->last)
+                <tr>
+                  <td class="text-left" style="width:60%; font-size: 15px">{!! $acao !!}</td>
+                  <td class="text-center">{{ $valor }}</td>
+                </tr>
+              @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
         @endif
           <p>Clique em uma das regionais para obter mais detalhes sobre fiscalização do ano {{ $periodoSelecionado->periodo }}.</p>
         </div>
@@ -76,61 +99,61 @@
               </thead>
               <tbody>
                 <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Auto de Constatação</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">{{ $r->campos()['autoconstatacao'] }}</td>
                   <td class="text-center" colspan="2">{{ $r->autoconstatacao }}</td>
                 </tr>
                 <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Autos de Infração</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">{{ $r->campos()['autosdeinfracao'] }}</td>
                   <td class="text-center" colspan="2">{{ $r->autosdeinfracao }}</td>
                 </tr>
                 <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Multa Administrativa</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">{{ $r->campos()['multaadministrativa'] }}</td>
                   <td class="text-center" colspan="2">{{ $r->multaadministrativa }}</td>
                 </tr>
                 <!--<tr>
-                  <td class="text-left" style="width:50%; font-size: 15px">Processos de Fiscalização <small class="text-danger">*<small></td>
+                  <td class="text-left" style="width:50%; font-size: 15px">{!! $r->campos()['processofiscalizacaopf'] !!} <small class="text-danger">*<small></td>
                   <td style="width:20%">{{-- $r->processofiscalizacaopf --}}</td>
                   <td style="width:20%">{{-- $r->processofiscalizacaopj --}}</td>
                 </tr>-->
                 <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Registros Convertidos</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">{!! $r->campos()['registroconvertidopj'] !!}</td>
                   <!--<td style="width:20%">{{-- $r->registroconvertidopf --}}</td>-->
                   <td style="width:50%">{{ $r->registroconvertidopj }}</td>
                 </tr>
                 <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Processos de Verificação</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">{{ $r->campos()['processoverificacao'] }}</td>
                   <td class="text-center" colspan="2">{{ $r->processoverificacao }}</td>
                 </tr>
                 <!-- <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Dispensa de Registro (de ofício)</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">{{-- $r->campos()['dispensaregistro'] --}}</td>
                   <td class="text-center" colspan="2">{{-- $r->dispensaregistro --}}</td>
                 </tr> -->
                 <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Notificações de RT</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">{{ $r->campos()['notificacaort'] }}</td>
                   <td class="text-center" colspan="2">{{ $r->notificacaort }}</td>
                 </tr>
                 <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Orientações às representadas</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">{{ $r->campos()['orientacaorepresentada'] }}</td>
                   <td class="text-center" colspan="2">{{ $r->orientacaorepresentada }}</td>
                 </tr>
                 <!-- <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Orientações aos representantes</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">{{-- $r->campos()['orientacaorepresentante'] --}}</td>
                   <td class="text-center" colspan="2">{{ $r->orientacaorepresentante }}</td>
                 </tr> -->
                 <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Diligências externas</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">{{ $r->campos()['cooperacaoinstitucional'] }}</td>
                   <td class="text-center" colspan="2">{{ $r->cooperacaoinstitucional }}</td>
                 </tr>
                 <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Orientação às contabilidades</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">{{ $r->campos()['orientacaocontabil'] }}</td>
                   <td class="text-center" colspan="2">{{ $r->orientacaocontabil }}</td>
                 </tr>
                 <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Ofício às prefeituras</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">{{ $r->campos()['oficioprefeitura'] }}</td>
                   <td class="text-center" colspan="2">{{ $r->oficioprefeitura }}</td>
                 </tr>
                 <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Ofício de incentivo a contratação de representantes comerciais</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">{{ $r->campos()['oficioincentivo'] }}</td>
                   <td class="align-middle text-center" colspan="2">{{ $r->oficioincentivo }}</td>
                 </tr>
               </tbody>

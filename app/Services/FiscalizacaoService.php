@@ -136,7 +136,8 @@ class FiscalizacaoService implements FiscalizacaoServiceInterface {
 
     public function mapaSite($id = null)
     {
-        $todosPeriodos = PeriodoFiscalizacao::with(['dadoFiscalizacao', 'dadoFiscalizacao.regional'])
+        $select = 'dadoFiscalizacao:'.PeriodoFiscalizacao::selectMapa();
+        $todosPeriodos = PeriodoFiscalizacao::with([$select, 'dadoFiscalizacao.regional'])
         ->where('status', true)
         ->orderBy('periodo', 'DESC')
         ->paginate(25);
@@ -146,7 +147,7 @@ class FiscalizacaoService implements FiscalizacaoServiceInterface {
         if(isset($id))
             $periodoSelecionado = $todosPeriodos->find($id);
 
-        $somaTotal = isset($periodoSelecionado) ? $periodoSelecionado->somaTotal() : null;
+        $somaTotal = isset($periodoSelecionado) ? array_merge($periodoSelecionado->somaTotalPorAcao(), ['Total' => $periodoSelecionado->somaTotal()]) : null;
         $dataAtualizacao = isset($periodoSelecionado) ? onlyDate($periodoSelecionado->dadoFiscalizacao->sortByDesc("updated_at")->first()->updated_at) : null;
 
         return [
