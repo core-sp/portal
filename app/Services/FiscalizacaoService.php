@@ -6,6 +6,7 @@ use App\Contracts\FiscalizacaoServiceInterface;
 use App\PeriodoFiscalizacao;
 use App\Events\CrudEvent;
 use App\Contracts\MediadorServiceInterface;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class FiscalizacaoService implements FiscalizacaoServiceInterface {
 
@@ -136,19 +137,26 @@ class FiscalizacaoService implements FiscalizacaoServiceInterface {
 
     public function mapaSite($id = null)
     {
-        $select = 'dadoFiscalizacao:'.PeriodoFiscalizacao::selectMapa();
-        $todosPeriodos = PeriodoFiscalizacao::with([$select, 'dadoFiscalizacao.regional'])
-        ->where('status', true)
+        $select = PeriodoFiscalizacao::selectMapa();
+        $todosPeriodos = PeriodoFiscalizacao::where('status', true)
         ->orderBy('periodo', 'DESC')
         ->paginate(25);
         
-        $periodoSelecionado = $todosPeriodos->total() > 0 ? $todosPeriodos->first() : null;
+        $periodoSelecionado = null;
+
+        if(($todosPeriodos->total() > 0) && isset($id) && !$todosPeriodos->contains($id))
+            throw new ModelNotFoundException("No query results for model [App\PeriodoFiscalizacao] " . $id);
+
+        if($todosPeriodos->total() > 0)
+            $periodoSelecionado = isset($id) ? $todosPeriodos->find($id)->load(['dadoFiscalizacao' => function ($query) use($select, $id){
+                $query->selectRaw($select)->where('idperiodo', $id);
+            }, 'dadoFiscalizacao.regional:idregional,prefixo,regional']) : $todosPeriodos->first()->load(['dadoFiscalizacao' => function ($query) use($select){
+                $query->selectRaw($select);
+            }, 'dadoFiscalizacao.regional:idregional,prefixo,regional']);
         
-        if(isset($id))
-            $periodoSelecionado = $todosPeriodos->find($id);
 
         $somaTotal = isset($periodoSelecionado) ? array_merge($periodoSelecionado->somaTotalPorAcao(), ['Total' => $periodoSelecionado->somaTotal()]) : null;
-        $dataAtualizacao = isset($periodoSelecionado) ? onlyDate($periodoSelecionado->dadoFiscalizacao->sortByDesc("updated_at")->first()->updated_at) : null;
+        $dataAtualizacao = isset($periodoSelecionado) ? onlyDate($periodoSelecionado->dadoFiscalizacao->max("updated_at")) : null;
 
         return [
             'todosPeriodos' => $todosPeriodos->total() == 0 ? null : $todosPeriodos,

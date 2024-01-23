@@ -1689,22 +1689,6 @@ class FiscalizacaoTest extends TestCase
         ]);
 
         $this->get(route("fiscalizacao.mapaperiodo", 22))
-            ->assertOk()
-            ->assertDontSeeText($dados->processofiscalizacaopf)
-            ->assertDontSeeText($dados->processofiscalizacaopj)
-            ->assertDontSeeText($dados->registroconvertidopf)
-            ->assertDontSeeText($dados->registroconvertidopj)
-            ->assertDontSeeText($dados->processoverificacao)
-            ->assertDontSeeText($dados->dispensaregistro)
-            ->assertDontSeeText($dados->notificacaort)
-            ->assertDontSeeText($dados->orientacaorepresentada)
-            ->assertDontSeeText($dados->orientacaorepresentante)
-            ->assertDontSeeText($dados->cooperacaoinstitucional)
-            ->assertDontSeeText($dados->autoconstatacao)
-            ->assertDontSeeText($dados->autosdeinfracao)
-            ->assertDontSeeText($dados->multaadministrativa)
-            ->assertDontSeeText('Clique em uma das regionais para obter mais detalhes sobre fiscalização do ano ' . $fiscal->periodo)
-            ->assertDontSeeText(onlyDate($dados->updated_at))
-            ->assertSeeText($fiscal->periodo);
+            ->assertNotFound();
     }
 }
