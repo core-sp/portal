@@ -59,7 +59,7 @@
         <div class="card bg-light">
           @isset($somaTotal['Total'])
           <div class="card-header">
-            <h5 class="p-0">Total em {{ $periodoSelecionado->periodo }} - <span class="font-weight-normal">{{ $somaTotal['Total'] }}</span></h5>
+            <h5 class="p-0">Total em {{ $periodoSelecionado->periodo }}</h5>
           </div>
           @endisset
           <div class="card-body">

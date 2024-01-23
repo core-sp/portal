@@ -155,7 +155,7 @@ class FiscalizacaoService implements FiscalizacaoServiceInterface {
             }, 'dadoFiscalizacao.regional:idregional,prefixo,regional']);
         
 
-        $somaTotal = isset($periodoSelecionado) ? array_merge($periodoSelecionado->somaTotalPorAcao(), ['Total' => $periodoSelecionado->somaTotal()]) : null;
+        $somaTotal = isset($periodoSelecionado) ? array_merge($periodoSelecionado->somaTotalPorAcao(), ['Total' => 0/*$periodoSelecionado->somaTotal()*/]) : null;
         $dataAtualizacao = isset($periodoSelecionado) ? onlyDate($periodoSelecionado->dadoFiscalizacao->max("updated_at")) : null;
 
         return [

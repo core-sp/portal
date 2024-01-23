@@ -1555,7 +1555,7 @@ class FiscalizacaoTest extends TestCase
         $this->get(route("fiscalizacao.mapa"))
         ->assertOk()
         ->assertSeeText($periodo->periodo)
-        ->assertSee('<h5 class="p-0">Total em '.$periodo->periodo.' - <span class="font-weight-normal">')
+        ->assertSee('<h5 class="p-0">Total em '.$periodo->periodo.'</h5>')
         ->assertSeeText('Clique em uma das regionais para obter mais detalhes sobre fiscalização do ano ' . $periodo->periodo)
         ->assertSeeText(onlyDate($periodo->dadoFiscalizacao->get(0)->updated_at));
     }
@@ -1617,7 +1617,7 @@ class FiscalizacaoTest extends TestCase
 
         $this->get(route("fiscalizacao.mapaperiodo", $fiscal->id))
             ->assertOk()
-            ->assertSee('<h5 class="p-0">Total em '.$fiscal->periodo.' - <span class="font-weight-normal">')
+            ->assertSee('<h5 class="p-0">Total em '.$fiscal->periodo.'</h5>')
             ->assertDontSeeText($dados->processofiscalizacaopf)
             ->assertDontSeeText($dados->processofiscalizacaopj)
             ->assertDontSeeText($dados->registroconvertidopf)
@@ -1660,15 +1660,15 @@ class FiscalizacaoTest extends TestCase
 
         $this->get(route("fiscalizacao.mapaperiodo", $periodo2020->id))
             ->assertOk()
-            ->assertSee('<h5 class="p-0">Total em '.$periodo2020->periodo.' - <span class="font-weight-normal">')
-            ->assertDontSee('<h5 class="p-0">Total em '.$periodo2021->periodo.' - <span class="font-weight-normal">')
+            ->assertSee('<h5 class="p-0">Total em '.$periodo2020->periodo.'</h5>')
+            ->assertDontSee('<h5 class="p-0">Total em '.$periodo2021->periodo.'</h5>')
             ->assertSee("11111")
             ->assertDontSee("22222");
 
         $this->get(route("fiscalizacao.mapaperiodo", $periodo2021->id))
             ->assertOk()
-            ->assertDontSee('<h5 class="p-0">Total em '.$periodo2020->periodo.' - <span class="font-weight-normal">')
-            ->assertSee('<h5 class="p-0">Total em '.$periodo2021->periodo.' - <span class="font-weight-normal">')
+            ->assertDontSee('<h5 class="p-0">Total em '.$periodo2020->periodo.'</h5>')
+            ->assertSee('<h5 class="p-0">Total em '.$periodo2021->periodo.'</h5>')
             ->assertDontSee("11111")
             ->assertSee("22222");
     }
