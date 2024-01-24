@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\PeriodoFiscalizacaoRequest;
 use App\Contracts\MediadorServiceInterface;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class FiscalizacaoController extends Controller
 {
@@ -140,29 +141,26 @@ class FiscalizacaoController extends Controller
     {
         try{
             $dados = $this->service->getService('Fiscalizacao')->mapaSite();
-            $todosPeriodos = $dados['todosPeriodos'];
-            $periodoSelecionado = $dados['periodoSelecionado'];
-            $dataAtualizacao = $dados['dataAtualizacao'];
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar o mapa da fiscalização.");
         }
 
-        return view('site.mapa-fiscalizacao', compact('todosPeriodos', 'periodoSelecionado', 'dataAtualizacao'));
+        return view('site.mapa-fiscalizacao', $dados);
     }
 
     public function mostrarMapaPeriodo($id)
     {
         try{
             $dados = $this->service->getService('Fiscalizacao')->mapaSite($id);
-            $todosPeriodos = $dados['todosPeriodos'];
-            $periodoSelecionado = $dados['periodoSelecionado'];
-            $dataAtualizacao = $dados['dataAtualizacao'];
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Período não encontrado.");
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar o mapa da fiscalização.");
         }
 
-        return view('site.mapa-fiscalizacao', compact('todosPeriodos', 'periodoSelecionado', 'dataAtualizacao'));
+        return view('site.mapa-fiscalizacao', $dados);
     }
 }
