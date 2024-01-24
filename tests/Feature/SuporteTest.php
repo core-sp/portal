@@ -298,11 +298,13 @@ class SuporteTest extends TestCase
     /** @test */
     public function admin_can_search_logs_by_month_with_lines()
     {
-        $data = Carbon::today()->subMonth()->format('Y-m');
+        $data = Carbon::today()->subMonth();
+        $ano = $data->format('Y');
+        $data = $data->format('Y-m');
 
         $this->signInAsAdmin();
 
-        $this->get(route('suporte.log.externo.busca', ['mes' => $data, 'tipo' => 'externo', 'texto' => date('Y'), 'n_linhas' => 'on']))
+        $this->get(route('suporte.log.externo.busca', ['mes' => $data, 'tipo' => 'externo', 'texto' => $ano, 'n_linhas' => 'on']))
         ->assertSee('<th>Nome do Log</th>')
         ->assertSee('<th>Tamanho em KB</th>')
         ->assertSee('<th>Total de ocorrências</th>')
