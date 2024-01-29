@@ -138,15 +138,15 @@ class SuporteController extends Controller
 
         try{
             $dados = $request->validated();
-            $dados = $this->service->getService('Suporte')->relatorios($dados);
-            $relat = 'relatorio_'.$dados['relatorio']['data'].'-'.$dados['relatorio']['tipo'].'-'.$dados['relatorio']['opcoes'];
-            session([$relat => $dados]);
+            $relat = $this->service->getService('Suporte')->relatorios($dados);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            if(in_array($e->getCode(), [400]))
+                return redirect()->route('suporte.log.externo.index')->with(['message' => $e->getMessage(), 'class' => 'alert-danger']);
             abort(500, "Erro ao gerar relatório.");
         }
 
-        return view('admin.views.log_relatorio', ['tabela' => $dados['tabela'], 'relat' => $relat]);
+        return redirect()->route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']);
     }
 
     public function relatoriosAcoes($relat, $acao)
@@ -164,7 +164,7 @@ class SuporteController extends Controller
 
         if($acao == 'exportar-csv')
             return response()->stream($dados['final'], 200, $dados['headers']);
-        return isset($dados) ? view('admin.views.log_relatorio', ['tabela' => $dados['tabela'], 'relat' => $relat]) : redirect()->back();
+        return isset($dados) ? view('admin.views.log_relatorio', ['tabela' => $dados['tabela'], 'relat' => $relat]) : redirect()->route('suporte.log.externo.index')->with('relat_removido', $relat);
     }
 
     public function relatorioFinal()
@@ -172,14 +172,13 @@ class SuporteController extends Controller
         $this->authorize('onlyAdmin', auth()->user());
 
         try{
-            $dados = $this->service->getService('Suporte')->relatorioFinal();
-            session(['relatorio_final' => ['tabela' => $dados]]);
+            $relat = $this->service->getService('Suporte')->relatorioFinal();
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao gerar relatório final.");
         }
 
-        return view('admin.views.log_relatorio', ['tabela' => $dados, 'relat' => 'relatorio_final']);
+        return redirect()->route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']);
     }
 
     public function errosIndex()

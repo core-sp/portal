@@ -94,6 +94,7 @@ class SuporteService implements SuporteServiceInterface {
             'tipos_textos' => Suporte::tiposTextos(),
             'filtros' => Suporte::filtros(),
             'tabelaRelatorio' => Suporte::camposTabelaRelatorio(),
+            'suporte' => new Suporte(),
         ];
     }
 
@@ -206,27 +207,20 @@ class SuporteService implements SuporteServiceInterface {
 
     public function relatorios($dados, $acao = null)
     {
+        $suporte = new Suporte();
+
         if(isset($acao))
         {
-            if(gettype($dados) != 'string')
-                throw new \Exception('Formato de relatório não existe.', 404);
-
             $final = null;
             switch ($acao) {
                 case 'remover':
-                    if(!session()->exists($dados))
-                        throw new \Exception('Relatório não existe para remover.', 404);
-                    session()->forget($dados);
+                    $suporte->removerRelatorioPorNome($dados);
                     break;
                 case 'visualizar':
-                    if(!session()->exists($dados))
-                        throw new \Exception('Relatório não existe para visualizar.', 404);
-                    $final = session($dados);
+                    $final = $suporte->getRelatorioPorNome($dados);
                     break;
                 case 'exportar-csv':
-                    if(!session()->exists($dados))
-                        throw new \Exception('Relatório não existe para exportar em .csv.', 404);
-                    $final['final'] = Suporte::exportarCsv($dados, session($dados));
+                    $final['final'] = $suporte->exportarCsv($dados);
                     $final['headers'] = [
                         'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
                         'Content-type' => 'text/csv; charset=UTF-8',
@@ -239,6 +233,7 @@ class SuporteService implements SuporteServiceInterface {
             return $final;
         }
 
+        $suporte->conferePodeCriar();
         $textos = Suporte::textosFiltros();
 
         $data = 'relat_' . $dados['relat_data'];
@@ -256,19 +251,13 @@ class SuporteService implements SuporteServiceInterface {
         $dados_final['data'] = $dados[$data];
         $dados_final['opcoes'] = $dados['relat_opcoes'];
 
-        return [
-            'tabela' => Suporte::getRelatorioHTML($dados_final),
-            'relatorio' => $dados_final,
-        ];
+        return Suporte::criarRelatorio($dados_final);
     }
 
     public function relatorioFinal()
     {
-        $dados_finais = array_filter(session()->all(), function($key) {
-            return strpos($key, 'relatorio_') !== false;
-        }, ARRAY_FILTER_USE_KEY);
-
-        return Suporte::getRelatorioFinalHTML($dados_finais);
+        $suporte = new Suporte();
+        return $suporte->getRelatorioFinalHTML();
     }
 
     public function filtros()

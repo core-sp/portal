@@ -57,9 +57,8 @@
     <hr />
 
     @php
-        $relatorios = array_filter(session()->all(), function($key) {
-            return (strpos($key, 'relatorio_') !== false) && ($key != 'relatorio_final');
-        }, ARRAY_FILTER_USE_KEY);
+        $relatorios = $suporte->todosRelatorios();
+        $cont = 1;
     @endphp
 
     <!-- RELATÓRIOS -->
@@ -68,20 +67,33 @@
             <fieldset class="border border-secondary p-3">
                 <legend>Relatórios</legend>
 
+                @if(session()->exists('relat_removido'))
+                <div class="toast bg-warning">
+                    <div class="toast-body text-danger text-center">
+                        <strong>Relatório removido!</strong>
+                    </div>
+                </div>
+                @endif
+
                 @if(!empty($relatorios))
                 <p><strong>Relatórios salvos temporariamente:</strong></p>
                 @foreach($relatorios as $relat => $r)
-                <span>
-                    @if(isset($r['relatorio']))
-                    <span class="text-nowrap">
-                        <a href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']) }}">
-                            {{ $tipos[$r['relatorio']['tipo']] }} - {{ $filtros[$r['relatorio']['opcoes']] }} - {{ Carbon\Carbon::hasFormat($r['relatorio']['data'], 'Y-m') ? Carbon\Carbon::parse($r['relatorio']['data'])->format('m\/Y') : $r['relatorio']['data'] }}</a>
-                            <a class="btn btn-link btn-sm" href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'exportar-csv']) }}"><i class="fas fa-download"></i></a>
-                        <a class="btn btn-link btn-sm" href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'remover']) }}"><i class="fas fa-times text-danger"></i></a></span>
-                    @endif
-                </span><br>
+                    @php
+                        if(isset($r['relatorio']))
+                            $data_relat = Carbon\Carbon::hasFormat($r['relatorio']['data'], 'Y-m') ? Carbon\Carbon::parse($r['relatorio']['data'])->format('m\/Y') : $r['relatorio']['data'];
+                        $nome_relat = $relat != 'relatorio_final' ? $relat : 'relatorio_final';
+                        $inicio = $relat != 'relatorio_final' ? $cont++ : 'Final';
+                        $texto_relat = $relat == 'relatorio_final' ? 'Relatório Final' : 
+                        $tipos[$r['relatorio']['tipo']] . ' - ' . $filtros[$r['relatorio']['opcoes']] . ' - ' . $data_relat;
+                    @endphp
+                <span class="text-nowrap">{{ $inicio }}: 
+                    <a href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $nome_relat, 'acao' => 'visualizar']) }}">{{ $texto_relat }}</a>
+                    <a class="btn btn-link btn-sm" href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $nome_relat, 'acao' => 'exportar-csv']) }}"><i class="fas fa-download"></i></a>
+                    <a class="btn btn-link btn-sm" href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $nome_relat, 'acao' => 'remover']) }}"><i class="fas fa-times text-danger"></i></a>
+                </span>
+                <br>
                 @endforeach
-                <a class="btn btn-success btn-sm mt-2" href="{{ route('suporte.log.externo.relatorios.final') }}">Gerar relatório final</a>
+                <a class="btn btn-success btn-sm mt-3" href="{{ route('suporte.log.externo.relatorios.final') }}">Gerar relatório final</a>
                 <hr>
                 @endif
 

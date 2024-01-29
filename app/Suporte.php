@@ -6,6 +6,8 @@ use Carbon\Carbon;
 
 class Suporte
 {
+    const TOTAL_RELAT = 50;
+
     const ERROS = 'erros';
     const INTERNO = 'interno';
     const EXTERNO = 'externo';
@@ -27,6 +29,8 @@ class Suporte
     const FILTRO_ABA_CURSOS = 'aba_cursos';
     const FILTRO_ABA_SALAS = 'aba_salas';
 
+    private $relatorios;
+
     private static function separarLinhasRelatHTML($relat_final)
     {
         return array_filter(explode('</tr>', strip_tags($relat_final, '<td><tr>')));
@@ -37,7 +41,7 @@ class Suporte
         return explode('<br>', strip_tags(str_replace('</td>', '<br>', strip_tags($linha, '<td>')), '<br>'));
     }
 
-    private static function formatarExportar($relat, $relatorioHTML)
+    private static function formatarExportar($relatorioHTML)
     {
         $array = array();
 
@@ -116,8 +120,9 @@ class Suporte
         ];
     }
 
-    public static function getRelatorioHTML($dados)
+    public static function criarRelatorio($dados)
     {
+        $relat = 'relatorio_'.$dados['data'].'-'.$dados['tipo'].'-'.$dados['opcoes'];
         $dados['data'] = Carbon::hasFormat($dados['data'], 'Y-m') ? Carbon::parse($dados['data'])->format('m\/Y') : $dados['data'];
 
         $texto = '<tr>';
@@ -129,19 +134,25 @@ class Suporte
         $texto .= '<td><small>'.now()->format('d\/m\/Y, \à\s H:i').'</small></td>';
         $texto .= '</tr>';
 
-        return $texto;
+        session([
+            $relat => [
+                'tabela' => $texto,
+                'relatorio' => $dados,
+            ]
+        ]);
+
+        return $relat;
     }
 
-    public static function getRelatorioFinalHTML($dados)
+    public function getRelatorioFinalHTML()
     {
         $tabela = '';
         $total_geral = 0;
         $total_distinto = 0;
-
+        $dados = $this->todosRelatorios(true);
+        
         foreach($dados as $key => $value)
         {
-            if($key == 'relatorio_final')
-                continue;
             $data = Carbon::hasFormat($value['relatorio']['data'], 'Y-m') ? Carbon::parse($value['relatorio']['data'])->format('m\/Y') : $value['relatorio']['data'];
             $tabela .= $value['tabela'];
             $total_geral += $value['relatorio']['geral'];
@@ -157,12 +168,15 @@ class Suporte
         $tabela .= '<td class="font-weight-bolder"><small>'.now()->format('d\/m\/Y, \à\s H:i').'</small></td>';
         $tabela .= '</tr>';
 
-        return $tabela;
+        session(['relatorio_final' => ['tabela' => $tabela]]);
+
+        return 'relatorio_final';
     }
 
-    public static function exportarCsv($relat, $relatorioHTML)
+    public function exportarCsv($relat)
     {
-        $array = self::formatarExportar($relat, $relatorioHTML['tabela']);
+        $relatorioHTML = $this->getRelatorioPorNome($relat);
+        $array = self::formatarExportar($relatorioHTML['tabela']);
 
         array_unshift($array, self::camposTabelaRelatorio());
         $callback = function() use($array) {
@@ -174,5 +188,46 @@ class Suporte
         };
 
         return $callback;
+    }
+
+    public function todosRelatorios($semRelatFinal = false)
+    {
+        $relatorios = array_filter(session()->all(), function($key) use($semRelatFinal) {
+            return $semRelatFinal ? ((strpos($key, 'relatorio_') !== false) && ($key != 'relatorio_final')) : (strpos($key, 'relatorio_') !== false);
+        }, ARRAY_FILTER_USE_KEY);
+
+        ksort($relatorios, SORT_STRING);
+
+        return $relatorios;
+    }
+
+    public function getRelatorioPorNome($relat)
+    {
+        if(gettype($relat) != 'string')
+            throw new \Exception('Formato de relatório não existe.', 404);
+
+        if(!session()->exists($relat))
+            throw new \Exception('Relatório não existe para visualizar / exportar.csv.', 404);
+
+        return session($relat);
+    }
+
+    public function removerRelatorioPorNome($relat)
+    {
+        if(gettype($relat) != 'string')
+            throw new \Exception('Formato de relatório não existe.', 404);
+
+        if(!session()->exists($relat))
+            throw new \Exception('Relatório não existe para remover', 404);
+
+        return session()->forget($relat);
+    }
+
+    public function conferePodeCriar()
+    {
+        $relatorios = $this->todosRelatorios(true);
+
+        if(count($relatorios) >= self::TOTAL_RELAT)
+            throw new \Exception('Alcançou limite de até '.self::TOTAL_RELAT.' relatórios!', 400);
     }
 }

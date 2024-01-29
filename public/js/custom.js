@@ -182,6 +182,9 @@ $(document).ready(function(){
       e.preventDefault();
     }
   });
+
+  $('.toast').toast({delay: 2000});
+  $('.toast').toast('show');
 });
 
 // Funcionalidade Agendamento Bloqueio

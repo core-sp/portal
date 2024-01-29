@@ -15,7 +15,7 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     </head>
     <body>
-        <div class="container mt-2">
+        <div class="container mt-2 mb-5">
             <h2>Relatório do Portal via Log</h2>
             @if(isset($tabela))
             <table class="table">
