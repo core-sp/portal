@@ -52,6 +52,11 @@ class Suporte
         return $array;
     }
 
+    private static function formatarData($data)
+    {
+        return Carbon::hasFormat($data, 'Y-m') ? Carbon::parse($data)->format('m\/Y') : $data;
+    }
+
     public static function camposTabelaRelatorio()
     {
         return ['Área', 'Filtro', 'Período', 'Total geral', 'Total distintos', 'Gerado em'];
@@ -123,7 +128,7 @@ class Suporte
     public static function criarRelatorio($dados)
     {
         $relat = 'relatorio_'.$dados['data'].'-'.$dados['tipo'].'-'.$dados['opcoes'];
-        $dados['data'] = Carbon::hasFormat($dados['data'], 'Y-m') ? Carbon::parse($dados['data'])->format('m\/Y') : $dados['data'];
+        $dados['data'] = self::formatarData($dados['data']);
 
         $texto = '<tr>';
         $texto .= '<td>'.self::tipos()[$dados['tipo']].'</td>';
@@ -153,7 +158,7 @@ class Suporte
         
         foreach($dados as $key => $value)
         {
-            $data = Carbon::hasFormat($value['relatorio']['data'], 'Y-m') ? Carbon::parse($value['relatorio']['data'])->format('m\/Y') : $value['relatorio']['data'];
+            $data = self::formatarData($value['relatorio']['data']);
             $tabela .= $value['tabela'];
             $total_geral += $value['relatorio']['geral'];
             $total_distinto += $value['relatorio']['distintos'];
@@ -229,5 +234,18 @@ class Suporte
 
         if(count($relatorios) >= self::TOTAL_RELAT)
             throw new \Exception('Alcançou limite de até '.self::TOTAL_RELAT.' relatórios!', 400);
+    }
+
+    public function getTituloPorNome($relat)
+    {
+        if($relat == 'relatorio_final')
+            return 'Relatório Final';
+
+        $r = $this->getRelatorioPorNome($relat);
+
+        $data_relat = self::formatarData($r['relatorio']['data']);
+        $relat = self::tipos()[$r['relatorio']['tipo']] . ' - ' . self::filtros()[$r['relatorio']['opcoes']] . ' - ' . $data_relat;
+
+        return $relat;
     }
 }
