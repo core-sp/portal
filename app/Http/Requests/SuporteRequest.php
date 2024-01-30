@@ -10,6 +10,12 @@ class SuporteRequest extends FormRequest
     private $tiposAceitos;
     private $service;
 
+    public function authorize()
+    {
+        $user = auth()->user();
+        return $user->can('onlyAdmin', $user);
+    }
+
     public function __construct(MediadorServiceInterface $service)
     {
         $this->service = $service->getService('Suporte');
@@ -66,6 +72,9 @@ class SuporteRequest extends FormRequest
             'date_format' => 'Formato de período inválido',
             'after' => 'Data deve ser a partir de 2019',
             'relat_data.in' => 'Deve ser mês ou ano',
+            'relat_mes.before_or_equal' => 'Deve selecionar um mês e ano anterior ou igual a hoje',
+            'relat_ano.before_or_equal' => 'Deve selecionar um ano anterior ou igual a hoje',
+            'relat_opcoes.in' => 'Tipo de filtro não existente',
         ];
     }
 }

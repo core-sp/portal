@@ -211,6 +211,9 @@ class SuporteService implements SuporteServiceInterface {
 
         if(isset($acao))
         {
+            if(!in_array($acao, ['remover', 'visualizar', 'exportar-csv']))
+                throw new \Exception('Ação não existe.', 404);
+
             $final = null;
             switch ($acao) {
                 case 'remover':

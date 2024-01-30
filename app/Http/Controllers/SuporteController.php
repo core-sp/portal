@@ -58,8 +58,6 @@ class SuporteController extends Controller
 
     public function buscaLogExterno(SuporteRequest $request)
     {
-        $this->authorize('onlyAdmin', auth()->user());
-
         $semCache = !Cache::has('request_busca_log_'.auth()->id()) || (Cache::get('request_busca_log_'.auth()->id()) !== $request->except(['page', '_token']));
         
         try{
@@ -134,8 +132,6 @@ class SuporteController extends Controller
 
     public function relatorios(SuporteRequest $request)
     {
-        $this->authorize('onlyAdmin', auth()->user());
-
         try{
             $dados = $request->validated();
             $relat = $this->service->getService('Suporte')->relatorios($dados);
