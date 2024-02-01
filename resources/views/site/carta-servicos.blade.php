@@ -32,12 +32,12 @@
     <div class="linha-lg"></div>
     <div class="row mt-2">
 	    <div class="col-lg conteudo-txt pr-4">
-        <p>
+        <!-- <p>
           O ano foi de muito trabalho e novidades no Core-SP. Nosso portal ganhou um visual contemporâneo e conta com notícias sobre tudo o que importa para o representante desempenhar suas funções com maestria; novos meios de pagamento da anuidade, via maquininha do cartão ou impressão de boletos para a quitação antecipada; a criação da Área Restrita, onde é possível atualizar seu cadastro e ficar a par, tanto  dos pagamentos pendentes quanto daqueles que já foram feitos.
         </p>
         <p>
           Dezembro chegou, mas as inovações e a atenção que damos a você não podem parar. Por isso, <strong>lançamos a nova Carta de serviços ao Usuário</strong>. No texto, estão dispostos, detalhadamente, todos os serviços oferecidos a quem procura o Conselho Regional dos Representantes Comerciais no Estado de São Paulo (CORE-SP), além uma Pesquisa de Satisfação – que visa amplificar a sua voz, representante. Afinal, é dessa troca de ideias que nascem as iniciativas para  que possamos atendê-lo da melhor maneira possível.
-        </p>
+        </p> -->
         
         @if(!isset($resultado) || $resultado->isEmpty())
         <p><strong>Ainda não consta a publicação atual.</strong></p>
