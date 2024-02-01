@@ -346,7 +346,7 @@
     <div class="mt-4 mb-4">
         <h4>Resultado da busca "<i>{{ $busca }}</i>" para o log <strong>{{ $textoTipo }}</strong></h4>
         @if(!isset(request()->query()['data']) && (isset(request()->query()['n_linhas']) || isset(request()->query()['distintos'])))
-        <h5>Total de ocorrências: {{ number_format($totalFinal, 0, ",", ".") }}</h5>
+        <h5>Total de ocorrências{{ isset(request()->query()['distintos']) ? ' distintas' : '' }}: {{ number_format($totalFinal, 0, ",", ".") }}</h5>
         @endif
     </div>
     
