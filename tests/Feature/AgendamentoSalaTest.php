@@ -1515,6 +1515,22 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_access_salas_in_form_agendar_sala()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $salas = factory('App\SalaReuniao', 3)->create();
+
+        $this->get(route('representante.agendar.inserir.view', 'agendar'));
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Agendar Salas" para agendar.';
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test */
     public function view_salas_enabled()
     {
         $representante = factory('App\Representante')->create();
@@ -2921,6 +2937,21 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_access_agendamento_to_edit()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->create();
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $agenda->id]));
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Agendar Salas" para editar.';
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test */
     public function cannot_send_mail_when_not_changed_participantes_reuniao()
     {
         Mail::fake();
@@ -3074,6 +3105,21 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_access_agendamento_to_cancel()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->create();
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]));
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Agendar Salas" para cancelar.';
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test */
     public function cannot_to_cancel_equal_or_after_dia()
     {
         $representante = factory('App\Representante')->create();
@@ -3214,6 +3260,23 @@ class AgendamentoSalaTest extends TestCase
         $string .= $representante->nome.' (CPF / CNPJ: '.$representante->cpf_cnpj.') *justificou e está em análise do atendente* o não comparecimento do agendamento da sala em *'.$agenda->sala->regional->regional;
         $string .= '* no dia '.onlyDate($agenda->dia).' para '.$agenda->tipo_sala.', no período ' .$agenda->periodo;
         $this->assertStringContainsString($string, $log);
+    }
+
+    /** @test */
+    public function log_is_generated_when_access_agendamento_to_justify()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->create([
+            'dia' => now()->format('Y-m-d')
+        ]);
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $agenda->id]));
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Agendar Salas" para justificar.';
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test */

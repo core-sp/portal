@@ -258,7 +258,7 @@ class RepresentanteSiteController extends Controller
 
     public function inserirContatoView()
     {
-        event(new ExternoEvent(' para incluir.', 'Contatos'));
+        event(new ExternoEvent(' para incluir / desativar.', 'Contatos'));
         return view('site.representante.inserir-contato');
     }
 

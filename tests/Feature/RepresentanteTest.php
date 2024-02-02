@@ -297,6 +297,81 @@ class RepresentanteTest extends TestCase
         $this->get(route('representante.cursos'))->assertOk();
     }
 
+    /** @test */
+    public function log_is_generated_when_access_tabs_on_restrict_area()
+    {
+        // exige ao acessar a aba bdo
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        $representante = factory('App\Representante')->create();
+        
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->get(route('representante.dashboard'))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Home".';
+        $this->assertStringContainsString($texto, $log);
+
+        $this->get(route('representante.dados-gerais'))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Dados Gerais".';
+        $this->assertStringContainsString($texto, $log);
+
+        $this->get(route('representante.contatos.view'))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Contatos".';
+        $this->assertStringContainsString($texto, $log);
+
+        $this->get(route('representante.enderecos.view'))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "End. de Correspondência".';
+        $this->assertStringContainsString($texto, $log);
+
+        $this->get(route('representante.lista-cobrancas'))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Situação Financeira".';
+        $this->assertStringContainsString($texto, $log);
+
+        $this->get(route('representante.bdo'))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Oportunidades".';
+        $this->assertStringContainsString($texto, $log);
+
+        $this->get(route('representante.solicitarCedulaView'))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Solicitação de Cédula".';
+        $this->assertStringContainsString($texto, $log);
+
+        $this->get(route('representante.agendar.inserir.view'))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Agendar Salas".';
+        $this->assertStringContainsString($texto, $log);
+
+        $this->get(route('representante.cursos'))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Cursos".';
+        $this->assertStringContainsString($texto, $log);
+    }
+
     /** @test 
      * 
      * Representante Comercial pode inserir contato.
@@ -310,6 +385,20 @@ class RepresentanteTest extends TestCase
 
         // Checa inserção de novo contato (teste não cobre integração com o GERENTI)
         $this->post(route('representante.inserir-ou-alterar-contato'), ['tipo' => 7, 'contato' => '(11) 9999-9999'])->assertRedirect(route('representante.contatos.view'));
+    }
+
+    /** @test */
+    public function log_is_generated_when_access_insert_or_remove_contact_for_representante()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->get(route('representante.inserir-ou-alterar-contato.view'))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Contatos" para incluir / desativar.';
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test 
@@ -346,6 +435,20 @@ class RepresentanteTest extends TestCase
 
         // Checa se a solicitação de mudança de endereço foi registrado no banco de dados
         $this->assertEquals(RepresentanteEndereco::count(), 1);
+    }
+
+    /** @test */
+    public function log_is_generated_when_access_insert_new_address_for_representante()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->get(route('representante.inserir-endereco.view'))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "End. de Correspondência" para incluir.';
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test 
