@@ -139,8 +139,12 @@ class SuporteService implements SuporteServiceInterface {
                     {
                         if($distintos)
                         {
-                            $pos = stripos($line, '] - ') + 4;
-                            $txt = trim(substr($line, $pos));
+                            $pos = stripos($line, '] - ') + strlen('] - ');
+                            // remove parte inicial do log envolvendo data e ip.
+                            $txt_inicio = trim(substr($line, $pos));
+                            // remove parte final do log após o texto buscado.
+                            $pos_final = strlen($request['texto']) > strlen($txt_inicio) ? strlen($txt_inicio) : strlen($request['texto']);
+                            $txt = substr($txt_inicio, 0, stripos($txt_inicio, $request['texto']) + $pos_final);
                             if(!in_array($txt, $array_unique))
                             {
                                 array_push($array_unique, $txt);

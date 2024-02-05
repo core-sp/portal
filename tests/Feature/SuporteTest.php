@@ -672,7 +672,7 @@ class SuporteTest extends TestCase
 
         $this->td = array_combine(array_keys(Suporte::filtros()), array_fill(0, count(Suporte::filtros()), 0));
         ++$this->td[Suporte::FILTRO_ACESSO];
-        $this->td[Suporte::FILTRO_ABA_TODAS] = 9;
+        ++$this->td[Suporte::FILTRO_ABA_TODAS];
 
         // exige ao acessar a aba bdo
         factory('App\Regional')->create([
