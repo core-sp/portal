@@ -35,21 +35,19 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
-    private function getCodigos()
+    private function getCodigos($classe)
     {
-        $codigos = array();
-        $relacoes = $this->getRelacoes();
+        $model = array_keys($this->getRelacoes(), $classe, true);
 
-        foreach($relacoes as $key => $model)
-            $codigos[$model] = $key::camposPreRegistro();
-        
-        return $codigos;
+        if(isset($model[0]))
+            return $model[0]::camposPreRegistro();
+
+        throw new \Exception('Classe não encontrada no serviço de pré-registro: ' . $classe, 404);
     }
 
     private function limparNomeCamposAjax($classe, $campo)
     {
-        $chave = false;
-        $campos = $this->getCodigos()[$classe];
+        $campos = $this->getCodigos($classe);
         $siglas = [
             PreRegistroService::RELATION_ANEXOS => null,
             PreRegistroService::RELATION_PRE_REGISTRO => null,
@@ -63,21 +61,15 @@ class PreRegistroService implements PreRegistroServiceInterface {
         {
             $temp = $cp . $siglas[$classe];
             if(($campo == $cp) || ($campo == $temp))
-            {
-                $chave = $key;
-                break;
-            }
+                return $campos[$key];
         }
 
-        return isset($campos[$chave]) ? $campos[$chave] : $campo;
+        return $campo;
     }
 
     private function formatCampos($request)
     {
-        if(isset($request['opcional_celular']))
-            $request['opcional_celular'] = implode(',', $request['opcional_celular']);
-        else
-            $request['opcional_celular'] = null;
+        $request['opcional_celular'] = isset($request['opcional_celular']) ? implode(',', $request['opcional_celular']) : null;
         if(isset($request['opcional_celular_1']))
             $request['opcional_celular_1'] = implode(',', $request['opcional_celular_1']);
         unset($request['pergunta']);

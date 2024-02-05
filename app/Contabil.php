@@ -29,11 +29,11 @@ class Contabil extends Authenticatable
     public static function camposPreRegistro()
     {
         return [
-            'c1' => 'cnpj',
-            'c2' => 'nome',
-            'c3' => 'email',
-            'c4' => 'nome_contato',
-            'c5' => 'telefone'
+            'cnpj',
+            'nome',
+            'email',
+            'nome_contato',
+            'telefone'
         ];
     }
 

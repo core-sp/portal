@@ -62,7 +62,7 @@ class Anexo extends Model
     public static function camposPreRegistro()
     {
         return [
-            'a1' => 'path',
+            'path',
         ];
     }
 

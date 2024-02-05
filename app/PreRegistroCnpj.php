@@ -28,19 +28,19 @@ class PreRegistroCnpj extends Model
     public static function camposPreRegistro()
     {
         return [
-            'pj1' => 'razao_social',
-            'pj2' => 'capital_social',
-            'pj3' => 'nire',
-            'pj4' => 'tipo_empresa',
-            'pj5' => 'dt_inicio_atividade',
-            'pj6' => 'nome_fantasia',
-            'pj8' => 'cep',
-            'pj9' => 'bairro',
-            'pj10' => 'logradouro',
-            'pj11' => 'numero',
-            'pj12' => 'complemento',
-            'pj13' => 'cidade',
-            'pj14' => 'uf',
+            'razao_social',
+            'capital_social',
+            'nire',
+            'tipo_empresa',
+            'dt_inicio_atividade',
+            'nome_fantasia',
+            'cep',
+            'bairro',
+            'logradouro',
+            'numero',
+            'complemento',
+            'cidade',
+            'uf',
         ];
     }
 

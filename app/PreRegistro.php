@@ -216,18 +216,18 @@ class PreRegistro extends Model
     public static function camposPreRegistro()
     {
         return [
-            'p1' => 'segmento',
-            'p2' => 'idregional',
-            'p3' => 'tipo_telefone',
-            'p4' => 'telefone',
-            'p5' => 'opcional_celular',
-            'p6' => 'cep',
-            'p7' => 'bairro',
-            'p8' => 'logradouro',
-            'p9' => 'numero',
-            'p10' => 'complemento',
-            'p11' => 'cidade',
-            'p12' => 'uf',
+            'segmento',
+            'idregional',
+            'tipo_telefone',
+            'telefone',
+            'opcional_celular',
+            'cep',
+            'bairro',
+            'logradouro',
+            'numero',
+            'complemento',
+            'cidade',
+            'uf',
         ];
     }
 
