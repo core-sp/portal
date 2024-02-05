@@ -139,7 +139,9 @@ class SuporteService implements SuporteServiceInterface {
                     {
                         if($distintos)
                         {
-                            $pos = stripos($line, '] - ') + strlen('] - ');
+                            // verificação de registros de log antes de inserir ip.
+                            $separador = stripos($line, '.INFO: [IP: ') !== false ? '] - ' : '.INFO: ';
+                            $pos = stripos($line, $separador) + strlen($separador);
                             // remove parte inicial do log envolvendo data e ip.
                             $txt_inicio = trim(substr($line, $pos));
                             // remove parte final do log após o texto buscado.
