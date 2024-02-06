@@ -12,6 +12,12 @@ interface SuporteServiceInterface {
 
     public function logPorData($data, $tipo);
 
+    public function relatorios($dados, $acao = null);
+
+    public function relatorioFinal();
+
+    public function filtros();
+
     public function ipsBloqueados();
 
     public function ips();

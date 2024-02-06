@@ -21,9 +21,10 @@ class ExternoEvent
      *
      * @return void
      */
-    public function __construct($string)
+    public function __construct($string, $secao = null)
     {
-        $this->string = "[IP: " . request()->ip() . "] - " . $string;
+        $temp = isset($secao) ? 'Usuário ' . auth()->guard('representante')->user()->id . ' ("'. auth()->guard('representante')->user()->cpf_cnpj .'") acessou a aba "'.$secao.'"' : '';
+        $this->string = "[IP: " . request()->ip() . "] - " . $temp . $string;
     }
 
     /**

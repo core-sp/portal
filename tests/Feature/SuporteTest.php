@@ -8,13 +8,17 @@ use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use App\SuporteIp;
+use App\Suporte;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\InternoSuporteMail;
+use PermissoesTableSeeder;
 use App\Permissao;
 
 class SuporteTest extends TestCase
 {
     use RefreshDatabase;
+    private $tg;
+    private $td;
 
     /** @test */
     public function non_authenticated_users_cannot_access_links()
@@ -26,6 +30,9 @@ class SuporteTest extends TestCase
         $this->get(route('suporte.log.externo.busca'))->assertRedirect(route('login'));
         $this->get(route('suporte.log.externo.view', ['data' => date('Y-m-d'), 'tipo' => 'interno']))->assertRedirect(route('login'));
         $this->get(route('suporte.log.externo.download', ['data' => date('Y-m-d'), 'tipo' => 'interno']))->assertRedirect(route('login'));
+        $this->get(route('suporte.log.externo.relatorios'))->assertRedirect(route('login'));
+        $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => 'teste', 'acao' => 'visualizar']))->assertRedirect(route('login'));
+        $this->get(route('suporte.log.externo.relatorios.final'))->assertRedirect(route('login'));
         $this->get(route('suporte.ips.view'))->assertRedirect(route('login'));
         $this->delete(route('suporte.ips.excluir', request()->ip()))->assertRedirect(route('login'));
         $this->get(route('admin.manual'))->assertRedirect(route('login'));
@@ -43,15 +50,18 @@ class SuporteTest extends TestCase
         $this->get(route('suporte.log.externo.busca', ['data' => Carbon::today()->subDay()->format('Y-m-d'), 'tipo' => 'interno']))->assertForbidden();
         $this->get(route('suporte.log.externo.view', ['data' => date('Y-m-d'), 'tipo' => 'interno']))->assertForbidden();
         $this->get(route('suporte.log.externo.download', ['data' => date('Y-m-d'), 'tipo' => 'interno']))->assertForbidden();
+        $this->get(route('suporte.log.externo.relatorios'))->assertForbidden();
+        $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => 'teste', 'acao' => 'visualizar']))->assertForbidden();
+        $this->get(route('suporte.log.externo.relatorios.final'))->assertForbidden();
         $this->get(route('suporte.ips.view'))->assertForbidden();
         $this->delete(route('suporte.ips.excluir', request()->ip()))->assertForbidden();
     }
 
     /** 
      * =======================================================================================================
-     * TESTES LOGS
+     * TESTES BUSCAS LOG
      * =======================================================================================================
-    */
+     */
 
     /** @test */
     public function admin_can_search_logs_by_day_before_today()
@@ -230,6 +240,7 @@ class SuporteTest extends TestCase
         ->assertSee('<th>Nome do Log</th>')
         ->assertSee('<th>Tamanho em KB</th>')
         ->assertSee('<th>Total de ocorrências</th>')
+        ->assertSee('<td>-----</td>')
         ->assertSee('<th>Ações</th>');
 
         $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
@@ -238,6 +249,7 @@ class SuporteTest extends TestCase
         ->assertSee('<th>Nome do Log</th>')
         ->assertSee('<th>Tamanho em KB</th>')
         ->assertSee('<th>Total de ocorrências</th>')
+        ->assertSee('<td>-----</td>')
         ->assertSee('<th>Ações</th>');
 
         $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
@@ -256,6 +268,7 @@ class SuporteTest extends TestCase
         ->assertSee('<th>Nome do Log</th>')
         ->assertSee('<th>Tamanho em KB</th>')
         ->assertSee('<th>Total de ocorrências</th>')
+        ->assertDontSee('<td>-----</td>')
         ->assertSee('<th>Ações</th>')
         ->assertSee('Total de ocorrências:');
 
@@ -265,8 +278,69 @@ class SuporteTest extends TestCase
         ->assertSee('<th>Nome do Log</th>')
         ->assertSee('<th>Tamanho em KB</th>')
         ->assertSee('<th>Total de ocorrências</th>')
+        ->assertDontSee('<td>-----</td>')
         ->assertSee('<th>Ações</th>')
         ->assertSee('Total de ocorrências:');
+
+        $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
+    }
+
+    /** @test */
+    public function admin_can_search_logs_by_month_with_distintos()
+    {
+        $data = Carbon::today()->subMonth();
+        $ano = $data->format('Y');
+        $data = $data->format('Y-m');
+
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.busca', ['mes' => $data, 'tipo' => 'externo', 'texto' => $ano, 'distintos' => 'on']))
+        ->assertSee('<th>Nome do Log</th>')
+        ->assertSee('<th>Tamanho em KB</th>')
+        ->assertSee('<th>Total de ocorrências</th>')
+        ->assertSee('<td>-----</td>')
+        ->assertSee('<th>Ações</th>')
+        ->assertSee('Total de ocorrências distintas:');
+
+        $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
+
+        $this->get(route('suporte.log.externo.busca', ['mes' => $data, 'tipo' => 'interno', 'texto' => 'info', 'distintos' => 'on']))
+        ->assertSee('<th>Nome do Log</th>')
+        ->assertSee('<th>Tamanho em KB</th>')
+        ->assertSee('<th>Total de ocorrências</th>')
+        ->assertSee('<td>-----</td>')
+        ->assertSee('<th>Ações</th>')
+        ->assertSee('Total de ocorrências distintas:');
+
+        $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
+    }
+
+    /** @test */
+    public function admin_can_search_logs_by_month_with_lines_and_distintos()
+    {
+        $data = Carbon::today()->subMonth();
+        $ano = $data->format('Y');
+        $data = $data->format('Y-m');
+
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.busca', ['mes' => $data, 'tipo' => 'externo', 'texto' => $ano, 'distintos' => 'on', 'n_linhas' => 'on']))
+        ->assertSee('<th>Nome do Log</th>')
+        ->assertSee('<th>Tamanho em KB</th>')
+        ->assertSee('<th>Total de ocorrências</th>')
+        ->assertDontSee('<td>-----</td>')
+        ->assertSee('<th>Ações</th>')
+        ->assertSee('Total de ocorrências distintas:');
+
+        $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
+
+        $this->get(route('suporte.log.externo.busca', ['mes' => $data, 'tipo' => 'interno', 'texto' => 'info', 'distintos' => 'on', 'n_linhas' => 'on']))
+        ->assertSee('<th>Nome do Log</th>')
+        ->assertSee('<th>Tamanho em KB</th>')
+        ->assertSee('<th>Total de ocorrências</th>')
+        ->assertDontSee('<td>-----</td>')
+        ->assertSee('<th>Ações</th>')
+        ->assertSee('Total de ocorrências distintas:');
 
         $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
     }
@@ -381,10 +455,11 @@ class SuporteTest extends TestCase
 
         $this->signInAsAdmin();
 
-        $this->get(route('suporte.log.externo.busca', ['ano' => $data, 'tipo' => 'externo', 'texto' => 'teste']))
+        $this->get(route('suporte.log.externo.busca', ['ano' => $data, 'tipo' => 'externo', 'texto' => '[IP:']))
         ->assertSee('<th>Nome do Log</th>')
         ->assertSee('<th>Tamanho em KB</th>')
         ->assertSee('<th>Total de ocorrências</th>')
+        ->assertSee('<td>-----</td>')
         ->assertSee('<th>Ações</th>');
 
         $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
@@ -393,6 +468,7 @@ class SuporteTest extends TestCase
         ->assertSee('<th>Nome do Log</th>')
         ->assertSee('<th>Tamanho em KB</th>')
         ->assertSee('<th>Total de ocorrências</th>')
+        ->assertSee('<td>-----</td>')
         ->assertSee('<th>Ações</th>');
 
         $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
@@ -405,10 +481,11 @@ class SuporteTest extends TestCase
 
         $this->signInAsAdmin();
 
-        $this->get(route('suporte.log.externo.busca', ['ano' => $data, 'tipo' => 'externo', 'texto' => 'teste', 'n_linhas' => 'on']))
+        $this->get(route('suporte.log.externo.busca', ['ano' => $data, 'tipo' => 'externo', 'texto' => '[IP:', 'n_linhas' => 'on']))
         ->assertSee('<th>Nome do Log</th>')
         ->assertSee('<th>Tamanho em KB</th>')
         ->assertSee('<th>Total de ocorrências</th>')
+        ->assertDontSee('<td>-----</td>')
         ->assertSee('<th>Ações</th>')
         ->assertSee('Total de ocorrências:');
 
@@ -418,8 +495,65 @@ class SuporteTest extends TestCase
         ->assertSee('<th>Nome do Log</th>')
         ->assertSee('<th>Tamanho em KB</th>')
         ->assertSee('<th>Total de ocorrências</th>')
+        ->assertDontSee('<td>-----</td>')
         ->assertSee('<th>Ações</th>')
         ->assertSee('Total de ocorrências:');
+
+        $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
+    }
+
+    /** @test */
+    public function admin_can_search_logs_by_year_with_distintos()
+    {
+        $data = Carbon::today()->format('Y');
+
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.busca', ['ano' => $data, 'tipo' => 'externo', 'texto' => '[IP:', 'distintos' => 'on']))
+        ->assertSee('<th>Nome do Log</th>')
+        ->assertSee('<th>Tamanho em KB</th>')
+        ->assertSee('<th>Total de ocorrências</th>')
+        ->assertSee('<td>-----</td>')
+        ->assertSee('<th>Ações</th>')
+        ->assertSee('Total de ocorrências distintas:');
+
+        $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
+
+        $this->get(route('suporte.log.externo.busca', ['ano' => $data, 'tipo' => 'interno', 'texto' => 'info', 'distintos' => 'on']))
+        ->assertSee('<th>Nome do Log</th>')
+        ->assertSee('<th>Tamanho em KB</th>')
+        ->assertSee('<th>Total de ocorrências</th>')
+        ->assertSee('<td>-----</td>')
+        ->assertSee('<th>Ações</th>')
+        ->assertSee('Total de ocorrências distintas:');
+
+        $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
+    }
+
+    /** @test */
+    public function admin_can_search_logs_by_year_with_lines_and_distintos()
+    {
+        $data = Carbon::today()->format('Y');
+
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.busca', ['ano' => $data, 'tipo' => 'externo', 'texto' => '[IP:', 'distintos' => 'on', 'n_linhas' => 'on']))
+        ->assertSee('<th>Nome do Log</th>')
+        ->assertSee('<th>Tamanho em KB</th>')
+        ->assertSee('<th>Total de ocorrências</th>')
+        ->assertDontSee('<td>-----</td>')
+        ->assertSee('<th>Ações</th>')
+        ->assertSee('Total de ocorrências distintas:');
+
+        $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
+
+        $this->get(route('suporte.log.externo.busca', ['ano' => $data, 'tipo' => 'interno', 'texto' => 'info', 'distintos' => 'on', 'n_linhas' => 'on']))
+        ->assertSee('<th>Nome do Log</th>')
+        ->assertSee('<th>Tamanho em KB</th>')
+        ->assertSee('<th>Total de ocorrências</th>')
+        ->assertDontSee('<td>-----</td>')
+        ->assertSee('<th>Ações</th>')
+        ->assertSee('Total de ocorrências distintas:');
 
         $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
     }
@@ -514,6 +648,742 @@ class SuporteTest extends TestCase
 
         $this->get(route('suporte.log.externo.busca', ['ano' => $data, 'tipo' => 'externo']))
         ->assertSessionHasErrors('texto');
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES RELATÓRIOS
+     * =======================================================================================================
+     */
+    
+    private function gerar_log_acessos_rc()
+    {
+        $this->tg = array_combine(array_keys(Suporte::filtros()), array_fill(0, count(Suporte::filtros()), 0));
+        ++$this->tg[Suporte::FILTRO_ACESSO];
+
+        $this->td = array_combine(array_keys(Suporte::filtros()), array_fill(0, count(Suporte::filtros()), 0));
+        ++$this->td[Suporte::FILTRO_ACESSO];
+        ++$this->td[Suporte::FILTRO_ABA_TODAS];
+
+        // exige ao acessar a aba bdo
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+
+        $representante = factory('App\Representante')->create();
+
+        for($j=0; $j < 10; $j++)
+        {
+            $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+            $this->get(route('representante.dados-gerais'))->assertOk();
+            ++$this->tg[Suporte::FILTRO_ABA_DADOS];
+            ++$this->tg[Suporte::FILTRO_ABA_TODAS];
+            $this->td[Suporte::FILTRO_ABA_DADOS] = 1;
+
+            $this->get(route('representante.dashboard'))->assertOk();
+            ++$this->tg[Suporte::FILTRO_ABA_HOME];
+            ++$this->tg[Suporte::FILTRO_ABA_TODAS];
+            $this->td[Suporte::FILTRO_ABA_HOME] = 1;
+
+            $this->get(route('representante.contatos.view'))->assertOk();
+            ++$this->tg[Suporte::FILTRO_ABA_CONTATOS];
+            ++$this->tg[Suporte::FILTRO_ABA_TODAS];
+            $this->td[Suporte::FILTRO_ABA_CONTATOS] = 1;
+
+            $this->get(route('representante.enderecos.view'))->assertOk();
+            ++$this->tg[Suporte::FILTRO_ABA_ENDER];
+            ++$this->tg[Suporte::FILTRO_ABA_TODAS];
+            $this->td[Suporte::FILTRO_ABA_ENDER] = 1;
+
+            if($j > 3){
+                $this->get(route('representante.bdo'))->assertOk();
+                ++$this->tg[Suporte::FILTRO_ABA_BDO];
+                ++$this->tg[Suporte::FILTRO_ABA_TODAS];
+                $this->td[Suporte::FILTRO_ABA_BDO] = 1;
+            }
+
+            $this->get(route('representante.solicitarCedulaView'))->assertOk();
+            ++$this->tg[Suporte::FILTRO_ABA_CEDULA];
+            ++$this->tg[Suporte::FILTRO_ABA_TODAS];
+            $this->td[Suporte::FILTRO_ABA_CEDULA] = 1;
+
+            $this->get(route('representante.agendar.inserir.view'))->assertOk();
+            ++$this->tg[Suporte::FILTRO_ABA_SALAS];
+            ++$this->tg[Suporte::FILTRO_ABA_TODAS];
+            $this->td[Suporte::FILTRO_ABA_SALAS] = 1;
+
+            if($j > 7){
+                $this->get(route('representante.cursos'))->assertOk();
+                ++$this->tg[Suporte::FILTRO_ABA_CURSOS];
+                ++$this->tg[Suporte::FILTRO_ABA_TODAS];
+                $this->td[Suporte::FILTRO_ABA_CURSOS] = 1;
+            }
+            if($j > 5)
+            {
+                $this->get(route('representante.lista-cobrancas'))->assertOk();
+                ++$this->tg[Suporte::FILTRO_ABA_FINANCA];
+                ++$this->tg[Suporte::FILTRO_ABA_TODAS];
+                $this->td[Suporte::FILTRO_ABA_FINANCA] = 1;
+            }
+
+            $this->post(route('representante.logout'));
+        }
+
+        $this->tg['relatorio_final'] = collect($this->tg)->sum();
+        $this->td['relatorio_final'] = collect($this->td)->sum();
+    }
+
+    private function gerar_log_acessos_admin()
+    {
+        $this->tg = [Suporte::FILTRO_ACESSO => 1];
+        $this->td = [Suporte::FILTRO_ACESSO => 1];
+
+        $this->seed(PermissoesTableSeeder::class);
+        $user = factory('App\User')->create([
+            'password' => bcrypt('TestePorta1@')
+        ]);
+
+        for($i=0; $i < 10; $i++)
+        {
+            $this->post('admin/login', ['login' => $user->username, 'password' => 'TestePorta1@']);
+            $this->get(route('regionais.index'))->assertOk();
+            $this->post(route('logout'));
+        }
+
+        $this->tg['relatorio_final'] = collect($this->tg)->sum();
+        $this->td['relatorio_final'] = collect($this->td)->sum();
+    }
+
+    /** @test */
+    public function admin_can_to_create_report()
+    {
+        $this->signInAsAdmin();
+
+        $relat = 'relatorio_'.now()->format('Y-m').'-externo-'.Suporte::FILTRO_ACESSO;
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'externo', 'relat_data' => 'mes', 'relat_mes' => now()->format('Y-m'), 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']));
+
+        $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+        ->assertSee('<title>Core-SP — Relatório</title>')
+        ->assertSee('<h2>Relatório do Portal via Log</h2>')
+        ->assertSee('<table class="table">')
+        ->assertSee('<a class="btn btn-primary" href="'.route('suporte.log.externo.index').'">Voltar</a>')
+        ->assertSessionHas($relat);
+    }
+
+    /** @test */
+    public function admin_can_to_create_report_by_month()
+    {
+        $this->signInAsAdmin();
+
+        foreach(Suporte::filtros() as $filtro => $f)
+        {
+            $relat = 'relatorio_'.now()->format('Y-m').'-externo-'.$filtro;
+            $this->get(route('suporte.log.externo.relatorios', [
+                'relat_tipo' => 'externo', 'relat_data' => 'mes', 'relat_mes' => now()->format('Y-m'), 'relat_opcoes' => $filtro
+            ]))
+            ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+            ->assertSessionHas($relat);
+        }
+
+        $relat = 'relatorio_'.now()->format('Y-m').'-interno-'.Suporte::FILTRO_ACESSO;
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'interno', 'relat_data' => 'mes', 'relat_mes' => now()->format('Y-m'), 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+        ->assertSessionHas($relat);
+    }
+
+    /** @test */
+    public function admin_can_to_create_report_by_year()
+    {
+        $this->signInAsAdmin();
+
+        foreach(Suporte::filtros() as $filtro => $f)
+        {
+            $relat = 'relatorio_'.now()->format('Y').'-externo-'.$filtro;
+            $this->get(route('suporte.log.externo.relatorios', [
+                'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => $filtro
+            ]))
+            ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+            ->assertSessionHas($relat);
+        }
+
+        $relat = 'relatorio_'.now()->format('Y').'-interno-'.Suporte::FILTRO_ACESSO;
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'interno', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+        ->assertSessionHas($relat);
+    }
+
+    /** @test */
+    public function admin_can_to_create_final_report()
+    {
+        $this->signInAsAdmin();
+
+        foreach(Suporte::filtros() as $filtro => $f)
+        {
+            $relat = 'relatorio_'.now()->format('Y').'-externo-'.$filtro;
+            $this->get(route('suporte.log.externo.relatorios', [
+                'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => $filtro
+            ]))
+            ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+            ->assertSessionHas($relat);
+        }
+
+        $this->get(route('suporte.log.externo.relatorios.final'))
+        ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => 'relatorio_final', 'acao' => 'visualizar']))
+        ->assertSessionHas('relatorio_final');
+
+        session()->forget('relatorio_final');
+
+        $relat = 'relatorio_'.now()->format('Y').'-interno-'.Suporte::FILTRO_ACESSO;
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'interno', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+        ->assertSessionHas($relat)
+        ->assertSessionMissing('relatorio_final');
+
+        $this->get(route('suporte.log.externo.relatorios.final'))
+        ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => 'relatorio_final', 'acao' => 'visualizar']))
+        ->assertSessionHas('relatorio_final');
+    }
+
+    /** @test */
+    public function admin_cannot_to_create_report_without_tipo()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => '', 'relat_data' => 'mes', 'relat_mes' => now()->format('Y-m'), 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertSessionHasErrors('relat_tipo');
+    }
+
+    /** @test */
+    public function admin_cannot_to_create_report_with_tipo_invalid()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'teste', 'relat_data' => 'mes', 'relat_mes' => now()->format('Y-m'), 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertSessionHasErrors('relat_tipo');
+    }
+
+    /** @test */
+    public function admin_cannot_to_create_report_without_data()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'externo', 'relat_data' => '', 'relat_mes' => now()->format('Y-m'), 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertSessionHasErrors('relat_data');
+    }
+
+    /** @test */
+    public function admin_cannot_to_create_report_with_data_invalid()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'externo', 'relat_data' => 'me', 'relat_mes' => now()->format('Y-m'), 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertSessionHasErrors('relat_data');
+    }
+
+    /** @test */
+    public function admin_cannot_to_create_report_without_mes_if_data_mes()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'externo', 'relat_data' => 'mes', 'relat_mes' => '', 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertSessionHasErrors('relat_mes');
+    }
+
+    /** @test */
+    public function admin_cannot_to_create_report_with_mes_invalid_if_data_mes()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'externo', 'relat_data' => 'mes', 'relat_mes' => '2024', 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertSessionHasErrors('relat_mes');
+    }
+
+    /** @test */
+    public function admin_cannot_to_create_report_with_mes_after_now_if_data_mes()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'externo', 'relat_data' => 'mes', 'relat_mes' => now()->addMonth()->format('Y-m'), 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertSessionHasErrors('relat_mes');
+    }
+
+    /** @test */
+    public function admin_cannot_to_create_report_with_mes_before_2019_if_data_mes()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'externo', 'relat_data' => 'mes', 'relat_mes' => '2018-12', 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertSessionHasErrors('relat_mes');
+    }
+
+    /** @test */
+    public function admin_cannot_to_create_report_without_ano_if_data_ano()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => '', 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertSessionHasErrors('relat_ano');
+    }
+
+    /** @test */
+    public function admin_cannot_to_create_report_with_ano_invalid_if_data_ano()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => 'an', 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertSessionHasErrors('relat_ano');
+    }
+
+    /** @test */
+    public function admin_cannot_to_create_report_with_ano_after_now_if_data_ano()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => '2025', 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertSessionHasErrors('relat_ano');
+    }
+
+    /** @test */
+    public function admin_cannot_to_create_report_with_ano_before_2019_if_data_ano()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => '2018', 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertSessionHasErrors('relat_ano');
+    }
+
+    /** @test */
+    public function admin_cannot_to_create_report_without_opcoes()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => ''
+        ]))
+        ->assertSessionHasErrors('relat_opcoes');
+    }
+
+    /** @test */
+    public function admin_cannot_to_create_report_with_opcoes_invalid()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => 'teste'
+        ]))
+        ->assertSessionHasErrors('relat_opcoes');
+    }
+
+    /** @test */
+    public function admin_can_to_view_report()
+    {
+        $suporte = new Suporte();
+        $this->signInAsAdmin();
+
+        foreach(Suporte::filtros() as $filtro => $f)
+        {
+            $relat = 'relatorio_'.now()->format('Y').'-externo-'.$filtro;
+            $this->get(route('suporte.log.externo.relatorios', [
+                'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => $filtro
+            ]))
+            ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+            ->assertSessionHas($relat, $suporte->getRelatorioPorNome($relat));
+
+            $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+            ->assertSee('<td>Site</td>')
+            ->assertSee('<td>'.$f.'</td>')
+            ->assertSee('<td>'.now()->format('Y').'</td>')
+            ->assertSee('<td><small>'.now()->format('d\/m\/Y, \à\s H:i').'</small></td>')
+            ->assertSee('<a class="btn btn-success float-right" href="'.route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'exportar-csv']).'">Exportar .csv</a>');
+
+            $this->get(route('suporte.log.externo.index'))
+            ->assertSee('<p><strong>Relatórios salvos temporariamente:</strong></p>')
+            ->assertSee('<span class="text-nowrap">')
+            ->assertSee($suporte->getTituloPorNome($relat));
+        }
+
+        $relat = 'relatorio_'.now()->format('Y').'-interno-'.Suporte::FILTRO_ACESSO;
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'interno', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+        ->assertSessionHas($relat, $suporte->getRelatorioPorNome($relat));
+
+        $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+        ->assertSee('<td>Admin</td>')
+        ->assertSee('<td>'.Suporte::filtros()[Suporte::FILTRO_ACESSO].'</td>')
+        ->assertSee('<td>'.now()->format('Y').'</td>')
+        ->assertSee('<td><small>'.now()->format('d\/m\/Y, \à\s H:i').'</small></td>')
+        ->assertSee('<a class="btn btn-success float-right" href="'.route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'exportar-csv']).'">Exportar .csv</a>');
+
+        $this->get(route('suporte.log.externo.index'))
+        ->assertSee('<p><strong>Relatórios salvos temporariamente:</strong></p>')
+        ->assertSee('<span class="text-nowrap">')
+        ->assertSee($suporte->getTituloPorNome($relat));
+    }
+
+    /** @test */
+    public function admin_can_to_view_final_report()
+    {
+        $suporte = new Suporte();
+        $this->signInAsAdmin();
+
+        foreach(Suporte::filtros() as $filtro => $f)
+        {
+            $relat = 'relatorio_'.now()->format('Y').'-externo-'.$filtro;
+            $this->get(route('suporte.log.externo.relatorios', [
+                'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => $filtro
+            ]));
+        }
+
+        $this->get(route('suporte.log.externo.relatorios.final'))
+        ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => 'relatorio_final', 'acao' => 'visualizar']))
+        ->assertSessionHas('relatorio_final', $suporte->getRelatorioPorNome('relatorio_final'));
+
+        $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => 'relatorio_final', 'acao' => 'visualizar']))
+        ->assertSee('<td class="border border-left-0 border-right-0 border-bottom-0 text-white">-----</td>')
+        ->assertSee('<td class="border border-left-0 border-right-0 border-bottom-0 text-white">-----</td>')
+        ->assertSee('<td class="font-weight-bolder">Total Final</td>')
+        ->assertSee('<td><small>'.now()->format('d\/m\/Y, \à\s H:i').'</small></td>')
+        ->assertSee('<a class="btn btn-success float-right" href="'.route('suporte.log.externo.relatorios.acoes', ['relat' => 'relatorio_final', 'acao' => 'exportar-csv']).'">Exportar .csv</a>');
+
+        $this->get(route('suporte.log.externo.index'))
+        ->assertSee('<p><strong>Relatórios salvos temporariamente:</strong></p>')
+        ->assertSee('<span class="text-nowrap">')
+        ->assertSee($suporte->getTituloPorNome('relatorio_final'));
+    }
+
+    /** @test */
+    public function admin_cannot_to_view_without_report()
+    {
+        $this->signInAsAdmin();
+
+        $relat = 'relatorio_'.now()->format('Y').'-interno-'.Suporte::FILTRO_ACESSO;
+
+        $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+        ->assertRedirect(route('suporte.log.externo.index'))
+        ->assertSessionHas('message', 'Relatório não existe para visualizar / exportar.csv.');
+    }
+
+    /** @test */
+    public function admin_can_to_remove_report()
+    {
+        $suporte = new Suporte();
+        $this->signInAsAdmin();
+
+        foreach(Suporte::filtros() as $filtro => $f)
+        {
+            $relat = 'relatorio_'.now()->format('Y').'-externo-'.$filtro;
+            $this->get(route('suporte.log.externo.relatorios', [
+                'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => $filtro
+            ]))
+            ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+            ->assertSessionHas($relat, $suporte->getRelatorioPorNome($relat));
+            $temp = $suporte->getTituloPorNome($relat);
+
+            $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'remover']))
+            ->assertRedirect(route('suporte.log.externo.index'))
+            ->assertSessionHas('relat_removido', $relat)
+            ->assertSessionMissing($relat);
+
+            $this->get(route('suporte.log.externo.index'))
+            ->assertSee('<div class="toast bg-warning">')
+            ->assertSee('<div class="toast-body text-danger text-center">')
+            ->assertSee('<strong>Relatório removido!</strong>')
+            ->assertDontSee('<p><strong>Relatórios salvos temporariamente:</strong></p>')
+            ->assertDontSee('<span class="text-nowrap">')
+            ->assertDontSee($temp);
+        }
+
+        $relat = 'relatorio_'.now()->format('Y').'-interno-'.Suporte::FILTRO_ACESSO;
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'interno', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+        ->assertSessionHas($relat, $suporte->getRelatorioPorNome($relat));
+        $temp = $suporte->getTituloPorNome($relat);
+
+        $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'remover']))
+        ->assertRedirect(route('suporte.log.externo.index'))
+        ->assertSessionHas('relat_removido', $relat)
+        ->assertSessionMissing($relat);
+
+        $this->get(route('suporte.log.externo.index'))
+        ->assertSee('<div class="toast bg-warning">')
+        ->assertSee('<div class="toast-body text-danger text-center">')
+        ->assertSee('<strong>Relatório removido!</strong>')
+        ->assertDontSee('<p><strong>Relatórios salvos temporariamente:</strong></p>')
+        ->assertDontSee('<span class="text-nowrap">')
+        ->assertDontSee($temp);
+    }
+
+    /** @test */
+    public function admin_can_to_remove_final_report()
+    {
+        $suporte = new Suporte();
+        $this->signInAsAdmin();
+
+        foreach(Suporte::filtros() as $filtro => $f)
+        {
+            $relat = 'relatorio_'.now()->format('Y').'-externo-'.$filtro;
+            $this->get(route('suporte.log.externo.relatorios', [
+                'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => $filtro
+            ]));
+        }
+
+        $this->get(route('suporte.log.externo.relatorios.final'))
+        ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => 'relatorio_final', 'acao' => 'visualizar']))
+        ->assertSessionHas('relatorio_final', $suporte->getRelatorioPorNome('relatorio_final'));
+
+        $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => 'relatorio_final', 'acao' => 'remover']))
+        ->assertRedirect(route('suporte.log.externo.index'))
+        ->assertSessionHas('relat_removido', 'relatorio_final')
+        ->assertSessionMissing('relatorio_final');
+
+        $this->get(route('suporte.log.externo.index'))
+        ->assertSee('<div class="toast bg-warning">')
+        ->assertSee('<div class="toast-body text-danger text-center">')
+        ->assertSee('<strong>Relatório removido!</strong>')
+        ->assertSee('<p><strong>Relatórios salvos temporariamente:</strong></p>')
+        ->assertSee('<span class="text-nowrap">')
+        ->assertDontSee('relatorio_final');
+    }
+
+    /** @test */
+    public function admin_cannot_to_remove_without_report()
+    {
+        $this->signInAsAdmin();
+
+        $relat = 'relatorio_'.now()->format('Y').'-interno-'.Suporte::FILTRO_ACESSO;
+        
+        $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'remover']))
+        ->assertRedirect(route('suporte.log.externo.index'))
+        ->assertSessionHas('message', 'Relatório não existe para remover');
+    }
+
+    /** @test */
+    public function admin_can_to_export_report()
+    {
+        $suporte = new Suporte();
+        $this->signInAsAdmin();
+
+        foreach(Suporte::filtros() as $filtro => $f)
+        {
+            $relat = 'relatorio_'.now()->format('Y').'-externo-'.$filtro;
+            $this->get(route('suporte.log.externo.relatorios', [
+                'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => $filtro
+            ]))
+            ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+            ->assertSessionHas($relat, $suporte->getRelatorioPorNome($relat));
+
+            $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'exportar-csv']))
+            ->assertHeader('Content-Disposition', 'attachment; filename='.$relat.'-'.date('Ymd').'.csv');
+
+            $csv = $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'exportar-csv']))
+            ->streamedContent();
+
+            $tg = $suporte->getRelatorioPorNome($relat)['relatorio']['geral'];
+            $td = $suporte->getRelatorioPorNome($relat)['relatorio']['distintos'];
+
+            $this->assertStringContainsString('Área;Filtro;Período;"Total geral";"Total distintos";"Gerado em"', $csv);
+            $this->assertStringContainsString('Site;"'.$f.'";'.now()->format('Y').';'.$tg.';'.$td.';"'.now()->format('d\/m\/Y, \à\s H:i'), $csv);
+        }
+
+        $relat = 'relatorio_'.now()->format('Y').'-interno-'.Suporte::FILTRO_ACESSO;
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'interno', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]))
+        ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']))
+        ->assertSessionHas($relat, $suporte->getRelatorioPorNome($relat));
+
+        $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'exportar-csv']))
+        ->assertHeader('Content-Disposition', 'attachment; filename='.$relat.'-'.date('Ymd').'.csv');
+
+        $csv = $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'exportar-csv']))
+        ->streamedContent();
+
+        $tg = $suporte->getRelatorioPorNome($relat)['relatorio']['geral'];
+        $td = $suporte->getRelatorioPorNome($relat)['relatorio']['distintos'];
+
+        $this->assertStringContainsString('Área;Filtro;Período;"Total geral";"Total distintos";"Gerado em"', $csv);
+        $this->assertStringContainsString('Admin;"'.Suporte::filtros()[Suporte::FILTRO_ACESSO].'";'.now()->format('Y').';'.$tg.';'.$td.';"'.now()->format('d\/m\/Y, \à\s H:i'), $csv);
+    }
+
+    /** @test */
+    public function admin_can_to_export_final_report()
+    {
+        $suporte = new Suporte();
+        $this->signInAsAdmin();
+
+        foreach(Suporte::filtros() as $filtro => $f)
+        {
+            $relat = 'relatorio_'.now()->format('Y').'-externo-'.$filtro;
+            $this->get(route('suporte.log.externo.relatorios', [
+                'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => $filtro
+            ]));
+        }
+
+        $this->get(route('suporte.log.externo.relatorios.final'))
+        ->assertRedirect(route('suporte.log.externo.relatorios.acoes', ['relat' => 'relatorio_final', 'acao' => 'visualizar']))
+        ->assertSessionHas('relatorio_final', $suporte->getRelatorioPorNome('relatorio_final'));
+
+        $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => 'relatorio_final', 'acao' => 'exportar-csv']))
+        ->assertHeader('Content-Disposition', 'attachment; filename=relatorio_final-'.date('Ymd').'.csv');
+
+        $csv = $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => 'relatorio_final', 'acao' => 'exportar-csv']))
+        ->streamedContent();
+
+        $this->assertStringContainsString('Área;Filtro;Período;"Total geral";"Total distintos";"Gerado em"', $csv);
+        $this->assertStringContainsString('-----;-----;"Total Final";', $csv);
+    }
+
+    /** @test */
+    public function admin_cannot_to_export_without_report()
+    {
+        $this->signInAsAdmin();
+
+        $relat = 'relatorio_'.now()->format('Y').'-interno-'.Suporte::FILTRO_ACESSO;
+        
+        $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'exportar-csv']))
+        ->assertRedirect(route('suporte.log.externo.index'))
+        ->assertSessionHas('message', 'Relatório não existe para visualizar / exportar.csv.');
+    }
+
+    /** @test */
+    public function error_input_acao_invalid()
+    {
+        $this->signInAsAdmin();
+
+        $relat = 'relatorio_'.now()->format('Y').'-interno-'.Suporte::FILTRO_ACESSO;
+        
+        $this->get(route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'exportar']))
+        ->assertNotFound();
+    }
+
+    /** @test */
+    public function remove_reports_after_logout()
+    {
+        $this->seed(PermissoesTableSeeder::class);
+        $user = factory('App\User')->create([
+            'password' => bcrypt('TestePorta1@')
+        ]);
+
+        $this->post('admin/login', ['login' => $user->username, 'password' => 'TestePorta1@']);
+
+        $relats = array();
+        foreach(Suporte::filtros() as $filtro => $f)
+        {
+            $relat = 'relatorio_'.now()->format('Y').'-externo-'.$filtro;
+            array_push($relats, $relat);
+            $this->get(route('suporte.log.externo.relatorios', [
+                'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => now()->format('Y'), 'relat_opcoes' => $filtro
+            ]));
+        }
+
+        $this->get(route('suporte.log.externo.relatorios.final'));
+        array_push($relats, 'relatorio_final');
+
+        $this->get(route('suporte.log.externo.index'))
+        ->assertSessionHasAll($relats);
+
+        $this->get(route('usuarios.lista'))
+        ->assertSessionHasAll($relats);
+
+        $this->get(route('regionais.index'))
+        ->assertSessionHasAll($relats);
+
+        $this->get(route('agendamentos.lista'))
+        ->assertSessionHasAll($relats);
+
+        $this->post(route('logout'));
+
+        $this->post('admin/login', ['login' => $user->username, 'password' => 'TestePorta1@']);
+
+        $this->get(route('suporte.log.externo.index'))
+        ->assertSessionMissing($relats[0])
+        ->assertSessionMissing($relats[2])
+        ->assertSessionMissing($relats[4])
+        ->assertSessionMissing($relats[6]);
+    }
+
+    /** @test */
+    public function sum_reports_tipo_externo()
+    {
+        Storage::disk('log_externo')->delete(Storage::disk('log_externo')->allFiles(date('Y\/m\/')));
+        $this->gerar_log_acessos_rc();
+
+        $this->signInAsAdmin();
+
+        foreach(Suporte::filtros() as $filtro => $f)
+        {
+            $relat = 'relatorio_'.now()->format('Y-m').'-externo-'.$filtro;
+            $this->get(route('suporte.log.externo.relatorios', [
+                'relat_tipo' => 'externo', 'relat_data' => 'mes', 'relat_mes' => now()->format('Y-m'), 'relat_opcoes' => $filtro
+            ]));
+
+            $this->assertEquals(session($relat)['relatorio']['geral'], $this->tg[$filtro]);
+            $this->assertEquals(session($relat)['relatorio']['distintos'], $this->td[$filtro]);
+        }
+
+        $this->get(route('suporte.log.externo.relatorios.final'));
+
+        $this->assertStringContainsString($this->tg['relatorio_final'], '<td class="font-weight-bolder">'.session('relatorio_final')['tabela'].'</td>');
+        $this->assertStringContainsString($this->td['relatorio_final'], '<td class="font-weight-bolder">'.session('relatorio_final')['tabela'].'</td>');
+    }
+
+    /** @test */
+    public function sum_reports_tipo_interno()
+    {
+        Storage::disk('log_interno')->delete(Storage::disk('log_interno')->allFiles(date('Y\/m\/')));
+        $this->gerar_log_acessos_admin();
+
+        $this->signInAsAdmin()->update(['idperfil' => 1]);
+
+        $relat = 'relatorio_'.now()->format('Y-m').'-interno-'.Suporte::FILTRO_ACESSO;
+        $this->get(route('suporte.log.externo.relatorios', [
+            'relat_tipo' => 'interno', 'relat_data' => 'mes', 'relat_mes' => now()->format('Y-m'), 'relat_opcoes' => Suporte::FILTRO_ACESSO
+        ]));
+
+        $this->assertEquals(session($relat)['relatorio']['geral'], $this->tg[Suporte::FILTRO_ACESSO]);
+        $this->assertEquals(session($relat)['relatorio']['distintos'], $this->td[Suporte::FILTRO_ACESSO]);
+
+        $this->get(route('suporte.log.externo.relatorios.final'));
+
+        $this->assertStringContainsString($this->tg['relatorio_final'], '<td class="font-weight-bolder">'.session('relatorio_final')['tabela'].'</td>');
+        $this->assertStringContainsString($this->td['relatorio_final'], '<td class="font-weight-bolder">'.session('relatorio_final')['tabela'].'</td>');
     }
 
     /** 
