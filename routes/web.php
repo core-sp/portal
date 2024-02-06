@@ -236,14 +236,20 @@ Route::middleware(['block_ip'])->group(function () {
 
     // Suporte
     Route::prefix('suporte')->group(function(){
+      // Logs
       Route::get('/logs', 'SuporteController@logExternoIndex')->name('suporte.log.externo.index');
       Route::get('/logs/hoje/{tipo}', 'SuporteController@viewLogExternoDoDia')->name('suporte.log.externo.hoje.view');
       Route::get('/logs/busca', 'SuporteController@buscaLogExterno')->name('suporte.log.externo.busca');
       Route::get('/logs/log/{data}/{tipo}', 'SuporteController@viewLogExterno')->name('suporte.log.externo.view');
       Route::get('/logs/log/download/{data}/{tipo}', 'SuporteController@downloadLogExterno')->name('suporte.log.externo.download');
+      Route::get('/logs/relatorios', 'SuporteController@relatorios')->name('suporte.log.externo.relatorios');
+      Route::get('/logs/relatorios/{relat}/{acao}', 'SuporteController@relatoriosAcoes')->where('acao', 'visualizar|remover|exportar-csv')->name('suporte.log.externo.relatorios.acoes');
+      Route::get('/logs/relatorios/final', 'SuporteController@relatorioFinal')->name('suporte.log.externo.relatorios.final');
+      // Sobre os erros
       Route::get('/erros', 'SuporteController@errosIndex')->name('suporte.erros.index');
       Route::post('/erros/file', 'SuporteController@uploadFileErros')->name('suporte.erros.file.post');
       Route::get('/erros/file', 'SuporteController@getErrosFile')->name('suporte.erros.file.get');
+      // Desbloqueio de IP
       Route::get('/ips', 'SuporteController@ipsView')->name('suporte.ips.view');
       Route::delete('/ips/excluir/{ip}', 'SuporteController@ipsExcluir')->name('suporte.ips.excluir');
     });

@@ -56,6 +56,126 @@
 
     <hr />
 
+    @php
+        $relatorios = $suporte->todosRelatorios();
+        $cont = 1;
+    @endphp
+
+    <!-- RELATÓRIOS -->
+    <div class="row mb-4">
+        <div class="col">
+            <fieldset class="border border-secondary p-3">
+                <legend>Relatórios</legend>
+
+                @if(session()->exists('relat_removido'))
+                <div class="toast bg-warning">
+                    <div class="toast-body text-danger text-center">
+                        <strong>Relatório removido!</strong>
+                    </div>
+                </div>
+                @endif
+
+                @if(!empty($relatorios))
+                <p><strong>Relatórios salvos temporariamente:</strong></p>
+                @foreach($relatorios as $relat => $r)
+                <span class="text-nowrap">{{ $relat != 'relatorio_final' ? $cont++ : 'Final' }}: 
+                    <a href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'visualizar']) }}">{{ $suporte->getTituloPorNome($relat) }}</a>
+                    <a class="btn btn-link btn-sm" href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'exportar-csv']) }}"><i class="fas fa-download"></i></a>
+                    <a class="btn btn-link btn-sm" href="{{ route('suporte.log.externo.relatorios.acoes', ['relat' => $relat, 'acao' => 'remover']) }}"><i class="fas fa-times text-danger"></i></a>
+                </span>
+                <br>
+                @endforeach
+                <a class="btn btn-success btn-sm mt-3" href="{{ route('suporte.log.externo.relatorios.final') }}">Gerar relatório final</a>
+                <hr>
+                @endif
+
+                <form action="{{ route('suporte.log.externo.relatorios') }}">
+                    <div class="form-row mb-2">
+                        <div class="col">
+                            <label for="relat_opcoes" class="mr-sm-2">Filtros:</label>
+                            <select name="relat_opcoes" class="form-control {{ $errors->has('relat_opcoes') ? 'is-invalid' : '' }}" id="relat_opcoes">
+                            @foreach($filtros as $tipoOpcao => $opcao)
+                                <option value="{{ $tipoOpcao }}" {{ old('relat_opcoes') == $tipoOpcao ? 'selected' : '' }}>{{ $opcao }}</option>
+                            @endforeach
+                            </select>
+                            @if($errors->has('relat_opcoes'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('relat_opcoes') }}
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="form-row d-flex align-items-end">
+                        <div class="col">
+                            <label for="relat_tipo" class="mr-sm-2">Tipo:</label>
+                            <select name="relat_tipo" class="form-control {{ $errors->has('relat_tipo') ? 'is-invalid' : '' }}" id="relat_tipo">
+                            @foreach($tipos as $k => $val)
+                                @if($val != 'Erros')
+                                <option value="{{ $k }}" {{ old('relat_tipo') == $k ? 'selected' : '' }}>{{ $val }}</option>
+                                @endif
+                            @endforeach
+                            </select>
+                            @if($errors->has('relat_tipo'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('relat_tipo') }}
+                            </div>
+                            @endif
+                        </div>
+
+                        <div class="col">
+                            <div class="input-group" id="relat-buscar-mes">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="radio" class="mr-1" name="relat_data" value="mes" checked><strong>Mês/Ano:</strong>
+                                    </div>
+                                </div>
+                                <input type="month" 
+                                    name="relat_mes" 
+                                    class="form-control {{ $errors->has('relat_mes') || $errors->has('relat_data') ? 'is-invalid' : '' }}" 
+                                    value="{{ date('Y-m') }}"
+                                    min="2019-01"
+                                    max="{{ date('Y-m') }}"
+                                />
+                                @if($errors->has('relat_mes') || $errors->has('relat_data'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->has('relat_data') ? $errors->first('relat_data') : $errors->first('relat_mes') }}
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="input-group" id="relat-buscar-ano">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="radio" class="mr-1" name="relat_data" value="ano"><strong>Ano:</strong>
+                                    </div>
+                                </div>
+                                <input type="number" 
+                                    name="relat_ano" 
+                                    class="form-control {{ $errors->has('relat_ano') || $errors->has('relat_data') ? 'is-invalid' : '' }}" 
+                                    value="{{ date('Y') }}"
+                                    min="2019"
+                                    max="{{ date('Y') }}"
+                                    step="1"
+                                    disabled
+                                />
+                                @if($errors->has('relat_ano') || $errors->has('relat_data'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->has('relat_data') ? $errors->first('relat_data') : $errors->first('relat_ano') }}
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary btn-sm mt-2 float-right" type="submit" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">Gerar</button>
+                </form>
+            </fieldset>
+        </div>
+    </div>
+
     <!-- BUSCA POR DATA -->
     <div class="row mb-4">
         <div class="col">
@@ -64,28 +184,33 @@
                 <form action="{{ route('suporte.log.externo.busca') }}">
                     <div class="form-inline">
                         <label for="tipo" class="mr-sm-2">Tipo de log:</label>
-                        <select name="tipo" class="form-control mb-2 mr-sm-3 {{ $errors->has('tipo') ? 'is-invalid' : '' }}">
-                            <option value="externo" {{ old('tipo') == 'externo' ? 'selected' : '' }}>Site</option>
-                            <option value="interno" {{ old('tipo') == 'interno' ? 'selected' : '' }}>Admin</option>
-                            <option value="erros" {{ old('tipo') == 'erros' ? 'selected' : '' }}>Erros</option>
+                        <select name="tipo" class="form-control mb-2 mr-sm-3 {{ isset(request()->query()['data']) && $errors->has('tipo') ? 'is-invalid' : '' }}">
+                            @foreach($tipos as $k => $val)
+                            <option value="{{ $k }}" {{ (isset(request()->query()['data']) && isset(request()->query()['tipo']) && (request()->query()['tipo'] == $k)) || (old('tipo') == $k) ? 'selected' : '' }}>{{ $val }}</option>
+                            @endforeach
                         </select>
+                        @if(isset(request()->query()['data']) && $errors->has('tipo'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('tipo') }}
+                        </div>
+                        @endif
                         
                         <label for="buscar-data" class="mr-sm-2">Data:</label>
                         <input type="date" 
                             name="data" 
-                            class="form-control mb-2 mr-sm-3 {{ $errors->has('data') ? 'is-invalid' : '' }}" 
+                            class="form-control mb-2 mr-sm-3 {{ isset(request()->query()['data']) && $errors->has('data') ? 'is-invalid' : '' }}" 
                             id="buscar-data"
-                            value="{{ empty(old('data')) ? date('Y-m-d', strtotime('yesterday')) : old('data') }}"
+                            value="{{ isset(request()->query()['data']) ? request()->query()['data'] : now()->yesterday()->format('Y-m-d') }}"
                             min="2019-01-01"
-                            max="{{ date('Y-m-d', strtotime('yesterday')) }}"
+                            max="{{ now()->yesterday()->format('Y-m-d') }}"
                         >
-                        
-                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">Buscar</button>
-                        @if($errors->has('data') || $errors->has('tipo'))
+                        @if($errors->has('data'))
                         <div class="invalid-feedback">
-                            {{ $errors->has('data') ? $errors->first('data') : $errors->first('tipo') }}
+                            {{ $errors->first('data') }}
                         </div>
                         @endif
+                        
+                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">Buscar</button>
                     </div>
                 </form>
             </fieldset>
@@ -96,113 +221,78 @@
     <div class="row mb-4">
         <div class="col">
             <fieldset class="border border-secondary p-3">
-                <legend>Buscar texto por mês</legend>
+                <legend>Buscar texto por mês / ano</legend>
                 <form action="{{ route('suporte.log.externo.busca') }}">
-                    <div class="form-inline">
-                        <label for="tipo" class="mr-sm-2">Tipo de log:</label>
-                        <select name="tipo" class="form-control mb-2 mr-sm-3 {{ $errors->has('tipo') ? 'is-invalid' : '' }}">
-                            <option value="externo" {{ old('tipo') == 'externo' ? 'selected' : '' }}>Site</option>
-                            <option value="interno" {{ old('tipo') == 'interno' ? 'selected' : '' }}>Admin</option>
-                        </select>
-                        
-                        <label for="buscar-mes" class="mr-sm-2">Mês/Ano:</label>
-                        <input type="month" 
-                            name="mes" 
-                            class="form-control mb-2 mr-sm-3 {{ $errors->has('mes') ? 'is-invalid' : '' }}" 
-                            id="buscar-mes"
-                            value="{{ empty(old('mes')) ? date('Y-m') : old('mes') }}"
-                            min="2019-01"
-                            max="{{ date('Y-m') }}"
-                        >
-
-                        <label for="buscar-texto" class="mr-sm-2">Texto:</label>
-                        <input type="text" 
-                            name="texto" 
-                            class="form-control mb-2 mr-sm-3 {{ $errors->has('texto') ? 'is-invalid' : '' }}" 
-                            id="buscar-texto"
-                            value="{{ old('texto') }}"
-                            size="70"
-                            list="opcoes_m"
-                        />
-                        <datalist id="opcoes_m">
-                            <option value="IP BLOQUEADO">
-                            <option value="IP DESBLOQUEADO">
-                            <option value="[IP: xxx.xxx.xxx.xxx] - ">
-                            <option value="(&quot;xxx.xxx.xxx-xx&quot;) verificou o email após o cadastro.">
-                            <option value="(&quot;xx.xxx.xxx/xxxx-xx&quot;) verificou o email após o cadastro.">
-                            <option value="&quot;xxxxxx/xxxx&quot; alterou o email">
-                            <option value="&quot;xxx.xxx.xxx-xx&quot; (&quot;email&quot;) cadastrou-se na Área do Representante.">
-                            <option value="&quot;xx.xxx.xxx/xxxx-xx&quot; (&quot;email&quot;) cadastrou-se na Área do Representante.">
-                            <option value="(&quot;xxxxxx/xxxx&quot;) conectou-se à Área do Representante.">
-                            <option value="(&quot;xxxxxx/xxxx&quot;) desconectou-se da Área do Representante.">
-                            <option value="Usuário com o cpf/cnpj xxx.xxx.xxx-xx alterou a senha com sucesso na Área do Representante.">
-                            <option value="Usuário com o cpf/cnpj xx.xxx.xxx/xxxx-xx alterou a senha com sucesso na Área do Representante.">
-                            <option value="(&quot;xxxxxx/xxxx&quot;) gerou certidão">
-                            <option value="(&quot;xxxxxx/xxxx&quot;) não conseguiu emitir certidão.">
-                            <option value="Possível bot tentou login">
-                        </datalist>
-
-                        <input type="checkbox"
-							name="n_linhas"
-							class="form-check-input {{ $errors->has('n_linhas') ? 'is-invalid' : '' }}"
-							id="n_linhas_mes"
-						/> 
-						<label for="n_linhas_mes" class="text-justify mr-sm-2">
-							total de ocorrências por log
-						</label>
-                        
-                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">Buscar</button>
-                        @if($errors->has('mes') || $errors->has('tipo') || $errors->has('texto'))
-                        <div class="invalid-feedback">
+                    <div class="form-inline mb-3">
+                        <div class="input-group mr-3" id="buscar-mes">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="radio" class="mr-1" name="optradio" {{ isset(request()->query()['mes']) || (!isset(request()->query()['mes']) && !isset(request()->query()['ano'])) ? 'checked' : '' }}><strong>Mês/Ano:</strong>
+                                </div>
+                            </div>
+                            <input type="month" 
+                                name="mes" 
+                                class="form-control {{ $errors->has('mes') ? 'is-invalid' : '' }}" 
+                                value="{{ isset(request()->query()['mes']) ? request()->query()['mes'] : date('Y-m') }}"
+                                min="2019-01"
+                                max="{{ date('Y-m') }}"
+                                {{ isset(request()->query()['mes']) || (!isset(request()->query()['mes']) && !isset(request()->query()['ano'])) ? '' : 'disabled' }}
+                            />
                             @if($errors->has('mes'))
+                            <div class="invalid-feedback">
                                 {{ $errors->first('mes') }}
-                            @elseif($errors->has('tipo'))
-                                {{ $errors->first('tipo') }}
-                            @else
-                                {{ $errors->first('texto') }}
+                            </div>
                             @endif
                         </div>
-                        @endif
-                    </div>
-                </form>
-            </fieldset>
-        </div>
-    </div>
 
-    <!-- BUSCA POR ANO -->
-    <div class="row mb-4">
-        <div class="col">
-            <fieldset class="border border-secondary p-3">
-                <legend>Buscar texto por ano</legend>
-                <form action="{{ route('suporte.log.externo.busca') }}">
+                        <div class="input-group" id="buscar-ano">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="radio" class="mr-1" name="optradio" {{ isset(request()->query()['ano']) ? 'checked' : '' }}><strong>Ano:</strong>
+                                </div>
+                            </div>
+                            <input type="number" 
+                                name="ano" 
+                                class="form-control {{ $errors->has('ano') ? 'is-invalid' : '' }}" 
+                                value="{{ isset(request()->query()['ano']) ? request()->query()['ano'] : date('Y') }}"
+                                min="2019"
+                                max="{{ date('Y') }}"
+                                step="1"
+                                {{ isset(request()->query()['mes']) || (!isset(request()->query()['mes']) && !isset(request()->query()['ano'])) ? 'disabled' : '' }}
+                            />
+                            @if($errors->has('ano'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('ano') }}
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
                     <div class="form-inline">
                         <label for="tipo" class="mr-sm-2">Tipo de log:</label>
-                        <select name="tipo" class="form-control mb-2 mr-sm-3 {{ $errors->has('tipo') ? 'is-invalid' : '' }}">
-                            <option value="externo" {{ old('tipo') == 'externo' ? 'selected' : '' }}>Site</option>
-                            <option value="interno" {{ old('tipo') == 'interno' ? 'selected' : '' }}>Admin</option>
+                        <select name="tipo" class="form-control mb-2 mr-sm-2 {{ !isset(request()->query()['data']) && $errors->has('tipo') ? 'is-invalid' : '' }}">
+                        @foreach($tipos as $k => $val)
+                            @if($val != 'Erros')
+                            <option value="{{ $k }}" {{ (!isset(request()->query()['data']) && isset(request()->query()['tipo']) && (request()->query()['tipo'] == $k)) || (old('tipo') == $k) ? 'selected' : '' }}>{{ $val }}</option>
+                            @endif
+                        @endforeach
                         </select>
-                        
-                        <label for="buscar-ano" class="mr-sm-2">Ano:</label>
-                        <input type="number" 
-                            name="ano" 
-                            class="form-control mb-2 mr-sm-3 {{ $errors->has('ano') ? 'is-invalid' : '' }}" 
-                            id="buscar-ano"
-                            value="{{ empty(old('ano')) ? date('Y') : old('ano') }}"
-                            min="2019"
-                            max="{{ date('Y') }}"
-                            step="1"
-                        >
+                        @if(!isset(request()->query()['data']) && $errors->has('tipo'))
+                        <div class="invalid-feedback mr-sm-2">
+                            {{ $errors->first('tipo') }}
+                        </div>
+                        @endif
 
                         <label for="buscar-texto" class="mr-sm-2">Texto:</label>
                         <input type="text" 
                             name="texto" 
-                            class="form-control mb-2 mr-sm-3 {{ $errors->has('texto') ? 'is-invalid' : '' }}" 
+                            class="form-control mb-2 mr-sm-2 {{ $errors->has('texto') ? 'is-invalid' : '' }}" 
                             id="buscar-texto"
-                            value="{{ old('texto') }}"
+                            value="{{ isset(request()->query()['texto']) ? request()->query()['texto'] : old('texto') }}"
                             size="70"
-                            list="opcoes_y"
+                            list="opcoes"
                         />
-                        <datalist id="opcoes_y">
+                        <datalist id="opcoes">
                             <option value="IP BLOQUEADO">
                             <option value="IP DESBLOQUEADO">
                             <option value="[IP: xxx.xxx.xxx.xxx] - ">
@@ -219,28 +309,45 @@
                             <option value="(&quot;xxxxxx/xxxx&quot;) não conseguiu emitir certidão.">
                             <option value="Possível bot tentou login">
                         </datalist>
-
-                        <input type="checkbox"
-							name="n_linhas"
-							class="form-check-input {{ $errors->has('n_linhas') ? 'is-invalid' : '' }}"
-							id="n_linhas_ano"
-						/> 
-						<label for="n_linhas_ano" class="text-justify mr-sm-2">
-							total de ocorrências por log
-						</label>
-                        
-                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">Buscar</button>
-                        @if($errors->has('ano') || $errors->has('tipo') || $errors->has('texto'))
+                        @if($errors->has('texto'))
                         <div class="invalid-feedback">
-                            @if($errors->has('ano'))
-                                {{ $errors->first('ano') }}
-                            @elseif($errors->has('tipo'))
-                                {{ $errors->first('tipo') }}
-                            @else
-                                {{ $errors->first('texto') }}
-                            @endif
+                            {{ $errors->first('texto') }}
                         </div>
                         @endif
+
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                <input type="checkbox" 
+                                    name="n_linhas"
+                                    class="form-check-input {{ $errors->has('n_linhas') ? 'is-invalid' : '' }}"
+                                    id="n_linhas"
+                                    {{ isset(request()->query()['n_linhas']) ? 'checked' : '' }}
+                                /> <strong>total de ocorrências por log</strong>
+                                @if($errors->has('n_linhas'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('n_linhas') }}
+                                </div>
+                                @endif
+                            </label>
+                        </div>
+
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                <input type="checkbox" 
+                                    name="distintos"
+                                    class="form-check-input {{ $errors->has('distintos') ? 'is-invalid' : '' }}"
+                                    id="distintos"
+                                    {{ isset(request()->query()['distintos']) ? 'checked' : '' }}
+                                /> <strong>somente registros distintos</strong>
+                                @if($errors->has('distintos'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('distintos') }}
+                                </div>
+                                @endif
+                            </label>
+                        </div>
+
+                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">Buscar</button>
                     </div>
                 </form>
             </fieldset>
@@ -252,13 +359,12 @@
     <hr />
 
     @php
-        $tipos = ['erros' => 'de Erros', 'interno' => 'do Admin', 'externo' => 'do Site'];
-        $textoTipo = $tipos[request()->query('tipo')];
+        $textoTipo = $tipos_textos[request()->query('tipo')];
     @endphp
     <div class="mt-4 mb-4">
         <h4>Resultado da busca "<i>{{ $busca }}</i>" para o log <strong>{{ $textoTipo }}</strong></h4>
-        @if(!isset(request()->query()['data']) && isset(request()->query()['n_linhas']))
-        <h5>Total de ocorrências: {{ number_format($totalFinal, 0, ",", ".") }}</h5>
+        @if(!isset(request()->query()['data']) && (isset(request()->query()['n_linhas']) || isset(request()->query()['distintos'])))
+        <h5>Total de ocorrências{{ isset(request()->query()['distintos']) ? ' distintas' : '' }}: {{ number_format($totalFinal, 0, ",", ".") }}</h5>
         @endif
     </div>
     
