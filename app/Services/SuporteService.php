@@ -10,6 +10,7 @@ use App\Events\CrudEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\InternoSuporteMail;
 use Illuminate\Support\LazyCollection;
+use App\Suporte;
 
 class SuporteService implements SuporteServiceInterface {
 
@@ -40,10 +41,6 @@ class SuporteService implements SuporteServiceInterface {
         $this->nomeFileErros = 'suporte-tabela-erros.txt';
     }
 
-    const ERROS = 'erros';
-    const INTERNO = 'interno';
-    const EXTERNO = 'externo';
-
     private function getLastModificationLog($data, $tipo)
     {
         return $this->hasLog($data, $tipo) ? Storage::disk('log_' . $tipo)->lastModified($this->getPathLogFile($data, $tipo)) : null;
@@ -55,7 +52,7 @@ class SuporteService implements SuporteServiceInterface {
         $anoMes = $data->format('Y').'/'.$data->format('m').'/';
         $nomeArquivo = 'laravel-'.$data->format('Y-m-d').'.log';
 
-        return $tipo == self::ERROS ? $nomeArquivo : $anoMes.$nomeArquivo;
+        return $tipo == Suporte::ERROS ? $nomeArquivo : $anoMes.$nomeArquivo;
     }
 
     private function getPathsLogsMonth($data)
@@ -79,7 +76,7 @@ class SuporteService implements SuporteServiceInterface {
 
     public function indexLog()
     {
-        foreach([self::ERROS, self::INTERNO, self::EXTERNO] as $tipo)
+        foreach([Suporte::ERROS, Suporte::INTERNO, Suporte::EXTERNO] as $tipo)
         {
             $infos[$tipo] = $this->getLastModificationLog(date('Y-m-d'), $tipo);
 
@@ -92,7 +89,12 @@ class SuporteService implements SuporteServiceInterface {
         return [
             'info' => $infos,
             'size' => $size,
-            'variaveis' => (object) $this->variaveisLog
+            'variaveis' => (object) $this->variaveisLog,
+            'tipos' => Suporte::tipos(),
+            'tipos_textos' => Suporte::tiposTextos(),
+            'filtros' => Suporte::filtros(),
+            'tabelaRelatorio' => Suporte::camposTabelaRelatorio(),
+            'suporte' => new Suporte(),
         ];
     }
 
@@ -119,7 +121,9 @@ class SuporteService implements SuporteServiceInterface {
             $array = array();
             $diretorio = isset($request['mes']) ? $this->getPathsLogsMonth($request['mes']) : $request['ano'];
             $all = Storage::disk('log_'.$request['tipo'])->allFiles($diretorio);
-            $com_total_linhas = isset($request['n_linhas']) && ($request['n_linhas'] == 'on');
+            $com_total_linhas = (isset($request['n_linhas']) && ($request['n_linhas'] == 'on')) || isset($request['relatorio']);
+            $distintos = (isset($request['distintos']) && ($request['distintos'] == 'on')) || isset($request['relatorio']);
+            $array_unique = array();
 
             foreach($all as $key => $file)
             {
@@ -133,9 +137,28 @@ class SuporteService implements SuporteServiceInterface {
                 {
                     if(stripos($line, $request['texto']) !== false)
                     {
-                        if($com_total_linhas)
-                            $total++;
-                        else
+                        if($distintos)
+                        {
+                            // verificação de registros de log antes de inserir ip.
+                            $separador = stripos($line, '.INFO: [IP: ') !== false ? '] - ' : '.INFO: ';
+                            $pos = stripos($line, $separador) + strlen($separador);
+                            // remove parte inicial do log envolvendo data e ip.
+                            $txt_inicio = trim(substr($line, $pos));
+                            // remove parte final do log após o texto buscado.
+                            $pos_final = strlen($request['texto']) > strlen($txt_inicio) ? strlen($txt_inicio) : strlen($request['texto']);
+                            $txt = substr($txt_inicio, 0, stripos($txt_inicio, $request['texto']) + $pos_final);
+                            if(!in_array($txt, $array_unique))
+                            {
+                                array_push($array_unique, $txt);
+                                $total++;
+                                isset($request['relatorio']) ? $request['relatorio']['distintos']++ : null;
+                            }
+                        }
+
+                        if((!$distintos && $com_total_linhas) || isset($request['relatorio']))
+                            isset($request['relatorio']) ? $request['relatorio']['geral']++ : $total++;
+
+                        if(!$com_total_linhas && !$distintos)
                         {
                             array_push($array, str_replace('.log', '', substr($file, 16)) . ';' . $size);
                             break;
@@ -144,25 +167,28 @@ class SuporteService implements SuporteServiceInterface {
                 }
                 fclose($f);
                 unset($f);
+                
+                if(($distintos && !$com_total_linhas) && ($total > 0) && !isset($request['relatorio']))
+                    array_push($array, str_replace('.log', '', substr($file, 16)) . ';' . $size);
 
-                if($com_total_linhas && ($total > 0))
+                if($com_total_linhas && ($total > 0) && !isset($request['relatorio']))
                     array_push($array, str_replace('.log', '', substr($file, 16)) . ';' . $size . ';' . $total);
                 $totalFinal += $total;
             }
-            
+
             if(isset($array[0]))
                 $dados['resultado'] = $array;
             unset($array);
             $dados['totalFinal'] = $totalFinal;
 
-            return $dados;
+            return isset($request['relatorio']) ? $request['relatorio'] : $dados;
         }
     }
 
     public function logPorData($data, $tipo)
     {
         $conteudo = null;
-        if(!in_array($tipo, [self::ERROS, self::INTERNO, self::EXTERNO]))
+        if(!in_array($tipo, [Suporte::ERROS, Suporte::INTERNO, Suporte::EXTERNO]))
             throw new \Exception('Tipo de log não existente', 500);
 
         $log = $this->hasLog($data, $tipo);
@@ -183,6 +209,69 @@ class SuporteService implements SuporteServiceInterface {
         }
     
         return isset($conteudo) ? $conteudo : null;
+    }
+
+    public function relatorios($dados, $acao = null)
+    {
+        $suporte = new Suporte();
+
+        if(isset($acao))
+        {
+            if(!in_array($acao, ['remover', 'visualizar', 'exportar-csv']))
+                throw new \Exception('Ação não existe.', 404);
+
+            $final = null;
+            switch ($acao) {
+                case 'remover':
+                    $suporte->removerRelatorioPorNome($dados);
+                    break;
+                case 'visualizar':
+                    $final = $suporte->getRelatorioPorNome($dados);
+                    break;
+                case 'exportar-csv':
+                    $final['final'] = $suporte->exportarCsv($dados);
+                    $final['headers'] = [
+                        'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                        'Content-type' => 'text/csv; charset=UTF-8',
+                        'Content-Disposition' => 'attachment; filename='.$dados.'-'.date('Ymd').'.csv',
+                        'Expires' => '0',
+                    ];
+                    break;
+            }
+
+            return $final;
+        }
+
+        $suporte->conferePodeCriar();
+        $textos = Suporte::textosFiltros();
+
+        $data = 'relat_' . $dados['relat_data'];
+        $texto = $textos[$dados['relat_opcoes'] . '_' . $dados['relat_tipo']];
+
+        $dados_final = [
+            'tipo' => $dados['relat_tipo'],
+            $dados['relat_data'] => $dados[$data],
+            'texto' => $texto,
+            'relatorio' => ['distintos' => 0, 'geral' => 0],
+        ];
+
+        $dados_final = $this->logBusca($dados_final);
+        $dados_final['tipo'] = $dados['relat_tipo'];
+        $dados_final['data'] = $dados[$data];
+        $dados_final['opcoes'] = $dados['relat_opcoes'];
+
+        return Suporte::criarRelatorio($dados_final);
+    }
+
+    public function relatorioFinal()
+    {
+        $suporte = new Suporte();
+        return $suporte->getRelatorioFinalHTML();
+    }
+
+    public function filtros()
+    {
+        return Suporte::filtros();
     }
 
     public function indexErros()
