@@ -1126,6 +1126,33 @@ class SolicitaCedulaTest extends TestCase
 
     /** @test 
      * 
+    */
+    public function log_is_generated_when_access_insert_new_solicitacao_cedula()
+    {
+        $regional = factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO'
+        ]);
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO - Alameda Santos'
+        ]);
+        $representante = factory('App\Representante')->create();
+        $cedula = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id
+        ]);
+
+        unset($cedula['status']);
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Solicitação de Cédula" para incluir.';
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test 
+     * 
      * Representante pode solicitar cédula pela primeira vez
     */
     public function insert_new_solicitacao_cedula_pj()
