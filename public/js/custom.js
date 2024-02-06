@@ -182,6 +182,9 @@ $(document).ready(function(){
       e.preventDefault();
     }
   });
+  
+  $('.toast').toast({delay: 2000});
+  $('.toast').toast('show');
 
   $('[data-toggle="popover"]').popover({html: true});
 });
@@ -472,11 +475,43 @@ $('#statusAgendamentoAdmin').ready(function(){
 		$('#parcelamento' + id).html('R$ ' + valorParcelado.replace('.', ','));
 	});
 
+  // Funcionalidade Suporte / Logs
   $(document).on('keydown', function(e) {
     if((e.keyCode == 27) && (window.location.href.indexOf('/admin/suporte/logs'))){
       $("#modalSuporte").modal('hide');
     }
   });
+
+  $('[name="relat_opcoes"]').change(function(){
+    var somente_rc = $('[name="relat_opcoes"] option[value="' + $(this).val() + '"]').text().search('do RC') > -1;
+    if(somente_rc){
+      $('[name="relat_tipo"] option[value="externo"]').prop('selected', true);
+      $('[name="relat_tipo"] option[value="interno"]').hide();
+    }else
+      $('[name="relat_tipo"] option[value="interno"]').show();
+  });
+
+  $('#buscar-mes [type="radio"], #relat-buscar-mes [type="radio"]').change(function(){
+    var id = $(this).parents('.input-group').attr('id');
+    var nome = id == 'relat-buscar-mes' ? 'relat_' : '';
+    var outra_id = id == 'relat-buscar-mes' ? 'relat-' : '';
+    if(this.checked){
+      $('#' + outra_id + 'buscar-mes [name="' + nome + 'mes"]').prop('disabled', false);
+      $('#' + outra_id + 'buscar-ano [name="' + nome + 'ano"]').prop('disabled', true);
+    }
+  });
+
+  $('#buscar-ano [type="radio"], #relat-buscar-ano [type="radio"]').change(function(){
+    var id = $(this).parents('.input-group').attr('id');
+    var nome = id == 'relat-buscar-ano' ? 'relat_' : '';
+    var outra_id = id == 'relat-buscar-ano' ? 'relat-' : '';
+    if(this.checked){
+      $('#' + outra_id + 'buscar-mes [name="' + nome + 'mes"]').prop('disabled', true);
+      $('#' + outra_id + 'buscar-ano [name="' + nome + 'ano"]').prop('disabled', false);
+    }
+  });
+
+  // FIM Funcionalidade Suporte / Logs
 
 })(jQuery);
 
