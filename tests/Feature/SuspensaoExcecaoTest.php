@@ -57,7 +57,7 @@ class SuspensaoExcecaoTest extends TestCase
         $this->post(route('sala.reuniao.suspensao.store'), [
             'cpf_cnpj' => '11748345000144',
             'data_inicial' => now()->format('Y-m-d'),
-            'data_final' => now()->addMonth()->format('Y-m-d'),
+            'data_final' => now()->addDays(31)->format('Y-m-d'),
             'justificativa' => $faker->sentence(100)
         ])->assertForbidden();
         $this->get(route('sala.reuniao.suspensao.busca'))->assertForbidden();
