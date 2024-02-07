@@ -6,7 +6,6 @@ use App\Contracts\PreRegistroServiceInterface;
 use App\PreRegistro;
 use App\Anexo;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 use App\Events\ExternoEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PreRegistroMail;
@@ -19,54 +18,6 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     const RELATION_ANEXOS = "anexos";
     const RELATION_PRE_REGISTRO = "preRegistro";
-    const RELATION_RT = "pessoaJuridica.responsavelTecnico";
-
-    private function getRTGerenti($gerentiRepository, $cpf)
-    {
-        if(!isset($cpf) || (strlen($cpf) != 11))
-            return null;
-
-        $resultadosGerenti = $gerentiRepository->gerentiBusca("", null, $cpf);
-        $ass_id = null;
-        $nome = null;
-        $gerenti = array();
-
-        // Para testar: colocar 5 em "ASS_TP_ASSOC" em gerentiBusca() em GerentiRepositoryMock
-        if(count($resultadosGerenti) > 0)
-            foreach($resultadosGerenti as $resultado)
-            {
-                $naoCancelado = $resultado['CANCELADO'] == "F";
-                $ativo = $resultado['ASS_ATIVO'] == "T";
-                $tipo = $resultado["ASS_TP_ASSOC"] == $this->getCodigoRT();
-
-                if($naoCancelado && $ativo && $tipo)
-                {
-                    $ass_id = $resultado["ASS_ID"];
-                    $gerenti['nome'] = $resultado["ASS_NOME"];
-                    $gerenti['registro'] = apenasNumeros($resultado["ASS_REGISTRO"]);
-                }
-            }
-        
-        if(isset($ass_id))
-        {
-            $resultadosGerenti = utf8_converter($gerentiRepository->gerentiDadosGeraisPF($ass_id));
-
-            $gerenti['nome_mae'] = isset($resultadosGerenti['Nome da mãe']) ? $resultadosGerenti['Nome da mãe'] : null;
-            $gerenti['nome_pai'] = isset($resultadosGerenti['Nome do pai']) ? $resultadosGerenti['Nome do pai'] : null;
-            $gerenti['identidade'] = isset($resultadosGerenti['identidade']) ? $resultadosGerenti['identidade'] : null;
-            $gerenti['orgao_emissor'] = isset($resultadosGerenti['emissor']) ? $resultadosGerenti['emissor'] : null;
-            $gerenti['dt_expedicao'] = isset($resultadosGerenti['expedicao']) && Carbon::hasFormat($resultadosGerenti['expedicao'], 'd/m/Y') ? 
-                Carbon::createFromFormat('d/m/Y', $resultadosGerenti['expedicao'])->format('Y-m-d') : null;
-            $gerenti['dt_nascimento'] = isset($resultadosGerenti['Data de nascimento']) && Carbon::hasFormat($resultadosGerenti['Data de nascimento'], 'd/m/Y') ? 
-                Carbon::createFromFormat('d/m/Y', $resultadosGerenti['Data de nascimento'])->format('Y-m-d') : null;
-            $gerenti['sexo'] = null;
-            if(isset($resultadosGerenti['Sexo']))
-                $gerenti['sexo'] = $resultadosGerenti['Sexo'] == "MASCULINO" ? "M" : "F";
-            $gerenti['cpf'] = $cpf;
-        }
-
-        return $gerenti;
-    }
 
     public function verificacao($gerentiRepository, $externo)
     {
@@ -244,8 +195,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
             $objeto = $preRegistro->has($request['classe'])->where('id', $preRegistro->id)->first();
         
         $request['campo'] = $this->limparNomeCamposAjax($request['classe'], $request['campo']);
-        $gerenti = ($request['classe'] == PreRegistroService::RELATION_RT) && ($request['campo'] == 'cpf') ? 
-            $this->getRTGerenti($gerentiRepository, $request['valor']) : null;
+        $gerenti = $request['campo'] == 'cpf' ? 
+            $this->getRTGerenti($request['classe'], $gerentiRepository, $request['valor']) : null;
 
         if(($request['classe'] == PreRegistroService::RELATION_PRE_REGISTRO) || isset($objeto))
             $resultado = $preRegistro->atualizarAjax($request['classe'], $request['campo'], $request['valor'], $gerenti);
@@ -290,22 +241,11 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $camposLimpos = $this->getCamposLimpos($request, $preRegistro->userExterno->getCamposPreRegistro());
 
         foreach($camposLimpos as $key => $arrayCampos)
-        {
-            $gerenti = null;
-            if($key != PreRegistroService::RELATION_PRE_REGISTRO)
-            {
-                $gerenti = $key == PreRegistroService::RELATION_RT ? $this->getRTGerenti($gerentiRepository, $arrayCampos['cpf']) : null;
-                $objeto = $preRegistro->has($key)->where('id', $preRegistro->id)->first();
-                $resultado = isset($objeto) ? $preRegistro->salvar($key, $arrayCampos, $gerenti) : 
-                    $preRegistro->salvar($key, $arrayCampos, $gerenti, array_search($key, $this->getRelacoes()));
-            } else
-                $resultado = $preRegistro->salvar($key, $arrayCampos, $gerenti);
-            
-            if(!isset($resultado))
-                throw new \Exception('Não salvou os dados do pré-registro com id ' .$preRegistro->id. ' em ' . $key, 500);
-        }
+            $resultado = $preRegistro->salvar($key, $arrayCampos, $this->getRTGerenti($key, $gerentiRepository, isset($arrayCampos['cpf']) ? $arrayCampos['cpf'] : ''));
 
-        $status = $preRegistro->status == PreRegistro::STATUS_CRIADO ? $preRegistro::STATUS_ANALISE_INICIAL : $preRegistro::STATUS_ANALISE_CORRECAO;
+        unset($camposLimpos);
+        
+        $status = $preRegistro->criado() ? $preRegistro::STATUS_ANALISE_INICIAL : $preRegistro::STATUS_ANALISE_CORRECAO;
         $resultado = $preRegistro->update(['status' => $status]);
         
         if(!$resultado)

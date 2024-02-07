@@ -450,6 +450,11 @@ class PreRegistro extends Model
         return isset($this->getJustificativaArray()['negado']) ? $this->getJustificativaArray()['negado'] : null;
     }
 
+    public function criado()
+    {
+        return $this->status == PreRegistro::STATUS_CRIADO;
+    }
+
     public function isFinalizado()
     {
         return ($this->status == PreRegistro::STATUS_NEGADO) || ($this->status == PreRegistro::STATUS_APROVADO);
@@ -726,11 +731,12 @@ class PreRegistro extends Model
         return $resultado;
     }
 
-    public function salvar($classe, $arrayCampos, $gerenti, $criar = null)
+    public function salvar($classe, $arrayCampos, $gerenti)
     {
         $resultado = null;
         $valido = null;
-        if(isset($criar))
+        $criar = $classe != 'preRegistro' ? array_search($classe, $this->getRelacoes()) : null;
+        if(isset($criar) && !$this->has($classe)->where('id', $this->id)->exists())
             $valido = $criar::atualizar($arrayCampos, $gerenti);
         
         switch ($classe) {
@@ -758,6 +764,9 @@ class PreRegistro extends Model
                 $this->touch();
                 break;
         }
+
+        if(!isset($resultado))
+            throw new \Exception('Não salvou os dados do pré-registro com id ' .$this->id. ' em ' . $classe, 500);
 
         return $resultado;
     }
