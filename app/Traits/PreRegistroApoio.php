@@ -103,19 +103,16 @@ trait PreRegistroApoio {
 
     public function getCamposLimpos($request, $campos)
     {
-        $request = collect($this->formatarCamposRequest($request));
-        $request->transform(function ($value, $chave) {
-            if(!isset($value))
-                return null;
-            return in_array($chave, ['checkEndEmpresa', 'email_contabil']) ? $value : mb_strtoupper($value, 'UTF-8');
-        });
+        $request = $this->formatarCamposRequest($request);
 
         return $campos->map(function ($item, $key) use($request){
-            return array_intersect_key($request->toArray(), array_fill_keys($item, ''));
+            return array_intersect_key($request, array_fill_keys($item, ''));
         })
         ->map(function ($valores, $classe) {
             return collect($valores)->mapWithKeys(function ($val, $campo) use($classe){
-                return [$this->limparNomeCamposAjax($classe, $campo) => $val];
+                if(!isset($val))
+                    return [$this->limparNomeCamposAjax($classe, $campo) => null];
+                return [$this->limparNomeCamposAjax($classe, $campo) => in_array($campo, ['checkEndEmpresa', 'email_contabil']) ? $val : mb_strtoupper($val, 'UTF-8')];
             });
         })
         ->toArray();
