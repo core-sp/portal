@@ -507,7 +507,7 @@ class PreRegistroTest extends TestCase
         {
             $preRegistro->preRegistro->update(['status' => $status]);
                 $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-                ->assertSeeText($preRegistro->preRegistro->status == PreRegistro::STATUS_CORRECAO ? 'Enviar' : 'Verificar Pendências');
+                ->assertSeeText($preRegistro->preRegistro->correcaoEnviada() ? 'Enviar' : 'Verificar Pendências');
         }
 
         $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
@@ -521,7 +521,7 @@ class PreRegistroTest extends TestCase
         {
             $preRegistro->preRegistro->update(['status' => $status]);
                 $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-                ->assertSeeText($preRegistro->preRegistro->status == PreRegistro::STATUS_CORRECAO ? 'Enviar' : 'Verificar Pendências');
+                ->assertSeeText($preRegistro->preRegistro->correcaoEnviada() ? 'Enviar' : 'Verificar Pendências');
         }
     }
 
@@ -2582,7 +2582,7 @@ class PreRegistroTest extends TestCase
         {
             $preRegistro->preRegistro->update(['status' => $status]);
                 $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))
-                ->assertSeeText($preRegistro->preRegistro->status == PreRegistro::STATUS_CORRECAO ? 'Enviar' : 'Verificar Pendências');
+                ->assertSeeText($preRegistro->preRegistro->correcaoEnviada() ? 'Enviar' : 'Verificar Pendências');
         }
 
         // PJ
@@ -2594,7 +2594,7 @@ class PreRegistroTest extends TestCase
         {
             $preRegistro->preRegistro->update(['status' => $status]);
                 $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 2]))
-                ->assertSeeText($preRegistro->preRegistro->status == PreRegistro::STATUS_CORRECAO ? 'Enviar' : 'Verificar Pendências');
+                ->assertSeeText($preRegistro->preRegistro->correcaoEnviada() ? 'Enviar' : 'Verificar Pendências');
         }
     }
 

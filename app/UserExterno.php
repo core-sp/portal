@@ -9,11 +9,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Notifications\UserExternoResetPasswordNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use App\Traits\PreRegistroApoio;
 
 class UserExterno extends Authenticatable
 {
     // use Notifiable;
-    use SoftDeletes;
+    use SoftDeletes, PreRegistroApoio;
 
     protected $guard = 'user_externo';
     protected $table = 'users_externo';
@@ -71,5 +72,10 @@ class UserExterno extends Authenticatable
     public function possuiLogin()
     {
         return $this->aceite == 1;
+    }
+
+    public function getCamposPreRegistro()
+    {
+        return collect($this->camposPjOuPf($this->isPessoaFisica()));
     }
 }

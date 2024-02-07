@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Traits\PreRegistroApoio;
 
 class PreRegistro extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, PreRegistroApoio;
 
     protected $table = 'pre_registros';
     protected $guarded = [];
@@ -22,6 +23,19 @@ class PreRegistro extends Model
     const STATUS_NEGADO = 'Negado';
     const MENU = 'Contabilidade,Dados Gerais,Endereço,Contato / RT,Canal de Relacionamento,Anexos';
     const TOTAL_HIST = 1;
+
+    private function atualizarCampoEspelho($request, $final)
+    {
+        if($this->correcaoEnviada())
+        {
+            $camposEspelho = $this->fromJson(isset($this->campos_espelho) ? $this->campos_espelho : '{}');
+            $dados = array_merge(array_diff_assoc($camposEspelho, $final), array_diff_assoc($final, $camposEspelho));
+            if(isset($dados['path']))
+                $dados['path'] = $final['path'];
+            $this->update(['campos_editados' => $this->asJson($dados)]);
+        }
+        $this->update(['campos_espelho' => $this->asJson($request)]);
+    }
 
     private function horaUpdateHistorico()
     {
@@ -446,14 +460,24 @@ class PreRegistro extends Model
         return $this->status == PreRegistro::STATUS_APROVADO;
     }
 
-    public function userPodeCorrigir()
+    public function correcaoEnviada()
     {
         return $this->status == PreRegistro::STATUS_CORRECAO;
     }
 
+    public function correcaoEmAnalise()
+    {
+        return $this->status == PreRegistro::STATUS_ANALISE_CORRECAO;
+    }
+
+    public function userPodeCorrigir()
+    {
+        return $this->correcaoEnviada();
+    }
+
     public function userPodeEditar()
     {
-        return ($this->status == PreRegistro::STATUS_CRIADO) || ($this->status == PreRegistro::STATUS_CORRECAO);
+        return ($this->status == PreRegistro::STATUS_CRIADO) || $this->correcaoEnviada();
     }
 
     public function atendentePodeEditar()
@@ -546,47 +570,40 @@ class PreRegistro extends Model
 
     public function setCamposEspelho($request)
     {
-        $anexos = $this->anexos;
-        $idAnexos = array();
-        foreach($anexos as $anexo)
-            array_push($idAnexos, $anexo->id);
-        $request['path'] = implode(',', $idAnexos);
+        $request = $this->formatarCamposRequest($request);
+        $idAnexos = isset($this->anexos) ? $this->anexos->pluck('id')->toArray() : array();
+        $request['path'] = !empty($idAnexos) ? implode(',', $idAnexos) : '';
         $final = $request;
 
         if(isset($this->campos_espelho))
         {
-            $campos = json_decode($this->campos_espelho, true);
-            $anexosAntigo = explode(',', $campos['path']);
-            foreach($idAnexos as $key => $id)
-                if(array_search($id, $anexosAntigo) !== false)
-                    unset($idAnexos[$key]);
+            $anexosAntigo = explode(',', $this->fromJson($this->campos_espelho)['path']);
+            $idAnexos = array_filter($idAnexos, function($v, $k) use($anexosAntigo) {
+                return !in_array($v, $anexosAntigo);
+            }, ARRAY_FILTER_USE_BOTH);
+
             if(!empty($idAnexos))
                 $final['path'] = implode(',', $idAnexos);
         }
 
-        if($this->status == PreRegistro::STATUS_CORRECAO)
-        {
-            $camposEspelho = isset($this->campos_espelho) ? json_decode($this->campos_espelho, true) : array();
-            $dados1 = array_diff_assoc($camposEspelho, $final);
-            $dados2 = array_diff_assoc($final, $camposEspelho);
-            $dados = array_merge($dados1, $dados2);
-            if(isset($dados['path']))
-                $dados['path'] = $final['path'];
-            $this->update(['campos_editados' => json_encode($dados, JSON_FORCE_OBJECT)]);
-        }
-        $this->update(['campos_espelho' => json_encode($request, JSON_FORCE_OBJECT)]);
+        $this->atualizarCampoEspelho($request, $final);
+    }
+
+    public function possuiCamposEditados()
+    {
+        if(isset($this->campos_editados))
+            return count($this->fromJson($this->campos_editados)) > 0;
+        return false;
     }
 
     public function getCamposEditados()
     {
-        if($this->status == PreRegistro::STATUS_ANALISE_CORRECAO)
-            return isset($this->campos_editados) ? json_decode($this->campos_editados, true) : array();
-        return array();
+        return $this->correcaoEmAnalise() && $this->possuiCamposEditados() ? $this->fromJson($this->campos_editados) : array();
     }
 
     public function confereJustificadosSubmit()
     {
-        return ($this->status != PreRegistro::STATUS_CORRECAO) || (($this->status == PreRegistro::STATUS_CORRECAO) && (strlen($this->campos_editados) > 5));
+        return !$this->correcaoEnviada() || ($this->correcaoEnviada() && $this->possuiCamposEditados());
     }
 
     public function getAbasCampos()
