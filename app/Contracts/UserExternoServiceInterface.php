@@ -3,7 +3,6 @@
 namespace App\Contracts;
 
 use App\Contabil;
-use App\UserExterno;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 // Sendo usados somente UserExterno e Contabil
 
@@ -21,5 +20,5 @@ interface UserExternoServiceInterface {
 
     public function verificaSeAtivo($tipo, $cpf_cnpj);
 
-    public function sendEmailCadastroPrevio(Contabil $contabil, UserExterno $externo);
+    public function cadastroPrevio($contabil, $dados_externo, $retorno_previo = false);
 }

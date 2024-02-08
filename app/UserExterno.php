@@ -84,4 +84,21 @@ class UserExterno extends Authenticatable
         $situacao = !$this->registroCancelado($naoCancelado) && $this->registroAtivo($ativo);
         return $this->isPessoaFisica() ? $situacao && (($assoc == $this->getCodigoPF()) || ($assoc == $this->getCodigoRT())) : $situacao && ($assoc == $this->getCodigoPJ());
     }
+
+    public function criarPreRegistro()
+    {
+        $resultado = $this->preRegistros()->create();
+        if(!$this->isPessoaFisica())
+        {
+            $pj = $resultado->pessoaJuridica()->create();
+            $pj->update(['historico_rt' => $this->asJson(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')])]);
+        }else
+            $resultado->pessoaFisica()->create();
+        $resultado->update([
+            'historico_contabil' => $this->asJson(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')]),
+            'historico_status' => $this->asJson([$resultado::STATUS_CRIADO . ';' . now()->format('Y-m-d H:i:s')])
+        ]);
+
+        return $resultado->fresh();
+    }
 }
