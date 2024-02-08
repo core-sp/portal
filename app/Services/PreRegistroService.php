@@ -9,15 +9,11 @@ use Illuminate\Support\Facades\Storage;
 use App\Events\ExternoEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PreRegistroMail;
-use App\Traits\Gerenti;
 use App\Traits\PreRegistroApoio;
 
 class PreRegistroService implements PreRegistroServiceInterface {
 
-    use Gerenti, PreRegistroApoio;
-
-    const RELATION_ANEXOS = "anexos";
-    const RELATION_PRE_REGISTRO = "preRegistro";
+    use PreRegistroApoio;
 
     public function verificacao($gerentiRepository, $externo)
     {
@@ -187,23 +183,11 @@ class PreRegistroService implements PreRegistroServiceInterface {
         if(!$preRegistro->userPodeEditar())
             throw new \Exception('Não autorizado a editar o formulário com a solicitação em análise ou finalizada', 401);
 
-        $resultado = null;
-        $objeto = null;
-        $classeCriar = array_search($request['classe'], $this->getRelacoes());
-
-        if(($request['classe'] != PreRegistroService::RELATION_ANEXOS) && ($request['classe'] != PreRegistroService::RELATION_PRE_REGISTRO))
-            $objeto = $preRegistro->has($request['classe'])->where('id', $preRegistro->id)->first();
-        
         $request['campo'] = $this->limparNomeCamposAjax($request['classe'], $request['campo']);
-        $gerenti = $request['campo'] == 'cpf' ? 
-            $this->getRTGerenti($request['classe'], $gerentiRepository, $request['valor']) : null;
+        $gerenti = $this->getRTGerenti($request['classe'], $gerentiRepository, $request['campo'] == 'cpf' ? $request['valor'] : '');
+        $resultado = $preRegistro->salvarAjax($request['classe'], $request['campo'], $request['valor'], $gerenti);
 
-        if(($request['classe'] == PreRegistroService::RELATION_PRE_REGISTRO) || isset($objeto))
-            $resultado = $preRegistro->atualizarAjax($request['classe'], $request['campo'], $request['valor'], $gerenti);
-        else
-            $resultado = $preRegistro->criarAjax($classeCriar, $request['classe'], $request['campo'], $request['valor'], $gerenti);
-
-        if(($request['classe'] == 'anexos') && isset($resultado->nome_original))
+        if(($request['classe'] == $this->getNomeClasses()[0]) && isset($resultado->nome_original))
         {
             $string = isset($contabil) ? 'Contabilidade com cnpj '.$contabil->cnpj.' realizou a operação para o Usuário Externo com ' : 'Usuário Externo com ';
             $string .= $externo->isPessoaFisica() ? 'cpf ' : 'cnpj ';

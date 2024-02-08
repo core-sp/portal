@@ -629,6 +629,7 @@ class PreRegistro extends Model
         ];
     }
 
+    // será privado
     public function atualizarAjax($classe, $campo, $valor, $gerenti)
     {
         $resultado = null;
@@ -689,9 +690,11 @@ class PreRegistro extends Model
         return $resultado;
     }
 
-    public function criarAjax($classe, $relacao, $campo, $valor, $gerenti)
+    // será privado
+    public function criarAjax($relacao, $campo, $valor, $gerenti)
     {
         $resultado = null;
+        $classe = array_search($relacao, $this->getRelacoes());
 
         switch ($relacao) {
             case 'pessoaJuridica.responsavelTecnico':
@@ -729,6 +732,17 @@ class PreRegistro extends Model
         }
 
         return $resultado;
+    }
+
+    public function salvarAjax($classe, $campo, $valor, $gerenti)
+    {
+        if(($classe != $this->getNomeClasses()[0]) && ($classe != $this->getNomeClasses()[4]))
+            return !$this->has($classe)->where('id', $this->id)->exists() ? $this->criarAjax($classe, $campo, $valor, $gerenti) : $this->atualizarAjax($classe, $campo, $valor, $gerenti);
+
+        if($classe == $this->getNomeClasses()[4])
+            return $this->atualizarAjax($classe, $campo, $valor, $gerenti);
+
+        return $this->criarAjax($classe, $campo, $valor, $gerenti);
     }
 
     public function salvar($classe, $arrayCampos, $gerenti)
