@@ -24,24 +24,21 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $gerenti = null;
 
         // Registro não pode estar cancelado; deve estar ativo; e se for pf busca pelo codigo de pf e rt, e pj pelo codigo pj
-        if(count($resultadosGerenti) > 0)
-            foreach($resultadosGerenti as $resultado)
+        foreach($resultadosGerenti as $resultado)
+        {
+            $possuiRegistro = $externo->possuiRegistroAtivo($resultado["ASS_TP_ASSOC"], $resultado['CANCELADO'], $resultado['ASS_ATIVO']);
+            if($possuiRegistro)
             {
-                $naoCancelado = $resultado['CANCELADO'] == "F";
-                $ativo = $resultado['ASS_ATIVO'] == "T";
-                $pf = $externo->isPessoaFisica() && (($resultado["ASS_TP_ASSOC"] == $this->getCodigoPF()) || ($resultado["ASS_TP_ASSOC"] == $this->getCodigoRT()));
-                $pj = !$externo->isPessoaFisica() && ($resultado["ASS_TP_ASSOC"] == $this->getCodigoPJ());
-                if($naoCancelado && $ativo && ($pf || $pj))
-                {
-                    $gerenti = $resultado['ASS_REGISTRO'];
+                $gerenti = $resultado['ASS_REGISTRO'];
                     
-                    $string = 'Usuário Externo com ';
-                    $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
-                    $string .= $externo->cpf_cnpj . ', não pode realizar a solicitação de registro ';
-                    $string .= 'devido constar no GERENTI um registro ativo : ' . formataRegistro($resultado['ASS_REGISTRO']);
-                    event(new ExternoEvent($string));
-                }
+                $string = 'Usuário Externo com ';
+                $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
+                $string .= $externo->cpf_cnpj . ', não pode realizar a solicitação de registro ';
+                $string .= 'devido constar no GERENTI um registro ativo : ' . formataRegistro($resultado['ASS_REGISTRO']);
+                event(new ExternoEvent($string));
+                break;
             }
+        }
 
         return [
             'gerenti' => $gerenti,

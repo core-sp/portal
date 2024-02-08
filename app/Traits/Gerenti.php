@@ -19,6 +19,16 @@ trait Gerenti {
         return 5;
     }
 
+    public function registroAtivo($resultado)
+    {
+        return $resultado == "T";
+    }
+
+    public function registroCancelado($resultado)
+    {
+        return $resultado == "T";
+    }
+
     public function getTipoPessoaByCodigo($codigo)
     {
         switch ($codigo) {

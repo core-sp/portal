@@ -130,24 +130,22 @@ trait PreRegistroApoio {
 
         $resultadosGerenti = $gerentiRepository->gerentiBusca("", null, $cpf);
         $ass_id = null;
-        $nome = null;
         $gerenti = array();
 
         // Para testar: colocar 5 em "ASS_TP_ASSOC" em gerentiBusca() em GerentiRepositoryMock
-        if(count($resultadosGerenti) > 0)
-            foreach($resultadosGerenti as $resultado)
-            {
-                $naoCancelado = $resultado['CANCELADO'] == "F";
-                $ativo = $resultado['ASS_ATIVO'] == "T";
-                $tipo = $resultado["ASS_TP_ASSOC"] == $this->getCodigoRT();
+        foreach($resultadosGerenti as $resultado)
+        {
+            $naoCancelado = $resultado['CANCELADO'] == "F";
+            $ativo = $resultado['ASS_ATIVO'] == "T";
+            $tipo = $resultado["ASS_TP_ASSOC"] == $this->getCodigoRT();
 
-                if($naoCancelado && $ativo && $tipo)
-                {
-                    $ass_id = $resultado["ASS_ID"];
-                    $gerenti['nome'] = $resultado["ASS_NOME"];
-                    $gerenti['registro'] = apenasNumeros($resultado["ASS_REGISTRO"]);
-                }
+            if($naoCancelado && $ativo && $tipo)
+            {
+                $ass_id = $resultado["ASS_ID"];
+                $gerenti['nome'] = $resultado["ASS_NOME"];
+                $gerenti['registro'] = apenasNumeros($resultado["ASS_REGISTRO"]);
             }
+        }
         
         if(isset($ass_id))
         {

@@ -78,4 +78,10 @@ class UserExterno extends Authenticatable
     {
         return collect($this->camposPjOuPf($this->isPessoaFisica()));
     }
+
+    public function possuiRegistroAtivo($assoc, $naoCancelado, $ativo)
+    {
+        $situacao = !$this->registroCancelado($naoCancelado) && $this->registroAtivo($ativo);
+        return $this->isPessoaFisica() ? $situacao && (($assoc == $this->getCodigoPF()) || ($assoc == $this->getCodigoRT())) : $situacao && ($assoc == $this->getCodigoPJ());
+    }
 }
