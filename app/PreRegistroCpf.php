@@ -14,6 +14,13 @@ class PreRegistroCpf extends Model
     protected $guarded = [];
     protected $touches = ['preRegistro'];
 
+    public function atualizarFinal($campo, $valor)
+    {
+        $this->update([$campo => $valor]);
+
+        return null;
+    }
+
     public static function camposPreRegistro()
     {
         return [

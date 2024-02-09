@@ -59,6 +59,21 @@ class Anexo extends Model
         ];
     }
 
+    protected static function criarFinal($campo, $valor, $pr)
+    {
+        $resultado = null;
+        $anexos = $pr->anexos();
+        $valido = self::armazenar($anexos->count(), $valor, $pr->id, $pr->userExterno->isPessoaFisica());
+        if(isset($valido))
+        {
+            $resultado = $anexos->create($valido);
+            $pr->touch();
+        }else
+            $resultado = $valido;
+        
+        return $resultado;
+    }
+
     public static function camposPreRegistro()
     {
         return [

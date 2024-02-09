@@ -12,6 +12,40 @@ class ResponsavelTecnico extends Model
     protected $table = 'responsaveis_tecnicos';
     protected $guarded = [];
 
+    protected static function criarFinal($campo, $valor, $gerenti, $pr)
+    {
+        $valido = $campo == 'cpf' ? self::buscar($valor, $gerenti, $pr->pessoaJuridica->getHistoricoCanEdit()) : null;
+        if(isset($valido))
+        {
+            if($valido == 'notUpdate')
+                $valido = ['update' => $pr->pessoaJuridica->getNextUpdateHistorico()];
+            else
+                $pr->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id, 'historico_rt' => $pr->pessoaJuridica->setHistorico()]);
+        }
+
+        return $valido;
+    }
+
+    public function atualizarFinal($campo, $valor, $gerenti, $pj)
+    {
+        $valido = $this->validarUpdateAjax($campo, $valor, $gerenti, $pj->getHistoricoCanEdit());
+        if(isset($valido))
+        {
+            if($valido == 'notUpdate')
+                $valido = ['update' => $pj->getNextUpdateHistorico()];
+            else
+                $valido == 'remover' ? $pj->update(['responsavel_tecnico_id' => null]) : 
+                $pj->update(['responsavel_tecnico_id' => $valido->id, 'historico_rt' => $pj->setHistorico()]);
+        }
+        else
+        {
+            $this->updateAjax($campo, $valor);
+            $pj->preRegistro->touch();
+        }
+
+        return $valido;
+    }
+
     public static function camposPreRegistro()
     {
         return [

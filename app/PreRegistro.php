@@ -46,22 +46,36 @@ class PreRegistro extends Model
         return $updateCarbon;
     }
 
-    private function setHistorico()
+    protected function atualizarFinal($campo, $valor)
+    {
+        $resultado = null;
+        $valido = $this->validarUpdateAjax($campo, $valor);
+        if(isset($valido))
+        {
+            $this->update($valido);
+            if(in_array($campo, ['cep', 'logradouro', 'numero', 'complemento', 'cidade', 'uf']) && !$this->userExterno->isPessoaFisica())
+                $resultado = $this->pessoaJuridica->mesmoEndereco();
+        }
+
+        return $resultado;
+    }
+
+    public function setHistorico()
     {
         $array = $this->getHistoricoArray();
-        $totalTentativas = intval($array['tentativas']) < PreRegistro::TOTAL_HIST;
+        $totalTentativas = intval($array['tentativas']) < self::TOTAL_HIST;
 
         if($totalTentativas)
             $array['tentativas'] = intval($array['tentativas']) + 1;
         $array['update'] = now()->format('Y-m-d H:i:s');
 
-        return json_encode($array, JSON_FORCE_OBJECT);
+        return $this->asJson($array);
     }
 
-    private function getHistoricoCanEdit()
+    public function getHistoricoCanEdit()
     {
         $array = $this->getHistoricoArray();
-        $can = intval($array['tentativas']) < PreRegistro::TOTAL_HIST;
+        $can = intval($array['tentativas']) < self::TOTAL_HIST;
         $horaUpdate = $this->horaUpdateHistorico();
         
         return $can || (!$can && ($horaUpdate < now()));
@@ -627,111 +641,6 @@ class PreRegistro extends Model
             'tipo_telefone,telefone,opcional_celular,tipo_telefone_1,telefone_1,opcional_celular_1',
             'path',
         ];
-    }
-
-    // será privado
-    public function atualizarAjax($classe, $campo, $valor, $gerenti)
-    {
-        $resultado = null;
-        
-        switch ($classe) {
-            case 'preRegistro':
-                $valido = $this->validarUpdateAjax($campo, $valor);
-                if(isset($valido))
-                {
-                    $this->update($valido);
-                    if(in_array($campo, ['cep', 'logradouro', 'numero', 'complemento', 'cidade', 'uf']) && !$this->userExterno->isPessoaFisica())
-                        $resultado = $this->pessoaJuridica->mesmoEndereco();
-                }
-                break;
-            case 'pessoaFisica':
-                $this->pessoaFisica->update([$campo => $valor]);
-                break;
-            case 'pessoaJuridica':
-                $valido = $this->pessoaJuridica->validarUpdateAjax($campo, $valor);
-                $this->pessoaJuridica->update($valido);
-                break;
-            case 'contabil':
-                $valido = $this->contabil->validarUpdateAjax($campo, $valor, $this->getHistoricoCanEdit());
-                if(isset($valido))
-                {
-                    if($valido == 'notUpdate')
-                        $valido = ['update' => $this->getNextUpdateHistorico()];
-                    else
-                        $valido == 'remover' ? $this->update(['contabil_id' => null]) : 
-                        $this->update(['contabil_id' => $valido->id, 'historico_contabil' => $this->setHistorico()]);
-                }
-                else
-                {
-                    $this->contabil->updateAjax($campo, $valor);
-                    $this->touch();
-                }
-                $resultado = $valido;
-                break;
-            case 'pessoaJuridica.responsavelTecnico':
-                $valido = $this->pessoaJuridica->responsavelTecnico->validarUpdateAjax($campo, $valor, $gerenti, $this->pessoaJuridica->getHistoricoCanEdit());
-                if(isset($valido))
-                {
-                    if($valido == 'notUpdate')
-                        $valido = ['update' => $this->pessoaJuridica->getNextUpdateHistorico()];
-                    else
-                        $valido == 'remover' ? $this->pessoaJuridica->update(['responsavel_tecnico_id' => null]) : 
-                        $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id, 'historico_rt' => $this->pessoaJuridica->setHistorico()]);
-                }
-                else
-                {
-                    $this->pessoaJuridica->responsavelTecnico->updateAjax($campo, $valor);
-                    $this->touch();
-                }
-                $resultado = $valido;
-                break;
-        }
-
-        return $resultado;
-    }
-
-    // será privado
-    public function criarAjax($relacao, $campo, $valor, $gerenti)
-    {
-        $resultado = null;
-        $classe = array_search($relacao, $this->getRelacoes());
-
-        switch ($relacao) {
-            case 'pessoaJuridica.responsavelTecnico':
-                $valido = $campo == 'cpf' ? $classe::buscar($valor, $gerenti, $this->pessoaJuridica->getHistoricoCanEdit()) : null;
-                if(isset($valido))
-                {
-                    if($valido == 'notUpdate')
-                        $valido = ['update' => $this->pessoaJuridica->getNextUpdateHistorico()];
-                    else
-                        $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id, 'historico_rt' => $this->pessoaJuridica->setHistorico()]);
-                }
-                $resultado = $valido;
-                break;
-            case 'contabil':
-                $valido = $campo == 'cnpj' ? $classe::buscar($valor, $this->getHistoricoCanEdit()) : null;
-                if(isset($valido))
-                {
-                    if($valido == 'notUpdate')
-                        $valido = ['update' => $this->getNextUpdateHistorico()];
-                    else
-                        $this->update(['contabil_id' => $valido->id, 'historico_contabil' => $this->setHistorico()]);
-                }
-                $resultado = $valido;
-                break;
-            case 'anexos':
-                $anexos = $this->anexos();
-                $valido = $classe::armazenar($anexos->count(), $valor, $this->id, $this->userExterno->isPessoaFisica());
-                if(isset($valido))
-                {
-                    $resultado = $anexos->create($valido);
-                    $this->touch();
-                }else
-                    $resultado = $valido;
-                break;
-        }
-
-        return $resultado;
     }
 
     public function salvarAjax($classe, $campo, $valor, $gerenti)

@@ -25,6 +25,14 @@ class PreRegistroCnpj extends Model
         return $updateCarbon;
     }
 
+    public function atualizarFinal($campo, $valor)
+    {
+        $valido = $this->validarUpdateAjax($campo, $valor);
+        $this->update($valido);
+
+        return null;
+    }
+
     public static function camposPreRegistro()
     {
         return [
@@ -62,7 +70,7 @@ class PreRegistroCnpj extends Model
     public function getHistoricoCanEdit()
     {
         $array = $this->getHistoricoArray();
-        $can = intval($array['tentativas']) < PreRegistroCnpj::TOTAL_HIST;
+        $can = intval($array['tentativas']) < self::TOTAL_HIST;
         $horaUpdate = $this->horaUpdateHistorico();
 
         return $can || (!$can && ($horaUpdate < now()));
@@ -70,7 +78,7 @@ class PreRegistroCnpj extends Model
 
     public function getHistoricoArray()
     {
-        return isset($this->historico_rt) ? json_decode($this->historico_rt, true) : array();
+        return $this->fromJson(isset($this->historico_rt) ? $this->historico_rt : array());
     }
 
     public function getNextUpdateHistorico()
@@ -81,13 +89,13 @@ class PreRegistroCnpj extends Model
     public function setHistorico()
     {
         $array = $this->getHistoricoArray();
-        $totalTentativas = intval($array['tentativas']) < PreRegistroCnpj::TOTAL_HIST;
+        $totalTentativas = intval($array['tentativas']) < self::TOTAL_HIST;
 
         if($totalTentativas)
             $array['tentativas'] = intval($array['tentativas']) + 1;
         $array['update'] = now()->format('Y-m-d H:i:s');
 
-        return json_encode($array, JSON_FORCE_OBJECT);
+        return $this->asJson($array);
     }
 
     public function mesmoEndereco()

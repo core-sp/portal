@@ -15,6 +15,46 @@ trait PreRegistroApoio {
     private $relation_pj = "pessoaJuridica";
     private $relation_pre_registro = "preRegistro";
     private $relation_rt = "pessoaJuridica.responsavelTecnico";
+
+    private function criarAjax($relacao, $campo, $valor, $gerenti)
+    {
+        $classe = array_search($relacao, $this->getRelacoes());
+
+        switch ($relacao) {
+            case $this->relation_rt:
+                return $classe::criarFinal($campo, $valor, $gerenti, $this);
+                break;
+            case $this->relation_contabil:
+            case $this->relation_anexos:
+                return $classe::criarFinal($campo, $valor, $this);
+                break;
+            default:
+                return null;
+        }
+    }
+
+    private function atualizarAjax($classe, $campo, $valor, $gerenti)
+    {
+        switch ($classe) {
+            case $this->relation_pre_registro:
+                return $this->atualizarFinal($campo, $valor);
+                break;
+            case $this->relation_pf:
+            case $this->relation_pj:
+                return $this->loadMissing($classe)[$classe]->atualizarFinal($campo, $valor);
+                break;
+            case $this->relation_contabil:
+                $pr = $this;
+                return $this->loadMissing($classe)[$classe]->atualizarFinal($campo, $valor, $pr);
+                break;
+            case $this->relation_rt:
+                $pj = $this->loadMissing($classe)->pessoaJuridica;
+                return $pj->responsavelTecnico->atualizarFinal($campo, $valor, $gerenti, $pj);
+                break;
+            default:
+                return null;
+        }
+    }
     
     public function getRelacoes()
     {

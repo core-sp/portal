@@ -20,6 +20,40 @@ class Contabil extends Authenticatable
     protected $guarded = [];
     protected $hidden = ['password', 'remember_token'];
 
+    protected static function criarFinal($campo, $valor, $pr)
+    {
+        $valido = $campo == 'cnpj' ? self::buscar($valor, $pr->getHistoricoCanEdit()) : null;
+        if(isset($valido))
+        {
+            if($valido == 'notUpdate')
+                $valido = ['update' => $pr->getNextUpdateHistorico()];
+            else
+                $pr->update(['contabil_id' => $valido->id, 'historico_contabil' => $pr->setHistorico()]);
+        }
+
+        return $valido;
+    }
+
+    public function atualizarFinal($campo, $valor, $pr)
+    {
+        $valido = $this->validarUpdateAjax($campo, $valor, $pr->getHistoricoCanEdit());
+        if(isset($valido))
+        {
+            if($valido == 'notUpdate')
+                $valido = ['update' => $pr->getNextUpdateHistorico()];
+            else
+                $valido == 'remover' ? $pr->update(['contabil_id' => null]) : 
+                $pr->update(['contabil_id' => $valido->id, 'historico_contabil' => $pr->setHistorico()]);
+        }
+        else
+        {
+            $this->updateAjax($campo, $valor);
+            $pr->touch();
+        }
+
+        return $valido;
+    }
+
     public function sendPasswordResetNotification($token)
     {
         // $this->notify(new UserExternoResetPasswordNotification($token));
