@@ -62,8 +62,34 @@ trait PreRegistroApoio {
         return $campo;
     }
 
-    public function formatarCamposRequest($request)
+    public function formatarCamposRequest($request, $admin = false)
     {
+        if($admin)
+        {
+            $campo = $request['campo'];
+            $valor = $request['valor'];
+            $classe = 'preRegistro';
+
+            if($request['acao'] != 'editar')
+            {
+                $campo = $request['acao'] == 'justificar' ? 'justificativa' : 'confere_anexos';
+                $valor = $request['acao'] == 'justificar' ? ['campo' => $request['campo'], 'valor' => $request['valor']] : $request['valor'];
+            }
+            
+            switch ($campo) {
+                case 'justificativa':
+                case 'confere_anexos':
+                case 'registro_secundario':
+                    $classe = 'preRegistro';
+                    break;
+                case 'registro':
+                    $classe = 'pessoaJuridica.responsavelTecnico';
+                    break;
+            }
+            
+            return ['classe' => $classe, 'campo' => $campo, 'valor' => $valor];
+        }
+
         $request['opcional_celular'] = isset($request['opcional_celular']) ? implode(',', $request['opcional_celular']) : null;
         if(isset($request['opcional_celular_1']))
             $request['opcional_celular_1'] = implode(',', $request['opcional_celular_1']);

@@ -10,8 +10,11 @@ use App\Mail\PreRegistroMail;
 use App\Events\CrudEvent;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use App\Traits\PreRegistroApoio;
 
 class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface {
+
+    use PreRegistroApoio;
 
     private $variaveis;
 
@@ -252,23 +255,9 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         if(!$preRegistro->atendentePodeEditar())
             throw new \Exception('Não autorizado a editar o pré-registro sendo elaborado, aguardando correção ou finalizado', 401);
 
-        $campo = $request['campo'];
-        $valor = $request['valor'];
+        $dados = $this->formatarCamposRequest($request, true);
 
-        if($request['acao'] != 'editar')
-        {
-            $campo = $request['acao'] == 'justificar' ? 'justificativa' : 'confere_anexos';
-            $valor = $request['acao'] == 'justificar' ? ['campo' => $request['campo'], 'valor' => $request['valor']] : $request['valor'];
-        }
-            
-        $camposCanEdit = [
-            'justificativa' => 'preRegistro',
-            'confere_anexos' => 'preRegistro',
-            'registro_secundario' => 'preRegistro',
-            'registro' => 'pessoaJuridica.responsavelTecnico',
-        ];
-
-        $preRegistro->atualizarAjax($camposCanEdit[$campo], $campo, $valor, null);
+        $preRegistro->salvarAjax($dados['classe'], $dados['campo'], $dados['valor'], null);
         $preRegistro->update(['idusuario' => $user->idusuario]);
         event(new CrudEvent('pré-registro', 'fez a ação de "' . $request['acao'] . '" o campo "' . $request['campo'] . '", inserindo ou removendo valor', $preRegistro->id));
 
@@ -288,7 +277,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         $preRegistro->update(['idusuario' => $user->idusuario, 'status' => $status]);
         $preRegistro->setHistoricoStatus();
         $preRegistro->setHistoricoJustificativas();
-        $preRegistro->fresh();
+        $preRegistro = $preRegistro->fresh();
 
         Mail::to($preRegistro->userExterno->email)->queue(new PreRegistroMail($preRegistro));
         if(isset($preRegistro->contabil) && $preRegistro->contabil->possuiLogin())
