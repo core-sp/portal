@@ -197,7 +197,7 @@ class PreRegistro extends Model
         return $final;
     }
 
-    private function validarUpdate($arrayCampos)
+    private function finalArray($arrayCampos)
     {
         $camposObrig = [
             'tipo_telefone' => [
@@ -226,7 +226,7 @@ class PreRegistro extends Model
             $arrayCampos[$key] = implode(';', $camposObrig[$key]);
         }
 
-        return $arrayCampos;
+        return $this->update($arrayCampos);
     }
 
     private static function colorLabelStatusAdmin()
@@ -625,6 +625,11 @@ class PreRegistro extends Model
         return !$this->correcaoEnviada() || ($this->correcaoEnviada() && $this->possuiCamposEditados());
     }
 
+    public function getEndereco()
+    {
+        return $this->only(['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf']);
+    }
+
     public function getAbasCampos()
     {
         $pf = 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade_cidade,naturalidade_estado,nome_mae,nome_pai,tipo_identidade,identidade,orgao_emissor,dt_expedicao,titulo_eleitor,zona,secao,ra_reservista';
@@ -643,8 +648,14 @@ class PreRegistro extends Model
         ];
     }
 
-    public function salvarAjax($classe, $campo, $valor, $gerenti)
+    public function salvarAjax($request, $gerentiRepository)
     {
+        $classe = $request['classe'];
+        $request['campo'] = $this->limparNomeCamposAjax($request['classe'], $request['campo']);
+        $gerenti = isset($gerentiRepository) ? $this->getRTGerenti($request['classe'], $gerentiRepository, $request['campo'] == 'cpf' ? $request['valor'] : '') : null;
+        $campo = $request['campo'];
+        $valor = $request['valor'];
+
         if(($classe != $this->getNomeClasses()[0]) && ($classe != $this->getNomeClasses()[4]))
             return !$this->has($classe)->where('id', $this->id)->exists() ? $this->criarAjax($classe, $campo, $valor, $gerenti) : $this->atualizarAjax($classe, $campo, $valor, $gerenti);
 
@@ -654,42 +665,27 @@ class PreRegistro extends Model
         return $this->criarAjax($classe, $campo, $valor, $gerenti);
     }
 
-    public function salvar($classe, $arrayCampos, $gerenti)
+    public function salvar($request, $gerentiRepository)
     {
-        $resultado = null;
-        $valido = null;
-        $criar = $classe != 'preRegistro' ? array_search($classe, $this->getRelacoes()) : null;
-        if(isset($criar) && !$this->has($classe)->where('id', $this->id)->exists())
-            $valido = $criar::atualizar($arrayCampos, $gerenti);
-        
-        switch ($classe) {
-            case 'preRegistro':
-                $valido = $this->validarUpdate($arrayCampos);
-                $resultado = $this->update($valido);
-                break;
-            case 'pessoaFisica':
-                $resultado = $this->pessoaFisica->update($arrayCampos);
-                break;
-            case 'pessoaJuridica':
-                $valido = $this->pessoaJuridica->validarUpdate($arrayCampos);
-                $resultado = $this->pessoaJuridica->update($valido);
-                break;
-            case 'contabil':
-                if(!isset($valido))
-                    $valido = $this->contabil->atualizar($arrayCampos);
-                $resultado = $this->update(['contabil_id' => $valido == 'remover' ? null : $valido->id]);
-                $this->touch();
-                break;
-            case 'pessoaJuridica.responsavelTecnico':
-                if(!isset($valido))
-                    $valido = $this->pessoaJuridica->responsavelTecnico->atualizar($arrayCampos, $gerenti);
-                $resultado = $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido == 'remover' ? null : $valido->id]);
-                $this->touch();
-                break;
-        }
+        try{
+            $camposLimpos = $this->getCamposLimpos($request, $this->userExterno->getCamposPreRegistro());
+            unset($request);
 
-        if(!isset($resultado))
-            throw new \Exception('Não salvou os dados do pré-registro com id ' .$this->id. ' em ' . $classe, 500);
+            foreach($camposLimpos as $classe => $arrayCampos)
+                $resultado = $this->salvarArray($classe, $arrayCampos, $this->getRTGerenti($classe, $gerentiRepository, isset($arrayCampos['cpf']) ? $arrayCampos['cpf'] : ''));
+
+            unset($camposLimpos);
+            $status = $this->criado() ? self::STATUS_ANALISE_INICIAL : self::STATUS_ANALISE_CORRECAO;
+            $resultado = $this->update(['status' => $status]);
+
+            if(!$resultado)
+                throw new \Exception('Não atualizou o status da solicitação de registro', 500);
+
+            $this->setHistoricoStatus();
+            $resultado = $status;
+        }catch(\Throwable $e){
+            throw new \Exception('Erro ao salvar dados finais do pré-registro com id ' . $this->id . ' na classe: ' . $classe .', com a seguinte mensagem: ' . $e->getMessage(), 500);
+        }
 
         return $resultado;
     }

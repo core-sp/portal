@@ -129,24 +129,15 @@ class PreRegistroCnpj extends Model
         return [$campo => $valor];
     }
 
-    public function validarUpdate($arrayCampos)
+    public function finalArray($arrayCampos)
     {
         if(isset($arrayCampos['checkEndEmpresa']))
         {
             if($arrayCampos['checkEndEmpresa'] == 'on')
-            {
-                $preRegistro = $this->preRegistro;
-                $arrayCampos['cep'] = $preRegistro->cep;
-                $arrayCampos['logradouro'] = $preRegistro->logradouro;
-                $arrayCampos['numero'] = $preRegistro->numero;
-                $arrayCampos['complemento'] = $preRegistro->complemento; 
-                $arrayCampos['bairro'] = $preRegistro->bairro;
-                $arrayCampos['cidade'] = $preRegistro->cidade; 
-                $arrayCampos['uf'] = $preRegistro->uf;
-            }
+                $arrayCampos = array_merge($arrayCampos, $this->preRegistro->getEndereco());
             unset($arrayCampos['checkEndEmpresa']);
         }
 
-        return $arrayCampos;
+        return $this->update($arrayCampos);
     }
 }

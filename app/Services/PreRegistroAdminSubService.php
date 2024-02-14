@@ -257,7 +257,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
 
         $dados = $this->formatarCamposRequest($request, true);
 
-        $preRegistro->salvarAjax($dados['classe'], $dados['campo'], $dados['valor'], null);
+        $preRegistro->salvarAjax($dados, null);
         $preRegistro->update(['idusuario' => $user->idusuario]);
         event(new CrudEvent('pré-registro', 'fez a ação de "' . $request['acao'] . '" o campo "' . $request['campo'] . '", inserindo ou removendo valor', $preRegistro->id));
 

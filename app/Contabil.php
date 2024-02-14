@@ -83,9 +83,9 @@ class Contabil extends Authenticatable
             if(isset($canEdit) && !$canEdit)
                 return 'notUpdate';
 
-            $existe = Contabil::where('cnpj', $cnpj)->first();
+            $existe = self::where('cnpj', $cnpj)->first();
 
-            return isset($existe) ? $existe->makeHidden(['verify_token']) : Contabil::create(['cnpj' => $cnpj]);
+            return isset($existe) ? $existe->makeHidden(['verify_token']) : self::create(['cnpj' => $cnpj]);
         }
 
         return null;
@@ -109,20 +109,24 @@ class Contabil extends Authenticatable
             $campo != 'cnpj' ? $this->update([$campo => $valor]) : null;
     }
 
-    public static function atualizar($arrayCampos)
+    public function finalArray($arrayCampos, $pr)
     {
+        $resultado = 'remover';
+
         if(isset($arrayCampos['cnpj']) && (strlen($arrayCampos['cnpj']) == 14))
         {
-            $contabil = Contabil::buscar($arrayCampos['cnpj']);
-            if(!$contabil->possuiLogin())
+            $resultado = '';
+            if(!$this->possuiLogin())
             {
                 unset($arrayCampos['cnpj']);
-                $contabil->update($arrayCampos);
+                $this->update($arrayCampos);
             }
-            return $contabil;
         }
 
-        return 'remover';
+        $resultado = $pr->update(['contabil_id' => $resultado == 'remover' ? null : $this->id]);
+        $pr->touch();
+
+        return $resultado;
     }
 
     public function podeAtivar()

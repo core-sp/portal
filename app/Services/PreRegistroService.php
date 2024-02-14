@@ -169,9 +169,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         if(!$preRegistro->userPodeEditar())
             throw new \Exception('Não autorizado a editar o formulário com a solicitação em análise ou finalizada', 401);
 
-        $request['campo'] = $this->limparNomeCamposAjax($request['classe'], $request['campo']);
-        $gerenti = $this->getRTGerenti($request['classe'], $gerentiRepository, $request['campo'] == 'cpf' ? $request['valor'] : '');
-        $resultado = $preRegistro->salvarAjax($request['classe'], $request['campo'], $request['valor'], $gerenti);
+        $resultado = $preRegistro->salvarAjax($request, $gerentiRepository);
 
         if(($request['classe'] == $this->getNomeClasses()[0]) && isset($resultado->nome_original))
         {
@@ -208,20 +206,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 'class' => 'alert-danger'
             ];
 
-        $camposLimpos = $this->getCamposLimpos($request, $preRegistro->userExterno->getCamposPreRegistro());
-
-        foreach($camposLimpos as $key => $arrayCampos)
-            $resultado = $preRegistro->salvar($key, $arrayCampos, $this->getRTGerenti($key, $gerentiRepository, isset($arrayCampos['cpf']) ? $arrayCampos['cpf'] : ''));
-
-        unset($camposLimpos);
+        $status = $preRegistro->salvar($request, $gerentiRepository);
         
-        $status = $preRegistro->criado() ? $preRegistro::STATUS_ANALISE_INICIAL : $preRegistro::STATUS_ANALISE_CORRECAO;
-        $resultado = $preRegistro->update(['status' => $status]);
-        
-        if(!$resultado)
-            throw new \Exception('Não atualizou o status da solicitação de registro com id '.$preRegistro->id.' para ' . $status, 500);
-        
-        $preRegistro->setHistoricoStatus();
         Mail::to($externo->email)->queue(new PreRegistroMail($preRegistro->fresh()));
         if(isset($preRegistro->contabil) && $preRegistro->contabil->possuiLogin())
             Mail::to($preRegistro->contabil->email)->queue(new PreRegistroMail($preRegistro->fresh()));

@@ -87,10 +87,10 @@ class ResponsavelTecnico extends Model
             if(isset($canEdit) && !$canEdit)
                 return 'notUpdate';
 
-            $existe = ResponsavelTecnico::where('cpf', $cpf)->first();
+            $existe = self::where('cpf', $cpf)->first();
 
             if(!isset($existe))
-                $existe = isset($gerenti["registro"]) ? ResponsavelTecnico::create($gerenti) : ResponsavelTecnico::create(['cpf' => $cpf]);
+                $existe = isset($gerenti["registro"]) ? self::create($gerenti) : self::create(['cpf' => $cpf]);
 
             return $existe;
         }
@@ -116,16 +116,19 @@ class ResponsavelTecnico extends Model
             $this->update([$campo => $valor]);
     }
 
-    public static function atualizar($arrayCampos, $gerenti)
+    public function finalArray($arrayCampos, $pj)
     {
+        $resultado = 'remover';
+
         if(isset($arrayCampos['cpf']) && (strlen($arrayCampos['cpf']) == 11))
         {
-            $rt = ResponsavelTecnico::buscar($arrayCampos['cpf'], $gerenti);
             unset($arrayCampos['cpf']);
-            $rt->update($arrayCampos);
-            return $rt;
+            $resultado = $this->update($arrayCampos);
         }
 
-        return 'remover';
+        $resultado = $pj->update(['responsavel_tecnico_id' => $resultado == 'remover' ? null : $this->id]);
+        $pj->preRegistro->touch();
+
+        return $resultado;
     }
 }

@@ -53,4 +53,9 @@ class PreRegistroCpf extends Model
     {
         return $this->dt_nascimento <= Carbon::today()->subYears(46)->format('Y-m-d');
     }
+
+    public function finalArray($arrayCampos)
+    {
+        return $this->update($arrayCampos);
+    }
 }

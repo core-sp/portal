@@ -37,11 +37,10 @@ trait PreRegistroApoio {
     {
         switch ($classe) {
             case $this->relation_pre_registro:
-                return $this->atualizarFinal($campo, $valor);
-                break;
             case $this->relation_pf:
             case $this->relation_pj:
-                return $this->loadMissing($classe)[$classe]->atualizarFinal($campo, $valor);
+                $temp = $classe == $this->relation_pre_registro ? $this : $this->loadMissing($classe)[$classe];
+                return isset($temp) ? $temp->atualizarFinal($campo, $valor) : null;
                 break;
             case $this->relation_contabil:
                 $pr = $this;
@@ -54,6 +53,32 @@ trait PreRegistroApoio {
             default:
                 return null;
         }
+    }
+
+    private function salvarArray($classe, $arrayCampos, $gerenti)
+    {
+        $nome_classe = array_search($classe, $this->getRelacoes());
+        $obj_existe = ($classe == $this->relation_contabil) || ($classe == $this->relation_rt) ? $this->has($classe)->where('id', $this->id)->exists() : true;
+
+        switch ($classe) {
+            case $this->relation_pre_registro:
+            case $this->relation_pf:
+            case $this->relation_pj:
+                $temp = $this->relation_pre_registro == $classe ? $this : $this->loadMissing($classe)[$classe];
+                return $temp->finalArray($arrayCampos);
+                break;
+            case $this->relation_contabil:
+                $temp = !$obj_existe ? $nome_classe::buscar($arrayCampos['cnpj']) : $this->loadMissing($classe)[$classe];
+                return isset($temp) ? $temp->finalArray($arrayCampos, $this) : false;
+                break;
+            case $this->relation_rt:
+                $pj = $this->loadMissing($classe)->pessoaJuridica;
+                $temp = !$obj_existe ? $nome_classe::buscar($arrayCampos['cpf'], $gerenti) : $pj->responsavelTecnico;
+                return isset($temp) ? $temp->finalArray($arrayCampos, $pj) : false;
+                break;
+        }
+
+        throw new \Exception('Classe não está configurada para ser salva no array final', 500);
     }
     
     public function getRelacoes()
