@@ -20,6 +20,24 @@ class Contabil extends Authenticatable
     protected $guarded = [];
     protected $hidden = ['password', 'remember_token'];
 
+    private function validarUpdateAjax($campo, $valor, $canEdit = null)
+    {
+        if($campo == 'cnpj')
+        {
+            if(isset($valor) && (strlen($valor) == 14)) 
+                return self::buscar($valor, $canEdit);
+            return 'remover';
+        }
+
+        return null;
+    }
+
+    private function updateAjax($campo, $valor)
+    {
+        if(!$this->possuiLogin())
+            $campo != 'cnpj' ? $this->update([$campo => $valor]) : null;
+    }
+
     protected static function criarFinal($campo, $valor, $pr)
     {
         $valido = $campo == 'cnpj' ? self::buscar($valor, $pr->getHistoricoCanEdit()) : null;
@@ -89,24 +107,6 @@ class Contabil extends Authenticatable
         }
 
         return null;
-    }
-
-    public function validarUpdateAjax($campo, $valor, $canEdit = null)
-    {
-        if($campo == 'cnpj')
-        {
-            if(isset($valor) && (strlen($valor) == 14)) 
-                return Contabil::buscar($valor, $canEdit);
-            return 'remover';
-        }
-
-        return null;
-    }
-
-    public function updateAjax($campo, $valor)
-    {
-        if(!$this->possuiLogin())
-            $campo != 'cnpj' ? $this->update([$campo => $valor]) : null;
     }
 
     public function finalArray($arrayCampos, $pr)

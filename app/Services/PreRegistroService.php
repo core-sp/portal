@@ -145,14 +145,14 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
         return [
             'resultado' => $resultado,
-            'codigos' => PreRegistro::getCodigosCampos($resultado->getAbasCampos()),
+            'codigos' => $this->getCodigosCampos($resultado->userExterno->isPessoaFisica()),
             'regionais' => $service->getService('Regional')
                 ->all()
                 ->whereNotIn('idregional', [14])
                 ->sortBy('regional'),
             'classes' => $this->getNomeClasses(),
             'totalFiles' => $externo->isPessoaFisica() ? Anexo::TOTAL_PF_PRE_REGISTRO : Anexo::TOTAL_PJ_PRE_REGISTRO,
-            'abas' => PreRegistro::getMenu()
+            'abas' => $this->getMenu()
         ];
     }
 

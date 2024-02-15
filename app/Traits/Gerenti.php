@@ -46,7 +46,6 @@ trait Gerenti {
 
             default:
                 return 'Indefinida';
-            break;
         }
     }
         

@@ -12,6 +12,24 @@ class ResponsavelTecnico extends Model
     protected $table = 'responsaveis_tecnicos';
     protected $guarded = [];
 
+    private function validarUpdateAjax($campo, $valor, $gerenti, $canEdit = null)
+    {
+        if($campo == 'cpf')
+        {
+            if(isset($valor) && (strlen($valor) == 11)) 
+                return self::buscar($valor, $gerenti, $canEdit);
+            return 'remover';
+        }
+
+        return null;
+    }
+
+    private function updateAjax($campo, $valor)
+    {
+        if($campo != 'cpf')
+            $this->update([$campo => $valor]);
+    }
+
     protected static function criarFinal($campo, $valor, $gerenti, $pr)
     {
         $valido = $campo == 'cpf' ? self::buscar($valor, $gerenti, $pr->pessoaJuridica->getHistoricoCanEdit()) : null;
@@ -96,24 +114,6 @@ class ResponsavelTecnico extends Model
         }
 
         return null;
-    }
-
-    public function validarUpdateAjax($campo, $valor, $gerenti, $canEdit = null)
-    {
-        if($campo == 'cpf')
-        {
-            if(isset($valor) && (strlen($valor) == 11)) 
-                return ResponsavelTecnico::buscar($valor, $gerenti, $canEdit);
-            return 'remover';
-        }
-
-        return null;
-    }
-
-    public function updateAjax($campo, $valor)
-    {
-        if($campo != 'cpf')
-            $this->update([$campo => $valor]);
     }
 
     public function finalArray($arrayCampos, $pj)

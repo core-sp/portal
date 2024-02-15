@@ -25,18 +25,13 @@ class PreRegistroAjaxRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->msgUnique = 'Valor não permitido';
+        $this->classes = implode(',', array_keys($this->service->getService('PreRegistro')->getNomesCampos()));
+        $this->todos = implode(',', array_values($this->service->getService('PreRegistro')->getNomesCampos()));
 
-        $campos_array = $this->service->getService('PreRegistro')->getNomesCampos();
         if(auth()->guard('contabil')->check() && (strpos($this->campo, 'contabil') !== false))
             $this->merge([
                 'campo' => null,
             ]);
-
-        foreach($campos_array as $key => $campos)
-        {
-            $this->classes .= isset($this->classes) ? ','.$key : $key;
-            $this->todos .= isset($this->todos) ? ','.$campos : $campos;
-        }
 
         $this->regraValor = ['max:191'];
         $arrayIn = [
@@ -44,6 +39,8 @@ class PreRegistroAjaxRequest extends FormRequest
             'uf' => implode(',', array_keys(estados())),
             'tipo_telefone' => implode(',', tipos_contatos()),
             'opcional_celular' => implode(',', opcoes_celular()),
+            'tipo_telefone_1' => implode(',', tipos_contatos()),
+            'opcional_celular_1' => implode(',', opcoes_celular()),
             'sexo' => implode(',', array_keys(generos())),
             'estado_civil' => implode(',', estados_civis()),
             'nacionalidade' => implode(',', nacionalidades()),
@@ -64,29 +61,6 @@ class PreRegistroAjaxRequest extends FormRequest
                 'campo' => str_replace('[]', '', request()->campo),
             ]);
 
-        $telefoneOptions = [
-            'tipo_telefone_1' => tipos_contatos(), 
-            'telefone_1' => null, 
-            'opcional_celular_1' => opcoes_celular(),
-        ];
-        if(in_array($this->campo, array_keys($telefoneOptions)))
-        {
-            // a quantidade de ';' define qual a chave do valor no campo
-            // lembrar de alterar a quantidade de campos no model do PreRegistro em: getChaveValorTotal($valor = null)
-            $flag = '';
-            $total = intval(substr($this->campo, strripos($this->campo, '_') + 1));
-            for($i = 0; $i  < $total; $i++)
-                $flag .= ';';
-
-            $implode = $telefoneOptions[$this->campo];
-            if(isset(request()->valor) && isset($implode))
-                $this->regraValor = 'in:' . mb_strtoupper(implode($flag . ',', $implode), 'UTF-8') . $flag;
-            $this->merge([
-                'campo' => str_replace(substr($this->campo, strripos($this->campo, '_')), '', $this->campo),
-                'valor' => request()->valor . $flag
-            ]);
-        }
-
         if((strpos(request()->campo, 'cpf') !== false) || (strpos(request()->campo, 'cnpj') !== false))
         {
             $this->merge(['valor' => apenasNumeros($this->valor)]);
@@ -100,7 +74,6 @@ class PreRegistroAjaxRequest extends FormRequest
                     break;
                 default:
                     $this->regraValor = ['nullable', new CpfCnpj];
-                    break;
             }
         }
 

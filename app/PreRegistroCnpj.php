@@ -25,6 +25,13 @@ class PreRegistroCnpj extends Model
         return $updateCarbon;
     }
 
+    private function validarUpdateAjax($campo, $valor)
+    {
+        if(($campo == 'checkEndEmpresa') && ($valor == 'on'))
+            return $this->preRegistro->getEndereco();
+        return [$campo => $valor];
+    }
+
     public function atualizarFinal($campo, $valor)
     {
         $valido = $this->validarUpdateAjax($campo, $valor);
@@ -98,35 +105,16 @@ class PreRegistroCnpj extends Model
         return $this->asJson($array);
     }
 
+    public function getEndereco()
+    {
+        return $this->only(['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf']);
+    }
+
     public function mesmoEndereco()
     {
         $naoNulo = isset($this->cep) && isset($this->logradouro) && isset($this->numero) && isset($this->bairro) && isset($this->cidade) && isset($this->uf);
-        
-        $preRegistro = $this->preRegistro;
-        $cepIgual = ($this->cep == $preRegistro->cep) && ($this->logradouro == $preRegistro->logradouro) && ($this->numero == $preRegistro->numero) && 
-        ($this->complemento == $preRegistro->complemento) && ($this->bairro == $preRegistro->bairro) && ($this->cidade == $preRegistro->cidade) && ($this->uf == $preRegistro->uf);
-        
-        return $naoNulo && $cepIgual;
-    }
 
-    public function validarUpdateAjax($campo, $valor)
-    {
-        if($campo == 'checkEndEmpresa')
-            if($valor == 'on')
-            {
-                $preRegistro = $this->preRegistro;
-                return [
-                    'cep' => $preRegistro->cep, 
-                    'logradouro' => $preRegistro->logradouro, 
-                    'numero' => $preRegistro->numero, 
-                    'complemento' => $preRegistro->complemento, 
-                    'bairro' => $preRegistro->bairro, 
-                    'cidade' => $preRegistro->cidade, 
-                    'uf' => $preRegistro->uf
-                ];
-            }
-
-        return [$campo => $valor];
+        return $naoNulo && empty(array_diff_assoc($this->getEndereco(), $this->preRegistro->getEndereco()));
     }
 
     public function finalArray($arrayCampos)

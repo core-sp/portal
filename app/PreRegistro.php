@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Traits\PreRegistroApoio;
+use Illuminate\Support\Arr;
 
 class PreRegistro extends Model
 {
@@ -21,7 +22,6 @@ class PreRegistro extends Model
     const STATUS_ANALISE_CORRECAO = 'Em análise da correção';
     const STATUS_APROVADO = 'Aprovado';
     const STATUS_NEGADO = 'Negado';
-    const MENU = 'Contabilidade,Dados Gerais,Endereço,Contato / RT,Canal de Relacionamento,Anexos';
     const TOTAL_HIST = 1;
 
     private function atualizarCampoEspelho($request, $final)
@@ -53,178 +53,113 @@ class PreRegistro extends Model
         if(isset($valido))
         {
             $this->update($valido);
-            if(in_array($campo, ['cep', 'logradouro', 'numero', 'complemento', 'cidade', 'uf']) && !$this->userExterno->isPessoaFisica())
+            if(in_array($campo, array_keys($this->getEndereco())) && !$this->userExterno->isPessoaFisica())
                 $resultado = $this->pessoaJuridica->mesmoEndereco();
         }
 
         return $resultado;
     }
 
-    public function setHistorico()
+    private function formatTelefones($campo, $valor)
     {
-        $array = $this->getHistoricoArray();
-        $totalTentativas = intval($array['tentativas']) < self::TOTAL_HIST;
-
-        if($totalTentativas)
-            $array['tentativas'] = intval($array['tentativas']) + 1;
-        $array['update'] = now()->format('Y-m-d H:i:s');
-
-        return $this->asJson($array);
-    }
-
-    public function getHistoricoCanEdit()
-    {
-        $array = $this->getHistoricoArray();
-        $can = intval($array['tentativas']) < self::TOTAL_HIST;
-        $horaUpdate = $this->horaUpdateHistorico();
-        
-        return $can || (!$can && ($horaUpdate < now()));
-    }
-
-    private function getChaveValorTotal($valor = null)
-    {
-        // total é a quantidade de campos que deve armazenar
-        $total = 2;
-
-        return [
-            'chave' => substr_count($valor, ';'),
-            'valor' => str_replace(';', '', $valor),
-            'total' => $total
-        ];
-    }
-
-    private function setUmCampo($arrayValor, $arrayOpcoes)
-    {
-        for($i = 0; $i < $arrayOpcoes['total']; $i++)
-            if($arrayOpcoes['chave'] == $i)
-                $arrayValor[$i] = $arrayOpcoes['valor'];
-            else
-                $arrayValor[$i] = isset($arrayValor[$i]) && (strlen($arrayValor[$i]) > 0) ? $arrayValor[$i] : '';
-
-        return implode(';', $arrayValor);
-    }
-
-    private function setCheckbox($arrayValor, $arrayOpcoes)
-    {
-        for($i = 0; $i < $arrayOpcoes['total']; $i++)
-        {
-            if($arrayOpcoes['chave'] == $i)
-            {
-                $temp = array();
-                if(isset($arrayValor[$i]))
-                {
-                    $temp = explode(',', $arrayValor[$i]);
-                    // remover do explode os valores vazios
-                    foreach($temp as $key => $value)         
-                        if(empty($value))
-                            unset($temp[$key]);
-                }
-
-                if(isset($temp) && in_array($arrayOpcoes['valor'], $temp))
-                    unset($temp[array_search($arrayOpcoes['valor'], $temp)]);
-                else
-                    array_push($temp, $arrayOpcoes['valor']);
-                $arrayValor[$i] = implode(',', $temp);
-            }
-            else
-                $arrayValor[$i] = isset($arrayValor[$i]) && (strlen($arrayValor[$i]) > 0) ? $arrayValor[$i] : '';
+        switch ($campo) {
+            case 'tipo_telefone':
+            case 'tipo_telefone_1':
+                $temp = array_filter(explode(';', $this->tipo_telefone));
+                break;
+            case 'telefone':
+            case 'telefone_1':
+                $temp = array_filter(explode(';', $this->telefone));
+                break;
+            case 'opcional_celular':
+            case 'opcional_celular_1':
+                $temp = array_filter(explode(';', $this->opcional_celular));
+                $temp[0] = isset($temp[0]) ? $temp[0] : null;
+                $temp[1] = isset($temp[1]) ? $temp[1] : null;
+                $array_opcoes = $campo == 'opcional_celular' ? array_filter(explode(',', $temp[0])) : array_filter(explode(',', $temp[1]));
+                $valor = !in_array($valor, $array_opcoes) ? implode(',', Arr::add($array_opcoes, count($array_opcoes), $valor)) : implode(',', Arr::except($array_opcoes, array_search($valor, $array_opcoes, true)));
+                break;
         }
 
-        return implode(';', $arrayValor);
+        if(strpos($campo, '_1') === false)
+            $temp[0] = $valor;
+        else
+        {
+            $temp[0] = isset($temp[0]) ? $temp[0] : '';
+            $temp[1] = $valor;
+        }
+
+        ksort($temp, SORT_NUMERIC);
+
+        return implode(';', $temp);
     }
 
     private function formatTextoCorrecaoAdmin($campo, $valor)
     {
+        if($campo == 'negado')
+            $this->update(['justificativa' => null]);
+
         $original = $campo == 'confere_anexos' ? $this->confere_anexos : $this->justificativa;
-        $texto = isset($original) ? json_decode($original, true) : array();
-        
-        if($campo != 'confere_anexos')
-        {                
-            if(isset($valor) && (strlen($valor) > 0))
-                $texto[$campo] = $valor;
-            elseif(isset($texto[$campo]))
-                unset($texto[$campo]);
-        
-            $texto = count($texto) == 0 ? null : json_encode($texto, JSON_FORCE_OBJECT);
+        $texto = isset($original) ? $this->fromJson($original) : array();
+
+        switch ($campo) {
+            case 'confere_anexos':
+                if(!isset($texto[$valor]))
+                    $texto[$valor] = "OK";
+                else
+                    unset($texto[$valor]);
+                break;
+            default:
+                if(isset($valor) && (strlen($valor) > 0))
+                    $texto[$campo] = $valor;
+                elseif(isset($texto[$campo]))
+                    unset($texto[$campo]);
         }
-        else
-        {
-            if(!isset($texto[$valor]))
-                $texto[$valor] = "OK";
-            else
-                unset($texto[$valor]);
-        
-            $texto = count($texto) == 0 ? null : json_encode($texto, JSON_FORCE_OBJECT);
-        }
-        
-        return $texto;
+
+        return count($texto) == 0 ? null : $this->asJson($texto);
     }
 
     private function validarUpdateAjax($campo, $valor)
     {
-        $final = [$campo => $valor];
-
         switch ($campo) {
             case 'tipo_telefone':
+            case 'tipo_telefone_1':
             case 'telefone':
-                $temp = $campo == 'tipo_telefone' ? explode(';', $this->tipo_telefone) : explode(';', $this->telefone);
-                $array = $this->getChaveValorTotal($valor);
-                $valor = $this->setUmCampo($temp, $array);
-                $final = [$campo => $valor];
-                break;
+            case 'telefone_1':
             case 'opcional_celular':
-                $options = explode(';', $this->opcional_celular);
-                $array = $this->getChaveValorTotal($valor);
-                $valor = $this->setCheckbox($options, $array);
-                $final = [$campo => $valor];
+            case 'opcional_celular_1':
+                $valor = $this->formatTelefones($campo, $valor);
+                $campo = str_replace('_1', '', $campo);
                 break;
             case 'justificativa':
-                if($valor['campo'] == 'negado')
-                    $this->update(['justificativa' => null]);
-                $texto = $this->formatTextoCorrecaoAdmin($valor['campo'], $valor['valor']);
-                $final = [$campo => $texto];
+                $valor = $this->formatTextoCorrecaoAdmin($valor['campo'], $valor['valor']);
                 break;
             case 'confere_anexos':
-                $texto = $this->formatTextoCorrecaoAdmin($campo, $valor);
-                $final = [$campo => $texto];
+                $valor = $this->formatTextoCorrecaoAdmin($campo, $valor);
                 break;
             case 'pergunta':
-                // Pergunta não será salva, apenas para reforçar a mensagem sobre ser Representante Comercial
-                $final = null;
+                return null;
                 break;
         }
 
-        return $final;
+        return [$campo => $valor];
     }
 
     private function finalArray($arrayCampos)
     {
-        $camposObrig = [
-            'tipo_telefone' => [
-                0 => $arrayCampos['tipo_telefone']
-            ],
-            'telefone' => [
-                0 => $arrayCampos['telefone']
-            ],
-            'opcional_celular' => [
-                0 => isset($arrayCampos['opcional_celular']) ? $arrayCampos['opcional_celular'] : ''
-            ]
-        ];
+        $arrayCampos['tipo_telefone'] = isset($arrayCampos['tipo_telefone_1']) ? 
+        $arrayCampos['tipo_telefone'] . ';' . $arrayCampos['tipo_telefone_1'] : $arrayCampos['tipo_telefone'] . ';';
 
-        foreach($camposObrig as $key => $valor)
-        {
-            $total = $this->getChaveValorTotal()['total'];
-            for($i = 1; $i < $total; $i++)
-            {
-                $chave = $key . '_' . $i;
-                if(isset($arrayCampos[$chave]))
-                    $camposObrig[$key][$i] = $arrayCampos[$chave];
-                else
-                    $camposObrig[$key][$i] = '';
-                unset($arrayCampos[$chave]);
-            }
-            $arrayCampos[$key] = implode(';', $camposObrig[$key]);
-        }
+        $arrayCampos['telefone'] = isset($arrayCampos['telefone_1']) ? 
+        $arrayCampos['telefone'] . ';' . $arrayCampos['telefone_1'] : $arrayCampos['telefone'] . ';';
+
+        if(isset($arrayCampos['opcional_celular']))
+            $arrayCampos['opcional_celular'] = isset($arrayCampos['opcional_celular_1']) ? 
+            $arrayCampos['opcional_celular'] . ';' . $arrayCampos['opcional_celular_1'] : $arrayCampos['opcional_celular'] . ';';
+
+        unset($arrayCampos['tipo_telefone_1']);
+        unset($arrayCampos['telefone_1']);
+        unset($arrayCampos['opcional_celular_1']);
 
         return $this->update($arrayCampos);
     }
@@ -292,31 +227,6 @@ class PreRegistro extends Model
         return $legenda;
     }
 
-    public static function getMenu()
-    {
-        return explode(',', PreRegistro::MENU);
-    }
-
-    // Fazer os códigos automaticos
-    public static function getCodigosCampos($arrayCampos)
-    {
-        $codigos = array();
-
-        foreach($arrayCampos as $key => $value)
-        {
-            $temp = explode(',', $value);
-            $cont = 1;
-            $chave = (string) $key + 1;
-            foreach($temp as $campo)
-            {
-                $codigos[$key][$campo] = $chave . '.' . $cont;
-                $cont++;
-            }
-        }
-
-        return $codigos;
-    }
-
     public function userExterno()
     {
         return $this->belongsTo('App\UserExterno')->withTrashed();
@@ -365,6 +275,27 @@ class PreRegistro extends Model
                 $this->touch();
             }
         }
+    }
+
+    public function setHistorico()
+    {
+        $array = $this->getHistoricoArray();
+        $totalTentativas = intval($array['tentativas']) < self::TOTAL_HIST;
+
+        if($totalTentativas)
+            $array['tentativas'] = intval($array['tentativas']) + 1;
+        $array['update'] = now()->format('Y-m-d H:i:s');
+
+        return $this->asJson($array);
+    }
+
+    public function getHistoricoCanEdit()
+    {
+        $array = $this->getHistoricoArray();
+        $can = intval($array['tentativas']) < self::TOTAL_HIST;
+        $horaUpdate = $this->horaUpdateHistorico();
+        
+        return $can || (!$can && ($horaUpdate < now()));
     }
 
     public function getLabelStatus($status = null)
@@ -573,7 +504,7 @@ class PreRegistro extends Model
                 $textos = json_decode($temp[0], true);
                 foreach($textos as $key => $texto)
                 {
-                    foreach(self::getCodigosCampos($this->getAbasCampos()) as $k => $c)
+                    foreach($this->getCodigosCampos($this->userExterno->isPessoaFisica()) as $k => $c)
                         if(isset($c[$key]))
                             $final_campos[$c[$key]] = $texto;
                 }
@@ -630,29 +561,11 @@ class PreRegistro extends Model
         return $this->only(['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf']);
     }
 
-    public function getAbasCampos()
-    {
-        $pf = 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade_cidade,naturalidade_estado,nome_mae,nome_pai,tipo_identidade,identidade,orgao_emissor,dt_expedicao,titulo_eleitor,zona,secao,ra_reservista';
-        $pj = 'razao_social,nome_fantasia,capital_social,nire,tipo_empresa,dt_inicio_atividade';
-        $dadosGerais = $this->userExterno->isPessoaFisica() ? $pf : $pj;
-
-        // A índice é referente a índice do menu
-        // Colocar na ordem dos campos nas blades
-        return [
-            'cnpj_contabil,nome_contabil,email_contabil,nome_contato_contabil,telefone_contabil',
-            $dadosGerais . ',segmento,idregional,pergunta',
-            'cep,bairro,logradouro,numero,complemento,cidade,uf,checkEndEmpresa,cep_empresa,bairro_empresa,logradouro_empresa,numero_empresa,complemento_empresa,cidade_empresa,uf_empresa',
-            'cpf_rt,registro,nome_rt,nome_social_rt,dt_nascimento_rt,sexo_rt,tipo_identidade_rt,identidade_rt,orgao_emissor_rt,dt_expedicao_rt,titulo_eleitor_rt,zona_rt,secao_rt,ra_reservista_rt,cep_rt,bairro_rt,logradouro_rt,numero_rt,complemento_rt,cidade_rt,uf_rt,nome_mae_rt,nome_pai_rt',
-            'tipo_telefone,telefone,opcional_celular,tipo_telefone_1,telefone_1,opcional_celular_1',
-            'path',
-        ];
-    }
-
-    public function salvarAjax($request, $gerentiRepository)
+    public function salvarAjax($request, $gerentiRepository = null)
     {
         $classe = $request['classe'];
         $request['campo'] = $this->limparNomeCamposAjax($request['classe'], $request['campo']);
-        $gerenti = isset($gerentiRepository) ? $this->getRTGerenti($request['classe'], $gerentiRepository, $request['campo'] == 'cpf' ? $request['valor'] : '') : null;
+        $gerenti = $this->getRTGerenti($request['classe'], $gerentiRepository, $request['campo'] == 'cpf' ? $request['valor'] : '');
         $campo = $request['campo'];
         $valor = $request['valor'];
 

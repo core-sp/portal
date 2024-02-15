@@ -81,7 +81,7 @@ trait PreRegistroApoio {
         throw new \Exception('Classe não está configurada para ser salva no array final', 500);
     }
     
-    public function getRelacoes()
+    private function getRelacoes()
     {
         return [
             'App\Anexo' => $this->relation_anexos,
@@ -91,6 +91,29 @@ trait PreRegistroApoio {
             'App\PreRegistro' => $this->relation_pre_registro,
             'App\ResponsavelTecnico' => $this->relation_rt,
         ];
+    }
+
+    private function getAbasCampos($pessoaFisica = true)
+    {
+        $pf = 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade_cidade,naturalidade_estado,nome_mae,nome_pai,tipo_identidade,identidade,orgao_emissor,dt_expedicao,titulo_eleitor,zona,secao,ra_reservista';
+        $pj = 'razao_social,nome_fantasia,capital_social,nire,tipo_empresa,dt_inicio_atividade';
+        $dadosGerais = $pessoaFisica ? $pf : $pj;
+
+        // A índice é referente a índice do menu
+        // Colocar na ordem dos campos nas blades
+        return [
+            'cnpj_contabil,nome_contabil,email_contabil,nome_contato_contabil,telefone_contabil',
+            $dadosGerais . ',segmento,idregional,pergunta',
+            'cep,bairro,logradouro,numero,complemento,cidade,uf,checkEndEmpresa,cep_empresa,bairro_empresa,logradouro_empresa,numero_empresa,complemento_empresa,cidade_empresa,uf_empresa',
+            'cpf_rt,registro,nome_rt,nome_social_rt,dt_nascimento_rt,sexo_rt,tipo_identidade_rt,identidade_rt,orgao_emissor_rt,dt_expedicao_rt,titulo_eleitor_rt,zona_rt,secao_rt,ra_reservista_rt,cep_rt,bairro_rt,logradouro_rt,numero_rt,complemento_rt,cidade_rt,uf_rt,nome_mae_rt,nome_pai_rt',
+            'tipo_telefone,telefone,opcional_celular,tipo_telefone_1,telefone_1,opcional_celular_1',
+            'path',
+        ];
+    }
+
+    public function getMenu()
+    {
+        return explode(',', 'Contabilidade,Dados Gerais,Endereço,Contato / RT,Canal de Relacionamento,Anexos');
     }
 
     public function getCodigos($classe)
@@ -106,16 +129,20 @@ trait PreRegistroApoio {
     public function limparNomeCamposAjax($classe, $campo)
     {
         $campos = $this->getCodigos($classe);
-        $siglas = [
-            $this->relation_anexos => null,
-            $this->relation_pre_registro => null,
-            $this->relation_pf => null,
-            $this->relation_pj => '_empresa',
-            $this->relation_contabil => '_contabil',
-            $this->relation_rt => '_rt',
-        ];
-
-        $siglas = $siglas[$classe];
+        $siglas = null;
+        switch ($classe) {
+            case $this->relation_pj:
+                $siglas = '_empresa';
+                break;
+            case $this->relation_contabil:
+                $siglas = '_contabil';
+                break;
+            case $this->relation_rt:
+                $siglas = '_rt';
+                break;
+            default:
+                $siglas = null;
+        }
 
         foreach($campos as $key => $cp)
         {
@@ -170,15 +197,13 @@ trait PreRegistroApoio {
 
     public function getNomesCampos()
     {
-        $classes = $this->getNomeClasses();
-
         return [
-            $classes[0] => 'path',
-            $classes[1] => 'nome_contabil,cnpj_contabil,email_contabil,nome_contato_contabil,telefone_contabil',
-            $classes[4] => 'segmento,idregional,cep,bairro,logradouro,numero,complemento,cidade,uf,tipo_telefone,telefone,opcional_celular,tipo_telefone_1,telefone_1,opcional_celular_1,pergunta',
-            $classes[2] => 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade_cidade,naturalidade_estado,nome_mae,nome_pai,tipo_identidade,identidade,orgao_emissor,dt_expedicao,titulo_eleitor,zona,secao,ra_reservista',
-            $classes[3] => 'razao_social,nome_fantasia,capital_social,nire,tipo_empresa,dt_inicio_atividade,checkEndEmpresa,cep_empresa,bairro_empresa,logradouro_empresa,numero_empresa,complemento_empresa,cidade_empresa,uf_empresa',
-            $classes[5] => 'nome_rt,nome_social_rt,sexo_rt,dt_nascimento_rt,cpf_rt,tipo_identidade_rt,identidade_rt,orgao_emissor_rt,dt_expedicao_rt,titulo_eleitor_rt,zona_rt,secao_rt,ra_reservista_rt,cep_rt,bairro_rt,logradouro_rt,numero_rt,complemento_rt,cidade_rt,uf_rt,nome_mae_rt,nome_pai_rt'
+            $this->relation_anexos => 'path',
+            $this->relation_contabil => 'nome_contabil,cnpj_contabil,email_contabil,nome_contato_contabil,telefone_contabil',
+            $this->relation_pre_registro => 'segmento,idregional,cep,bairro,logradouro,numero,complemento,cidade,uf,tipo_telefone,telefone,opcional_celular,tipo_telefone_1,telefone_1,opcional_celular_1,pergunta',
+            $this->relation_pf => 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade_cidade,naturalidade_estado,nome_mae,nome_pai,tipo_identidade,identidade,orgao_emissor,dt_expedicao,titulo_eleitor,zona,secao,ra_reservista',
+            $this->relation_pj => 'razao_social,nome_fantasia,capital_social,nire,tipo_empresa,dt_inicio_atividade,checkEndEmpresa,cep_empresa,bairro_empresa,logradouro_empresa,numero_empresa,complemento_empresa,cidade_empresa,uf_empresa',
+            $this->relation_rt => 'nome_rt,nome_social_rt,sexo_rt,dt_nascimento_rt,cpf_rt,tipo_identidade_rt,identidade_rt,orgao_emissor_rt,dt_expedicao_rt,titulo_eleitor_rt,zona_rt,secao_rt,ra_reservista_rt,cep_rt,bairro_rt,logradouro_rt,numero_rt,complemento_rt,cidade_rt,uf_rt,nome_mae_rt,nome_pai_rt'
         ];
     }
 
@@ -195,6 +220,27 @@ trait PreRegistroApoio {
             $this->relation_pj => explode(',', $camposView[$this->relation_pj]),
             $this->relation_rt => explode(',', $camposView[$this->relation_rt]),
         ];
+    }
+
+    // Fazer os códigos automaticos
+    public function getCodigosCampos($pessoaFisica = true)
+    {
+        $arrayCampos = $this->getAbasCampos($pessoaFisica);
+        $codigos = array();
+
+        foreach($arrayCampos as $key => $value)
+        {
+            $temp = explode(',', $value);
+            $cont = 1;
+            $chave = (string) $key + 1;
+            foreach($temp as $campo)
+            {
+                $codigos[$key][$campo] = $chave . '.' . $cont;
+                $cont++;
+            }
+        }
+
+        return $codigos;
     }
 
     public function getCamposLimpos($request, $campos)
@@ -216,6 +262,8 @@ trait PreRegistroApoio {
 
     public function getRTGerenti($relacao, $gerentiRepository, $cpf)
     {
+        if(!isset($gerentiRepository) || !isset(class_implements($gerentiRepository)["App\Repositories\GerentiRepositoryInterface"]))
+            return null;
         if(($relacao != $this->relation_rt) && (!isset($cpf) || (strlen($cpf) != 11)))
             return null;
 
