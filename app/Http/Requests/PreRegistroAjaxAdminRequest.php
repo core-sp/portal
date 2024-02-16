@@ -48,12 +48,8 @@ class PreRegistroAjaxAdminRequest extends FormRequest
 
     public function rules()
     {
-        $todos = null;
-        $campos_array = $this->service->getService('PreRegistro')->getNomesCampos();
-
-        foreach($campos_array as $key => $campos)
-            $todos .= isset($todos) ? ','.$campos : $campos;
-
+        $todos = implode(',', array_values($this->service->getService('PreRegistro')->getNomesCampos()));
+        
         $todos .= ',registro,negado';
         if(request()->acao == 'editar')
             $todos = 'registro,registro_secundario';

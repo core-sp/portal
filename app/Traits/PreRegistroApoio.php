@@ -225,22 +225,14 @@ trait PreRegistroApoio {
     // Fazer os códigos automaticos
     public function getCodigosCampos($pessoaFisica = true)
     {
-        $arrayCampos = $this->getAbasCampos($pessoaFisica);
-        $codigos = array();
-
-        foreach($arrayCampos as $key => $value)
-        {
-            $temp = explode(',', $value);
-            $cont = 1;
-            $chave = (string) $key + 1;
-            foreach($temp as $campo)
-            {
-                $codigos[$key][$campo] = $chave . '.' . $cont;
-                $cont++;
-            }
-        }
-
-        return $codigos;
+        return collect($this->getAbasCampos($pessoaFisica))->transform(function ($item, $key) {
+            $chave = (string) ($key + 1) . '.';
+            return collect(array_flip(array_filter(explode(',', $item))))->transform(function ($item_1, $key_1) use($chave){
+                return $chave . ++$item_1;
+            })
+            ->toArray();
+        })
+        ->toArray();
     }
 
     public function getCamposLimpos($request, $campos)

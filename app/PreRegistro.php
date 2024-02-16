@@ -342,47 +342,37 @@ class PreRegistro extends Model
 
     public function getTipoTelefone()
     {
-        $tipos = explode(';', $this->tipo_telefone);
-
-        foreach($tipos as $key => $valor)
-            $tipos[$key] = isset($valor) && (strlen($valor) > 0) ? $valor : null;
-
-        return $tipos;
+        return array_filter(explode(';', $this->tipo_telefone));
     }
 
     public function getTelefone()
     {
-        $tels = explode(';', $this->telefone);
-
-        foreach($tels as $key => $valor)
-            $tels[$key] = isset($valor) && (strlen($valor) > 0) ? $valor : null;
-
-        return $tels;
+        return array_filter(explode(';', $this->telefone));
     }
 
     public function getOpcionalCelular()
     {
-        $options = explode(';', $this->opcional_celular);
+        $options = array_filter(explode(';', $this->opcional_celular));
 
         foreach($options as $key => $valor)
-            $options[$key] = isset($valor) && (strlen($valor) > 0) ? explode(',', $valor) : null;
+            $options[$key] = array_filter(explode(',', $valor));
 
         return $options;
     }
 
     public function getJustificativaArray()
     {
-        return isset($this->justificativa) ? json_decode($this->justificativa, true) : array();
+        return isset($this->justificativa) ? $this->fromJson($this->justificativa) : array();
     }
 
     public function getConfereAnexosArray()
     {
-        return isset($this->confere_anexos) ? json_decode($this->confere_anexos, true) : array();
+        return isset($this->confere_anexos) ? $this->fromJson($this->confere_anexos) : array();
     }
 
     public function getHistoricoArray()
     {
-        return isset($this->historico_contabil) ? json_decode($this->historico_contabil, true) : array();
+        return isset($this->historico_contabil) ? $this->fromJson($this->historico_contabil) : array();
     }
 
     public function getNextUpdateHistorico()
@@ -437,16 +427,17 @@ class PreRegistro extends Model
 
     public function getCodigosJustificadosByAba($arrayAba)
     {
-        $array = $this->getJustificativaArray();
-        if($this->userPodeCorrigir() && ($array !== null))
+        if($this->userPodeCorrigir())
         {
-            $correcoes = array();
-            foreach($array as $key => $campo)
-                if(in_array($key, array_keys($arrayAba)))
-                    array_push($correcoes, $arrayAba[$key]);
-
-            natsort($correcoes);
-            return $correcoes;
+            $array = collect($this->getJustificativaArray())->map(function ($item, $key) use($arrayAba){
+                if(isset($arrayAba[$key]))
+                    return $arrayAba[$key];
+            })
+            ->filter()
+            ->toArray();
+            
+            natsort($array);
+            return $array;
         }
 
         return null;
@@ -454,16 +445,16 @@ class PreRegistro extends Model
 
     public function getTextosJustificadosByAba($arrayAba)
     {
-        $array = $this->getJustificativaArray();
-        if($this->userPodeCorrigir() && ($array !== null))
+        if($this->userPodeCorrigir())
         {
-            $correcoes = array();
-            foreach($array as $key => $campo)
-                if(in_array($key, array_keys($arrayAba)))
-                    $correcoes[$arrayAba[$key]] = $campo;
-
-            uksort($correcoes, "strnatcmp");
-            return $correcoes;
+            $array = collect($this->getJustificativaArray())->keyBy(function ($item, $key) use($arrayAba){
+                return isset($arrayAba[$key]) ? $arrayAba[$key] : 'remover';
+            })
+            ->forget('remover')
+            ->toArray();
+            
+            ksort($array, SORT_NATURAL);
+            return $array;
         }
 
         return null;
@@ -471,51 +462,47 @@ class PreRegistro extends Model
 
     public function setHistoricoStatus()
     {
-        $historico = isset($this->historico_status) ? json_decode($this->historico_status, true) : array();
+        $historico = isset($this->historico_status) ? $this->fromJson($this->historico_status) : array();
         array_push($historico, $this->status . ';' . $this->updated_at);
-        $this->update(['historico_status' => json_encode($historico, JSON_FORCE_OBJECT)]);
+        $this->update(['historico_status' => $this->asJson($historico)]);
     }
 
     public function setHistoricoJustificativas()
     {
-        if(strlen($this->justificativa) < 5)
+        if(strlen($this->justificativa) < 3)
             return null;
 
-        $justificativas = isset($this->historico_justificativas) ? json_decode($this->historico_justificativas, true) : array();
+        $justificativas = isset($this->historico_justificativas) ? $this->fromJson($this->historico_justificativas) : array();
         array_push($justificativas, $this->justificativa . ';' . $this->updated_at);
-        $this->update(['historico_justificativas' => json_encode($justificativas, JSON_FORCE_OBJECT)]);
+        $this->update(['historico_justificativas' => $this->asJson($justificativas)]);
     }
 
     public function getHistoricoStatus()
     {
-        return isset($this->historico_status) ? json_decode($this->historico_status, true) : array();
+        return isset($this->historico_status) ? $this->fromJson($this->historico_status) : array();
     }
 
     public function getHistoricoJustificativas()
     {
-        if(isset($this->historico_justificativas))
-        {
-            $final = array();
-            $justificados = json_decode($this->historico_justificativas, true);
-            foreach($justificados as $value)
-            {
-                $final_campos = array();
-                $temp = explode(';', $value);
-                $textos = json_decode($temp[0], true);
-                foreach($textos as $key => $texto)
-                {
-                    foreach($this->getCodigosCampos($this->userExterno->isPessoaFisica()) as $k => $c)
-                        if(isset($c[$key]))
-                            $final_campos[$c[$key]] = $texto;
-                }
-                ksort($final_campos, SORT_NATURAL);
-                array_push($final, $final_campos);
-            }
+        $justificados = isset($this->historico_justificativas) ? collect($this->fromJson($this->historico_justificativas)) : collect();
+        $campos = collect($this->getCodigosCampos($this->userExterno->isPessoaFisica()))->mapWithKeys(function ($item){
+            return $item;
+        })
+        ->flip()
+        ->toArray();
 
-            return $final;
-        }
-
-        return array();
+        return $justificados->map(function ($values) use($campos){
+            $temp = array_filter(explode(';', $values));
+            $textos = collect($this->fromJson($temp[0]));
+            $array = $textos->keyBy(function ($item, $key) use($campos){
+                if(in_array($key, $campos))
+                    return array_keys($campos, $key, true)[0];
+            })
+            ->toArray();
+            ksort($array, SORT_NATURAL);
+            return $array;
+        })
+        ->toArray();
     }
 
     public function setCamposEspelho($request)
