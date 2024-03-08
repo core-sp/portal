@@ -17,45 +17,85 @@ class Anexo extends Model
     const TOTAL_PJ_PRE_REGISTRO = 15;
     const PATH_PRE_REGISTRO = 'userExterno/pre_registros';
 
-    private static function ziparFilesPreRegistro($files, $id)
+    private static function criarNomeFile($extensao)
+    {
+        return (string) Str::uuid() . '.' . $extensao;
+    }
+
+    private static function criarNomeFilesZip($cont = 1, $extensao)
+    {
+        return (string) Carbon::now()->timestamp . '_' . $cont . '.' . $extensao;
+    }
+
+    private static function confereDiretorio($id, $zipar = false)
     {
         $pathStorage = config('app.env') == "testing" ? storage_path('framework/testing/disks/local/') : storage_path('app/');
-        $path = $pathStorage . Anexo::PATH_PRE_REGISTRO . '/' . $id . '/';
-        $nomeZip = (string) Str::uuid() . '.zip';
+        $path_id = self::PATH_PRE_REGISTRO . '/' . $id;
+        $path_absoluto = $pathStorage . $path_id . '/';
+        $temp = 'temp/' . $id;
 
-        if(!file_exists($pathStorage . Anexo::PATH_PRE_REGISTRO . '/' . $id))
-            Storage::makeDirectory(Anexo::PATH_PRE_REGISTRO . '/' . $id);
-        if(!file_exists($pathStorage . 'temp/' . $id))
-            Storage::makeDirectory('temp/' . $id);
-            
-        $nomeFiles = '';
-        $nomesTemp = '';
+        if(!file_exists($pathStorage . $path_id))
+            Storage::makeDirectory($path_id);
+        if($zipar && !file_exists($pathStorage . $temp))
+            Storage::makeDirectory($temp);
+
+        return [
+            'pathStorage' => $pathStorage,
+            'pathAbsoluto' => $path_absoluto,
+            'path' => $path_id,
+            'temp' => $temp,
+        ];
+    }
+
+    private static function salvar_files_bd_storage($files, $id)
+    {
+        $zipar = count($files) > 1;
+        $dados = self::confereDiretorio($id, $zipar);
+
+        if(count($files) == 1)
+        {
+            $nome = self::criarNomeFile($files[0]->extension());
+            $anexo = $files[0]->storeAs($dados['path'], $nome, 'local');
+            return [
+                'path' => $anexo,
+                'nome_original' => $files[0]->getClientOriginalName(),
+                'tamanho_bytes' => Storage::size($anexo),
+                'extensao' => $files[0]->extension(),
+            ];
+        }
+
         $cont = 1;
         foreach($files as $key => $file)
         {
-            $nome = (string) Carbon::now()->timestamp . '_' . $cont . '.' . $file->extension();
-            $file->storeAs('temp/' . $id, $nome, 'local');
-            $cont++;
+            $nome = self::criarNomeFilesZip($cont++, $file->extension());
+            $file->storeAs($dados['temp'], $nome, 'local');
         }
-        $final = shell_exec('cd ' . $pathStorage . 'temp/' . $id . ' ; zip -r ' . $path . $nomeZip . ' .');
-        Storage::deleteDirectory('temp/' . $id);
 
-        $finalArray = isset($final) ? explode(PHP_EOL, $final) : array();
-        foreach($finalArray as $key => $fim)
-            if($fim == '')
-                unset($finalArray[$key]);
-    
-        if(count($finalArray) != count($files))
+        return self::ziparFilesPreRegistro($dados, $files, $id);
+    }
+
+    private static function ziparFilesPreRegistro($dados, $files, $id)
+    {
+        $extensao = 'zip';
+        $nomeZip = self::criarNomeFile($extensao);
+        $caminho_atual = $dados['path'] . '/' . $nomeZip;
+
+        $final = shell_exec('cd ' . $dados['pathStorage'] . $dados['temp'] . ' ; zip -r ' . $dados['pathAbsoluto'] . $nomeZip . ' .');
+        Storage::deleteDirectory($dados['temp']);
+
+        $finalArray = count(array_filter(explode(PHP_EOL, $final)));
+
+        if($finalArray != count($files))
         {
-            Storage::delete(Anexo::PATH_PRE_REGISTRO . '/' . $id . '/' . $nomeZip);
+            Storage::delete($caminho_atual);
             throw new \Exception('Erro ao comprimir os arquivos do pré-registro, pois não possui a mesma quantidade do que foi enviado - Erro shell: ' . $final, 500);
         }
 
         return [
-            'path' => Anexo::PATH_PRE_REGISTRO . '/' . $id . '/' . $nomeZip,
+            'path' => $caminho_atual,
             'nome_original' => $nomeZip,
-            'tamanho_bytes' => Storage::size(Anexo::PATH_PRE_REGISTRO . '/' . $id . '/' . $nomeZip),
-            'extensao' => 'zip',
+            'tamanho_bytes' => Storage::size($caminho_atual),
+            'extensao' => $extensao,
         ];
     }
 
@@ -88,29 +128,18 @@ class Anexo extends Model
 
     public function excluirDiretorioPreRegistro()
     {
-        $diretorio = Anexo::PATH_PRE_REGISTRO . '/';
-        if(Storage::disk('local')->exists($diretorio . $this->preRegistro->id))
-            return Storage::deleteDirectory($diretorio . $this->preRegistro->id);
+        $diretorio = self::PATH_PRE_REGISTRO . '/' . $this->preRegistro->id;
+        if(Storage::disk('local')->exists($diretorio))
+            return Storage::deleteDirectory($diretorio);
         return true;
     }
 
     public static function armazenar($total, $valor, $id, $pf = true)
     {
-        $totalAnexo = $pf ? Anexo::TOTAL_PF_PRE_REGISTRO : Anexo::TOTAL_PJ_PRE_REGISTRO;
+        $totalAnexo = $pf ? self::TOTAL_PF_PRE_REGISTRO : self::TOTAL_PJ_PRE_REGISTRO;
 
         if($total < $totalAnexo)
-        {
-            if(count($valor) > 1)
-                return Anexo::ziparFilesPreRegistro($valor, $id);
-            $nome = (string) Str::uuid() . '.' . $valor[0]->extension();
-            $anexo = $valor[0]->storeAs(Anexo::PATH_PRE_REGISTRO . '/' . $id, $nome, 'local');
-            return [
-                'path' => $anexo,
-                'nome_original' => $valor[0]->getClientOriginalName(),
-                'tamanho_bytes' => Storage::size($anexo),
-                'extensao' => $valor[0]->extension(),
-            ];
-        }
+            return self::salvar_files_bd_storage($valor, $id);
 
         return null;
     }
@@ -124,7 +153,7 @@ class Anexo extends Model
             $doc->delete();
         }
 
-        $nome = (string) Str::uuid() . '.' . $file->extension();
+        $nome = self::criarNomeFile($file->extension());
         $anexo = $file->storeAs(self::PATH_PRE_REGISTRO . '/' . $id, $nome, 'local');
 
         return [
@@ -149,12 +178,14 @@ class Anexo extends Model
         ];
     }
 
-    private function getAceitosPF($preRegistro, $tipos)
+    private function getAceitosPF()
     {
-        if($preRegistro->pessoaFisica->nacionalidade != 'BRASILEIRA')
+        $tipos = self::getAceitosPreRegistro();
+
+        if($this->preRegistro->pessoaFisica->nacionalidade != 'BRASILEIRA')
             unset($tipos[3]);
 
-        if(($preRegistro->pessoaFisica->sexo != 'M') || (($preRegistro->pessoaFisica->sexo == 'M') && $preRegistro->pessoaFisica->maisDe45Anos()))
+        if(($this->preRegistro->pessoaFisica->sexo != 'M') || (($this->preRegistro->pessoaFisica->sexo == 'M') && $this->preRegistro->pessoaFisica->maisDe45Anos()))
             unset($tipos[4]);
 
         unset($tipos[5]);
@@ -164,32 +195,28 @@ class Anexo extends Model
         return $tipos;
     }
 
-    public function getObrigatoriosPreRegistro()
+    private function getAceitosPJ()
     {
-        $tipos = Anexo::getAceitosPreRegistro();
-        $preRegistro = $this->preRegistro;
+        $tipos = self::getAceitosPreRegistro();
 
-        if($preRegistro->userExterno->isPessoaFisica())
-            $tipos = $this->getAceitosPF($preRegistro, $tipos);
-        else
-        {
-            // por não saber via sistema se os sócios são do sexo masculino ou não
-            unset($tipos[3]);
-            unset($tipos[4]);
-        }
+        // por não saber via sistema se os sócios são do sexo masculino ou não
+        unset($tipos[3]);
+        unset($tipos[4]);
 
         return $tipos;
     }
 
+    public function getObrigatoriosPreRegistro()
+    {
+        return $this->preRegistro->userExterno->isPessoaFisica() ? $this->getAceitosPF() : $this->getAceitosPJ();
+    }
+
     public function getOpcoesPreRegistro()
     {
-        $tipos = Anexo::getAceitosPreRegistro();
-        $preRegistro = $this->preRegistro;
+        if($this->preRegistro->userExterno->isPessoaFisica())
+            return $this->getAceitosPF();
 
-        if($preRegistro->userExterno->isPessoaFisica())
-            $tipos = $this->getAceitosPF($preRegistro, $tipos);
-
-        return $tipos;
+        return self::getAceitosPreRegistro();
     }
 
     public function anexadoPeloAtendente()

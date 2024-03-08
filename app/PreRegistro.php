@@ -211,17 +211,15 @@ class PreRegistro extends Model
 
     public static function getLegendaStatus()
     {
-        $colors = self::colorLabelStatusAdmin();
-
         $inicio = '<button type="button" class="btn btn-sm mr-3 bg';
         $meio = ' font-weight-bolder font-italic" data-toggle="popover" data-placement="bottom" data-content=';
         $legenda = '<p><strong><em>Legenda<small> (click)</small>: </em></strong>';
-        $legenda .= $inicio . $colors[PreRegistro::STATUS_CRIADO] . $meio . '"<strong>Solicitante está em processo de preenchimento do formulário</strong>">' . PreRegistro::STATUS_CRIADO . '</button>';
-        $legenda .= $inicio . $colors[PreRegistro::STATUS_ANALISE_INICIAL] . $meio . '"<strong>Solicitante está aguardando o atendente analisar os dados</strong>">' . PreRegistro::STATUS_ANALISE_INICIAL . '</button>';
-        $legenda .= $inicio . $colors[PreRegistro::STATUS_CORRECAO] . $meio . '"<strong>Atendente está aguardando o solicitante corrigir os dados</strong>">' . PreRegistro::STATUS_CORRECAO . '</button>';
-        $legenda .= $inicio . $colors[PreRegistro::STATUS_ANALISE_CORRECAO] . $meio . '"<strong>Solicitante está aguardando o atendente analisar os dados após correção</strong>">' . PreRegistro::STATUS_ANALISE_CORRECAO . '</button>';
-        $legenda .= $inicio . $colors[PreRegistro::STATUS_APROVADO] . $meio . '"<strong>Atendente aprovou a solicitação e pode realizar o anexo do boleto</strong>">' . PreRegistro::STATUS_APROVADO . '</button>';
-        $legenda .= $inicio . $colors[PreRegistro::STATUS_NEGADO] . $meio . '"<strong>Atendente negou a solicitação</strong>">' . PreRegistro::STATUS_NEGADO . '</button>';
+        $legenda .= $inicio . self::colorLabelStatusAdmin()[self::STATUS_CRIADO] . $meio . '"<strong>Solicitante está em processo de preenchimento do formulário</strong>">' . self::STATUS_CRIADO . '</button>';
+        $legenda .= $inicio . self::colorLabelStatusAdmin()[self::STATUS_ANALISE_INICIAL] . $meio . '"<strong>Solicitante está aguardando o atendente analisar os dados</strong>">' . self::STATUS_ANALISE_INICIAL . '</button>';
+        $legenda .= $inicio . self::colorLabelStatusAdmin()[self::STATUS_CORRECAO] . $meio . '"<strong>Atendente está aguardando o solicitante corrigir os dados</strong>">' . self::STATUS_CORRECAO . '</button>';
+        $legenda .= $inicio . self::colorLabelStatusAdmin()[self::STATUS_ANALISE_CORRECAO] . $meio . '"<strong>Solicitante está aguardando o atendente analisar os dados após correção</strong>">' . self::STATUS_ANALISE_CORRECAO . '</button>';
+        $legenda .= $inicio . self::colorLabelStatusAdmin()[self::STATUS_APROVADO] . $meio . '"<strong>Atendente aprovou a solicitação e pode realizar o anexo do boleto</strong>">' . self::STATUS_APROVADO . '</button>';
+        $legenda .= $inicio . self::colorLabelStatusAdmin()[self::STATUS_NEGADO] . $meio . '"<strong>Atendente negou a solicitação</strong>">' . self::STATUS_NEGADO . '</button>';
         $legenda .= '</p><hr/>';
 
         return $legenda;
@@ -300,30 +298,46 @@ class PreRegistro extends Model
 
     public function getLabelStatus($status = null)
     {
-        $colorStatus = self::colorLabelStatusAdmin();
-
-        return isset($status) ? $colorStatus[$status] : $colorStatus[$this->status];
+        return isset($status) && isset(self::colorLabelStatusAdmin()[$status]) ? self::colorLabelStatusAdmin()[$status] : self::colorLabelStatusAdmin()[$this->status];
     }
 
     public function getLabelStatusUser($semExplicacao = false)
     {
-        $colorStatus = !$semExplicacao ? [
-            PreRegistro::STATUS_CRIADO => '<span class="badge badge-secondary">' . PreRegistro::STATUS_CRIADO . '</span><small> - O formulário ainda está sendo elaborado pelo solicitante</small>',
-            PreRegistro::STATUS_ANALISE_INICIAL => '<span class="badge badge-primary">' . PreRegistro::STATUS_ANALISE_INICIAL . '</span><small> - O formulário foi enviado pelo solicitante e está aguardando a análise pelo atendente</small>',
-            PreRegistro::STATUS_CORRECAO => '<span class="badge badge-warning">' . PreRegistro::STATUS_CORRECAO . '</span><small> - O formulário foi analisado pelo atendente e possui correções a serem realizadas pelo solicitante</small>',
-            PreRegistro::STATUS_ANALISE_CORRECAO => '<span class="badge badge-info">' . PreRegistro::STATUS_ANALISE_CORRECAO . '</span><small> - O formulário foi enviado pelo solicitante e está aguardando a análise da correção pelo atendente</small>',
-            PreRegistro::STATUS_APROVADO => '<span class="badge badge-success">' . PreRegistro::STATUS_APROVADO . '</span><small> - O formulário foi aprovado pelo atendente e estará disponível o boleto para pagamento</small>',
-            PreRegistro::STATUS_NEGADO => '<span class="badge badge-danger">' . PreRegistro::STATUS_NEGADO . '</span><small> - O formulário foi negado pelo atendente com justificativa</small>',
-        ] : [
-            PreRegistro::STATUS_CRIADO => '<span class="badge badge-secondary">' . PreRegistro::STATUS_CRIADO . '</span>',
-            PreRegistro::STATUS_ANALISE_INICIAL => '<span class="badge badge-primary">' . PreRegistro::STATUS_ANALISE_INICIAL . '</span>',
-            PreRegistro::STATUS_CORRECAO => '<span class="badge badge-warning">' . PreRegistro::STATUS_CORRECAO . '</span>',
-            PreRegistro::STATUS_ANALISE_CORRECAO => '<span class="badge badge-info">' . PreRegistro::STATUS_ANALISE_CORRECAO . '</span>',
-            PreRegistro::STATUS_APROVADO => '<span class="badge badge-success">' . PreRegistro::STATUS_APROVADO . '</span>',
-            PreRegistro::STATUS_NEGADO => '<span class="badge badge-danger">' . PreRegistro::STATUS_NEGADO . '</span>',
-        ];
+        $cor = '';
+        $texto = '';
 
-        return isset($colorStatus[$this->status]) ? $colorStatus[$this->status] : null;
+        switch ($this->status) {
+            case self::STATUS_CRIADO:
+                $cor = 'secondary';
+                $texto = 'O formulário ainda está sendo elaborado pelo solicitante';
+                break;
+            case self::STATUS_ANALISE_INICIAL:
+                $cor = 'primary';
+                $texto = 'O formulário foi enviado pelo solicitante e está aguardando a análise pelo atendente';
+                break;
+            case self::STATUS_CORRECAO:
+                $cor = 'warning';
+                $texto = 'O formulário foi analisado pelo atendente e possui correções a serem realizadas pelo solicitante';
+                break;
+            case self::STATUS_ANALISE_CORRECAO:
+                $cor = 'info';
+                $texto = 'O formulário foi enviado pelo solicitante e está aguardando a análise da correção pelo atendente';
+                break;
+            case self::STATUS_APROVADO:
+                $cor = 'success';
+                $texto = 'O formulário foi aprovado pelo atendente e estará disponível o boleto para pagamento';
+                break;
+            case self::STATUS_NEGADO:
+                $cor = 'danger';
+                $texto = 'O formulário foi negado pelo atendente com justificativa';
+                break;
+            default:
+                return null;
+        }
+
+        $inicio = '<span class="badge badge-'. $cor .'">' . $this->status . '</span>';
+
+        return !$semExplicacao ? $inicio . '<small> - '. $texto .'</small>' : $inicio;
     }
 
     public function getBoleto()
