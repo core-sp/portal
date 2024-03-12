@@ -65,7 +65,7 @@
     </div>
 </div>
 
-<fieldset id="opcoesCelular" {{ isset($resultado->getTelefone()[0]) && ($resultado->getTipoTelefone()[0] == 'CELULAR') ? '' : 'disabled' }}>
+<fieldset id="opcoesCelular" {{ isset($resultado->getTelefone()[0]) && isset($resultado->getTipoTelefone()[0]) && ($resultado->getTipoTelefone()[0] == 'CELULAR') ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
             <label>{{ $codigos[4]['opcional_celular'] }} <small class="bold">(opcional)</small> - Outras comunicações </label><br>
@@ -140,17 +140,17 @@
     </div>
 </div>
 
-<fieldset id="opcoesCelular_1" {{ isset($resultado->getTelefone()[1]) && ($resultado->getTipoTelefone()[1] == 'CELULAR') ? '' : 'disabled' }}>
+<fieldset id="opcoesCelular_1" {{ isset($resultado->getTelefone()[1]) && isset($resultado->getTipoTelefone()[1]) && ($resultado->getTipoTelefone()[1] == 'CELULAR') ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
             <label for="opcional_celular_1">{{ $codigos[4]['opcional_celular_1'] }} <small class="bold">(opcional)</small> - Outras comunicações </label><br>
             @foreach(opcoes_celular() as $key => $tipo)
             <div class="form-check-inline">
-                <label for="{{ 'opcional_celular__' . $key }}" class="form-check-label">
+                <label for="{{ 'opcional_celular_' . $key }}" class="form-check-label">
                     <input 
                         type="checkbox" 
                         name="opcional_celular_1[]"
-                        id="{{ 'opcional_celular__' . $key }}"
+                        id="{{ 'opcional_celular_' . $key }}"
                         class="{{ $classes[4] }} form-check-input {{ $errors->has('opcional_celular_1') ? 'is-invalid' : '' }}" 
                         value="{{ $tipo }}" 
                         @if(!empty(old('opcional_celular_1')) && is_array(old('opcional_celular_1')))
