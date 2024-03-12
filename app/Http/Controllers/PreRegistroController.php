@@ -120,8 +120,8 @@ class PreRegistroController extends Controller
         $this->authorize('updateOther', auth()->user());
 
         try{
-            $file = $request->validated()['file'];
-            $dados = $this->service->getService('PreRegistro')->admin()->uploadDoc($preRegistro, $file, 'boleto');
+            $dados = $request->validated();
+            $dados = $this->service->getService('PreRegistro')->admin()->uploadDoc($preRegistro, $dados['file'], $dados['tipo']);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 

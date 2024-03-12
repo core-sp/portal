@@ -114,6 +114,13 @@ class Anexo extends Model
         return $resultado;
     }
 
+    public static function tiposDocsAtendentePreRegistro()
+    {
+        return [
+            'boleto',
+        ];
+    }
+
     public static function camposPreRegistro()
     {
         return [

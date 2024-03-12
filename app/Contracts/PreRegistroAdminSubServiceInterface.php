@@ -7,6 +7,8 @@ use App\User;
 
 interface PreRegistroAdminSubServiceInterface {
 
+    public function tiposDocsAtendente();
+
     public function getTiposAnexos($idPreRegistro);
 
     public function listar($request, MediadorServiceInterface $service, User $user, $filtro = null);

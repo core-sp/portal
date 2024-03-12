@@ -20,7 +20,10 @@ class PreRegistroAdminRequest extends FormRequest
         $this->msg = '';
         
         if(\Route::is('preregistro.upload.doc'))
+        {
+            $this->merge(['tipo' => implode(',', $this->service->getService('PreRegistro')->admin()->tiposDocsAtendente())]);  
             return;
+        }
 
         $preRegistro = $this->service->getService('PreRegistro')->admin()->view($this->preRegistro)['resultado'];
         $arrayStatus = [
@@ -110,6 +113,7 @@ class PreRegistroAdminRequest extends FormRequest
         return \Route::is('preregistro.upload.doc') ? 
             [
                 'file' => 'required|file|mimetypes:application/pdf|max:2048',
+                'tipo' => 'required|in:'.implode(',', $this->service->getService('PreRegistro')->admin()->tiposDocsAtendente()),
             ] : [
                 'situacao' => 'required|in:aprovar,negar,corrigir',
                 'status' => 'required',

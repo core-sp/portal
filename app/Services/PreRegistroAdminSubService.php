@@ -98,7 +98,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         if(isset($temFiltro) && $temFiltro)
             $this->variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
 
-        $regionais = $service->getService('Regional')->all()->whereNotIn('idregional', [14])->sortBy('regional');
+        $regionais = $service->getService('Regional')->getRegionais()->sortBy('regional');
         $options = !isset($request->regional) ? 
         getFiltroOptions('Todas', 'Todas', true) : getFiltroOptions('Todas', 'Todas');
 
@@ -175,6 +175,11 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         }
     }
 
+    public function tiposDocsAtendente()
+    {
+        return Anexo::tiposDocsAtendentePreRegistro();
+    }
+
     public function getTiposAnexos($idPreRegistro)
     {
         $preRegistro = PreRegistro::findOrFail($idPreRegistro);
@@ -212,6 +217,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
             'variaveis' => (object) $variaveis,
             'abas' => $this->getMenu(),
             'codigos' => $this->getCodigosCampos($resultado->userExterno->isPessoaFisica()),
+            'boleto' => $resultado->getBoleto(),
         ];
     }
 
@@ -307,12 +313,12 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
                 'class' => 'alert-danger'
             ];
         
-        $doc = Anexo::armazenarDoc($id, $file, 'boleto');
+        $doc = Anexo::armazenarDoc($id, $file, $tipo_doc);
         $doc = is_array($doc) ? $preRegistro->anexos()->create($doc) : null;
-        event(new CrudEvent('pré-registro', 'anexou o documento "' . $file->getClientOriginalName() . '" do tipo boleto', $id));
+        event(new CrudEvent('pré-registro', 'anexou o documento "' . $file->getClientOriginalName() . '" do tipo '.$tipo_doc, $id));
 
         return [
-            'message' => '<i class="icon fa fa-check"></i> Boleto anexado com sucesso!',
+            'message' => '<i class="icon fa fa-check"></i> '.ucfirst($tipo_doc).' anexado com sucesso!',
             'class' => 'alert-success'
         ];
     }
