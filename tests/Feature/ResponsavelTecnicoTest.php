@@ -698,7 +698,10 @@ class ResponsavelTecnicoTest extends TestCase
         $pr = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make();
         $dados = $pr->final;
         
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         $this->assertDatabaseHas('responsaveis_tecnicos', [
             'nome_mae' => $rt['nome_mae'],
@@ -728,8 +731,11 @@ class ResponsavelTecnicoTest extends TestCase
         $dados = $pr->final;
         foreach($rt as $chave => $val)
             !in_array($chave, ['registro']) ? $dados[$chave.'_rt'] = $val : null;
-        
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         foreach($rt as $key => $value)
             $rt[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : $value;
@@ -1110,7 +1116,7 @@ class ResponsavelTecnicoTest extends TestCase
         $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['titulo_eleitor_rt'] = '';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('titulo_eleitor_rt');
     }
 
@@ -1123,7 +1129,7 @@ class ResponsavelTecnicoTest extends TestCase
         $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['titulo_eleitor_rt'] = '23569874521';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('titulo_eleitor_rt');
     }
 
@@ -1136,7 +1142,7 @@ class ResponsavelTecnicoTest extends TestCase
         $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['titulo_eleitor_rt'] = '2356987452123658';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('titulo_eleitor_rt');
     }
 
@@ -1149,7 +1155,7 @@ class ResponsavelTecnicoTest extends TestCase
         $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['zona_rt'] = '';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('zona_rt');
     }
 
@@ -1162,7 +1168,7 @@ class ResponsavelTecnicoTest extends TestCase
         $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['zona_rt'] = '7536985';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('zona_rt');
     }
 
@@ -1175,7 +1181,7 @@ class ResponsavelTecnicoTest extends TestCase
         $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['secao_rt'] = '';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('secao_rt');
     }
 
@@ -1188,7 +1194,7 @@ class ResponsavelTecnicoTest extends TestCase
         $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['secao_rt'] = '753698575';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('secao_rt');
     }
 
@@ -1203,7 +1209,7 @@ class ResponsavelTecnicoTest extends TestCase
         $dados['sexo_rt'] = 'M';
         $dados['ra_reservista_rt'] = '';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('ra_reservista_rt');
     }
 
@@ -1218,7 +1224,7 @@ class ResponsavelTecnicoTest extends TestCase
         $dados['sexo_rt'] = 'M';
         $dados['ra_reservista_rt'] = '55522211174';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('ra_reservista_rt');
     }
 
@@ -1233,7 +1239,7 @@ class ResponsavelTecnicoTest extends TestCase
         $dados['sexo_rt'] = 'M';
         $dados['ra_reservista_rt'] = '5552221117488874';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('ra_reservista_rt');
     }
 
@@ -2229,7 +2235,10 @@ class ResponsavelTecnicoTest extends TestCase
         $pr = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make();
         $dados = $pr->final;
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         $this->assertDatabaseHas('responsaveis_tecnicos', [
@@ -2262,7 +2271,10 @@ class ResponsavelTecnicoTest extends TestCase
         foreach($rt as $chave => $val)
             !in_array($chave, ['registro']) ? $dados[$chave.'_rt'] = $val : null;
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         foreach($rt as $key => $value)

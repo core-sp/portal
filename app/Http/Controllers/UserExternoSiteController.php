@@ -248,13 +248,6 @@ class UserExternoSiteController extends Controller
             auth()->guard('contabil')->user()->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
             
-            $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
-            
-            if(isset($dados['gerenti']))
-                return isset($preRegistro) ? 
-                redirect()->route('externo.preregistro.view', $preRegistro)->with(['resultado' => null, 'gerenti' => $dados['gerenti']]) : 
-                redirect()->route('externo.preregistro.view')->with(['resultado' => null, 'gerenti' => $dados['gerenti']]);
-
             if(!isset($externo) && auth()->guard('contabil')->check())
                 return redirect()->route('externo.relacao.preregistros');
 
@@ -266,12 +259,12 @@ class UserExternoSiteController extends Controller
                     ->with($dados)
                     ->with(['resultado' => null, 'gerenti' => null]);
 
-            $resultado = $dados['resultado'];
-
-            if(!$resultado->userPodeEditar())
+            if(!$dados['resultado']->userPodeEditar())
                 throw new \Exception('Não autorizado a editar o formulário com a solicitação em análise ou finalizada', 401);
 
+            $request->session()->flash('final_pr', $request->validated());
             $dados['semPendencia'] = true;
+            $dados['gerenti'] = null;
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             return redirect()->route('externo.relacao.preregistros')->with([
@@ -288,9 +281,8 @@ class UserExternoSiteController extends Controller
     }
 
     // Esse request não devolve a página para correção.
-    // Apenas valida os dados já salvos no bd que foram carregados no form novamente ou via request direto
-    // Apenas rota de confirmação do envio e onde é realizado os processos
-    public function inserirPreRegistro(PreRegistroRequest $request, $preRegistro = null)
+    // Apenas recebe os dados já verificados na rota anterior e onde é realizado os processos
+    public function inserirPreRegistro($preRegistro = null)
     {
         try{
             if(isset($preRegistro) && !auth()->guard('contabil')->check())
@@ -309,8 +301,10 @@ class UserExternoSiteController extends Controller
 
             $contabil = auth()->guard('contabil')->user();
 
-            $validatedData = $request->validated();
-            $dados = $this->service->getService('PreRegistro')->saveSite($validatedData, $this->gerentiRepository, $externo, $contabil);
+            if(!session()->exists('final_pr'))
+                throw new \Exception('Não autorizado a enviar o formulário com a solicitação sem verificação de pendências', 401);
+
+            $dados = $this->service->getService('PreRegistro')->saveSite(session('final_pr'), $this->gerentiRepository, $externo, $contabil);
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             return redirect()->route('externo.relacao.preregistros')->with([

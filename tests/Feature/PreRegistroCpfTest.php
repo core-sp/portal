@@ -70,7 +70,7 @@ class PreRegistroCpfTest extends TestCase
         $this->put(route('externo.verifica.inserir.preregistro', $pr))->assertRedirect(route('externo.preregistro.view'));
         $this->assertEquals(PreRegistro::count(), 0);
 
-        $this->put(route('externo.inserir.preregistro', $pr))->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.inserir.preregistro'))->assertUnauthorized();
         $this->assertEquals(PreRegistro::count(), 0);
     }
 
@@ -686,10 +686,7 @@ class PreRegistroCpfTest extends TestCase
 
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertOk();
 
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-        ->assertSee('<button type="button" class="btn btn-success" id="submitPreRegistro" value="">Enviar</button>'); 
-
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.inserir.preregistro'))
         ->assertRedirect(route('externo.preregistro.view'));
 
         Mail::assertQueued(PreRegistroMail::class);
@@ -724,7 +721,8 @@ class PreRegistroCpfTest extends TestCase
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();
 
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         foreach($pr as $key => $value)
             $pr[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : $value;
@@ -759,7 +757,8 @@ class PreRegistroCpfTest extends TestCase
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();
 
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         foreach($pr as $key => $value)
             $pr[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : $value;
@@ -795,7 +794,8 @@ class PreRegistroCpfTest extends TestCase
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         foreach($pr as $key => $value)
             $pr[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : $value;
@@ -833,7 +833,7 @@ class PreRegistroCpfTest extends TestCase
         $pr = $pr->makeHidden(['final'])->attributesToArray();
         Anexo::first()->delete();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('path');
 
         foreach($pr as $key => $value)
@@ -873,7 +873,8 @@ class PreRegistroCpfTest extends TestCase
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         foreach($pr as $key => $value)
             $pr[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : $value;
@@ -920,7 +921,8 @@ class PreRegistroCpfTest extends TestCase
         $dados['tipo_telefone_1'] = null;
         $dados['opcional_celular_1'] = [];    
 
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         foreach($pr as $key => $value)
             $pr[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : $value;
@@ -1230,7 +1232,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['nome_mae'] = 'N0me Mãe';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_mae');
     }
 
@@ -1270,7 +1272,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['nome_pai'] = 'Nom3 pai';
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_pai');
     }
 
@@ -1283,7 +1285,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['tipo_identidade'] = '';
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('tipo_identidade');
     }
 
@@ -1296,7 +1298,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['tipo_identidade'] = 'Teste';
     
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('tipo_identidade');
     }
 
@@ -1309,7 +1311,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['identidade'] = '';
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('identidade');
     }
 
@@ -1322,7 +1324,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['identidade'] = '123';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('identidade');
     }
 
@@ -1335,7 +1337,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['identidade'] = '1234567890123456789012345678901';
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('identidade');
     }
 
@@ -1348,7 +1350,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['orgao_emissor'] = '';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('orgao_emissor');
     }
 
@@ -1361,7 +1363,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['orgao_emissor'] = 'SS';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('orgao_emissor');
     }
 
@@ -1375,7 +1377,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['orgao_emissor'] = $faker->text(500);     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('orgao_emissor');
     }
 
@@ -1388,7 +1390,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['dt_expedicao'] = '';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_expedicao');
     }
 
@@ -1401,7 +1403,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['dt_expedicao'] = '2000/12/21';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_expedicao');
     }
 
@@ -1414,7 +1416,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['dt_expedicao'] = 'text';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_expedicao');
     }
 
@@ -1427,7 +1429,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['dt_expedicao'] = Carbon::today()->addDay()->format('Y-m-d');     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_expedicao');
     }
 
@@ -1440,7 +1442,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['titulo_eleitor'] = '';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('titulo_eleitor');
     }
 
@@ -1453,7 +1455,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['titulo_eleitor'] = '23569874521';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('titulo_eleitor');
     }
 
@@ -1466,7 +1468,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['titulo_eleitor'] = '2356987452123658';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('titulo_eleitor');
     }
 
@@ -1479,7 +1481,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['zona'] = '';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('zona');
     }
 
@@ -1492,7 +1494,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['zona'] = '7536985';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('zona');
     }
 
@@ -1505,7 +1507,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['secao'] = '';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('secao');
     }
 
@@ -1518,7 +1520,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['secao'] = '753698575';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('secao');
     }
 
@@ -1532,7 +1534,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['ra_reservista'] = '';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('ra_reservista');
     }
 
@@ -1546,7 +1548,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['ra_reservista'] = '55522211174';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('ra_reservista');
     }
 
@@ -1560,7 +1562,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['ra_reservista'] = '5552221117488874';     
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('ra_reservista');
     }
 
@@ -1573,7 +1575,8 @@ class PreRegistroCpfTest extends TestCase
 
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
 
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         $pr = PreRegistro::first();
 
@@ -1597,8 +1600,8 @@ class PreRegistroCpfTest extends TestCase
             $preRegistro->update(['status' => $status]);
             if(!in_array($status, [PreRegistro::STATUS_CRIADO, PreRegistro::STATUS_CORRECAO]))
                 in_array($status, [PreRegistro::STATUS_APROVADO, PreRegistro::STATUS_NEGADO]) ? 
-                $this->put(route('externo.inserir.preregistro'), $dados)->assertSessionHasErrors('path') : 
-                $this->put(route('externo.inserir.preregistro'), $dados)->assertStatus(401);
+                $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertSessionHasErrors('path') : 
+                $this->put(route('externo.inserir.preregistro'))->assertUnauthorized();
         }
     }
 
@@ -1617,7 +1620,8 @@ class PreRegistroCpfTest extends TestCase
             $preRegistro->update(['status' => $status]);
             if($status == PreRegistro::STATUS_CORRECAO)
                 $dados['nome_mae'] = 'Outro nome da mãe';
-            $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+            $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+            $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
             Mail::assertQueued(PreRegistroMail::class);
             $this->assertEquals(PreRegistro::first()->status, $s[$status]);
         }
@@ -1633,7 +1637,8 @@ class PreRegistroCpfTest extends TestCase
 
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
 
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -1652,7 +1657,8 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['path'] = null;
            
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         $pr = PreRegistro::first();
         $arrayFinal = array_diff(array_keys(json_decode($pr->campos_espelho, true)), array_keys($dados));
@@ -1688,7 +1694,8 @@ class PreRegistroCpfTest extends TestCase
         $dados['secao'] = '12';
         $dados['ra_reservista'] = '444555666777';
       
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
         $pr = PreRegistro::first();
         $dados = Arr::except($dados, ['final', 'created_at', 'updated_at', 'deleted_at', 'pergunta']);
 
@@ -2355,7 +2362,10 @@ class PreRegistroCpfTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))
         ->assertSee('<button type="button" class="btn btn-success" id="submitPreRegistro" value="">Enviar</button>'); 
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         Mail::assertQueued(PreRegistroMail::class);
@@ -2391,7 +2401,10 @@ class PreRegistroCpfTest extends TestCase
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         foreach($pr as $key => $value)
@@ -2428,7 +2441,10 @@ class PreRegistroCpfTest extends TestCase
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 3]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 3]));
 
         foreach($pr as $key => $value)
@@ -2465,7 +2481,10 @@ class PreRegistroCpfTest extends TestCase
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 3]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 3]));
 
         foreach($pr as $key => $value)
@@ -2504,8 +2523,11 @@ class PreRegistroCpfTest extends TestCase
         $pr = $pr->makeHidden(['final'])->attributesToArray();
         Anexo::first()->delete();
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
         ->assertSessionHasErrors('path');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 3]))
+        ->assertUnauthorized();
 
         foreach($pr as $key => $value)
             $pr[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : $value;
@@ -2545,7 +2567,10 @@ class PreRegistroCpfTest extends TestCase
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 3]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 3]));
 
         foreach($pr as $key => $value)
@@ -2584,7 +2609,10 @@ class PreRegistroCpfTest extends TestCase
         $dados['tipo_telefone_1'] = null;
         $dados['opcional_celular_1'] = [];        
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         foreach($pr as $key => $value)
@@ -2916,7 +2944,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['nome_mae'] = 'N0me Mãe';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('nome_mae');
     }
 
@@ -2959,7 +2987,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['nome_pai'] = 'Nom3 pai';
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('nome_pai');
     }
 
@@ -2973,7 +3001,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['tipo_identidade'] = '';
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('tipo_identidade');
     }
 
@@ -2987,7 +3015,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['tipo_identidade'] = 'Teste';
     
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('tipo_identidade');
     }
 
@@ -3001,7 +3029,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['identidade'] = '';
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('identidade');
     }
 
@@ -3015,7 +3043,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['identidade'] = '123';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('identidade');
     }
 
@@ -3029,7 +3057,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['identidade'] = '1234567890123456789012345678901';
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('identidade');
     }
 
@@ -3043,7 +3071,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['orgao_emissor'] = '';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('orgao_emissor');
     }
 
@@ -3057,7 +3085,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['orgao_emissor'] = 'SS';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('orgao_emissor');
     }
 
@@ -3072,7 +3100,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['orgao_emissor'] = $faker->text(500);     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('orgao_emissor');
     }
 
@@ -3086,7 +3114,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['dt_expedicao'] = '';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('dt_expedicao');
     }
 
@@ -3100,7 +3128,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['dt_expedicao'] = '2000/12/21';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('dt_expedicao');
     }
 
@@ -3114,7 +3142,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['dt_expedicao'] = 'text';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('dt_expedicao');
     }
 
@@ -3128,7 +3156,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['dt_expedicao'] = Carbon::today()->addDay()->format('Y-m-d');     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('dt_expedicao');
     }
 
@@ -3142,7 +3170,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['titulo_eleitor'] = '';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('titulo_eleitor');
     }
 
@@ -3156,7 +3184,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['titulo_eleitor'] = '23569874521';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('titulo_eleitor');
     }
 
@@ -3170,7 +3198,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['titulo_eleitor'] = '2356987452123658';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('titulo_eleitor');
     }
 
@@ -3184,7 +3212,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['zona'] = '';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('zona');
     }
 
@@ -3198,7 +3226,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['zona'] = '7536985';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('zona');
     }
 
@@ -3212,7 +3240,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['secao'] = '';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('secao');
     }
 
@@ -3226,7 +3254,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['secao'] = '753698575';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('secao');
     }
 
@@ -3241,7 +3269,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['ra_reservista'] = '';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('ra_reservista');
     }
 
@@ -3256,7 +3284,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['ra_reservista'] = '55522211174';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('ra_reservista');
     }
 
@@ -3271,7 +3299,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['ra_reservista'] = '5552221117488874';     
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('ra_reservista');
     }
 
@@ -3284,7 +3312,10 @@ class PreRegistroCpfTest extends TestCase
 
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         $pr = PreRegistro::first();
@@ -3309,8 +3340,8 @@ class PreRegistroCpfTest extends TestCase
             $preRegistro->update(['status' => $status]);
             if(!in_array($status, [PreRegistro::STATUS_CRIADO, PreRegistro::STATUS_CORRECAO]))
                 in_array($status, [PreRegistro::STATUS_APROVADO, PreRegistro::STATUS_NEGADO]) ? 
-                $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)->assertSessionHasErrors('path') : 
-                $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)->assertStatus(401);
+                $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)->assertSessionHasErrors('path') : 
+                $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))->assertUnauthorized();
         }
     }
 
@@ -3329,7 +3360,11 @@ class PreRegistroCpfTest extends TestCase
             $preRegistro->update(['status' => $status]);
             if($status == PreRegistro::STATUS_CORRECAO)
                 $dados['nome_mae'] = 'Outro nome da mãe';
-            $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+
+            $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+            ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+            $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
             ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
             Mail::assertQueued(PreRegistroMail::class);
             $this->assertEquals(PreRegistro::first()->status, $s[$status]);
@@ -3346,7 +3381,10 @@ class PreRegistroCpfTest extends TestCase
 
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
@@ -3366,7 +3404,10 @@ class PreRegistroCpfTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         $dados['path'] = null;
            
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         $pr = PreRegistro::first();
@@ -3403,7 +3444,10 @@ class PreRegistroCpfTest extends TestCase
         $dados['secao'] = '88';
         $dados['ra_reservista'] = '222555888777';
       
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
         $pr = PreRegistro::first();
         $dados = Arr::except($dados, ['final', 'created_at', 'updated_at', 'deleted_at', 'pergunta']);

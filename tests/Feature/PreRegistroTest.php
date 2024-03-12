@@ -94,10 +94,10 @@ class PreRegistroTest extends TestCase
             'valor' => 'Teste Teste'
         ])->assertStatus(401);
 
-        $this->put(route('externo.inserir.preregistro'), $dados)
-        ->assertSessionHasErrors('path');
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('path');
+        $this->put(route('externo.inserir.preregistro'))
+        ->assertStatus(401);
         $this->get(route('externo.preregistro.anexo.download', 1))->assertStatus(401);
         $this->delete(route('externo.preregistro.anexo.excluir', 1))->assertStatus(401);
     }
@@ -122,10 +122,10 @@ class PreRegistroTest extends TestCase
             'valor' => 'Teste Teste'
         ])->assertStatus(401);
 
-        $this->put(route('externo.inserir.preregistro'), $dados)
-        ->assertSessionHasErrors('path');
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('path');
+        $this->put(route('externo.inserir.preregistro'))
+        ->assertStatus(401);
         $this->get(route('externo.preregistro.anexo.download', 1))->assertStatus(401);
         $this->delete(route('externo.preregistro.anexo.excluir', 1))->assertStatus(401);
     }
@@ -149,8 +149,8 @@ class PreRegistroTest extends TestCase
             'valor' => 'Brindes'
         ])->assertStatus(401);
 
-        $this->put(route('externo.inserir.preregistro'), $dados)
-        ->assertNotFound();
+        $this->put(route('externo.inserir.preregistro'))
+        ->assertUnauthorized();
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertNotFound();
         $this->get(route('externo.preregistro.anexo.download', 1))->assertStatus(401);
@@ -2165,7 +2165,10 @@ class PreRegistroTest extends TestCase
         $this->put(route('externo.inserir.preregistro'), $dados);
         $externo->preRegistro->update(['status' => PreRegistro::STATUS_CORRECAO]);
 
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))
         ->assertRedirect(route('externo.preregistro.view'));
 
         $this->get(route('externo.preregistro.view'))
@@ -2184,7 +2187,10 @@ class PreRegistroTest extends TestCase
         $this->put(route('externo.inserir.preregistro'), $dados);
         $externo->preRegistro->update(['status' => PreRegistro::STATUS_CORRECAO]);
 
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))
         ->assertRedirect(route('externo.preregistro.view'));
 
         $this->get(route('externo.preregistro.view'))
@@ -2216,7 +2222,10 @@ class PreRegistroTest extends TestCase
         $dados["opcional_celular"] = [opcoes_celular()[1]];
         $dados["opcional_celular_1"] = [opcoes_celular()[1]];
 
-        $this->put(route('externo.inserir.preregistro'), array_merge($dadosTotais, $dados))
+        $this->put(route('externo.verifica.inserir.preregistro'), array_merge($dadosTotais, $dados))
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))
         ->assertRedirect(route('externo.preregistro.view'));
 
         $pr = PreRegistro::first();
@@ -2254,7 +2263,10 @@ class PreRegistroTest extends TestCase
         $dados["opcional_celular"] = [opcoes_celular()[1]];
         $dados["opcional_celular_1"] = [opcoes_celular()[1]];
 
-        $this->put(route('externo.inserir.preregistro'), array_merge($dadosTotais, $dados))
+        $this->put(route('externo.verifica.inserir.preregistro'), array_merge($dadosTotais, $dados))
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))
         ->assertRedirect(route('externo.preregistro.view'));
 
         $pr = PreRegistro::first();
@@ -2287,10 +2299,10 @@ class PreRegistroTest extends TestCase
         $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
         Anexo::first()->delete();
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
-        ->assertSessionHasErrors('path');
         $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('path');
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
+        ->assertStatus(401);
         $this->get(route('externo.preregistro.anexo.download', ['id' => 1, 'preRegistro' => 1]))->assertStatus(401);
         $this->delete(route('externo.preregistro.anexo.excluir', ['id' => 1, 'preRegistro' => 1]))->assertStatus(401);
 
@@ -2298,10 +2310,10 @@ class PreRegistroTest extends TestCase
         $dados = factory('App\PreRegistroCnpj')->states('request')->make()->final;
         Anexo::first()->delete();
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
-        ->assertSessionHasErrors('path');
         $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
         ->assertSessionHasErrors('path');
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
+        ->assertStatus(401);
         $this->get(route('externo.preregistro.anexo.download', ['id' => 1, 'preRegistro' => 1]))->assertStatus(401);
         $this->delete(route('externo.preregistro.anexo.excluir', ['id' => 1, 'preRegistro' => 1]))->assertStatus(401);
     }
@@ -4104,7 +4116,10 @@ class PreRegistroTest extends TestCase
 
         $this->get(route('externo.inserir.preregistro', ['preRegistro' => 1]))->assertOk();
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         $this->get(route('externo.preregistro.view', ['preRegistro' => 1]))
@@ -4136,7 +4151,10 @@ class PreRegistroTest extends TestCase
         $dados["opcional_celular"] = [opcoes_celular()[1]];
         $dados["opcional_celular_1"] = [opcoes_celular()[1]];
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), array_merge($dadosTotais, $dados))
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), array_merge($dadosTotais, $dados))
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         $pr = PreRegistro::first();
@@ -4174,7 +4192,10 @@ class PreRegistroTest extends TestCase
         $dados["opcional_celular"] = [opcoes_celular()[1]];
         $dados["opcional_celular_1"] = [opcoes_celular()[1]];
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), array_merge($dadosTotais, $dados))
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), array_merge($dadosTotais, $dados))
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         $pr = PreRegistro::first();

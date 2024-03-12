@@ -2236,7 +2236,10 @@ class ContabilTest extends TestCase
         $pr = factory('App\PreRegistroCpf')->states('request')->make();
         $dados = $pr->final;
 
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))
         ->assertRedirect(route('externo.preregistro.view'));
 
         foreach($cont as $key => $value)
@@ -3114,7 +3117,10 @@ class ContabilTest extends TestCase
         $pr = factory('App\PreRegistroCpf')->states('request')->make();
         $dados = $pr->final;
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view',['preRegistro' => 1]));
 
         $this->assertDatabaseHas('contabeis', $externo->attributesToArray());

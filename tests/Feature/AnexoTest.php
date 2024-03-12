@@ -893,7 +893,8 @@ class AnexoTest extends TestCase
             'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
         ])->assertOk();
 
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         $pr = PreRegistro::first();
         $dados = Arr::except($dados, ['final', 'created_at', 'updated_at', 'deleted_at', 'pergunta']);
@@ -1823,7 +1824,10 @@ class AnexoTest extends TestCase
             'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
         ])->assertOk();
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         $pr = PreRegistro::first();

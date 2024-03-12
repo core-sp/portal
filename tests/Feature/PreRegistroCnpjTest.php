@@ -69,7 +69,7 @@ class PreRegistroCnpjTest extends TestCase
         $this->put(route('externo.verifica.inserir.preregistro', $pr))->assertRedirect(route('externo.preregistro.view'));
         $this->assertEquals(PreRegistro::count(), 0);
 
-        $this->put(route('externo.inserir.preregistro', $pr))->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.inserir.preregistro'))->assertUnauthorized();
         $this->assertEquals(PreRegistro::count(), 0);
     }
 
@@ -690,7 +690,7 @@ class PreRegistroCnpjTest extends TestCase
             'titulo_eleitor_rt' => null,'zona_rt' => null,'secao_rt' => null,'ra_reservista_rt' => '123','path' => null,'pergunta' => '1',
         ];
 
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertRedirect(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));
 
         $errors = session('errors');
@@ -723,7 +723,7 @@ class PreRegistroCnpjTest extends TestCase
             'secao_rt' => null,'ra_reservista_rt' => '123','path' => null,'pergunta' => '1',
         ];
 
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertRedirect(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));
 
         $errors = session('errors');
@@ -762,7 +762,10 @@ class PreRegistroCnpjTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
         ->assertSee('<button type="button" class="btn btn-success" id="submitPreRegistro" value="">Enviar</button>'); 
 
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))
         ->assertRedirect(route('externo.preregistro.view'));
         
         Mail::assertQueued(PreRegistroMail::class);
@@ -803,7 +806,10 @@ class PreRegistroCnpjTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
         ->assertSee('<button type="button" class="btn btn-success" id="submitPreRegistro" value="">Enviar</button>'); 
 
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))
         ->assertRedirect(route('externo.preregistro.view'));
         
         foreach($pr as $key => $value)
@@ -853,7 +859,10 @@ class PreRegistroCnpjTest extends TestCase
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         foreach($pr as $key => $value)
             $pr[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : $value;
@@ -894,7 +903,8 @@ class PreRegistroCnpjTest extends TestCase
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         foreach($pr as $key => $value)
             $pr[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : $value;
@@ -937,7 +947,7 @@ class PreRegistroCnpjTest extends TestCase
         $pr = $pr->makeHidden(['final'])->attributesToArray();
         Anexo::first()->delete();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('path');
 
         foreach($pr as $key => $value)
@@ -980,7 +990,8 @@ class PreRegistroCnpjTest extends TestCase
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         foreach($pr as $key => $value)
             $pr[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : $value;
@@ -1027,7 +1038,8 @@ class PreRegistroCnpjTest extends TestCase
         $dados['nome_pai_rt'] = null;
         $dados['ra_reservista_rt'] = null;
         
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
         
         foreach($pr as $key => $value)
             $pr[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : $value;
@@ -1570,7 +1582,8 @@ class PreRegistroCnpjTest extends TestCase
 
         $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
 
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         $pr = PreRegistro::first();
 
@@ -1596,8 +1609,8 @@ class PreRegistroCnpjTest extends TestCase
             $preRegistro->update(['status' => $status]);
             if(!in_array($status, [PreRegistro::STATUS_CRIADO, PreRegistro::STATUS_CORRECAO]))
                 in_array($status, [PreRegistro::STATUS_APROVADO, PreRegistro::STATUS_NEGADO]) ? 
-                $this->put(route('externo.inserir.preregistro'), $dados)->assertSessionHasErrors('path') : 
-                $this->put(route('externo.inserir.preregistro'), $dados)->assertStatus(401);
+                $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertSessionHasErrors('path') : 
+                $this->put(route('externo.inserir.preregistro'))->assertStatus(401);
         }
     }
 
@@ -1618,7 +1631,8 @@ class PreRegistroCnpjTest extends TestCase
             $preRegistro->update(['status' => $status]);
             if($status == PreRegistro::STATUS_CORRECAO)
                 $dados['nire'] = '65439';
-            $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+            $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+            $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
             Mail::assertQueued(PreRegistroMail::class);
             $this->assertEquals(PreRegistro::first()->status, $s[$status]);
         }
@@ -1636,7 +1650,8 @@ class PreRegistroCnpjTest extends TestCase
 
         $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -1655,7 +1670,8 @@ class PreRegistroCnpjTest extends TestCase
         $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['path'] = null;
 
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         $pr = PreRegistro::first();
         $arrayFinal = array_diff(array_keys(json_decode($pr->campos_espelho, true)), array_keys($dados));
@@ -1680,7 +1696,8 @@ class PreRegistroCnpjTest extends TestCase
         $dados['dt_inicio_atividade'] = '2019-12-10';
         $dados['capital_social'] = '5.000,00';
 
-        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
         $pr = PreRegistro::first();
         $dados = Arr::except($dados, ['final', 'created_at', 'updated_at', 'deleted_at', 'pergunta']);
@@ -2393,7 +2410,10 @@ class PreRegistroCnpjTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))
         ->assertSee('<button type="button" class="btn btn-success" id="submitPreRegistro" value="">Enviar</button>'); 
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
         
         Mail::assertQueued(PreRegistroMail::class);
@@ -2436,7 +2456,10 @@ class PreRegistroCnpjTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))
         ->assertSee('<button type="button" class="btn btn-success" id="submitPreRegistro" value="">Enviar</button>'); 
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
         
         foreach($pr as $key => $value)
@@ -2487,7 +2510,10 @@ class PreRegistroCnpjTest extends TestCase
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 3]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 3]));
 
         foreach($pr as $key => $value)
@@ -2529,7 +2555,10 @@ class PreRegistroCnpjTest extends TestCase
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 3]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 3]));
 
         foreach($pr as $key => $value)
@@ -2573,7 +2602,7 @@ class PreRegistroCnpjTest extends TestCase
         $pr = $pr->makeHidden(['final'])->attributesToArray();
         Anexo::first()->delete();
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
         ->assertSessionHasErrors('path');
 
         foreach($pr as $key => $value)
@@ -2617,7 +2646,10 @@ class PreRegistroCnpjTest extends TestCase
         $dados = $pr->final;
         $pr = $pr->makeHidden(['final'])->attributesToArray();
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 3]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 3]));
 
         foreach($pr as $key => $value)
@@ -2658,7 +2690,10 @@ class PreRegistroCnpjTest extends TestCase
         $dados['nome_pai_rt'] = null;
         $dados['ra_reservista_rt'] = null;
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
         
         foreach($pr as $key => $value)
@@ -3240,7 +3275,10 @@ class PreRegistroCnpjTest extends TestCase
 
         $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         $pr = PreRegistro::first();
@@ -3267,8 +3305,8 @@ class PreRegistroCnpjTest extends TestCase
             $preRegistro->update(['status' => $status]);
             if(!in_array($status, [PreRegistro::STATUS_CRIADO, PreRegistro::STATUS_CORRECAO]))
                 in_array($status, [PreRegistro::STATUS_APROVADO, PreRegistro::STATUS_NEGADO]) ? 
-                $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)->assertSessionHasErrors('path') : 
-                $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)->assertStatus(401);
+                $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)->assertSessionHasErrors('path') : 
+                $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))->assertStatus(401);
         }
     }
 
@@ -3289,7 +3327,11 @@ class PreRegistroCnpjTest extends TestCase
             $preRegistro->update(['status' => $status]);
             if($status == PreRegistro::STATUS_CORRECAO)
                 $dados['nire'] = '65439';
-            $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+
+            $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+            ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+            $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
             ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
             Mail::assertQueued(PreRegistroMail::class);
             $this->assertEquals(PreRegistro::first()->status, $s[$status]);
@@ -3308,7 +3350,10 @@ class PreRegistroCnpjTest extends TestCase
 
         $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
@@ -3328,7 +3373,10 @@ class PreRegistroCnpjTest extends TestCase
         $dados = factory('App\PreRegistroCnpj')->states('request_mesmo_endereco')->make()->final;
         $dados['path'] = null;
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         $pr = PreRegistro::first();
@@ -3354,7 +3402,10 @@ class PreRegistroCnpjTest extends TestCase
         $dados['dt_inicio_atividade'] = '2019-12-10';
         $dados['capital_social'] = '5.000,00';
 
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         $pr = PreRegistro::first();
