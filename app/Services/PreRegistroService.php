@@ -20,12 +20,13 @@ class PreRegistroService implements PreRegistroServiceInterface {
         if(!isset($externo))
             throw new \Exception('Deve ter um usuário externo para criar o pré-registro.', 401);
 
-        $resultado = $externo->load('preRegistro')->preRegistro;
         if($externo->preRegistroAprovado())
             return [
                 'message' => 'Este CPF / CNPJ já possui uma solicitação aprovada.',
                 'class' => 'alert-warning'
             ];
+
+        $resultado = $externo->load('preRegistro')->preRegistro;
         if(isset($resultado))
             return $resultado;
         
@@ -123,8 +124,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function getPreRegistros($externo)
     {
-        $resultados = $externo->load('preRegistros')
-        ->preRegistros()
+        $resultados = $externo->preRegistros()
+        ->with('userExterno')
         ->orderBy('updated_at', 'DESC')
         ->orderBy('user_externo_id')
         ->paginate(5);
@@ -145,11 +146,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
         return [
             'resultado' => $resultado,
-            'codigos' => $this->getCodigosCampos($resultado->userExterno->isPessoaFisica()),
-            'regionais' => $service->getService('Regional')
-                ->all()
-                ->whereNotIn('idregional', [14])
-                ->sortBy('regional'),
+            'codigos' => $this->getCodigosCampos($externo->isPessoaFisica()),
+            'regionais' => $service->getService('Regional')->getRegionais()->sortBy('regional'),
             'classes' => $this->getNomeClasses(),
             'totalFiles' => $externo->isPessoaFisica() ? Anexo::TOTAL_PF_PRE_REGISTRO : Anexo::TOTAL_PJ_PRE_REGISTRO,
             'abas' => $this->getMenu()
@@ -223,33 +221,28 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
-    public function downloadAnexo($id, $idPreRegistro, $admin = false, $doc = null)
+    public function downloadAnexo($id, $idPreRegistro, $admin = false)
     {
         $preRegistro = PreRegistro::findOrFail($idPreRegistro);
 
         if(!isset($preRegistro))
             throw new \Exception('Não autorizado a acessar a solicitação de registro', 401);
 
-        $anexo = $preRegistro->anexos()->where('id', $id)->first();
-        $file = null;
+        $anexo = $preRegistro->anexos->where('id', $id)->first();
 
         if(isset($anexo) && Storage::disk('local')->exists($anexo->path))
         {
             $file = Storage::disk('local')->path($anexo->path);
-            if(isset($doc))
-                $doc = isset($file) && ($anexo->nome_original == ('boleto_aprovado_' . $preRegistro->id));
+            if(!isset($file))
+                throw new \Exception('Arquivo de anexo com ID '.$id.' do pré-registro não existe no storage', 404);
+
+            if($anexo->anexadoPeloAtendente() && !$admin)
+                event(new ExternoEvent('Foi realizado o download do boleto com ID ' . $anexo->id .' do pré-registro com ID ' . $preRegistro->id . '.'));
+
+            return $file;
         }
 
-        if(isset($anexo) && isset($doc) && $doc && !$admin)
-            event(new ExternoEvent('Foi realizado o download do boleto com ID ' . $anexo->id .' do pré-registro com ID ' . $preRegistro->id . '.'));
-
-        if(isset($anexo) && isset($doc) && !$doc && !$admin)
-            throw new \Exception('Somente os documentos anexados pelo atendente podem ser acessados após aprovação', 401);
-
-        if(isset($file))
-            return $file;
-
-        throw new \Exception('Arquivo não existe / não pode acessar', 401);
+        throw new \Exception('Arquivo de anexo do pré-registro não existe / não pode acessar', 401);
     }
 
     public function excluirAnexo($id, $externo, $contabil = null)
@@ -265,7 +258,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         if(!$preRegistro->userPodeEditar())
             throw new \Exception('Não autorizado a excluir arquivo com status diferente de ' . PreRegistro::STATUS_CORRECAO, 401);
 
-        $anexo = $preRegistro->anexos()->where('id', $id)->first();
+        $anexo = $preRegistro->anexos->where('id', $id)->first();
 
         if(isset($anexo) && Storage::disk('local')->exists($anexo->path))
         {

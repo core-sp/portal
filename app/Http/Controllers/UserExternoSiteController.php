@@ -124,7 +124,7 @@ class UserExternoSiteController extends Controller
                 return redirect()->route('externo.dashboard');
 
             $pr = isset($preRegistro) && auth()->guard('contabil')->check() ? 
-            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro) :
+            auth()->guard('contabil')->user()->preRegistros()->findOrFail($preRegistro) :
             auth()->guard('user_externo')->user();
 
             $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? $pr->userExterno : $pr;
@@ -133,10 +133,9 @@ class UserExternoSiteController extends Controller
             $resultado = null;
             
             if(isset($externo)){
-                $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
-                $gerenti = $dados['gerenti'];
+                $gerenti = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo)['gerenti'];
                 if(!isset($gerenti))
-                    $resultado = isset($preRegistro) ? $pr : $externo->load('preRegistro')->preRegistro;
+                $resultado = isset($preRegistro) ? $pr : $externo->load('preRegistro')->preRegistro;
             }
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -178,7 +177,7 @@ class UserExternoSiteController extends Controller
                 return redirect()->route('externo.dashboard');
 
             $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
-            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
+            auth()->guard('contabil')->user()->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
 
             if(!isset($externo) && auth()->guard('contabil')->check())
@@ -220,7 +219,7 @@ class UserExternoSiteController extends Controller
                 return redirect()->route('externo.dashboard');
 
             $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
-            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
+            auth()->guard('contabil')->user()->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
 
             $contabil = auth()->guard('contabil')->user();
@@ -246,7 +245,7 @@ class UserExternoSiteController extends Controller
                 return redirect()->route('externo.dashboard');
 
             $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
-            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
+            auth()->guard('contabil')->user()->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
             
             $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
@@ -298,7 +297,7 @@ class UserExternoSiteController extends Controller
                 return redirect()->route('externo.dashboard');
 
             $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
-            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
+            auth()->guard('contabil')->user()->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
 
             $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
@@ -335,20 +334,20 @@ class UserExternoSiteController extends Controller
                 return redirect()->route('externo.dashboard');
 
             $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
-            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
+            auth()->guard('contabil')->user()->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
 
-            $preRegistro = isset($externo) ? $externo->load('preRegistro')->preRegistro : null;
-            $doc = null;
-            if(!isset($preRegistro) && isset($externo)){
+            if(!isset($externo))
+                throw new \Exception('Não autorizado a realizar download do anexo da solicitação de registro por falta de autenticação de usuário externo', 401);
+
+            $preRegistro = $externo->load('preRegistro')->preRegistro;
+            if(!isset($preRegistro))
                 $preRegistro = $externo->load('preRegistroDoc')->preRegistroDoc;
-                $doc = isset($preRegistro) ? true : $doc;
-            }
 
             if(!isset($preRegistro))
-                throw new \Exception('Não autorizado a acessar a solicitação de registro', 401);
+                throw new \Exception('Não autorizado a realizar download do anexo da solicitação de registro devido solicitação com status inválido', 401);
 
-            $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $preRegistro->id, false, $doc);
+            $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $preRegistro->id);
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(404, 'Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.');
@@ -368,7 +367,7 @@ class UserExternoSiteController extends Controller
                 return redirect()->route('externo.dashboard');
             
             $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
-            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
+            auth()->guard('contabil')->user()->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
 
             $contabil = auth()->guard('contabil')->user();

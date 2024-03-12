@@ -80,18 +80,18 @@ class PreRegistroAjaxRequest extends FormRequest
         if(request()->campo == 'path')
         {
             $total = 0;
-            if(!request()->hasFile('valor'))
-                $this->merge([
-                    'total' => $total
-                ]);  
-            else{
+            if(request()->hasFile('valor'))
+            {
                 $files = request()->file('valor');
-                foreach($files as $value)
+                foreach($files as $value){
                     $total += round($value->getSize() / 1024);
-                $this->merge([
-                    'total' => $total > 5120 ? '' : $total
-                ]);  
+                    if($total > 5120){
+                        $total = '';
+                        break;
+                    }
+                }
             }
+            $this->merge(['total' => $total]);
         }
 
         if(strpos(request()->campo, 'dt_nascimento') !== false)

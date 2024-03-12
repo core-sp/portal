@@ -66,9 +66,6 @@
 
     <p class="font-weight-bolder">Documentos anexados pelo atendente após aprovação:</p>
     @if($resultado->isAprovado())
-        @php
-            $boleto = $resultado->temBoleto() ? $resultado->getBoleto() : null;
-        @endphp
         <p>
             <i class="fas fa-exclamation-circle text-primary"></i>
             &nbsp;<i>Após anexar, o documento ficará disponível para o solicitante realizar download na área restrita.</i>

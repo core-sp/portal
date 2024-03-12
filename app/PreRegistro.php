@@ -28,7 +28,7 @@ class PreRegistro extends Model
     {
         if($this->correcaoEnviada())
         {
-            $camposEspelho = $this->fromJson(isset($this->campos_espelho) ? $this->campos_espelho : '{}');
+            $camposEspelho = isset($this->campos_espelho) ? $this->fromJson($this->campos_espelho) : array();
             $dados = array_merge(array_diff_assoc($camposEspelho, $final), array_diff_assoc($final, $camposEspelho));
             if(isset($dados['path']))
                 $dados['path'] = $final['path'];
@@ -153,7 +153,7 @@ class PreRegistro extends Model
         $arrayCampos['telefone'] = isset($arrayCampos['telefone_1']) ? 
         $arrayCampos['telefone'] . ';' . $arrayCampos['telefone_1'] : $arrayCampos['telefone'] . ';';
 
-        if(isset($arrayCampos['opcional_celular']))
+        if(isset($arrayCampos['opcional_celular']) || isset($arrayCampos['opcional_celular_1']))
             $arrayCampos['opcional_celular'] = isset($arrayCampos['opcional_celular_1']) ? 
             $arrayCampos['opcional_celular'] . ';' . $arrayCampos['opcional_celular_1'] : $arrayCampos['opcional_celular'] . ';';
 
@@ -342,16 +342,12 @@ class PreRegistro extends Model
 
     public function getBoleto()
     {
-        $boleto = null;
-        if($this->anexos()->count() > 0)
-            $boleto = $this->anexos()->where('nome_original', 'boleto_aprovado_' . $this->id)->first();
-
-        return $boleto;
+        return ($this->anexos->count() > 0) && $this->isAprovado() ? $this->anexos->where('nome_original', 'boleto_aprovado_' . $this->id)->first() : null;
     }
 
     public function temBoleto()
     {
-        return $this->anexos()->where('nome_original', 'boleto_aprovado_' . $this->id)->exists();
+        return null !== $this->getBoleto();
     }
 
     public function getTipoTelefone()
@@ -366,12 +362,9 @@ class PreRegistro extends Model
 
     public function getOpcionalCelular()
     {
-        $options = array_filter(explode(';', $this->opcional_celular));
-
-        foreach($options as $key => $valor)
-            $options[$key] = array_filter(explode(',', $valor));
-
-        return $options;
+        return collect(array_filter(explode(';', $this->opcional_celular)))->map(function ($item, $key) {
+            return array_filter(explode(',', $item));
+        })->toArray();
     }
 
     public function getJustificativaArray()

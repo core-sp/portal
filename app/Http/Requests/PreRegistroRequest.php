@@ -144,7 +144,7 @@ class PreRegistroRequest extends FormRequest
         }
         
         $this->externo = auth()->guard('contabil')->check() ? 
-        auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($this->preRegistro)->userExterno : 
+        auth()->guard('contabil')->user()->preRegistros()->findOrFail($this->preRegistro)->userExterno : 
         auth()->guard('user_externo')->user();
 
         $preRegistro = $this->externo->load('preRegistro')->preRegistro;
