@@ -35,7 +35,8 @@ class GerarTextoService implements GerarTextoServiceInterface {
 
         return [
             'resultado' => $resultado,
-            'variaveis' => (object) $this->variaveis
+            'variaveis' => (object) $this->variaveis,
+            'orientacao_sumario' => GerarTexto::orientacaoSumario()[$tipo_doc],
         ];
     }
 
@@ -55,12 +56,8 @@ class GerarTextoService implements GerarTextoServiceInterface {
             $dados['texto_tipo'] = $dados['tipo'] == GerarTexto::TIPO_TITULO ? mb_strtoupper($dados['texto_tipo'], 'UTF-8') : $dados['texto_tipo'];
             $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->where('id', $id)->firstOrFail();
 
-            $resultado->tipo = $dados['tipo'];
-            $resultado->texto_tipo = $dados['texto_tipo'];
-            $resultado->conteudo = $dados['conteudo'];
-            $resultado->com_numeracao = $dados['com_numeracao'];
-            $resultado->nivel = $dados['nivel'];
-
+            $resultado->fill($dados);
+            
             if($resultado->isDirty())
             {
                 $resultado->save();

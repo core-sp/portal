@@ -451,6 +451,7 @@
             $concurso = in_array($idperfil, $permitidos->find(37)['perfis']);
             $plantao = in_array($idperfil, $permitidos->find(61)['perfis']);
             $plantaoBloqueio = in_array($idperfil, $permitidos->find(63)['perfis']);
+            $prestacaoContas = /*in_array($idperfil, $permitidos->find(75)['perfis'])*/true;
         @endphp
 
         @if($licitacao || $concurso || $plantao | $plantaoBloqueio)
@@ -538,6 +539,15 @@
                 </li>
                 @endif
             </ul>
+        </li>
+        @endif
+
+        @if($prestacaoContas)
+        <li class="nav-item">
+            <a href="{{ route('textos.view', 'prestacao-contas') }}" class="nav-link">
+                <i class="nav-icon fas fa-tasks"></i>
+                <p>Prestação de Contas</p>
+            </a>
         </li>
         @endif
 

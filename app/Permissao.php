@@ -39,6 +39,7 @@ class Permissao extends Model
             'SalaReuniaoController' => 'Sala Reunião',
             'SuspensaoExcecaoController' => 'Sala Reunião - Suspensos / Exceções',
             'CartaServicos' => 'Carta de Serviços',
+            'PrestacaoContas' => 'Prestação de Contas',
         ];
     }
 }

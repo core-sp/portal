@@ -14,6 +14,15 @@ class GerarTexto extends Model
     const TIPO_SUBTITULO = 'Subtítulo';
 
     const DOC_CARTA_SERV = 'carta-servicos';
+    const DOC_PREST_CONT = 'prestacao-contas';
+    
+    public static function orientacaoSumario()
+    {
+        return [
+            self::DOC_CARTA_SERV => 'vertical',
+            self::DOC_PREST_CONT => 'horizontal',
+        ];
+    }
     
     public static function tipos()
     {
@@ -27,6 +36,7 @@ class GerarTexto extends Model
     {
         return [
             self::DOC_CARTA_SERV => 'Carta de serviços ao usuário',
+            self::DOC_PREST_CONT => 'Prestação de Contas',
         ];
     }
 

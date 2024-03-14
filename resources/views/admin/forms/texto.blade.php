@@ -38,10 +38,48 @@
         <button type="button" class="btn btn-info btn-sm selecionarTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;Selecionar Todos</button>
         <div class="textosSortable">
         @php
-        $col = 1;
+        $col = $orientacao_sumario == 'horizontal' ? $resultado->whereIn('nivel', [0,1])->pluck('ordem')->toArray() : 1;
         $row = 1;
         @endphp
 
+        <!-- Sumário horizontal -->
+        @if($orientacao_sumario == 'horizontal')
+
+        @foreach($resultado as $texto)
+            
+            @if(in_array($texto->ordem, $col))
+            {!! $texto->tipoTitulo() ? '<hr />' : '' !!}
+            <div class="row">
+                <div class="d-flex flex-wrap {{ ($texto->nivel == 1) && !in_array($texto->ordem + 1, $col) ? 'mb-3' : '' }}">
+            @endif 
+                    <div class="form-check border border-left-0 border-info rounded-right mb-2 pr-4">
+                        <label class="form-check-label pl-4">
+                            <input type="hidden" name="id-{{ $texto->id }}" value="{{ $texto->id }}" />
+                            <input type="checkbox" class="form-check-input mt-2" name="excluir_ids" value="{{ $texto->id }}">
+                            <button type="button" class="btn btn-link btn-sm pl-0 abrir" value="{{ $texto->id }}">
+                        @if($texto->tipoTitulo())
+                        {!! session()->exists('novo_texto') && ($texto->id == session()->get('novo_texto')) ? '<span class="badge badge-warning">Novo</span>&nbsp;&nbsp;' : '' !!}
+                        <span 
+                        class="indice-texto"
+                        >{{ $texto->tituloFormatado() }}</span>
+                        @else
+                        <strong><span 
+                        class="indice-texto"
+                        >{{ $texto->subtituloFormatado() }}</span></strong>
+                        @endif
+                            </button>
+                        </label>
+                    </div>
+            @if(in_array($texto->ordem + 1, $col) || $loop->last)
+                </div>
+            </div>
+            @endif
+            
+        @endforeach
+
+        @else
+
+        <!-- Sumário vertical -->
         @foreach($resultado as $texto)
             @if($row == 1)
             <hr />
@@ -80,6 +118,8 @@
             $row = ($row == 100) ? 1 : $row + 1;
             @endphp
         @endforeach
+
+        @endif
         </div>
 
         <button type="button" class="btn btn-info btn-sm selecionarTextos mt-2 mb-2"><i class="fas fa-check-square"></i>&nbsp;&nbsp;Selecionar Todos</button>

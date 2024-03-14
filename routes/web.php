@@ -327,12 +327,12 @@ Route::middleware(['block_ip'])->group(function () {
 
     // Rota para Gerar Textos
     Route::prefix('textos')->group(function(){
-      Route::get('/{tipo_doc}/{id?}', 'GerarTextoController@view')->where('tipo_doc', 'carta-servicos')->name('textos.view');
-      Route::post('/{tipo_doc}', 'GerarTextoController@create')->where('tipo_doc', 'carta-servicos')->name('textos.create');
-      Route::post('/{tipo_doc}/{id}', 'GerarTextoController@updateCampos')->where('tipo_doc', 'carta-servicos')->name('textos.update.campos');
-      Route::post('/publicar/{tipo_doc}', 'GerarTextoController@publicar')->where('tipo_doc', 'carta-servicos')->name('textos.publicar');
-      Route::delete('/{tipo_doc}/excluir', 'GerarTextoController@delete')->where('tipo_doc', 'carta-servicos')->name('textos.delete');
-      Route::put('/{tipo_doc}', 'GerarTextoController@update')->where('tipo_doc', 'carta-servicos')->name('textos.update.indice');
+      Route::get('/{tipo_doc}/{id?}', 'GerarTextoController@view')->where('tipo_doc', 'carta-servicos|prestacao-contas')->name('textos.view');
+      Route::post('/{tipo_doc}', 'GerarTextoController@create')->where('tipo_doc', 'carta-servicos|prestacao-contas')->name('textos.create');
+      Route::post('/{tipo_doc}/{id}', 'GerarTextoController@updateCampos')->where('tipo_doc', 'carta-servicos|prestacao-contas')->name('textos.update.campos');
+      Route::post('/publicar/{tipo_doc}', 'GerarTextoController@publicar')->where('tipo_doc', 'carta-servicos|prestacao-contas')->name('textos.publicar');
+      Route::delete('/{tipo_doc}/excluir', 'GerarTextoController@delete')->where('tipo_doc', 'carta-servicos|prestacao-contas')->name('textos.delete');
+      Route::put('/{tipo_doc}', 'GerarTextoController@update')->where('tipo_doc', 'carta-servicos|prestacao-contas')->name('textos.update.indice');
     });
     
   });
@@ -441,6 +441,7 @@ Route::middleware(['block_ip'])->group(function () {
 
     Route::get('/carta-de-servicos-ao-usuario/buscar', 'GerarTextoController@buscar')->name('carta-servicos-buscar');
     Route::get('/carta-de-servicos-ao-usuario/{id?}', 'GerarTextoController@show')->name('carta-servicos');
+    Route::get('/prestacao-de-contas-do-core-sp', 'GerarTextoController@show')->name('prestacao-contas');
 
     // Páginas (deve ser inserido no final do arquivo de rotas)
     Route::get('{slug}', 'PaginaController@show')->name('paginas.site');
