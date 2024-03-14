@@ -147,6 +147,8 @@ $(document).ready(function(){
 
   $(".textosSortable").sortable({
     items: "> div > div > div.form-check",
+    placeholder: "sortable-placeholder",
+    forcePlaceholderSize: true,
   });
   $(".textosSortable").disableSelection();
 
@@ -1171,7 +1173,8 @@ function hideShowOptions(){
       if($(this).val() == '0')
         $(this).hide();
     });
-    $('#nivel')[0].selectedIndex = 1;
+    if(($('#nivel option:selected').length == 0) || (($('#nivel option:selected').length > 0) && ($('#nivel option:selected').val() == 0)))
+      $('#nivel option[value="1"]').prop('selected', true);
     $('#com_numeracao option').each(function(){
       if($(this).val() == '0')
         $(this).hide();
