@@ -38,7 +38,7 @@
         <button type="button" class="btn btn-info btn-sm selecionarTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;Selecionar Todos</button>
         <div class="textosSortable">
         @php
-        $col = $orientacao_sumario == 'horizontal' ? $resultado->whereIn('nivel', [0,1])->pluck('ordem')->toArray() : 1;
+        $col = 1;
         $row = 1;
         @endphp
 
@@ -47,10 +47,10 @@
 
         @foreach($resultado as $texto)
             
-            @if(in_array($texto->ordem, $col))
+            @if(in_array($texto->nivel, [0,1]))
             {!! $texto->tipoTitulo() ? '<hr />' : '' !!}
             <div class="row">
-                <div class="d-flex flex-wrap {{ ($texto->nivel == 1) && !in_array($texto->ordem + 1, $col) ? 'mb-3' : '' }}">
+                <div class="d-flex flex-wrap {{ ($texto->nivel == 1) && $resultado->where('ordem', $texto->ordem + 1)->whereIn('nivel', [0,1])->isEmpty() ? 'mb-3' : '' }}">
             @endif 
                     <div class="form-check border border-left-0 border-info rounded-right mb-2 pr-4">
                         <label class="form-check-label pl-4">
@@ -70,7 +70,7 @@
                             </button>
                         </label>
                     </div>
-            @if(in_array($texto->ordem + 1, $col) || $loop->last)
+            @if($resultado->where('ordem', $texto->ordem + 1)->whereIn('nivel', [0,1])->isNotEmpty() || $loop->last)
                 </div>
             </div>
             @endif

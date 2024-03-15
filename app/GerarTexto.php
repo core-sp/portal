@@ -42,7 +42,7 @@ class GerarTexto extends Model
 
     public static function criar($tipo_doc)
     {
-        $total = self::where('tipo_doc', $tipo_doc)->count() + 1;
+        $total = self::where('tipo_doc', $tipo_doc)->max('ordem') + 1;
         $publicada = $total > 1 ? self::select('publicar')->where('tipo_doc', $tipo_doc)->first()->publicar : false;
 
         return self::create([
