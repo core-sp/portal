@@ -115,7 +115,7 @@ class GerarTextoService implements GerarTextoServiceInterface {
 
     public function show($tipo_doc, $id = null, $user = null)
     {
-        $resultado = GerarTexto::resultadoByDoc($tipo_doc, $user)->except(['conteudo']);
+        $resultado = in_array($tipo_doc, [GerarTexto::DOC_PREST_CONT]) ? GerarTexto::resultadoByDoc($tipo_doc, $user) : GerarTexto::resultadoByDoc($tipo_doc, $user)->except(['conteudo']);
         $dt_atualizacao = onlyDate(GerarTexto::ultimaAtualizacao($tipo_doc));
 
         $textos = array();
