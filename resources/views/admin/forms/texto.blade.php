@@ -52,24 +52,10 @@
             <div class="row">
                 <div class="d-flex flex-wrap {{ ($texto->nivel == 1) && $resultado->where('ordem', $texto->ordem + 1)->whereIn('nivel', [0,1])->isEmpty() ? 'mb-3' : '' }}">
             @endif 
-                    <div class="form-check border border-left-0 border-info rounded-right mb-2 pr-4">
-                        <label class="form-check-label pl-4">
-                            <input type="hidden" name="id-{{ $texto->id }}" value="{{ $texto->id }}" />
-                            <input type="checkbox" class="form-check-input mt-2" name="excluir_ids" value="{{ $texto->id }}">
-                            <button type="button" class="btn btn-link btn-sm pl-0 abrir" value="{{ $texto->id }}">
-                        @if($texto->tipoTitulo())
-                        {!! session()->exists('novo_texto') && ($texto->id == session()->get('novo_texto')) ? '<span class="badge badge-warning">Novo</span>&nbsp;&nbsp;' : '' !!}
-                        <span 
-                        class="indice-texto"
-                        >{{ $texto->tituloFormatado() }}</span>
-                        @else
-                        <strong><span 
-                        class="indice-texto"
-                        >{{ $texto->subtituloFormatado() }}</span></strong>
-                        @endif
-                            </button>
-                        </label>
-                    </div>
+
+            @component('components.item-gerar-texto', ['texto' => $texto])
+            @endcomponent
+
             @if($resultado->where('ordem', $texto->ordem + 1)->whereIn('nivel', [0,1])->isNotEmpty() || $loop->last)
                 </div>
             </div>
@@ -88,24 +74,10 @@
                 @if($col == 1)
                 <div class="col-3">
                 @endif            
-                    <div class="form-check border border-left-0 border-info rounded-right mb-2 pr-4">
-                        <label class="form-check-label pl-4">
-                            <input type="hidden" name="id-{{ $texto->id }}" value="{{ $texto->id }}" />
-                            <input type="checkbox" class="form-check-input mt-2" name="excluir_ids" value="{{ $texto->id }}">
-                            <button type="button" class="btn btn-link btn-sm pl-0 abrir" value="{{ $texto->id }}">
-                        @if($texto->tipoTitulo())
-                        {!! session()->exists('novo_texto') && ($texto->id == session()->get('novo_texto')) ? '<span class="badge badge-warning">Novo</span>&nbsp;&nbsp;' : '' !!}
-                        <span 
-                        class="indice-texto"
-                        >{{ $texto->tituloFormatado() }}</span>
-                        @else
-                        <strong><span 
-                        class="indice-texto"
-                        >{{ $texto->subtituloFormatado() }}</span></strong>
-                        @endif
-                            </button>
-                        </label>
-                    </div>
+                
+                @component('components.item-gerar-texto', ['texto' => $texto])
+                @endcomponent
+                
                 @if(($col == 25) || $loop->last)
                 </div>
                 @endif
