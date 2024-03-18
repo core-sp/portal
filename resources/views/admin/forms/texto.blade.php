@@ -26,7 +26,14 @@
         @endif
         
         <p class="mt-3">
-            <i>* Arraste as caixas com o cursor <i class="fas fa-arrows-alt"></i> para definir a ordem da índice</i>
+            <i>* Clique no botão 
+            <button type="button" class="btn btn-success btn-sm m-0 pt-0 pb-0"><i class="{{ $orientacao_sumario == 'horizontal' ? 'fas fa-exchange-alt' : 'fas fa-exchange-alt fa-rotate-90' }}"></i></button> 
+            para inciar a ação de mover o item, em seguida clique no botão 
+            <button type="button" class="btn btn-secondary btn-sm m-0 pt-0 pb-0"><i class="{{ $orientacao_sumario == 'horizontal' ? 'fas fa-long-arrow-alt-right' : 'fas fa-long-arrow-alt-down' }}"></i></button>
+            para inserir o item na posição seguinte e reordenar a índice</i> 
+        </p>
+        <p>
+            <i>* A nova ordem da índice é salva somente após clicar no botão <button type="button" class="btn btn-sm btn-primary">Atualizar índice</button></i>
         </p>
         <p>
             <i>* Clique sobre o título com o cursor <i class="far fa-hand-pointer"></i> para editar o item</i>
@@ -36,7 +43,7 @@
         </p>
 
         <button type="button" class="btn btn-info btn-sm selecionarTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;Selecionar Todos</button>
-        <div class="textosSortable">
+        <div class="{{-- textosSortable --}} sumario-{{ $orientacao_sumario }}" id="sumario">
         @php
         $col = 1;
         $row = 1;
@@ -53,7 +60,7 @@
                 <div class="d-flex flex-wrap {{ ($texto->nivel == 1) && $resultado->where('ordem', $texto->ordem + 1)->whereIn('nivel', [0,1])->isEmpty() ? 'mb-3' : '' }}">
             @endif 
 
-            @component('components.item-gerar-texto', ['texto' => $texto])
+            @component('components.item-gerar-texto', ['texto' => $texto, 'orientacao_sumario' => $orientacao_sumario])
             @endcomponent
 
             @if($resultado->where('ordem', $texto->ordem + 1)->whereIn('nivel', [0,1])->isNotEmpty() || $loop->last)
@@ -75,7 +82,7 @@
                 <div class="col-3">
                 @endif            
                 
-                @component('components.item-gerar-texto', ['texto' => $texto])
+                @component('components.item-gerar-texto', ['texto' => $texto, 'orientacao_sumario' => $orientacao_sumario])
                 @endcomponent
                 
                 @if(($col == 25) || $loop->last)

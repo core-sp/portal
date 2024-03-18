@@ -145,12 +145,12 @@ $(document).ready(function(){
     activeHeader: "fas fa-angle-down"
   };
 
-  $(".textosSortable").sortable({
-    items: "> div > div > div.form-check",
-    placeholder: "sortable-placeholder",
-    forcePlaceholderSize: true,
-  });
-  $(".textosSortable").disableSelection();
+  // $(".textosSortable").sortable({
+  //   items: "> div > div > div.form-check",
+  //   placeholder: "sortable-placeholder",
+  //   forcePlaceholderSize: true,
+  // });
+  // $(".textosSortable").disableSelection();
 
   // Regra de data no filtro de agendamento +++ Será removido depois de refatorar todos que o utilizam 
   $('#filtroAgendamento').submit(function(e){
@@ -1248,7 +1248,7 @@ $("#updateIndice").click(function(){
 });
 
 // link no sumário para abrir e ir no texto
-$('button.abrir').click(function(){
+$("#sumario").on('click', 'button.abrir', function(){
   crudGerarTexto('carregar', $(this));
   $('#lista').hide();
   $('#lista').show();
@@ -1260,7 +1260,7 @@ $('#formGerarTexto').ready(function(){
     $('button.abrir .badge').click();
 });
 
-$('[name="excluir_ids"]').change(function(){
+$('#sumario').on('change', '[name="excluir_ids"]', function(){
   selecionarTodos(false);
 });
 
@@ -1269,6 +1269,36 @@ $('.selecionarTextos').click(function(){
   var selecionados = $('[name="excluir_ids"]:checked').length > 0 ? false : true;
   $('[name="excluir_ids"]').prop('checked', selecionados);
   $('[name="excluir_ids"]:first').prop('checked', false);
+});
+
+$('#sumario').on('click', 'button.mover', function(e){
+  var botao = 'button.mover';
+  var orientacao = $('div.sumario-horizontal').length > 0 ? 'horizontal' : 'vertical';
+  var trocar = orientacao == 'horizontal' ? '<i class="fas fa-long-arrow-alt-right"></i>' : '<i class="fas fa-long-arrow-alt-down"></i>';
+  var mover = orientacao == 'horizontal' ? '<i class="fas fa-exchange-alt"></i>' : '<i class="fas fa-exchange-alt fa-rotate-90"></i>';
+
+  if($(this).hasClass('btn-secondary')){
+    var temp = $(botao + '.btn-warning').parent();
+    if(temp.length == 0)
+      return;
+
+    $(this).parent().after(temp.prop("outerHTML"));
+    temp.remove();
+  }
+
+  if($(this).hasClass('btn-success')){
+    $(this).removeClass('btn-success').addClass('btn-warning');
+    $(this).text('Cancelar');
+    $(botao + '.btn-success').each(function(){
+      $(this).html(trocar);
+      $(this).removeClass('btn-success').addClass('btn-secondary');
+    });
+  }
+  else
+    $(botao).html(mover)
+    .removeClass('btn-secondary')
+    .removeClass('btn-warning')
+    .addClass('btn-success');
 });
 
 // FIM da Funcionalidade GerarTexto ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

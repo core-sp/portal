@@ -48,7 +48,7 @@ $titulos = $resultado->whereIn('nivel', [0])->pluck('ordem')->toArray();
         </p>
 
         @if($resultado->isEmpty())
-        <p><i>Informações sendo elaboradas.</i></p>
+        <p><i>Informações sendo atualizadas.</i></p>
         @endif
 
         <div id="accordionPrimario" class="accordion">
@@ -77,30 +77,30 @@ $titulos = $resultado->whereIn('nivel', [0])->pluck('ordem')->toArray();
           @else
           
             @php
-              if(!isset($texto->conteudo))
+              if(!$texto->possuiConteudoPrestacaoContas())
                 $temp_sub_slug = Str::slug(strtolower($texto->texto_tipo), '-');
-              if(!isset($texto->conteudo) && in_array($texto->nivel, [1,2]))
+              if(!$texto->possuiConteudoPrestacaoContas() && in_array($texto->nivel, [1,2]))
                 $temp[$texto->nivel] = $temp_sub_slug;
             @endphp
                 <li>
-                  <a href="{{ isset($texto->conteudo) ? strip_tags($texto->conteudo) : '#lista-'.$temp_sub_slug }}" 
+                  <a href="{{ $texto->possuiConteudoPrestacaoContas() ? strip_tags($texto->conteudo) : '#lista-'.$temp_sub_slug }}" 
                     target="_blank" rel="noopener"
-                    @if(!isset($texto->conteudo))
+                    @if(!$texto->possuiConteudoPrestacaoContas())
                       data-toggle="collapse"
                     @endif
                   >
                     {{ $texto->texto_tipo }}
                   </a>
-                  @if(isset($texto->conteudo))
+                  @if($texto->possuiConteudoPrestacaoContas())
                 </li>
-                  @elseif(!isset($texto->conteudo) && !$loop->last)
+                  @elseif(!$texto->possuiConteudoPrestacaoContas() && !$loop->last)
                   <div id="lista-{{ $temp_sub_slug }}" class="collapse" data-parent="#{{ ($texto->nivel > 1) && isset($temp[$texto->nivel - 1]) ? 'lista-'.Str::slug(strtolower($temp[$texto->nivel - 1]), '-') : 'accordion'.$temp_titulo_studly }}">
                     <ul class="mb-0 pb-0">
                   @endif
 
-                  @if(isset($resultado[$loop->index + 1]) && ($resultado->get($loop->index + 1)->nivel < $texto->nivel) && ($texto->nivel > 1))
+                  @if(((isset($resultado[$loop->index + 1]) && ($resultado->get($loop->index + 1)->nivel < $texto->nivel)) || $loop->last) && ($texto->nivel > 1))
                     @php
-                      $cont = $resultado->get($loop->index + 1)->nivel;
+                      $cont = $loop->last ? 0 : $resultado->get($loop->index + 1)->nivel;
                       $cont = $cont == 0 ? $texto->nivel - 1 : $texto->nivel - $cont;
                     @endphp
                     {!! str_repeat('</ul></div></li>', $cont) !!}

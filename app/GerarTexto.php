@@ -85,10 +85,9 @@ class GerarTexto extends Model
                         {
                             $temp = (int) $indice_array[$nivel];
                             $indice_array[$nivel] = ++$temp;
-                            foreach($indice_array as $key_1 => $val){
-                                if($key_1 > $nivel)
-                                    unset($indice_array[$key_1]);
-                            }
+                            $indice_array = array_filter($indice_array, function($v, $k) use($nivel){
+                                return $k <= $nivel;
+                            }, ARRAY_FILTER_USE_BOTH);
                             $indice = implode(self::SEPARADOR, $indice_array);
                         }
                     }
@@ -116,11 +115,12 @@ class GerarTexto extends Model
 
     private function atualizaOrdemIndice($ordem, $indice)
     {
+        $this->nivel = substr_count($indice, self::SEPARADOR);
         $this->ordem = $ordem;
         $this->indice = $this->com_numeracao ? $indice : null;
 
         // Somente salva o registro que foi alterado
-        if($this->isDirty('ordem') || $this->isDirty('indice'))
+        if($this->isDirty('ordem') || $this->isDirty('indice') || $this->isDirty('nivel'))
             $this->save();
     }
 
@@ -152,5 +152,14 @@ class GerarTexto extends Model
     public function subtituloFormatado()
     {
         return $this->indice . ' - ' . $this->texto_tipo;
+    }
+
+    public function possuiConteudoPrestacaoContas()
+    {
+        if(!isset($this->conteudo))
+            return false;
+        if(isset($this->conteudo) && (strlen(strip_tags($this->conteudo)) >= 10))
+            return true;
+        return false;
     }
 }
