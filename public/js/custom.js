@@ -1283,6 +1283,11 @@ $('#sumario').on('click', 'button.mover', function(e){
       return;
 
     $(this).parent().after(temp.prop("outerHTML"));
+    var item = $(this).parent().next();
+    item.addClass('blink_me').attr('style', 'background-color: yellow');
+    setTimeout(function(){ 
+      item.removeClass('blink_me').attr('style', '');
+    }, 2000);
     temp.remove();
   }
 

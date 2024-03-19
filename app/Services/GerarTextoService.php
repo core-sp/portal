@@ -33,6 +33,9 @@ class GerarTextoService implements GerarTextoServiceInterface {
         ->orderBy('ordem','ASC')
         ->get();
 
+        $this->variaveis['singular'] = $this->variaveis['singular'] . ' '. GerarTexto::tiposDoc()[$tipo_doc];
+        $this->variaveis['singulariza'] = $this->variaveis['singulariza'] . ' '. GerarTexto::tiposDoc()[$tipo_doc];
+
         return [
             'resultado' => $resultado,
             'variaveis' => (object) $this->variaveis,
