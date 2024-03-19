@@ -13,14 +13,20 @@
     @method('PUT')
     <div class="card-body">
 
+        <p><strong>Orientação do sumário:</strong>
+            <a type="button" class="btn btn-link pt-0 {{ $orientacao_sumario == 'horizontal' ? 'disabled' : '' }}" href="{{ route('textos.orientacao', ['tipo_doc' => $tipo_doc, 'orientacao' => 'horizontal']) }}">Horizontal</a>
+            <strong>|</strong>
+            <a type="button" class="btn btn-link pt-0 {{ $orientacao_sumario != 'horizontal' ? 'disabled' : '' }}" href="{{ route('textos.orientacao', ['tipo_doc' => $tipo_doc, 'orientacao' => 'vertical']) }}">Vertical</a>
+        </p>
+
         <p class="text-muted"><em>* Sumário após última atualização da índice.</em></p>
         <h4><strong>Sumário:</strong></h4>
 
         @if(isset($can_update) && $can_update)
         <div class="row mt-3">
             <div class="col">
-            <button type="button" class="btn btn-danger excluirTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;<i class="fas fa-trash"></i></button>
-            <button type="button" class="btn btn-success ml-2 criarTexto"><i class="fas fa-plus"></i>&nbsp;&nbsp;Texto</button>
+                <button type="button" class="btn btn-danger excluirTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;<i class="fas fa-trash"></i></button>
+                <button type="button" class="btn btn-success ml-2 criarTexto"><i class="fas fa-plus"></i>&nbsp;&nbsp;Texto</button>
             </div>
         </div>
         @endif
@@ -54,16 +60,16 @@
 
         @foreach($resultado as $texto)
             
-            @if(in_array($texto->nivel, [0,1]))
+            @if(in_array($texto->nivel, [0]))
             {!! $texto->tipoTitulo() ? '<hr />' : '' !!}
             <div class="row">
-                <div class="d-flex flex-wrap {{ ($texto->nivel == 1) && $resultado->where('ordem', $texto->ordem + 1)->whereIn('nivel', [0,1])->isEmpty() ? 'mb-3' : '' }}">
+                <div class="d-flex flex-wrap {{-- ($texto->nivel == 1) && $resultado->where('ordem', $texto->ordem + 1)->whereIn('nivel', [0])->isEmpty() ? 'mb-3' : '' --}}">
             @endif 
 
             @component('components.item-gerar-texto', ['texto' => $texto, 'orientacao_sumario' => $orientacao_sumario])
             @endcomponent
 
-            @if($resultado->where('ordem', $texto->ordem + 1)->whereIn('nivel', [0,1])->isNotEmpty() || $loop->last)
+            @if($resultado->where('ordem', $texto->ordem + 1)->whereIn('nivel', [0])->isNotEmpty() || $loop->last)
                 </div>
             </div>
             @endif
@@ -101,13 +107,14 @@
         @endif
         </div>
 
+        <hr />
         <button type="button" class="btn btn-info btn-sm selecionarTextos mt-2 mb-2"><i class="fas fa-check-square"></i>&nbsp;&nbsp;Selecionar Todos</button>
 
         @if(isset($can_update) && $can_update)
         <div class="row mt-3">
             <div class="col">
-            <button type="button" class="btn btn-danger excluirTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;<i class="fas fa-trash"></i></button>
-            <button type="button" class="btn btn-success ml-2 criarTexto"><i class="fas fa-plus"></i>&nbsp;&nbsp;Texto</button>
+                <button type="button" class="btn btn-danger excluirTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;<i class="fas fa-trash"></i></button>
+                <button type="button" class="btn btn-success ml-2 criarTexto"><i class="fas fa-plus"></i>&nbsp;&nbsp;Texto</button>
             </div>
         </div>
         @endif

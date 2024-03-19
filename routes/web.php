@@ -327,6 +327,7 @@ Route::middleware(['block_ip'])->group(function () {
 
     // Rota para Gerar Textos
     Route::prefix('textos')->group(function(){
+      Route::get('/{tipo_doc}/sumario/{orientacao}', 'GerarTextoController@orientacaoSumario')->where('tipo_doc', 'carta-servicos|prestacao-contas')->where('orientacao', 'horizontal|vertical')->name('textos.orientacao');
       Route::get('/{tipo_doc}/{id?}', 'GerarTextoController@view')->where('tipo_doc', 'carta-servicos|prestacao-contas')->name('textos.view');
       Route::post('/{tipo_doc}', 'GerarTextoController@create')->where('tipo_doc', 'carta-servicos|prestacao-contas')->name('textos.create');
       Route::post('/{tipo_doc}/{id}', 'GerarTextoController@updateCampos')->where('tipo_doc', 'carta-servicos|prestacao-contas')->name('textos.update.campos');

@@ -71,6 +71,7 @@ class GerarTextoController extends Controller
 
         try{
             $dados = $this->service->getService('GerarTexto')->view($tipo_doc, $id);
+            $dados['orientacao_sumario'] = session()->exists('orientacao_sumario') ? session('orientacao_sumario') : $dados['orientacao_sumario'];
             $dados['tipo_doc'] = $tipo_doc;
             $dados['can_update'] = $user->can('gerarTextoUpdate', $user);
         } catch (\Exception $e) {
@@ -79,6 +80,18 @@ class GerarTextoController extends Controller
         }
 
         return isset($id) ? response()->json($dados['resultado']) : view('admin.crud.editar', $dados);
+    }
+
+    public function orientacaoSumario($tipo_doc, $orientacao)
+    {
+        try{
+            session()->put('orientacao_sumario', $orientacao);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao mudar orientação do sumário em ".$tipo_doc.".");
+        }
+
+        return redirect()->route('textos.view', ['tipo_doc' => $tipo_doc, 'id' => null]);
     }
 
     public function update($tipo_doc, Request $request)
