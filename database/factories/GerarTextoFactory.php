@@ -19,6 +19,15 @@ $factory->define(GerarTexto::class, function (Faker $faker) {
     ];
 });
 
+$factory->state(GerarTexto::class, 'carta-servicos', [
+    'tipo_doc' => GerarTexto::DOC_CARTA_SERV,
+]);
+
+$factory->state(GerarTexto::class, 'prestacao-contas', [
+    'tipo_doc' => GerarTexto::DOC_PREST_CONT,
+    'conteudo' => null,
+]);
+
 $factory->state(GerarTexto::class, 'sumario_publicado', [
     'indice' => '1',
     'publicar' => 1,
@@ -26,8 +35,11 @@ $factory->state(GerarTexto::class, 'sumario_publicado', [
 
 $factory->afterCreatingState(GerarTexto::class, 'sumario_publicado', function ($texto, $faker) {
     $id = $texto->id;
+    $url = $faker->url;
+
     switch ($id) {
         case 2:
+        case 7:
             $texto->update([
                 'tipo' => GerarTexto::tipos()[1],
                 'nivel' => 1,
@@ -36,6 +48,7 @@ $factory->afterCreatingState(GerarTexto::class, 'sumario_publicado', function ($
             ]);
             break;
         case 3:
+        case 8:
             $texto->update([
                 'tipo' => GerarTexto::tipos()[1],
                 'nivel' => 2,
@@ -44,17 +57,21 @@ $factory->afterCreatingState(GerarTexto::class, 'sumario_publicado', function ($
             ]);
             break;
         case 4:
+        case 9:
             $texto->update([
                 'tipo' => GerarTexto::tipos()[1],
                 'nivel' => 3,
                 'indice' => '1.1.1.1',
                 'ordem' => 4
             ]);
+            if($texto->tipo_doc == 'prestacao-contas')
+                $texto->update(['conteudo' => '<p><a href="'.$url.'">'.$url.'</a></p>']);
             break;
         case 5:
+        case 10:
             $texto->update([
                 'com_numeracao' => 0,
-                'ordem' => 6,
+                'ordem' => 5,
                 'indice' => null,
             ]);
             break;

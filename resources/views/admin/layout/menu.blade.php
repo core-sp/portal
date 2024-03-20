@@ -451,10 +451,10 @@
             $concurso = in_array($idperfil, $permitidos->find(37)['perfis']);
             $plantao = in_array($idperfil, $permitidos->find(61)['perfis']);
             $plantaoBloqueio = in_array($idperfil, $permitidos->find(63)['perfis']);
-            $prestacaoContas = /*in_array($idperfil, $permitidos->find(75)['perfis'])*/true;
+            $prestacaoContas = in_array($idperfil, $permitidos->find(75)['perfis']);
         @endphp
 
-        @if($licitacao || $concurso || $plantao | $plantaoBloqueio)
+        @if($licitacao || $concurso || $plantao || $plantaoBloqueio || $prestacaoContas)
         <li class="nav-header">JURÍDICO</li>
 
         @if($licitacao)

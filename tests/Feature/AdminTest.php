@@ -79,6 +79,7 @@ class AdminTest extends TestCase
             ->assertSee(route('concursos.create'))
             ->assertSee(route('plantao.juridico.index'))
             ->assertSee(route('plantao.juridico.bloqueios.index'))
+            ->assertSee(route('textos.view', 'prestacao-contas'))
             ->assertSee(route('fiscalizacao.index'))
             ->assertSee(route('fiscalizacao.createperiodo'));
     }
@@ -130,6 +131,7 @@ class AdminTest extends TestCase
             ->assertDontSee(route('concursos.create'))
             ->assertDontSee(route('plantao.juridico.index'))
             ->assertDontSee(route('plantao.juridico.bloqueios.index'))
+            ->assertDontSee(route('textos.view', 'prestacao-contas'))
             ->assertDontSee(route('fiscalizacao.index'))
             ->assertDontSee(route('fiscalizacao.createperiodo'));
     }

@@ -49,7 +49,8 @@ $titulos = $resultado->whereIn('nivel', [0])->pluck('ordem')->toArray();
 
         @if($resultado->isEmpty())
         <p><i>Informações sendo atualizadas.</i></p>
-        @endif
+
+        @else
 
         <div id="accordionPrimario" class="accordion">
         @foreach($resultado as $texto)
@@ -116,6 +117,8 @@ $titulos = $resultado->whereIn('nivel', [0])->pluck('ordem')->toArray();
         @endforeach
 
         </div>
+        @endif
+        
       </div>
       <div class="col-lg-4">
         @include('site.inc.content-sidebar')

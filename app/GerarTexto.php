@@ -158,7 +158,7 @@ class GerarTexto extends Model
     {
         if(!isset($this->conteudo))
             return false;
-        if(isset($this->conteudo) && (strlen(strip_tags($this->conteudo)) >= 10))
+        if(isset($this->conteudo) && (strlen(strip_tags($this->conteudo)) >= 5))
             return true;
         return false;
     }
