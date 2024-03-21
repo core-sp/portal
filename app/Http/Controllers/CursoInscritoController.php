@@ -65,6 +65,7 @@ class CursoInscritoController extends Controller
         try{
             $validated = $request->validated();
             $curso = $this->service->getService('Curso')->show($idcurso);
+            $validated['conta_no_portal'] = $this->service->getService('Representante')->getRepresentanteByCpfCnpj(apenasNumeros($validated['cpf']));
             $dados = $this->service->getService('Curso')->inscritos()->save($validated, auth()->user(), $curso);
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -153,6 +154,7 @@ class CursoInscritoController extends Controller
             if(!empty($verifica))
                 return redirect()->route($verifica['rota'])->with($verifica);
 
+            $validated['conta_no_portal'] = $this->service->getService('Representante')->getRepresentanteByCpfCnpj(apenasNumeros($validated['cpf']));
             $dados = $this->service->getService('Curso')->inscritos()->inscricaoExterna($curso, $validated);
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -236,6 +238,23 @@ class CursoInscritoController extends Controller
 
         return redirect()->back()
             ->with('message', '<i class="icon fa fa-check"></i>Inscrição com ID '.$id.' teve a presença atualizada com sucesso!')
+            ->with('class', 'alert-success');
+    }
+
+    public function reenviarCodCertificado(Request $request, $id)
+    {
+        $this->authorize('updateOther', auth()->user());
+        
+        try{
+            $msg = $this->service->getService('Curso')->inscritos()->reenviarCodigo($id, $this->service);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [400]) ? abort($e->getCode(), $e->getMessage()) : 
+            abort(500, "Erro ao reenviar código do certificado da inscrição com ID ".$id.".");
+        }
+
+        return isset($msg['message']) ? redirect()->back()->with($msg) : redirect()->back()
+            ->with('message', '<i class="icon fa fa-check"></i>Inscrição com ID '.$id.' teve o código do certificado reenviado com sucesso!')
             ->with('class', 'alert-success');
     }
 }

@@ -90,6 +90,7 @@ Route::middleware(['block_ip'])->group(function () {
       Route::get('/inscritos/editar/{id}', 'CursoInscritoController@edit')->name('inscritos.edit');
       Route::put('/inscritos/editar/{id}', 'CursoInscritoController@update')->name('inscritos.update');
       Route::put('/inscritos/atualizar-presenca/{id}', 'CursoInscritoController@updatePresenca')->name('inscritos.update.presenca');
+      Route::put('/inscritos/reenviar-cod-certificado/{id}', 'CursoInscritoController@reenviarCodCertificado')->name('inscritos.reenviar.codigo');
       Route::get('/adicionar-inscrito/{idcurso}', 'CursoInscritoController@create')->name('inscritos.create');
       Route::post('/adicionar-inscrito/{idcurso}', 'CursoInscritoController@store')->name('inscritos.store');
       Route::delete('/cancelar-inscricao/{id}', 'CursoInscritoController@destroy')->name('inscritos.destroy');

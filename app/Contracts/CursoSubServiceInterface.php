@@ -27,4 +27,6 @@ interface CursoSubServiceInterface {
     public function liberarInscricao($curso, $rep = null, $situacao = '');
 
     public function inscricaoExterna($curso, $validated = null);
+
+    public function reenviarCodigo($id, MediadorServiceInterface $service);
 }

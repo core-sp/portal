@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class CursoInscrito extends Model
 {
@@ -33,6 +34,11 @@ class CursoInscrito extends Model
         sort($tipos);
 
         return $tipos;
+    }
+
+    public static function gerarCodigoCertificado($conta_portal = null)
+    {
+        return !isset($conta_portal) ? (string) Str::uuid() : null;
     }
 
     public function curso()
@@ -82,6 +88,15 @@ class CursoInscrito extends Model
         $agradece .= "Endereço: ".$this->curso->endereco."<br>";
         $agradece .= "Data de Início: ".onlyDate($this->curso->datarealizacao)."<br>";
         $agradece .= "Horário: ".onlyHour($this->curso->datarealizacao)."h<br>";
+
+        if($this->curso->tipoParaCertificado())
+        {
+            $agradece .= "<br><strong>Certificado</strong><br>";
+            $agradece .= isset($this->codigo_certificado) ? 
+                "Código para gerar o certificado em caso de presença confirmada após encerramento: <br>".$this->codigo_certificado."<br>" : 
+                "Em caso de presença confirmada após encerramento, pode ser gerado o certificado na sua área restrita.<br>";
+        }
+
         $adendo = '<i>* As informações foram enviadas ao email cadastrado no formulário</i>';
 
         return [
@@ -90,11 +105,64 @@ class CursoInscrito extends Model
         ];
     }
 
+    public function textoReenvio()
+    {
+        $agradece = "Sua presença em <strong>".$this->curso->tipo;
+        $agradece .= " - ".$this->curso->tema."</strong>";
+        $agradece .= " (turma ".$this->curso->idcurso.") foi confirmada.";
+        $agradece .= "<br><br>";
+        $agradece .= "<strong>Detalhes da inscrição</strong><br>";
+        $agradece .= "Nome: ".$this->nome."<br>";
+        $agradece .= "CPF: ".$this->cpf."<br>";
+        $agradece .= "Telefone: ".$this->telefone;
+        $agradece .= "<br>";
+        $agradece .= "<br><strong>Certificado</strong><br>Código para gerar o certificado: <br>".$this->codigo_certificado."<br>";
+
+        return $agradece;
+    }
+
     public function valorCampoAdicional()
     {
         if(!isset($this->campo_adicional))
             return '';
 
         return explode(': ', $this->campo_adicional)[1];
+    }
+
+    public function possuiCodigoCertificado()
+    {
+        return isset($this->codigo_certificado);
+    }
+
+    public function podeGerarCertificado($conta_portal, $admin = false)
+    {
+        if(!$this->curso->tipoParaCertificado())
+            return [
+                'message' => 'O tipo do curso não está incluso para gerar certificado.',
+                'class' => 'alert-danger'
+            ];
+
+        if($this->possuiCodigoCertificado() && isset($conta_portal))
+        {
+            $this->update(['codigo_certificado' => null]);
+
+            if($admin)
+                return [
+                    'message' => 'Este CPF / CNPJ já possui conta no Portal, deve gerar o certificado pela área restrita.',
+                    'class' => 'alert-warning'
+                ];
+        }
+
+        if(!isset($this->presenca))
+            return [
+                'message' => 'Ainda não foi atualizada a presença no sistema para gerar o certificado.',
+                'class' => 'alert-danger'
+            ];
+
+        if(!$this->compareceu())
+            return [
+                'message' => 'Este CPF / CNPJ não teve a presença confirmada para gerar o certificado.',
+                'class' => 'alert-danger'
+            ];
     }
 }

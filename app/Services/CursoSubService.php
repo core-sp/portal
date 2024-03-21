@@ -68,9 +68,18 @@ class CursoSubService implements CursoSubServiceInterface {
                 $acoes .= '<input type="hidden" name="presenca" value="Não" />';
                 $acoes .= '<input type="submit" class="btn btn-sm btn-warning" value="Dar falta" />';
                 $acoes .= '</form>';
-            }elseif($resultado->possuiPresenca())
+            }elseif($resultado->possuiPresenca()){
                 $acoes .= $resultado->compareceu() ? "<p class='d-inline text-success'><strong><i class='fas fa-check checkIcone'></i> Compareceu&nbsp;</strong></p>" :
                 "<p class='d-inline text-danger'><strong><i class='fas fa-ban checkIcone'></i> Não Compareceu&nbsp;</strong></p>";
+
+                if($resultado->compareceu() && $resultado->possuiCodigoCertificado()){
+                    $acoes .= '<form method="POST" action="'.route('inscritos.reenviar.codigo', $resultado->idcursoinscrito).'" class="d-inline">';
+                    $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+                    $acoes .= '<input type="hidden" name="_method" value="put" />';
+                    $acoes .= '<button type="submit" class="btn btn-sm btn-primary" value="" />Reenviar Código</button>';
+                    $acoes .= '</form> ';
+                }
+            }
 
             if(empty($acoes))
                 $acoes = '<i class="fas fa-lock text-muted"></i>';
@@ -166,6 +175,9 @@ class CursoSubService implements CursoSubServiceInterface {
         $validated['idusuario'] = $user->idusuario;
         $validated['nome'] = mb_convert_case(mb_strtolower($validated['nome']), MB_CASE_TITLE);
 
+        if(!isset($id) && $curso->tipoParaCertificado())
+            $validated['codigo_certificado'] = CursoInscrito::gerarCodigoCertificado($validated['conta_no_portal']);
+
         if(isset($validated['cpf']))
             $validated['cpf'] = formataCpfCnpj(apenasNumeros($validated['cpf']));
 
@@ -178,11 +190,16 @@ class CursoSubService implements CursoSubServiceInterface {
         $acao = !isset($id) ? 'adicionou' : 'editou';
 
         if(!isset($inscrito))
-            $id = $curso->cursoinscrito()->create($validated)->idcursoinscrito;
-        else
+        {
+            unset($validated['conta_no_portal']);
+            $inscrito = $curso->cursoinscrito()->create($validated);
+        }else
             $inscrito->update($validated);
         
-        event(new CrudEvent('inscrito em curso', $acao, $id));
+        event(new CrudEvent('inscrito em curso', $acao, $inscrito->idcursoinscrito));
+
+        if(!isset($id) && $curso->tipoParaCertificado())
+            Mail::to($inscrito->email)->queue(new CursoInscritoMailGuest($inscrito->textoAgradece()['agradece']));
 
         return [
             'idcurso' => $curso->idcurso
@@ -278,9 +295,16 @@ class CursoSubService implements CursoSubServiceInterface {
 
         $validated['nome'] = mb_convert_case(mb_strtolower($validated['nome']), MB_CASE_TITLE);
         $validated['cpf'] = formataCpfCnpj(apenasNumeros($validated['cpf']));
+
+        if($curso->tipoParaCertificado())
+            $validated['codigo_certificado'] = CursoInscrito::gerarCodigoCertificado($validated['conta_no_portal']);
+
+        $txt_certificado = isset($validated['codigo_certificado']) ? 'foi gerado código para o certificado' : null;
         $ip = $validated['ip'];
+
         unset($validated['ip']);
         unset($validated['termo']);
+        unset($validated['conta_no_portal']);
 
         if($curso->add_campo)
         {
@@ -292,12 +316,31 @@ class CursoSubService implements CursoSubServiceInterface {
         $termo = $inscrito->termos()->create(['ip' => $ip]);
 
         $string = $inscrito->nome." (CPF: ".$inscrito->cpf.") *inscreveu-se* no curso *".$inscrito->curso->tipo." - ".$inscrito->curso->tema;
-        $string .= "*, turma *".$inscrito->curso->idcurso."* e " . $termo->message();
+        $string .= "*, turma *".$inscrito->curso->idcurso."*, ".$txt_certificado." e " . $termo->message();
         event(new ExternoEvent($string));
         
         $textos = $inscrito->textoAgradece();
         Mail::to($inscrito->email)->queue(new CursoInscritoMailGuest($textos['agradece']));
 
         return $textos;
+    }
+
+    public function reenviarCodigo($id, $service)
+    {
+        $inscrito = CursoInscrito::findOrFail($id);
+
+        if(!$inscrito->possuiCodigoCertificado())
+            return [
+                'message' => 'Este CPF / CNPJ não possui código para ser enviado.',
+                'class' => 'alert-danger'
+            ];
+
+        $conta_portal = $service->getService('Representante')->getRepresentanteByCpfCnpj(apenasNumeros($inscrito->cpf));
+        $msg = $inscrito->podeGerarCertificado($conta_portal, true);
+
+        if(isset($msg['message']))
+            return $msg;
+        
+        Mail::to($inscrito->email)->queue(new CursoInscritoMailGuest($inscrito->textoReenvio()));
     }
 }

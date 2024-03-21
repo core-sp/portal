@@ -250,4 +250,9 @@ class Curso extends Model
     {
         return $this->nomeRotulo() . ': ' . $valor;
     }
+
+    public function tipoParaCertificado()
+    {
+        return ($this->tipo == self::TIPO_CURSO) || ($this->tipo == self::TIPO_PALESTRA) || ($this->tipo == self::TIPO_WORK);
+    }
 }
