@@ -75,6 +75,15 @@ class Curso extends Model
         ];
     }
 
+    public static function tiposCertificado()
+    {
+        return [
+            self::tipos()[0],
+            self::tipos()[3],
+            self::tipos()[4],
+        ];
+    }
+
     public static function acessos()
     {
         return [
@@ -253,6 +262,6 @@ class Curso extends Model
 
     public function tipoParaCertificado()
     {
-        return ($this->tipo == self::TIPO_CURSO) || ($this->tipo == self::TIPO_PALESTRA) || ($this->tipo == self::TIPO_WORK);
+        return in_array($this->tipo, self::tiposCertificado());
     }
 }

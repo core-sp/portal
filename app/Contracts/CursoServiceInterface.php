@@ -36,5 +36,7 @@ interface CursoServiceInterface {
 
     public function cursosAnteriores();
 
+    public function certificadosRepresentante($cpf_cnpj);
+
     public function inscritos();
 }

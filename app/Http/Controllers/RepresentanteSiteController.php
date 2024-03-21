@@ -581,7 +581,8 @@ class RepresentanteSiteController extends Controller
     public function cursos()
     {
         try{
-            $cursos = $this->service->getService('Curso')->siteGrid(true);
+            $dados['cursos'] = $this->service->getService('Curso')->siteGrid(true);
+            $dados['certificados'] = $this->service->getService('Curso')->certificadosRepresentante(auth()->guard('representante')->user()->cpf_cnpj);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os cursos.");
@@ -589,7 +590,7 @@ class RepresentanteSiteController extends Controller
 
         event(new ExternoEvent('.', 'Cursos'));
 
-        return view('site.representante.cursos', ['cursos' => $cursos]);
+        return view('site.representante.cursos', $dados);
     }
 
     public function agendamentoSala($acao = null, $id = null)

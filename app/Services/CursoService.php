@@ -276,6 +276,27 @@ class CursoService implements CursoServiceInterface {
         ->paginate(9);
     }
 
+    public function certificadosRepresentante($cpf_cnpj)
+    {
+        $now = now()->format('Y-m-d H:i');
+        $cpf_cnpj = formataCpfCnpj(apenasNumeros($cpf_cnpj));
+
+        return Curso::with(['cursoInscrito' => function ($query) use ($cpf_cnpj) {
+                $query->where('cpf', $cpf_cnpj)->where(function ($query1) {
+                    $query1->where('presenca', 'Sim')->orWhereNull('presenca');
+                });
+            }])
+            ->where('datatermino','<', $now)
+            ->where('publicado','Sim')
+            ->whereIn('tipo', Curso::tiposCertificado())
+            ->whereHas('cursoInscrito', function ($query1) use ($cpf_cnpj) {
+                $query1->where('cpf', $cpf_cnpj)->where(function ($query2) {
+                    $query2->where('presenca', 'Sim')->orWhereNull('presenca');
+                });
+            })
+            ->paginate(6);
+    }
+
     public function inscritos(Curso $curso = null)
     {
         return resolve('App\Contracts\CursoSubServiceInterface');
