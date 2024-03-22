@@ -3,8 +3,9 @@
 @section('content-representante')
 
 <div class="representante-content w-100">
-    @if(Session::has('message'))
-    <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
+    @if(Session::has('message') || $errors->has('inscrito'))
+    <p class="alert {{ Session::has('message') ? Session::get('class') : 'alert-danger' }}">{!! Session::has('message') ? Session::get('message') : $errors->first('inscrito') !!}</p>
+    <hr />
     @endif
     
     <!-- CURSOS PRIVADOS COM INSCRIÇÕES ABERTAS -->
@@ -42,15 +43,17 @@
         </div>
     @endif
 
-        <div class="text-right">
+        <div class="text-right mt-2">
         @if(isset($cursos))
             {{ $cursos->links() }}
         @endif
         </div>
     </div>
 
+    <hr />
+
     <!-- CERTIFICADOS -->
-    <div class="conteudo-txt-mini light mt-5">
+    <div class="conteudo-txt-mini light mt-2">
         <h4 class="pt-1 pb-1"><i class="fas fa-award"></i> Certificados</h4>
         <div class="linha-lg-mini mb-1"></div>
     @if(isset($certificados) && $certificados->isNotEmpty())
@@ -67,7 +70,11 @@
                             </div>
                         </div>
                     </a>
-                    <a href="{{-- route('cursos.inscricao.website', $curso->idcurso) --}}" class="btn btn-sm btn-primary text-white mt-2"><i class="fas fa-award"></i> Certificado</a>
+                    <form method="POST" action="{{ route('cursos.certificado', $certificado->idcurso) }}">
+                        @csrf
+                        <input type="hidden" name="idcursoinscrito" value="{{ $certificado->cursoInscrito->first()->idcursoinscrito }}" />
+                        <button type="submit" class="btn btn-sm btn-primary btn-block text-white mt-2"><i class="fas fa-award"></i> Certificado</button>
+                    </form>
                 </div>
             </div>
         @endforeach
@@ -78,7 +85,7 @@
         </div>
     @endif
 
-        <div class="text-right">
+        <div class="text-right mt-2">
         @if(isset($certificados))
             {{ $certificados->links() }}
         @endif

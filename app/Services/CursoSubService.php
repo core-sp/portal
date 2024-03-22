@@ -336,11 +336,24 @@ class CursoSubService implements CursoSubServiceInterface {
             ];
 
         $conta_portal = $service->getService('Representante')->getRepresentanteByCpfCnpj(apenasNumeros($inscrito->cpf));
-        $msg = $inscrito->podeGerarCertificado($conta_portal, true);
+        $msg = $inscrito->podeGerarCertificado($conta_portal);
 
         if(isset($msg['message']))
             return $msg;
         
         Mail::to($inscrito->email)->queue(new CursoInscritoMailGuest($inscrito->textoReenvio()));
+    }
+
+    public function gerarCertificado($inscrito, $validated, $rep_autenticado = false)
+    {
+        if($rep_autenticado)
+            $inscrito->update(['codigo_certificado' => null]);
+
+        $msg = $inscrito->podeGerarCertificado($validated['conta_no_portal']);
+
+        if(isset($msg['message']))
+            return $msg;
+
+        return 'certificado';
     }
 }

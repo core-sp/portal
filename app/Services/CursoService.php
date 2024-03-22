@@ -294,6 +294,7 @@ class CursoService implements CursoServiceInterface {
                     $query2->where('presenca', 'Sim')->orWhereNull('presenca');
                 });
             })
+            ->orderBy('created_at', 'DESC')
             ->paginate(6);
     }
 

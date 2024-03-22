@@ -7,6 +7,7 @@ use App\Repositories\GerentiRepositoryInterface;
 use App\Contracts\MediadorServiceInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Http\Requests\CursoInscricaoRequest;
+use App\Http\Requests\CursoRequest;
 
 class CursoInscritoController extends Controller
 {
@@ -15,7 +16,7 @@ class CursoInscritoController extends Controller
     
     public function __construct(GerentiRepositoryInterface $gerentiRepository, MediadorServiceInterface $service)
     {
-        $this->middleware('auth', ['except' => ['inscricao', 'inscricaoView']]);
+        $this->middleware('auth', ['except' => ['inscricao', 'inscricaoView', 'downloadCertificado']]);
         $this->gerentiRepository = $gerentiRepository;
         $this->service = $service;
     }
@@ -154,7 +155,7 @@ class CursoInscritoController extends Controller
             if(!empty($verifica))
                 return redirect()->route($verifica['rota'])->with($verifica);
 
-            $validated['conta_no_portal'] = $this->service->getService('Representante')->getRepresentanteByCpfCnpj(apenasNumeros($validated['cpf']));
+            $validated['conta_no_portal'] = auth()->guard('representante')->check() ? true : $this->service->getService('Representante')->getRepresentanteByCpfCnpj(apenasNumeros($validated['cpf']));
             $dados = $this->service->getService('Curso')->inscritos()->inscricaoExterna($curso, $validated);
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -165,6 +166,25 @@ class CursoInscritoController extends Controller
         }
         
         return view('site.agradecimento')->with($dados);
+    }
+
+    public function downloadCertificado(CursoRequest $request, $idcurso)
+    {        
+        try{
+            $validated = $request->validated();
+            $validated['conta_no_portal'] = auth()->guard('representante')->check() ? true : $this->service->getService('Representante')->getRepresentanteByCpfCnpj(apenasNumeros($validated['inscrito']->cpf));
+            $dados = $this->service->getService('Curso')->inscritos()->gerarCertificado($validated['inscrito'], $validated, auth()->guard('representante')->check());
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Curso não encontrado.");
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao gerar certificado no curso com ID ".$idcurso.".");
+        }
+
+        return isset($dados['message']) ? redirect()->back()->with($dados) : redirect()->back()
+            ->with('message', '<i class="icon fa fa-check"></i>Certificado gerado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function destroy($id)

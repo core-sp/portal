@@ -3,6 +3,7 @@
 namespace App\Contracts;
 
 use App\Contracts\MediadorServiceInterface;
+use App\CursoInscrito;
 
 interface CursoSubServiceInterface {
 
@@ -29,4 +30,6 @@ interface CursoSubServiceInterface {
     public function inscricaoExterna($curso, $validated = null);
 
     public function reenviarCodigo($id, MediadorServiceInterface $service);
+
+    public function gerarCertificado(CursoInscrito $inscrito, $validated, $rep_autenticado = false);
 }

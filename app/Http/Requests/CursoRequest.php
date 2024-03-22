@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Contracts\MediadorServiceInterface;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class CursoRequest extends FormRequest
 {
@@ -21,6 +22,20 @@ class CursoRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+        if(\Route::is('cursos.certificado'))
+        {
+            if((!auth()->guard('representante')->check() && !Str::isUuid($this->codigo_certificado)) || (auth()->guard('representante')->check() && !isset($this->idcursoinscrito)))
+                return;
+
+            $curso = $this->service->show($this->idcurso, true);
+
+            $inscrito = auth()->guard('representante')->check() ? $curso->cursoInscrito()->where('idcursoinscrito', $this->idcursoinscrito)->first() :
+            $curso->cursoInscrito()->where('codigo_certificado', $this->codigo_certificado)->first();
+
+            $this->merge(['inscrito' => isset($inscrito) ? $inscrito : null]);
+            return;
+        }
+
         foreach ($this->all() as $key => $value) {
             if(in_array($key, ['datarealizacao', 'datatermino', 'inicio_inscricao', 'termino_inscricao']))
                 $this->merge([$key => str_replace('T', ' ', $this->input($key))]);
@@ -44,6 +59,12 @@ class CursoRequest extends FormRequest
 
     public function rules()
     {
+        if(\Route::is('cursos.certificado'))
+            return [
+                'codigo_certificado' => auth()->guard('representante')->check() ? '' : 'required|uuid',
+                'inscrito' => 'required',
+            ];
+
         return [
             'tipo' => 'required|in:' . implode(',', $this->service->tipos()),
             'tema' => 'required|max:191',
@@ -83,6 +104,8 @@ class CursoRequest extends FormRequest
             'required_with' => 'A data final das inscrições é obrigatória quando data inicial está preenchida',
             'boolean' => 'Campo com valor inválido',
             'campo_rotulo.required_if' => 'Campo obrigatório se for adicionar campo',
+            'uuid' => 'Formato inválido de código',
+            'inscrito.required' => 'Não há inscrição relacionada a este código',
         ];
     }
 

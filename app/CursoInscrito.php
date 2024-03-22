@@ -56,6 +56,15 @@ class CursoInscrito extends Model
         return $this->hasMany('App\TermoConsentimento', 'idcursoinscrito');
     }
 
+    private function linkTextoPaginaCertificado()
+    {
+        $txt = 'Link com o código para gerar o certificado em caso de presença confirmada após encerramento: <a href="';
+        $txt .= route('cursos.show', ['id' => $this->curso->idcurso, 'certificado' => $this->codigo_certificado]);
+        $txt .= '" target="_blank">Abrir</a><br>Código: '.$this->codigo_certificado;
+
+        return $txt;
+    }
+
     public function possuiPresenca()
     {
         return isset($this->presenca);
@@ -92,8 +101,7 @@ class CursoInscrito extends Model
         if($this->curso->tipoParaCertificado())
         {
             $agradece .= "<br><strong>Certificado</strong><br>";
-            $agradece .= isset($this->codigo_certificado) ? 
-                "Código para gerar o certificado em caso de presença confirmada após encerramento: <br>".$this->codigo_certificado."<br>" : 
+            $agradece .= isset($this->codigo_certificado) ? $this->linkTextoPaginaCertificado().'<br>' : 
                 "Em caso de presença confirmada após encerramento, pode ser gerado o certificado na sua área restrita.<br>";
         }
 
@@ -116,7 +124,7 @@ class CursoInscrito extends Model
         $agradece .= "CPF: ".$this->cpf."<br>";
         $agradece .= "Telefone: ".$this->telefone;
         $agradece .= "<br>";
-        $agradece .= "<br><strong>Certificado</strong><br>Código para gerar o certificado: <br>".$this->codigo_certificado."<br>";
+        $agradece .= '<br><strong>Certificado</strong><br>'.$this->linkTextoPaginaCertificado().'<br>';
 
         return $agradece;
     }
@@ -134,7 +142,7 @@ class CursoInscrito extends Model
         return isset($this->codigo_certificado);
     }
 
-    public function podeGerarCertificado($conta_portal, $admin = false)
+    public function podeGerarCertificado($conta_portal)
     {
         if(!$this->curso->tipoParaCertificado())
             return [
@@ -146,11 +154,10 @@ class CursoInscrito extends Model
         {
             $this->update(['codigo_certificado' => null]);
 
-            if($admin)
-                return [
-                    'message' => 'Este CPF / CNPJ já possui conta no Portal, deve gerar o certificado pela área restrita.',
-                    'class' => 'alert-warning'
-                ];
+            return [
+                'message' => 'Este CPF / CNPJ já possui conta no Portal, deve gerar o certificado pela área restrita. O código foi invalidado.',
+                'class' => 'alert-warning'
+            ];
         }
 
         if(!isset($this->presenca))

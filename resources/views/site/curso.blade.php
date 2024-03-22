@@ -39,6 +39,11 @@
       </div>
     </div>
     <div class="linha-lg"></div>
+
+    @if($curso->tipoParaCertificado() && $curso->encerrado() && Session::has('message'))
+        <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
+    @endif
+
     <div class="row mt-2">
       <div class="col-lg-4 edital-info">
         <table class="table table-bordered mb-4">
@@ -88,12 +93,41 @@
         @if(auth()->guard('representante')->check() && $curso->representanteInscrito(auth()->guard('representante')->user()->cpf_cnpj))
         <div class="center-992">
           <span class="{{ $curso::TEXTO_BTN_INSCRITO }} btn-curso-inscrito">Inscrição realizada</span>
+          @if($curso->tipoParaCertificado() && $curso->encerrado())
+            <p class="mt-2"><i class="fas fa-award"></i> <strong>Certificado</strong> - Acesse a área restrita para realizar o download do certificado.</p>
+          @endif
         </div>
         @elseif($curso->podeInscreverExterno())
           <div class="center-992">
             <a href="{{ route('cursos.inscricao.website', $curso->idcurso) }}" class="btn-curso-interna">Inscrever-se</a>
           </div>
         @endif
+
+        @if($curso->tipoParaCertificado() && $curso->encerrado() && !auth()->guard('representante')->check())
+        <div class="center-992">
+          <form method="POST" action="{{ route('cursos.certificado', $curso->idcurso) }}">
+            @csrf
+            <label for="codigo_certificado"><i class="fas fa-award"></i> Certificado</label>
+            <input type="text"
+              class="form-control {{ $errors->has('codigo_certificado') || $errors->has('inscrito') ? 'is-invalid' : '' }}"
+              name="codigo_certificado"
+              id="codigo_certificado"
+              minlength="36"
+              maxlength="36"
+              placeholder="Insira o código gerado na inscrição"
+              value="{{ request()->query('certificado') }}"
+              required
+            />
+            @if($errors->has('codigo_certificado') || $errors->has('inscrito'))
+            <div class="invalid-feedback">
+              {{  $errors->has('codigo_certificado') ? $errors->first('codigo_certificado') : $errors->first('inscrito') }}
+            </div>
+            @endif
+            <button type="submit" class="btn btn-sm btn-primary float-right mt-1">Download</button>
+          </form>
+        </div>
+        @endif
+
       </div>
       <div class="col-lg-8 mt-2-992">
         <div class="curso-img">
