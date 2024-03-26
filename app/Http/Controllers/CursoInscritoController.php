@@ -182,9 +182,7 @@ class CursoInscritoController extends Controller
             abort(500, "Erro ao gerar certificado no curso com ID ".$idcurso.".");
         }
 
-        return isset($dados['message']) ? redirect()->back()->with($dados) : redirect()->back()
-            ->with('message', '<i class="icon fa fa-check"></i>Certificado gerado com sucesso!')
-            ->with('class', 'alert-success');
+        return isset($dados['message']) ? redirect()->back()->with($dados) : $dados['download'];
     }
 
     public function destroy($id)

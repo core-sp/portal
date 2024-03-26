@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class Curso extends Model
 {
@@ -263,5 +264,32 @@ class Curso extends Model
     public function tipoParaCertificado()
     {
         return in_array($this->tipo, self::tiposCertificado());
+    }
+
+    public function dataRealizacaoCertificado()
+    {
+        $data_inicial = Carbon::parse($this->datarealizacao);
+        $data_final = Carbon::parse($this->datatermino);
+        $temp = 'no dia ';
+        $temp_data_corrida = $data_inicial->isoFormat('D') . ' de ' . ucFirst($data_inicial->isoFormat('MMMM'));
+        $temp_hora_incial = $data_inicial->minute == 0 ? $data_inicial->format('H\h') : $data_inicial->format('H:i');
+        $temp_hora_final = $data_final->minute == 0 ? $data_final->format('H\h') : $data_final->format('H:i');
+
+        if($data_inicial->day != $data_final->day){
+            $temp = 'com início ' . $temp;
+            $temp .= $temp_data_corrida . ', às ';
+            $temp .= $temp_hora_incial;
+            $temp .= ', e término no dia ';
+            $temp .= $data_final->isoFormat('D') . ' de ' . ucFirst($data_final->isoFormat('MMMM')) . ', às ';
+        }else{
+            $temp .= $temp_data_corrida . ', das ';
+            $temp .= $temp_hora_incial;
+            $temp .= ' às ';
+        }
+        
+        $temp .= $temp_hora_final;
+        $temp .= ', em ' . $this->regional->regional;
+
+        return $temp;
     }
 }

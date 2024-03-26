@@ -8,6 +8,7 @@ use App\Events\ExternoEvent;
 use App\Contracts\CursoSubServiceInterface;
 use App\Mail\CursoInscritoMailGuest;
 use Illuminate\Support\Facades\Mail;
+use PDF;
 
 class CursoSubService implements CursoSubServiceInterface {
 
@@ -354,6 +355,15 @@ class CursoSubService implements CursoSubServiceInterface {
         if(isset($msg['message']))
             return $msg;
 
-        return 'certificado';
+        // temporário
+        $inscrito->curso->conferencista = 'Conferencista Teste';
+
+        return [
+            'download' => PDF::loadView('site.inc.certificadoPDF', compact('inscrito'))
+            ->setPaper('a4', 'landscape')
+            ->setWarnings(false)
+            ->download('certificado.pdf')
+            // ->stream('certificado.pdf')
+        ];
     }
 }
