@@ -355,6 +355,9 @@ class CursoSubService implements CursoSubServiceInterface {
         if(isset($msg['message']))
             return $msg;
 
+        if($rep_autenticado)
+            event(new ExternoEvent(' e realizou download do certificado.', 'Cursos'));
+
         // temporário
         $inscrito->curso->conferencista = 'Conferencista Teste';
 
