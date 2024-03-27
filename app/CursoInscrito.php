@@ -150,6 +150,12 @@ class CursoInscrito extends Model
                 'class' => 'alert-danger'
             ];
 
+        if(!$this->curso->encerrado())
+            return [
+                'message' => 'O curso deve estar encerrado para gerar certificado.',
+                'class' => 'alert-danger'
+            ];
+
         if($this->possuiCodigoCertificado() && isset($conta_portal))
         {
             $this->update(['codigo_certificado' => null]);
