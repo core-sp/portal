@@ -179,7 +179,7 @@ else
 
   <div id="box-descricao">
     <span class="texto-fixo">n{{ $inscrito->curso->tipo == $inscrito->curso::TIPO_PALESTRA ? 'a' : 'o' }} {{ mb_strtolower($inscrito->curso->tipo, 'UTF-8') }} <b>{{ $inscrito->curso->tema }},</b> ministrada pelo(a) conferencista 
-      <strong>{{ $inscrito->curso->conferencista }}</strong>, {{ $inscrito->curso->dataRealizacaoCertificado() }}.
+      <strong>{{ $inscrito->curso->conferencista }},</strong> {{ $inscrito->curso->dataRealizacaoCertificado() }} e {{ $inscrito->curso->cargaHorariaCertificado() }}.
     </span>
   </div>
 
@@ -209,7 +209,7 @@ else
 
     <div id="box-pg2-curso">
       <p class="conteudo-curso">Certificamos que <span class="curso-upper">{{ trim($inscrito->nome) }}</span> participou d{{ $inscrito->curso->tipo == $inscrito->curso::TIPO_PALESTRA ? 'a' : 'o' }} {{ mb_strtolower($inscrito->curso->tipo, 'UTF-8') }} "{{ $inscrito->curso->tema }}", ministrada pelo(a) conferencista 
-      "{{ $inscrito->curso->conferencista }}", {{ $inscrito->curso->dataRealizacaoCertificado() }}.</p>
+      "{{ $inscrito->curso->conferencista }}", {{ $inscrito->curso->dataRealizacaoCertificado() }} e {{ $inscrito->curso->cargaHorariaCertificado() }}.</p>
 
       <br />
       <br />

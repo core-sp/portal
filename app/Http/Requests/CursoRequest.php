@@ -68,6 +68,8 @@ class CursoRequest extends FormRequest
         return [
             'tipo' => 'required|in:' . implode(',', $this->service->tipos()),
             'tema' => 'required|max:191',
+            'conferencista' => 'required|max:191',
+            'carga_horaria' => 'required|regex:/[0-9]{2}:[0-9]{2}/',
             'idregional' => 'required|exists:regionais',
             'img' => 'nullable|max:191',
             'datarealizacao' => 'required|date_format:Y-m-d H:i|after:'.now()->format('Y-m-d 23:59'),
@@ -106,6 +108,7 @@ class CursoRequest extends FormRequest
             'campo_rotulo.required_if' => 'Campo obrigatório se for adicionar campo',
             'uuid' => 'Formato inválido de código',
             'inscrito.required' => 'Não há inscrição relacionada a este código',
+            'carga_horaria.regex' => 'A carga horaria do curso deve ser no formato 00:00',
         ];
     }
 

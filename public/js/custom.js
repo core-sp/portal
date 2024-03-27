@@ -47,6 +47,7 @@ $(document).ready(function(){
 	$('.cpfOuCnpj').index() > -1 && $('.cpfOuCnpj').val().length > 11 ? 
 	$('.cpfOuCnpj').mask('00.000.000/0000-00', options) : 
 	$('.cpfOuCnpj').mask('000.000.000-00#', options);
+  $('.horaInput').mask('00:00');
   
   // copiado
 	$('.placaVeiculo').mask('AAA 0U00', {

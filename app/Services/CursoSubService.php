@@ -358,9 +358,6 @@ class CursoSubService implements CursoSubServiceInterface {
         if($rep_autenticado)
             event(new ExternoEvent(' e realizou download do certificado.', 'Cursos'));
 
-        // temporário
-        $inscrito->curso->conferencista = 'Conferencista Teste';
-
         return [
             'download' => PDF::loadView('site.inc.certificadoPDF', compact('inscrito'))
             ->setPaper('a4', 'landscape')

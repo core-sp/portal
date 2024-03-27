@@ -54,6 +54,41 @@
                 @endif
             </div>
         </div>
+
+        <div class="form-row mt-2">
+            <div class="col">
+                <label for="conferencista">Conferencista</label>
+                <input type="text"
+                    class="form-control {{ $errors->has('conferencista') ? 'is-invalid' : '' }}" 
+                    placeholder="Nome do conferencista" 
+                    name="conferencista"
+                    maxlength="191"
+                    value="{{ isset($resultado->conferencista) ? $resultado->conferencista : old('conferencista') }}"
+                    required
+                />
+                @if($errors->has('conferencista'))
+                <div class="invalid-feedback">
+                {{ $errors->first('conferencista') }}
+                </div>
+                @endif
+            </div>
+            <div class="col-2">
+                <label for="carga_horaria">Carga Horária</label>
+                <input type="text" 
+                    class="form-control horaInput {{ $errors->has('carga_horaria') ? 'is-invalid' : '' }}" 
+                    name="carga_horaria" 
+                    id="carga_horaria"
+                    value="{{ isset($resultado->carga_horaria) ? onlyHour($resultado->carga_horaria) : old('carga_horaria') }}"
+                    required
+                />
+                @if($errors->has('carga_horaria'))
+                <div class="invalid-feedback">
+                {{ $errors->first('carga_horaria') }}
+                </div>
+                @endif
+            </div>
+        </div>
+
         <div class="form-row mt-2">
             <div class="col-sm-3">
                 <label for="idregional">Regional</label>

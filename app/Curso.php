@@ -292,4 +292,15 @@ class Curso extends Model
 
         return $temp;
     }
+
+    public function cargaHorariaCertificado()
+    {
+        if($this->carga_horaria == '00:00')
+            return '';
+
+        $carga_horaria = Carbon::parse($this->carga_horaria);
+        $temp_hora = $carga_horaria->minute == 0 ? $carga_horaria->format('H\h') : $carga_horaria->format('H') . ' horas e ' . $carga_horaria->format('i') . ' minutos';
+        
+        return 'com carga horária de ' . $temp_hora;
+    }
 }
