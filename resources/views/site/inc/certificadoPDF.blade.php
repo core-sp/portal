@@ -7,6 +7,16 @@
   <title>Certificado - {{ $inscrito->curso->tema }}</title>
   <style>
 
+    @font-face { 
+      font-family: "Constantia Regular";
+      src: url({{ storage_path('fonts/constan.ttf') }});
+    }
+
+    @font-face { 
+      font-family: "Calibri Bold";
+      src: url({{ storage_path('fonts/calibri-bold.ttf') }});
+    }
+
   /* Página 1, Certificado com design */
     #img_fundo {
       position: absolute;
@@ -29,7 +39,7 @@
     #box-nome {
       width: 750px;
       position: absolute;
-      bottom: 315px;
+      bottom: 318px;
       left: 245px;
       padding: 0;
     }
@@ -41,12 +51,18 @@
       margin: 0;
     }
 
+    #box-nome div span {
+      font-family: "Calibri Bold";
+      line-height: 83%;
+      color: #153f67;
+    }
+
     #box-descricao {
       margin: auto;
-      width: 70%;
+      width: 77%;
       position: absolute;
-      top: 400px;
-      left: 230px;
+      top: 410px;
+      left: 200px;
       padding: 0;
       text-align: center;
     }
@@ -55,12 +71,14 @@
       margin: auto;
       text-align: center;
       position: absolute;
-      bottom: 125px;
+      bottom: 115px;
       left: 20px;
     }
 
     .texto-fixo {
       font-size: 23px;
+      font-family: "Constantia Regular";
+      line-height: 83%;
     }
 
     .inscrito {
@@ -156,12 +174,14 @@
 @php
 
 $len = strlen(trim($inscrito->nome));
-if($len <= 62)
-  $font = '35px';
+if($len <= 22)
+  $font = '50px';
+elseif($len <= 62)
+  $font = '40px';
 elseif($len <= 75)
-  $font = '30px';
+  $font = '35px';
 else
-  $font = '27px';
+  $font = '30px';
 
 @endphp
 
@@ -173,7 +193,7 @@ else
 
   <div id="box-nome">
     <div>
-      <span class="inscrito" style="font-size: {{ $font }}"><strong>{{ trim($inscrito->nome) }}</strong></span>
+      <span class="inscrito" style="font-size: {{ $font }}">{{ trim($inscrito->nome) }}</span>
     </div>
   </div>
 
