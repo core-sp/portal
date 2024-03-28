@@ -142,6 +142,14 @@ class CursoInscrito extends Model
         return isset($this->codigo_certificado);
     }
 
+    public function getChecksum()
+    {
+        $checksum = hash('sha256', $this->nome . '|' . $this->cpf . '|' . $this->idcurso . '|' . $this->idcursoinscrito . '|' . now()->timestamp);
+        $this->update(['checksum' => $checksum]);
+
+        return $checksum;
+    }
+
     public function podeGerarCertificado($conta_portal)
     {
         if(!$this->curso->tipoParaCertificado())

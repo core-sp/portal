@@ -9,6 +9,8 @@ use App\Contracts\CursoSubServiceInterface;
 use App\Mail\CursoInscritoMailGuest;
 use Illuminate\Support\Facades\Mail;
 use PDF;
+use Illuminate\Support\Facades\Storage;
+use App\QRCode;
 
 class CursoSubService implements CursoSubServiceInterface {
 
@@ -104,6 +106,20 @@ class CursoSubService implements CursoSubServiceInterface {
 
         $tabela = montaTabela($headers, $contents, $classes);
         return $tabela;
+    }
+
+    private function gerarQRCode($checksum, $idinscrito)
+    {
+        $nome_file = $idinscrito . '_' . now()->timestamp . '.png';
+        $link = route('cursos.certificado.validar', (string) $checksum);
+        $generator = new QRCode($link, ['s' => 'qr', 'wq' => 0, 'fc' => '#004587', 'sf' => 3]);
+
+        /* Create bitmap image. */
+        $image = $generator->render_image();
+        imagepng($image, storage_path('app/certificados/temp/' . $nome_file));
+        imagedestroy($image);
+
+        return $nome_file;
     }
 
     public function tiposInscricao()
@@ -358,12 +374,34 @@ class CursoSubService implements CursoSubServiceInterface {
         if($rep_autenticado)
             event(new ExternoEvent(' e realizou download do certificado.', 'Cursos'));
 
+            $checksum = $inscrito->getChecksum();
+            $nome_file = $this->gerarQRCode($checksum, $inscrito->idcursoinscrito);
+
+            $download = PDF::loadView('site.inc.certificadoPDF', compact('inscrito', 'nome_file'))
+                ->setPaper('a4', 'landscape')
+                ->setWarnings(false)
+                // ->download('certificado.pdf')
+                ->stream('certificado.pdf');
+
+            Storage::disk('local')->delete('certificados/temp/' . $nome_file);
+            
         return [
-            'download' => PDF::loadView('site.inc.certificadoPDF', compact('inscrito'))
-            ->setPaper('a4', 'landscape')
-            ->setWarnings(false)
-            ->download('certificado.pdf')
-            // ->stream('certificado.pdf')
+            'download' => $download,
+        ];
+    }
+
+    public function validarCertificado($checksum)
+    {
+        $valido = CursoInscrito::where('checksum', $checksum)->first();
+
+        if(isset($valido))
+            return [
+                'message' => '<i class="fas fa-award"></i> Certificado do curso ' . $valido->curso->tema . ' é válido!',
+                'class' => 'alert-success'
+            ];
+        return [
+            'message' => '<i class="fas fa-award"></i> Certificado inválido!',
+            'class' => 'alert-danger'
         ];
     }
 }

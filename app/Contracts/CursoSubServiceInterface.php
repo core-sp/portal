@@ -32,4 +32,6 @@ interface CursoSubServiceInterface {
     public function reenviarCodigo($id, MediadorServiceInterface $service);
 
     public function gerarCertificado(CursoInscrito $inscrito, $validated, $rep_autenticado = false);
+
+    public function validarCertificado($checksum);
 }

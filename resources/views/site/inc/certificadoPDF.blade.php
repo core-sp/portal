@@ -87,6 +87,12 @@
       margin: 0;
     }
 
+    .qrcode {
+      position: fixed;
+      bottom: 145px;
+      left: 120px;
+    }
+
     /* Cria a página seguinte */
     .page-break {
       page-break-after: always;
@@ -209,6 +215,8 @@ else
     </p>
   </div>
 
+  <img class="qrcode" src="{{ storage_path('app/certificados/temp/' . $nome_file) }}">
+
   <div class="page-break"></div>
 
   <div id="simples">
@@ -238,6 +246,8 @@ else
     <p id="pg2-data">São Paulo, {{ now()->isoFormat('D') }} de {{ ucFirst(now()->isoFormat('MMMM')) }} de {{ now()->isoFormat('G') }}.</p>
 
     <img id="assinatura" src="{{ storage_path('app/certificados/assinatura.png') }}" />
+
+    <img class="qrcode" src="{{ storage_path('app/certificados/temp/' . $nome_file) }}">
 
   </div>
 

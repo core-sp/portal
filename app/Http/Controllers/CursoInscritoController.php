@@ -16,7 +16,7 @@ class CursoInscritoController extends Controller
     
     public function __construct(GerentiRepositoryInterface $gerentiRepository, MediadorServiceInterface $service)
     {
-        $this->middleware('auth', ['except' => ['inscricao', 'inscricaoView', 'downloadCertificado']]);
+        $this->middleware('auth', ['except' => ['inscricao', 'inscricaoView', 'downloadCertificado', 'validarCertificado']]);
         $this->gerentiRepository = $gerentiRepository;
         $this->service = $service;
     }
@@ -183,6 +183,18 @@ class CursoInscritoController extends Controller
         }
 
         return isset($dados['message']) ? redirect()->back()->with($dados) : $dados['download'];
+    }
+
+    public function validarCertificado($checksum)
+    {        
+        try{
+            $dados = $this->service->getService('Curso')->inscritos()->validarCertificado($checksum);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao validar certificado.");
+        }
+
+        return redirect()->route('cursos.index.website')->with($dados);
     }
 
     public function destroy($id)

@@ -372,6 +372,7 @@ Route::middleware(['block_ip'])->group(function () {
     Route::post('cursos/{idcurso}/certificado', 'CursoInscritoController@downloadCertificado')->name('cursos.certificado');
     Route::post('cursos/{idcurso}/inscricao', 'CursoInscritoController@inscricao')->name('cursos.inscricao');
     Route::get('cursos-anteriores', 'CursoController@cursosAnterioresView')->name('cursos.previous.website');
+    Route::get('cursos/validar-cert/{checksum}', 'CursoInscritoController@validarCertificado')->name('cursos.certificado.validar');
     // Redirects
     Route::get('/curso/{id}', function($id){
         return redirect(route('cursos.show', $id), 301);
