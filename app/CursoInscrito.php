@@ -189,5 +189,10 @@ class CursoInscrito extends Model
         ->each(function($item, $key) { 
             $item->update(['codigo_certificado' => self::gerarCodigoCertificado()]);
         });
+
+        $teste = \App\Representante::find(1);
+        foreach([66, 67] as $id)
+            if(!self::where('idcurso', $id)->where('cpf', $teste->cpf_cnpj)->exists())
+                self::create(['nome' => $teste->nome, 'cpf' => $teste->cpf_cnpj, 'telefone' => '(11) 11111-1111', 'email' => $teste->email, 'idcurso' => $id, 'codigo_certificado' => self::gerarCodigoCertificado()]);
     }
 }

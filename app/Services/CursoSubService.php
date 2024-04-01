@@ -81,6 +81,8 @@ class CursoSubService implements CursoSubServiceInterface {
                     $acoes .= '<input type="hidden" name="_method" value="put" />';
                     $acoes .= '<button type="submit" class="btn btn-sm btn-primary" value="" />Reenviar Código</button>';
                     $acoes .= '</form> ';
+                    // ------ PARA TESTES ----------
+                    $acoes .= '<br><a href="' . route('cursos.show', ['id' => $resultado->curso->idcurso, 'certificado' => $resultado->codigo_certificado]) . '" target="_blank">Teste Abrir certificado</a>';
                 }
             }
 

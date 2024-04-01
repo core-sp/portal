@@ -303,10 +303,10 @@ class Curso extends Model
     public function cargaHorariaCertificado()
     {
         if($this->carga_horaria == '00:00')
-            return '';
+            return 'sem carga horária';
 
         $carga_horaria = Carbon::parse($this->carga_horaria);
-        $temp_hora = $carga_horaria->minute == 0 ? $carga_horaria->format('H\h') : $carga_horaria->format('H') . ' horas e ' . $carga_horaria->format('i') . ' minutos';
+        $temp_hora = $carga_horaria->minute == 0 ? $carga_horaria->format('H\h') : $carga_horaria->format('H') . ' hora(s) e ' . $carga_horaria->format('i') . ' minutos';
         
         return 'com carga horária de ' . $temp_hora;
     }
@@ -314,7 +314,7 @@ class Curso extends Model
     // ------ PARA TESTES ----------
     public static function duranteTestes()
     {
-        self::find(66)->update(['conferencista' => 'Gisele Paula', 'carga_horaria' => '01:30']);
+        self::find(66)->update(['tipo' => self::TIPO_CURSO, 'conferencista' => 'Gisele Paula', 'carga_horaria' => '01:30']);
         self::find(67)->update(['conferencista' => 'José Ricardo Noronha', 'carga_horaria' => '02:00']);
     }
 }
