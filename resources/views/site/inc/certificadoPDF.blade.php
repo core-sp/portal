@@ -231,7 +231,7 @@ else
 
   <div id="simples">
 
-    <img id="logo" src="{{ asset('img/brasao_cabecalho_cedula.png') }}" />
+    <img id="logo" src="{{ public_path('img/brasao_cabecalho_cedula.png') }}" />
 
     <div id="box-pg2-sobre">
       <p id="titulo"><strong>Conselho Regional dos Representantes Comerciais no Estado de São Paulo</strong></p>
