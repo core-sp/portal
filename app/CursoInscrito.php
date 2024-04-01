@@ -180,4 +180,14 @@ class CursoInscrito extends Model
                 'class' => 'alert-danger'
             ];
     }
+
+    // ------ PARA TESTES ----------
+    public static function duranteTestes()
+    {
+        self::whereIn('idcurso', [66, 67])
+        ->get()
+        ->each(function($item, $key) { 
+            $item->update(['codigo_certificado' => self::gerarCodigoCertificado()]);
+        });
+    }
 }

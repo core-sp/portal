@@ -310,4 +310,11 @@ class Curso extends Model
         
         return 'com carga horária de ' . $temp_hora;
     }
+
+    // ------ PARA TESTES ----------
+    public static function duranteTestes()
+    {
+        self::find(66)->update(['conferencista' => 'Gisele Paula', 'carga_horaria' => '01:30']);
+        self::find(67)->update(['conferencista' => 'José Ricardo Noronha', 'carga_horaria' => '02:00']);
+    }
 }
