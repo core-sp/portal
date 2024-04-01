@@ -78,7 +78,11 @@
                     class="form-control horaInput {{ $errors->has('carga_horaria') ? 'is-invalid' : '' }}" 
                     name="carga_horaria" 
                     id="carga_horaria"
-                    value="{{ isset($resultado->carga_horaria) ? onlyHour($resultado->carga_horaria) : old('carga_horaria') }}"
+                    @if(empty(old('carga_horaria')) && !isset($resultado->carga_horaria))
+                    value="00:00"
+                    @else
+                    value="{{ isset($resultado->carga_horaria) ? $resultado->carga_horaria : old('carga_horaria') }}"
+                    @endif
                     required
                 />
                 @if($errors->has('carga_horaria'))
