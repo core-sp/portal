@@ -111,7 +111,7 @@ class CursoSubService implements CursoSubServiceInterface {
     private function gerarQRCode($checksum, $idinscrito)
     {
         $nome_file = $idinscrito . '_' . now()->timestamp . '.png';
-        $link = route('cursos.certificado.validar', (string) $checksum);
+        $link = route('cursos.certificado.validar', $checksum);
         $generator = new QRCode($link, ['s' => 'qr', 'wq' => 0, 'fc' => '#004587', 'sf' => 3]);
 
         /* Create bitmap image. */
@@ -363,7 +363,7 @@ class CursoSubService implements CursoSubServiceInterface {
 
     public function gerarCertificado($inscrito, $validated, $rep_autenticado = false)
     {
-        if($rep_autenticado)
+        if($rep_autenticado && isset($inscrito->codigo_certificado))
             $inscrito->update(['codigo_certificado' => null]);
 
         $msg = $inscrito->podeGerarCertificado($validated['conta_no_portal']);
@@ -377,7 +377,7 @@ class CursoSubService implements CursoSubServiceInterface {
             $checksum = $inscrito->getChecksum();
             $nome_file = $this->gerarQRCode($checksum, $inscrito->idcursoinscrito);
 
-            $download = PDF::loadView('site.inc.certificadoPDF', compact('inscrito', 'nome_file'))
+            $download = PDF::loadView('site.inc.certificadoPDF', compact('inscrito', 'nome_file', 'checksum'))
                 ->setPaper('a4', 'landscape')
                 ->setWarnings(false)
                 // ->download('certificado.pdf')

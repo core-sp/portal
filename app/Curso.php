@@ -24,6 +24,8 @@ class Curso extends Model
     const TIPO_WORK = 'Workshop';
 
     const TEXTO_BTN_INSCRITO = "btn btn-sm btn-dark text-center text-uppercase text-white mt-2 disabled";
+
+    const CERT_ID_MAIOR_QUE = 67;
     
     private static function inputText($rotulo, $value, $required = false, $possuiErro = false, $classes = '')
     {
@@ -263,7 +265,12 @@ class Curso extends Model
 
     public function tipoParaCertificado()
     {
-        return in_array($this->tipo, self::tiposCertificado());
+        return in_array($this->tipo, self::tiposCertificado())/* && ($this->idcurso > self::CERT_ID_MAIOR_QUE)*/;
+    }
+
+    public function acessarCertificado()
+    {
+        return $this->encerrado() && $this->tipoParaCertificado();
     }
 
     public function dataRealizacaoCertificado()

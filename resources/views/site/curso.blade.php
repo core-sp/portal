@@ -40,7 +40,7 @@
     </div>
     <div class="linha-lg"></div>
 
-    @if($curso->tipoParaCertificado() && $curso->encerrado() && Session::has('message'))
+    @if($curso->acessarCertificado() && Session::has('message'))
         <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
     @endif
 
@@ -93,7 +93,7 @@
         @if(auth()->guard('representante')->check() && $curso->representanteInscrito(auth()->guard('representante')->user()->cpf_cnpj))
         <div class="center-992">
           <span class="{{ $curso::TEXTO_BTN_INSCRITO }} btn-curso-inscrito">Inscrição realizada</span>
-          @if($curso->tipoParaCertificado() && $curso->encerrado())
+          @if($curso->acessarCertificado())
             <p class="mt-2"><i class="fas fa-award"></i> <strong>Certificado</strong> - Acesse a área restrita para realizar o download do certificado.</p>
           @endif
         </div>
@@ -103,7 +103,7 @@
           </div>
         @endif
 
-        @if($curso->tipoParaCertificado() && $curso->encerrado() && !auth()->guard('representante')->check())
+        @if($curso->acessarCertificado() && !auth()->guard('representante')->check())
         <div class="center-992">
           <form method="POST" action="{{ route('cursos.certificado', $curso->idcurso) }}">
             @csrf

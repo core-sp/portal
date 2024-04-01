@@ -144,7 +144,7 @@ class CursoInscrito extends Model
 
     public function getChecksum()
     {
-        $checksum = hash('sha256', $this->nome . '|' . $this->cpf . '|' . $this->idcurso . '|' . $this->idcursoinscrito . '|' . now()->timestamp);
+        $checksum = (string) hash('sha256', $this->nome . '|' . $this->cpf . '|' . $this->idcurso . '|' . $this->idcursoinscrito . '|' . now()->timestamp);
         $this->update(['checksum' => $checksum]);
 
         return $checksum;
@@ -152,15 +152,9 @@ class CursoInscrito extends Model
 
     public function podeGerarCertificado($conta_portal)
     {
-        if(!$this->curso->tipoParaCertificado())
+        if(!$this->curso->acessarCertificado())
             return [
-                'message' => 'O tipo do curso não está incluso para gerar certificado.',
-                'class' => 'alert-danger'
-            ];
-
-        if(!$this->curso->encerrado())
-            return [
-                'message' => 'O curso deve estar encerrado para gerar certificado.',
+                'message' => 'Este curso não pode gerar certificado.',
                 'class' => 'alert-danger'
             ];
 

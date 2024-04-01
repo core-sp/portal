@@ -93,6 +93,13 @@
       left: 120px;
     }
 
+    /* Sugestão de validação manual */
+    .link {
+      position: absolute;
+      bottom: -35px;
+      left: 120px;
+    }
+
     /* Cria a página seguinte */
     .page-break {
       page-break-after: always;
@@ -217,6 +224,9 @@ else
 
   <img class="qrcode" src="{{ storage_path('app/certificados/temp/' . $nome_file) }}">
 
+  <!-- Sugestão de validação manual -->
+  <a href="{{ route('cursos.certificado.validar', $checksum) }}" class="link">{{ route('cursos.certificado.validar', $checksum) }}</a>
+
   <div class="page-break"></div>
 
   <div id="simples">
@@ -248,6 +258,9 @@ else
     <img id="assinatura" src="{{ storage_path('app/certificados/assinatura.png') }}" />
 
     <img class="qrcode" src="{{ storage_path('app/certificados/temp/' . $nome_file) }}">
+
+    <!-- Sugestão de validação manual -->
+    <a href="{{ route('cursos.certificado.validar', $checksum) }}" class="link">{{ route('cursos.certificado.validar', $checksum) }}</a>
 
   </div>
 

@@ -286,6 +286,7 @@ class CursoService implements CursoServiceInterface {
                     $query1->where('presenca', 'Sim')->orWhereNull('presenca');
                 });
             }])
+            // ->where('idcurso','>', Curso::CERT_ID_MAIOR_QUE)
             ->where('datatermino','<', $now)
             ->where('publicado','Sim')
             ->whereIn('tipo', Curso::tiposCertificado())
