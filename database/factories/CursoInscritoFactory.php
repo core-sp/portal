@@ -13,8 +13,10 @@ $factory->define(CursoInscrito::class, function (Faker $faker) {
         'email' => $faker->email,
         'registrocore' => null,
         'campo_adicional' => null,
+        'codigo_certificado' => null,
         'tipo_inscrito' => CursoInscrito::INSCRITO_SITE,
         'presenca' => null,
+        'checksum' => null,
         'idcurso' => factory('App\Curso'),
         'idusuario' => Auth::id() !== null ? Auth::id() : factory('App\User')
     ];
@@ -58,5 +60,17 @@ $factory->state(CursoInscrito::class, 'tipo_parceiro', function (Faker $faker) {
 $factory->state(CursoInscrito::class, 'tipo_site', function (Faker $faker) {
     return [
         'tipo_inscrito' => CursoInscrito::INSCRITO_SITE,
+    ];
+});
+
+$factory->state(CursoInscrito::class, 'codigo_certificado', function (Faker $faker) {
+    return [
+        'codigo_certificado' => $faker->uuid,
+    ];
+});
+
+$factory->state(CursoInscrito::class, 'valido', function (Faker $faker) {
+    return [
+        'checksum' => $faker->sha256,
     ];
 });

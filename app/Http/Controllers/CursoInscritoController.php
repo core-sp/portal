@@ -172,7 +172,7 @@ class CursoInscritoController extends Controller
     {        
         try{
             $validated = $request->validated();
-            $validated['conta_no_portal'] = auth()->guard('representante')->check() ? true : $this->service->getService('Representante')->getRepresentanteByCpfCnpj(apenasNumeros($validated['inscrito']->cpf));
+            $validated['conta_no_portal'] = auth()->guard('representante')->check() ? auth()->guard('representante')->user() : $this->service->getService('Representante')->getRepresentanteByCpfCnpj(apenasNumeros($validated['inscrito']->cpf));
             $dados = $this->service->getService('Curso')->inscritos()->gerarCertificado($validated['inscrito'], $validated, auth()->guard('representante')->check());
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');

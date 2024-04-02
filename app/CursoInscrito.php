@@ -150,6 +150,13 @@ class CursoInscrito extends Model
         return $checksum;
     }
 
+    public function getTextoValidacaoCertificado()
+    {
+        $temp = strlen(apenasNumeros($this->cpf)) == 11 ? 'CPF: ' . Str::limit($this->cpf, 4, '***.***-**') : 'CNPJ: ' . $this->cpf;
+
+        return 'Certificado do curso "' . $this->curso->tema . '" e inscrição com ' . $temp . ' é válido!';
+    }
+
     public function podeGerarCertificado($conta_portal)
     {
         if(!$this->curso->acessarCertificado())

@@ -91,7 +91,7 @@ class CursoRequest extends FormRequest
     public function messages()
     {
         return [
-            'required' => 'O :attribute é obrigatório',
+            'required' => 'O campo :attribute é obrigatório',
             'numeric' => 'O :attribute aceita apenas números',
             'max' => 'O :attribute excedeu o limite de caracteres permitido',
             'in' => 'Valor inválido',

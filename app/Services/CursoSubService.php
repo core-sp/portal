@@ -318,7 +318,7 @@ class CursoSubService implements CursoSubServiceInterface {
         if($curso->tipoParaCertificado())
             $validated['codigo_certificado'] = CursoInscrito::gerarCodigoCertificado($validated['conta_no_portal']);
 
-        $txt_certificado = isset($validated['codigo_certificado']) ? 'foi gerado código para o certificado' : null;
+        $txt_certificado = isset($validated['codigo_certificado']) ? ', foi gerado código para o certificado' : null;
         $ip = $validated['ip'];
 
         unset($validated['ip']);
@@ -335,7 +335,7 @@ class CursoSubService implements CursoSubServiceInterface {
         $termo = $inscrito->termos()->create(['ip' => $ip]);
 
         $string = $inscrito->nome." (CPF: ".$inscrito->cpf.") *inscreveu-se* no curso *".$inscrito->curso->tipo." - ".$inscrito->curso->tema;
-        $string .= "*, turma *".$inscrito->curso->idcurso."*, ".$txt_certificado." e " . $termo->message();
+        $string .= "*, turma *".$inscrito->curso->idcurso."*".$txt_certificado." e " . $termo->message();
         event(new ExternoEvent($string));
         
         $textos = $inscrito->textoAgradece();
@@ -365,6 +365,12 @@ class CursoSubService implements CursoSubServiceInterface {
 
     public function gerarCertificado($inscrito, $validated, $rep_autenticado = false)
     {
+        if($rep_autenticado && ($validated['conta_no_portal']->cpf_cnpj != $inscrito->cpf))
+            return [
+                'message' => 'CPF / CNPJ da inscrição difere do representante autenticado.',
+                'class' => 'alert-danger'
+            ];
+
         if($rep_autenticado && isset($inscrito->codigo_certificado))
             $inscrito->update(['codigo_certificado' => null]);
 
@@ -375,6 +381,9 @@ class CursoSubService implements CursoSubServiceInterface {
 
         if($rep_autenticado)
             event(new ExternoEvent(' e realizou download do certificado.', 'Cursos'));
+
+            if(!Storage::disk('local')->exists('certificados/temp'))
+                Storage::disk('local')->makeDirectory('certificados/temp');
 
             $checksum = $inscrito->getChecksum();
             $nome_file = $this->gerarQRCode($checksum, $inscrito->idcursoinscrito);
@@ -398,11 +407,11 @@ class CursoSubService implements CursoSubServiceInterface {
 
         if(isset($valido))
             return [
-                'message' => '<i class="fas fa-award"></i> Certificado do curso ' . $valido->curso->tema . ' é válido!',
+                'message' => '<i class="fas fa-award"></i> - ' . $valido->getTextoValidacaoCertificado(),
                 'class' => 'alert-success'
             ];
         return [
-            'message' => '<i class="fas fa-award"></i> Certificado inválido!',
+            'message' => '<i class="fas fa-award"></i> - Certificado inválido!',
             'class' => 'alert-danger'
         ];
     }

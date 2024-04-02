@@ -269,6 +269,45 @@ class CursoTest extends TestCase
     }
 
     /** @test */
+    public function curso_without_conferencista_cannot_be_created()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'conferencista' => ''
+        ]);
+
+        $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors('conferencista');
+        $this->assertDatabaseMissing('cursos', ['resumo' => $attributes['resumo']]);
+    }
+
+    /** @test */
+    public function curso_without_carga_horaria_cannot_be_created()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'carga_horaria' => ''
+        ]);
+
+        $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors('carga_horaria');
+        $this->assertDatabaseMissing('cursos', ['resumo' => $attributes['resumo']]);
+    }
+
+    /** @test */
+    public function curso_with_invalid_value_in_carga_horaria_cannot_be_created()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'carga_horaria' => '0:01'
+        ]);
+
+        $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors('carga_horaria');
+        $this->assertDatabaseMissing('cursos', ['resumo' => $attributes['resumo']]);
+    }
+
+    /** @test */
     public function curso_without_resumo_cannot_be_created()
     {
         $this->signInAsAdmin();
@@ -670,6 +709,7 @@ class CursoTest extends TestCase
 
         $curso = factory('App\Curso')->create();
         $attributes = factory('App\Curso')->raw();
+        $attributes['carga_horaria'] = '08:00';
 
         $this->get(route('cursos.edit', $curso->idcurso))->assertOk();
         $this->patch(route('cursos.update', $curso->idcurso), $attributes);
@@ -681,7 +721,8 @@ class CursoTest extends TestCase
         $this->assertDatabaseHas('cursos', [
             'tema' => $attributes['tema'],
             'descricao' => $attributes['descricao'],
-            'resumo' => $attributes['resumo']
+            'resumo' => $attributes['resumo'],
+            'carga_horaria' => $attributes['carga_horaria'],
         ]);
     }
 
@@ -975,7 +1016,8 @@ class CursoTest extends TestCase
             ->assertSee('<div class="sit-btn sit-azul">Divulgação</div>')
             ->assertDontSee('<div class="sit-btn sit-vermelho">Já realizado</div>')
             ->assertDontSee('<div class="sit-btn sit-verde">Vagas Abertas</div>')
-            ->assertDontSee('<div class="sit-btn sit-vermelho">Vagas esgotadas</div>');
+            ->assertDontSee('<div class="sit-btn sit-vermelho">Vagas esgotadas</div>')
+            ->assertDontSee('<form method="POST" action="'. route('cursos.certificado', $curso->idcurso) .'">');
 
         $this->get(route('cursos.index.website'))
             ->assertOk()
@@ -998,7 +1040,8 @@ class CursoTest extends TestCase
             ->assertSee('<div class="sit-btn sit-azul">Divulgação</div>')
             ->assertDontSee('<div class="sit-btn sit-vermelho">Já realizado</div>')
             ->assertDontSee('<div class="sit-btn sit-verde">Vagas Abertas</div>')
-            ->assertDontSee('<div class="sit-btn sit-vermelho">Vagas esgotadas</div>');
+            ->assertDontSee('<div class="sit-btn sit-vermelho">Vagas esgotadas</div>')
+            ->assertDontSee('<form method="POST" action="'. route('cursos.certificado', $curso->idcurso) .'">');
 
         $this->get(route('cursos.index.website'))
             ->assertOk()
@@ -1019,7 +1062,8 @@ class CursoTest extends TestCase
             ->assertDontSee('<div class="sit-btn sit-azul">Divulgação</div>')
             ->assertDontSee('<div class="sit-btn sit-vermelho">Já realizado</div>')
             ->assertSee('<div class="sit-btn sit-verde">Vagas Abertas</div>')
-            ->assertDontSee('<div class="sit-btn sit-vermelho">Vagas esgotadas</div>');
+            ->assertDontSee('<div class="sit-btn sit-vermelho">Vagas esgotadas</div>')
+            ->assertDontSee('<form method="POST" action="'. route('cursos.certificado', $curso->idcurso) .'">');
 
         $this->get(route('cursos.index.website'))
             ->assertOk()
@@ -1042,7 +1086,8 @@ class CursoTest extends TestCase
             ->assertDontSee('<div class="sit-btn sit-azul">Divulgação</div>')
             ->assertDontSee('<div class="sit-btn sit-vermelho">Já realizado</div>')
             ->assertDontSee('<div class="sit-btn sit-verde">Vagas Abertas</div>')
-            ->assertSee('<div class="sit-btn sit-vermelho">Vagas esgotadas</div>');
+            ->assertSee('<div class="sit-btn sit-vermelho">Vagas esgotadas</div>')
+            ->assertDontSee('<form method="POST" action="'. route('cursos.certificado', $curso->idcurso) .'">');
 
         $this->get(route('cursos.index.website'))
             ->assertOk()
@@ -1066,7 +1111,8 @@ class CursoTest extends TestCase
             ->assertDontSee('<div class="sit-btn sit-azul">Divulgação</div>')
             ->assertDontSee('<div class="sit-btn sit-vermelho">Já realizado</div>')
             ->assertDontSee('<div class="sit-btn sit-verde">Vagas Abertas</div>')
-            ->assertSee('<div class="sit-btn sit-vermelho">Vagas esgotadas</div>');
+            ->assertSee('<div class="sit-btn sit-vermelho">Vagas esgotadas</div>')
+            ->assertDontSee('<form method="POST" action="'. route('cursos.certificado', $curso->idcurso) .'">');
 
         $this->get(route('cursos.index.website'))
             ->assertOk()
@@ -1089,7 +1135,8 @@ class CursoTest extends TestCase
             ->assertDontSee('<div class="sit-btn sit-azul">Divulgação</div>')
             ->assertSee('<div class="sit-btn sit-vermelho">Já realizado</div>')
             ->assertDontSee('<div class="sit-btn sit-verde">Vagas Abertas</div>')
-            ->assertDontSee('<div class="sit-btn sit-vermelho">Vagas esgotadas</div>');
+            ->assertDontSee('<div class="sit-btn sit-vermelho">Vagas esgotadas</div>')
+            ->assertSee('<form method="POST" action="'. route('cursos.certificado', $curso->idcurso) .'">');
 
         $this->get(route('cursos.index.website'))
             ->assertOk()
@@ -1113,11 +1160,38 @@ class CursoTest extends TestCase
 
         $this->get(route('cursos.show', $curso->idcurso))
             ->assertOk()
-            ->assertSee('btn-curso-inscrito">Inscrição realizada</span>');
+            ->assertSee('btn-curso-inscrito">Inscrição realizada</span>')
+            ->assertDontSee('<form method="POST" action="'. route('cursos.certificado', $curso->idcurso) .'">');
 
         $this->get(route('cursos.index.website'))
             ->assertOk()
             ->assertSee('btn-inscrito-grid"><b>Inscrição realizada</b></span>');
+    }
+
+    /** @test */
+    public function curso_with_representante_exists_with_status_inscricao_realizada_with_status_ja_realizado()
+    {
+        $curso = factory('App\Curso')->create();
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), ['termo' => 'on']);
+
+        $curso->update([
+            'datarealizacao' => now()->subDay()->format('Y-m-d H:i'),
+            'datatermino' => now()->subDay()->addHour()->format('Y-m-d H:i')
+        ]);
+
+        $this->get(route('cursos.show', $curso->idcurso))
+            ->assertOk()
+            ->assertSee('btn-curso-inscrito">Inscrição realizada</span>')
+            ->assertDontSee('<form method="POST" action="'. route('cursos.certificado', $curso->idcurso) .'">')
+            ->assertSee('<p class="mt-2"><i class="fas fa-award"></i> <strong>Certificado</strong> - Acesse a área restrita para realizar o download do certificado.</p>');
+
+        $this->get(route('cursos.index.website'))
+            ->assertOk()
+            ->assertDontSee('btn-inscrito-grid"><b>Inscrição realizada</b></span>');
     }
 
     /** 
@@ -1131,7 +1205,7 @@ class CursoTest extends TestCase
     {
         $user = $this->signInAsAdmin();
 
-        $curso = factory('App\Curso')->create();
+        $curso = factory('App\Curso')->create(['tipo' => 'Live']);
         $attributes = factory('App\CursoInscrito')->raw([
             'cpf' => '54384875290'
         ]);
@@ -1142,6 +1216,7 @@ class CursoTest extends TestCase
         $this->post(route('inscritos.store', $curso->idcurso), $attributes);
         $this->assertDatabaseHas('curso_inscritos', [
             'cpf' => formataCpfCnpj($attributes['cpf']),
+            'codigo_certificado' => null,
         ]);
     }
 
@@ -1162,6 +1237,63 @@ class CursoTest extends TestCase
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
         $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') adicionou *inscrito em curso* (id: 1)';
         $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function inscrito_with_certificate_can_be_created_by_an_user()
+    {
+        Mail::fake();
+
+        $user = $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+        $attributes = factory('App\CursoInscrito')->raw([
+            'cpf' => '54384875290'
+        ]);
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.create', $curso->idcurso))->assertOk();
+
+        $this->post(route('inscritos.store', $curso->idcurso), $attributes);
+
+        Mail::assertQueued(CursoInscritoMailGuest::class, function ($mail) {
+            return strpos($mail->body, CursoInscrito::first()->codigo_certificado) !== false;
+        });
+
+        $this->assertDatabaseHas('curso_inscritos', [
+            'cpf' => formataCpfCnpj($attributes['cpf']),
+        ]);
+        $this->assertDatabaseMissing('curso_inscritos', [
+            'codigo_certificado' => null,
+        ]);
+    }
+
+    /** @test */
+    public function inscrito_with_login_can_be_created_by_an_user()
+    {
+        Mail::fake();
+
+        $user = $this->signInAsAdmin();
+
+        $rep = factory('App\Representante')->create();
+        $curso = factory('App\Curso')->create();
+        $attributes = factory('App\CursoInscrito')->raw([
+            'cpf' => $rep->cpf_cnpj
+        ]);
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.create', $curso->idcurso))->assertOk();
+
+        $this->post(route('inscritos.store', $curso->idcurso), $attributes);
+
+        Mail::assertQueued(CursoInscritoMailGuest::class, function ($mail) {
+            return strpos($mail->body, "Em caso de presença confirmada após encerramento, pode ser gerado o certificado na sua área restrita.") !== false;
+        });
+
+        $this->assertDatabaseHas('curso_inscritos', [
+            'cpf' => formataCpfCnpj($attributes['cpf']),
+            'codigo_certificado' => null,
+        ]);
     }
 
     /** @test */
@@ -1494,6 +1626,39 @@ class CursoTest extends TestCase
     }
 
     /** @test */
+    public function inscrito_with_certificate_presenca_sim_can_be_updated_by_an_user()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->states('codigo_certificado')->create();
+        $inscrito->curso->update([
+            'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+            'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+        ]);
+
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = 'Sim';
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.edit', $inscrito->idcursoinscrito))->assertOk();
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes)
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Inscrição com ID 1 teve a presença atualizada com sucesso!');
+
+        $this->get(route('inscritos.index', $inscrito->idcurso))
+        ->assertSee('<button type="submit" class="btn btn-sm btn-primary" value="" />Reenviar Código</button>');
+
+        $this->assertDatabaseHas('curso_inscritos', [
+            'cpf' => $inscrito->cpf,
+            'presenca' => "Sim",
+        ]);
+
+        $this->assertDatabaseMissing('curso_inscritos', [
+            'codigo_certificado' => null,
+        ]);
+    }
+
+    /** @test */
     public function inscrito_presenca_nao_can_be_updated_by_an_user()
     {
         $user = $this->signInAsAdmin();
@@ -1540,6 +1705,35 @@ class CursoTest extends TestCase
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
         $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') confirmou falta do participante 1 *no curso* (id: 1)';
         $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function inscrito_with_certificate_presenca_nao_can_be_updated_by_an_user()
+    {
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->states('codigo_certificado')->create();
+        $inscrito->curso->update([
+            'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+            'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+        ]);
+
+        $attributes = $inscrito->attributesToArray();
+        $attributes['presenca'] = 'Não';
+        unset($attributes['idcurso']);
+
+        $this->get(route('inscritos.edit', $inscrito->idcursoinscrito))->assertOk();
+
+        $this->put(route('inscritos.update.presenca', $inscrito->idcursoinscrito), $attributes)
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Inscrição com ID 1 teve a presença atualizada com sucesso!');
+
+        $this->get(route('inscritos.index', $inscrito->idcurso))
+        ->assertDontSee('<button type="submit" class="btn btn-sm btn-primary" value="" />Reenviar Código</button>');
+
+        $this->assertDatabaseHas('curso_inscritos', [
+            'cpf' => $inscrito->cpf,
+            'presenca' => "Não",
+        ]);
     }
 
     /** @test */
@@ -1664,6 +1858,52 @@ class CursoTest extends TestCase
         ->assertForbidden();
     }
 
+    /** @test */
+    public function certificate_can_be_resend()
+    {
+        Mail::fake();
+
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->states('codigo_certificado')->create(['presenca' => 'Sim']);
+        $inscrito->curso->update([
+            'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+            'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+        ]);
+
+        $this->get(route('inscritos.index', $inscrito->idcurso))
+        ->assertSee('<button type="submit" class="btn btn-sm btn-primary" value="" />Reenviar Código</button>');
+
+        $this->put(route('inscritos.reenviar.codigo', $inscrito->idcursoinscrito))
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Inscrição com ID 1 teve o código do certificado reenviado com sucesso!');
+
+        Mail::assertQueued(CursoInscritoMailGuest::class, function ($mail) {
+            return strpos($mail->body, CursoInscrito::first()->codigo_certificado) !== false;
+        });
+    }
+
+    /** @test */
+    public function certificate_cannot_be_resend_without_certificate()
+    {
+        Mail::fake();
+
+        $user = $this->signInAsAdmin();
+
+        $inscrito = factory('App\CursoInscrito')->create(['presenca' => 'Sim']);
+        $inscrito->curso->update([
+            'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+            'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+        ]);
+
+        $this->get(route('inscritos.index', $inscrito->idcurso))
+        ->assertDontSee('<button type="submit" class="btn btn-sm btn-primary" value="" />Reenviar Código</button>');
+
+        $this->put(route('inscritos.reenviar.codigo', $inscrito->idcursoinscrito))
+        ->assertSessionHas('message', 'Este CPF / CNPJ não possui código para ser enviado.');
+
+        Mail::assertNotQueued(CursoInscritoMailGuest::class);
+    }
+
     /** 
      * =======================================================================================================
      * TESTES INSCRITOS SITE
@@ -1686,9 +1926,11 @@ class CursoTest extends TestCase
         $this->post(route('cursos.inscricao', $curso->idcurso), ['termo' => 'on'])
         ->assertViewIs('site.agradecimento');
 
-        Mail::assertQueued(CursoInscritoMailGuest::class);
+        Mail::assertQueued(CursoInscritoMailGuest::class, function ($mail) {
+            return strpos($mail->body, "Em caso de presença confirmada após encerramento, pode ser gerado o certificado na sua área restrita.") !== false;
+        });
 
-        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $representante->cpf_cnpj]);
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $representante->cpf_cnpj, 'codigo_certificado' => null]);
     }
 
     /** @test */
@@ -1708,7 +1950,9 @@ class CursoTest extends TestCase
         $this->post(route('cursos.inscricao', $curso->idcurso), ['termo' => 'on', $curso->campo_rotulo => 'ABC-1234'])
         ->assertViewIs('site.agradecimento');
 
-        Mail::assertQueued(CursoInscritoMailGuest::class);
+        Mail::assertQueued(CursoInscritoMailGuest::class, function ($mail) {
+            return strpos($mail->body, "Em caso de presença confirmada após encerramento, pode ser gerado o certificado na sua área restrita.") !== false;
+        });
 
         $this->assertDatabaseHas('curso_inscritos', [
             'cpf' => $representante->cpf_cnpj,
@@ -1733,7 +1977,9 @@ class CursoTest extends TestCase
         $this->post(route('cursos.inscricao', $curso->idcurso), ['termo' => 'on', $curso->campo_rotulo => ''])
         ->assertViewIs('site.agradecimento');
 
-        Mail::assertQueued(CursoInscritoMailGuest::class);
+        Mail::assertQueued(CursoInscritoMailGuest::class, function ($mail) {
+            return strpos($mail->body, "Em caso de presença confirmada após encerramento, pode ser gerado o certificado na sua área restrita.") !== false;
+        });
 
         $this->assertDatabaseHas('curso_inscritos', [
             'cpf' => $representante->cpf_cnpj,
@@ -1777,9 +2023,11 @@ class CursoTest extends TestCase
         $this->post(route('cursos.inscricao', $curso->idcurso), ['termo' => 'on'])
         ->assertViewIs('site.agradecimento');
 
-        Mail::assertQueued(CursoInscritoMailGuest::class);
+        Mail::assertQueued(CursoInscritoMailGuest::class, function ($mail) {
+            return strpos($mail->body, "Em caso de presença confirmada após encerramento, pode ser gerado o certificado na sua área restrita.") !== false;
+        });
 
-        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $representante->cpf_cnpj]);
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $representante->cpf_cnpj, 'codigo_certificado' => null]);
     }
 
     /** @test */
@@ -1819,6 +2067,24 @@ class CursoTest extends TestCase
     }
 
     /** @test */
+    public function get_certificate_when_inscrito_private_created_by_admin()
+    {
+        $inscrito = factory('App\CursoInscrito')->states('codigo_certificado')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+            'presenca' => 'Sim',
+        ]);
+
+        $this->get(route('cursos.show', $inscrito->idcurso))
+        ->assertSee('<form method="POST" action="'. route('cursos.certificado', $inscrito->idcurso) .'">');
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['codigo_certificado' => $inscrito->codigo_certificado])
+        ->assertHeader('content-type', 'application/pdf');
+    }
+
+    /** @test */
     public function inscrito_public_can_be_created()
     {
         Mail::fake();
@@ -1835,9 +2101,29 @@ class CursoTest extends TestCase
         $this->post(route('cursos.inscricao', $curso->idcurso), $inscrito)
         ->assertViewIs('site.agradecimento');
 
-        Mail::assertQueued(CursoInscritoMailGuest::class);
+        Mail::assertQueued(CursoInscritoMailGuest::class, function ($mail) {
+            return strpos($mail->body, CursoInscrito::first()->codigo_certificado) !== false;
+        });
 
-        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $inscrito['cpf']]);
+        $this->assertDatabaseHas('curso_inscritos', ['cpf' => $inscrito['cpf'], 'codigo_certificado' => CursoInscrito::first()->codigo_certificado]);
+    }
+
+    /** @test */
+    public function get_certificate_when_inscrito_public_created()
+    {
+        $inscrito = factory('App\CursoInscrito')->states('codigo_certificado')->create([
+            'idcurso' => factory('App\Curso')->states('publico')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+            'presenca' => 'Sim',
+        ]);
+
+        $this->get(route('cursos.show', $inscrito->idcurso))
+        ->assertSee('<form method="POST" action="'. route('cursos.certificado', $inscrito->idcurso) .'">');
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['codigo_certificado' => $inscrito->codigo_certificado])
+        ->assertHeader('content-type', 'application/pdf');
     }
 
     /** @test */
@@ -1859,7 +2145,9 @@ class CursoTest extends TestCase
         $this->post(route('cursos.inscricao', $curso->idcurso), $inscrito)
         ->assertViewIs('site.agradecimento');
 
-        Mail::assertQueued(CursoInscritoMailGuest::class);
+        Mail::assertQueued(CursoInscritoMailGuest::class, function ($mail) {
+            return strpos($mail->body, CursoInscrito::first()->codigo_certificado) !== false;
+        });
 
         $this->assertDatabaseHas('curso_inscritos', [
             'cpf' => $inscrito['cpf'],
@@ -1886,7 +2174,9 @@ class CursoTest extends TestCase
         $this->post(route('cursos.inscricao', $curso->idcurso), $inscrito)
         ->assertViewIs('site.agradecimento');
 
-        Mail::assertQueued(CursoInscritoMailGuest::class);
+        Mail::assertQueued(CursoInscritoMailGuest::class, function ($mail) {
+            return strpos($mail->body, CursoInscrito::first()->codigo_certificado) !== false;
+        });
 
         $this->assertDatabaseHas('curso_inscritos', [
             'cpf' => $inscrito['cpf'],
@@ -1895,7 +2185,26 @@ class CursoTest extends TestCase
     }
 
     /** @test */
-    public function log_is_generated_when_inscrito_public_is_created()
+    public function log_is_generated_when_inscrito_public_is_created_without_certificate()
+    {
+        $curso = factory('App\Curso')->states('publico')->create(['tipo' => 'Live']);
+        $inscrito = factory('App\CursoInscrito')->raw([
+            'idcurso' => $curso->idcurso,
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $inscrito);
+        $inscrito = CursoInscrito::find(1);
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $string = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $string .= $inscrito->nome." (CPF: ".$inscrito->cpf.") *inscreveu-se* no curso *".$inscrito->curso->tipo." - ".$inscrito->curso->tema;
+        $string .= "*, turma *".$inscrito->curso->idcurso."* e foi criado um novo registro no termo de consentimento, com a id: 1";
+        $this->assertStringContainsString($string, $log);
+    }
+
+    /** @test */
+    public function log_is_generated_when_inscrito_public_is_created_with_certificate()
     {
         $curso = factory('App\Curso')->states('publico')->create();
         $inscrito = factory('App\CursoInscrito')->raw([
@@ -1909,7 +2218,7 @@ class CursoTest extends TestCase
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $string = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
         $string .= $inscrito->nome." (CPF: ".$inscrito->cpf.") *inscreveu-se* no curso *".$inscrito->curso->tipo." - ".$inscrito->curso->tema;
-        $string .= "*, turma *".$inscrito->curso->idcurso."* e foi criado um novo registro no termo de consentimento, com a id: 1";
+        $string .= "*, turma *".$inscrito->curso->idcurso."*, foi gerado código para o certificado e foi criado um novo registro no termo de consentimento, com a id: 1";
         $this->assertStringContainsString($string, $log);
     }
 
@@ -2299,6 +2608,245 @@ class CursoTest extends TestCase
     }
 
     /** @test */
+    public function cannot_get_certificate_with_presenca_nao()
+    {
+        $inscrito = factory('App\CursoInscrito')->states('codigo_certificado')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+            'presenca' => 'Não',
+        ]);
+
+        $this->get(route('cursos.show', $inscrito->idcurso))
+        ->assertSee('<form method="POST" action="'. route('cursos.certificado', $inscrito->idcurso) .'">');
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['codigo_certificado' => $inscrito->codigo_certificado])
+        ->assertSessionHas('message', 'Este CPF / CNPJ não teve a presença confirmada para gerar o certificado.');
+
+        $this->assertDatabaseHas('curso_inscritos', ['codigo_certificado' => $inscrito->codigo_certificado]);
+    }
+
+    /** @test */
+    public function cannot_get_certificate_without_update_presenca()
+    {
+        $inscrito = factory('App\CursoInscrito')->states('codigo_certificado')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+        ]);
+
+        $this->get(route('cursos.show', $inscrito->idcurso))
+        ->assertSee('<form method="POST" action="'. route('cursos.certificado', $inscrito->idcurso) .'">');
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['codigo_certificado' => $inscrito->codigo_certificado])
+        ->assertSessionHas('message', 'Ainda não foi atualizada a presença no sistema para gerar o certificado.');
+
+        $this->assertDatabaseHas('curso_inscritos', ['codigo_certificado' => $inscrito->codigo_certificado]);
+    }
+
+    /** @test */
+    public function cannot_get_certificate_with_datatermino_after_today()
+    {
+        $inscrito = factory('App\CursoInscrito')->states('codigo_certificado')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->addHours(2)->format('Y-m-d H:i'),
+            ]),
+        ]);
+
+        $this->get(route('cursos.show', $inscrito->idcurso))
+        ->assertDontSee('<form method="POST" action="'. route('cursos.certificado', $inscrito->idcurso) .'">');
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['codigo_certificado' => $inscrito->codigo_certificado])
+        ->assertSessionHas('message', 'Este curso não pode gerar certificado.');
+
+        $this->assertDatabaseHas('curso_inscritos', ['codigo_certificado' => $inscrito->codigo_certificado]);
+    }
+
+    /** @test */
+    public function cannot_get_certificate_with_invalid_tipo_curso()
+    {
+        $inscrito = factory('App\CursoInscrito')->states('codigo_certificado')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+                'tipo' => 'Live',
+            ]),
+        ]);
+
+        $this->get(route('cursos.show', $inscrito->idcurso))
+        ->assertDontSee('<form method="POST" action="'. route('cursos.certificado', $inscrito->idcurso) .'">');
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['codigo_certificado' => $inscrito->codigo_certificado])
+        ->assertSessionHas('message', 'Este curso não pode gerar certificado.');
+
+        $this->assertDatabaseHas('curso_inscritos', ['codigo_certificado' => $inscrito->codigo_certificado]);
+    }
+
+    /** @test */
+    public function cannot_get_certificate_when_registered_portal()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $inscrito = factory('App\CursoInscrito')->states('codigo_certificado')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+            'cpf' => $representante->cpf_cnpj,
+        ]);
+
+        $this->get(route('cursos.show', $inscrito->idcurso))
+        ->assertSee('<form method="POST" action="'. route('cursos.certificado', $inscrito->idcurso) .'">');
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['codigo_certificado' => $inscrito->codigo_certificado])
+        ->assertSessionHas('message', 'Este CPF / CNPJ já possui conta no Portal, deve gerar o certificado pela área restrita. O código foi invalidado.');
+
+        $this->assertDatabaseHas('curso_inscritos', ['codigo_certificado' => null]);
+    }
+
+    /** @test */
+    public function cannot_get_certificate_without_uuid()
+    {
+        $inscrito = factory('App\CursoInscrito')->states('codigo_certificado')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+        ]);
+
+        $this->get(route('cursos.show', $inscrito->idcurso))
+        ->assertSee('<form method="POST" action="'. route('cursos.certificado', $inscrito->idcurso) .'">');
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['codigo_certificado' => ''])
+        ->assertSessionHasErrors('codigo_certificado');
+    }
+
+    /** @test */
+    public function cannot_get_certificate_with_invalid_uuid()
+    {
+        $inscrito = factory('App\CursoInscrito')->states('codigo_certificado')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+        ]);
+
+        $this->get(route('cursos.show', $inscrito->idcurso))
+        ->assertSee('<form method="POST" action="'. route('cursos.certificado', $inscrito->idcurso) .'">');
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['codigo_certificado' => '123456789'])
+        ->assertSessionHasErrors('codigo_certificado');
+    }
+
+    /** @test */
+    public function cannot_get_certificate_when_not_found_uuid()
+    {
+        $inscrito = factory('App\CursoInscrito')->states('codigo_certificado')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+        ]);
+
+        $this->get(route('cursos.show', $inscrito->idcurso))
+        ->assertSee('<form method="POST" action="'. route('cursos.certificado', $inscrito->idcurso) .'">');
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['codigo_certificado' => CursoInscrito::gerarCodigoCertificado()])
+        ->assertSessionHasErrors('inscrito');
+    }
+
+    /** @test */
+    public function cannot_get_certificate_when_not_found_curso()
+    {
+        $inscrito = factory('App\CursoInscrito')->states('codigo_certificado')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+        ]);
+
+        $this->get(route('cursos.show', $inscrito->idcurso))
+        ->assertSee('<form method="POST" action="'. route('cursos.certificado', $inscrito->idcurso) .'">');
+
+        $this->post(route('cursos.certificado', 2), ['codigo_certificado' => $inscrito->codigo_certificado])
+        ->assertNotFound();
+    }
+
+    /** @test */
+    public function can_validate_certificate_cpf()
+    {
+        $inscrito = factory('App\CursoInscrito')->states('valido')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+        ]);
+
+        $this->get(route('cursos.certificado.validar', $inscrito->checksum))
+        ->assertRedirect(route('cursos.index.website'));
+
+        $this->get(route('cursos.index.website'))
+        ->assertSee('<i class="fas fa-award"></i> - ' . $inscrito->getTextoValidacaoCertificado())
+        ->assertDontSeeText($inscrito->cpf);
+    }
+
+    /** @test */
+    public function can_validate_certificate_cnpj()
+    {
+        $inscrito = factory('App\CursoInscrito')->states('valido')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+            'cpf' => formataCpfCnpj('11748345000144')
+        ]);
+
+        $this->get(route('cursos.certificado.validar', $inscrito->checksum))
+        ->assertRedirect(route('cursos.index.website'));
+
+        $this->get(route('cursos.index.website'))
+        ->assertSee('<i class="fas fa-award"></i> - ' . $inscrito->getTextoValidacaoCertificado())
+        ->assertSeeText($inscrito->cpf);
+    }
+
+    /** @test */
+    public function cannot_validate_certificate_not_found_checksum()
+    {
+        $inscrito = factory('App\CursoInscrito')->states('valido')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+        ]);
+
+        $inscrito->checksum = str_replace('2', '3', $inscrito->checksum);
+
+        $this->get(route('cursos.certificado.validar', $inscrito->checksum))
+        ->assertRedirect(route('cursos.index.website'));
+
+        $this->get(route('cursos.index.website'))
+        ->assertSee('<i class="fas fa-award"></i> - Certificado inválido!')
+        ->assertDontSeeText($inscrito->cpf);
+    }
+
+    /** @test */
+    public function cannot_validate_certificate_invalid_checksum()
+    {
+        $inscrito = factory('App\CursoInscrito')->states('valido')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+        ]);
+        
+        $this->get(route('cursos.certificado.validar', $inscrito->checksum . '1'))
+        ->assertNotFound();
+    }
+
+    /** @test */
     public function download_csv_inscritos()
     {
         $user = $this->signInAsAdmin();
@@ -2396,5 +2944,240 @@ class CursoTest extends TestCase
         ->assertSee('<a href="'. route('cursos.show', $curso->idcurso) .'">')
         ->assertSee('<h6 class="light cinza-claro">'. $curso->regional->regional .' - '. onlyDate($curso->datarealizacao) .'</h6>')
         ->assertSee('<span class="'.$curso::TEXTO_BTN_INSCRITO.'">Inscrição realizada</span>');
+    }
+
+    /** @test */
+    public function cannot_view_cards_without_certificate()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.cursos'))
+        ->assertOk()
+        ->assertSee('<p class="light pb-0">No momento não há inscrições em cursos anteriores para gerar certificados para download.</p>');
+    }
+
+    /** @test */
+    public function can_view_cards_with_certificate()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+            'cpf' => $representante->cpf_cnpj,
+        ]);
+
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.cursos'))
+        ->assertOk()
+        ->assertSee('<a href="'. route('cursos.show', $inscrito->idcurso) .'">')
+        ->assertSee('<h6 class="light cinza-claro">'. onlyDate($inscrito->curso->datarealizacao) .'</h6>')
+        ->assertSee('<form method="POST" action="'. route('cursos.certificado', $inscrito->idcurso) .'">')
+        ->assertSee('<input type="hidden" name="idcursoinscrito" value="'. $inscrito->idcursoinscrito .'" />')
+        ->assertSee('<button type="submit" class="btn btn-sm btn-primary btn-block text-white mt-2"><i class="fas fa-award"></i> Certificado</button>');
+    }
+
+    /** @test */
+    public function get_certificate_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+            'cpf' => $representante->cpf_cnpj,
+            'presenca' => 'Sim',
+        ]);
+
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.cursos'))
+        ->assertOk();
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['idcursoinscrito' => $inscrito->idcursoinscrito])
+        ->assertHeader('content-type', 'application/pdf');
+    }
+
+    /** @test */
+    public function cannot_get_certificate_with_presenca_nao_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+            'cpf' => $representante->cpf_cnpj,
+            'presenca' => 'Não',
+        ]);
+
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.cursos'))
+        ->assertOk();
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['idcursoinscrito' => $inscrito->idcursoinscrito])
+        ->assertSessionHas('message', 'Este CPF / CNPJ não teve a presença confirmada para gerar o certificado.');
+    }
+
+    /** @test */
+    public function cannot_get_certificate_without_update_presenca_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+            'cpf' => $representante->cpf_cnpj,
+        ]);
+
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.cursos'))
+        ->assertOk();
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['idcursoinscrito' => $inscrito->idcursoinscrito])
+        ->assertSessionHas('message', 'Ainda não foi atualizada a presença no sistema para gerar o certificado.');
+    }
+
+    /** @test */
+    public function cannot_get_certificate_with_datatermino_after_today_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->addHours(2)->format('Y-m-d H:i'),
+            ]),
+            'cpf' => $representante->cpf_cnpj,
+        ]);
+
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.cursos'))
+        ->assertOk();
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['idcursoinscrito' => $inscrito->idcursoinscrito])
+        ->assertSessionHas('message', 'Este curso não pode gerar certificado.');
+    }
+
+    /** @test */
+    public function cannot_get_certificate_with_invalid_tipo_curso_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+                'tipo' => 'Live',
+            ]),
+            'cpf' => $representante->cpf_cnpj,
+        ]);
+
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.cursos'))
+        ->assertOk();
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['idcursoinscrito' => $inscrito->idcursoinscrito])
+        ->assertSessionHas('message', 'Este curso não pode gerar certificado.');
+    }
+
+    /** @test */
+    public function cannot_get_certificate_with_cpf_distinct_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+        ]);
+
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.cursos'))
+        ->assertOk();
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['idcursoinscrito' => $inscrito->idcursoinscrito])
+        ->assertSessionHas('message', 'CPF / CNPJ da inscrição difere do representante autenticado.');
+    }
+
+    /** @test */
+    public function cannot_get_certificate_without_idcursoinscrito_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+            'cpf' => $representante->cpf_cnpj,
+        ]);
+
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.cursos'))
+        ->assertOk();
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['idcursoinscrito' => ''])
+        ->assertSessionHasErrors('inscrito');
+    }
+
+    /** @test */
+    public function cannot_get_certificate_when_not_found_idcursoinscrito_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+            'cpf' => $representante->cpf_cnpj,
+        ]);
+
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.cursos'))
+        ->assertOk();
+
+        $this->post(route('cursos.certificado', $inscrito->idcurso), ['idcursoinscrito' => 2])
+        ->assertSessionHasErrors('inscrito');
+    }
+
+    /** @test */
+    public function cannot_get_certificate_when_not_found_curso_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $inscrito = factory('App\CursoInscrito')->create([
+            'idcurso' => factory('App\Curso')->create([
+                'datarealizacao' => now()->subDays(2)->format('Y-m-d H:i'),
+                'datatermino' => now()->subDays(2)->addHours(2)->format('Y-m-d H:i'),
+            ]),
+            'cpf' => $representante->cpf_cnpj,
+        ]);
+
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.cursos'))
+        ->assertOk();
+
+        $this->post(route('cursos.certificado', 2), ['idcursoinscrito' => 1])
+        ->assertNotFound();
     }
 }
