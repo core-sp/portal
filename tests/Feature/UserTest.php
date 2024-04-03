@@ -68,6 +68,22 @@ class UserTest extends TestCase
     }
 
     /** @test */
+    public function authorized_users_can_list_users()
+    {
+        $admin = $this->signInAsAdmin();
+        $user = factory('App\User')->create();
+
+        $this->get(route('usuarios.lista'))
+        ->assertOk()
+        ->assertSeeText($user->username)
+        ->assertSeeText($user->nome)
+        ->assertSee('<a href="/admin/perfil/senha/'.$user->idusuario.'" class="btn btn-sm btn-warning">Trocar senha</a> ')
+        ->assertSeeText($admin->username)
+        ->assertSeeText($admin->nome)
+        ->assertDontSee('<a href="/admin/perfil/senha/'.$admin->idusuario.'" class="btn btn-sm btn-warning">Trocar senha</a> ');
+    }
+
+    /** @test */
     public function log_is_generated_when_login_on_admin()
     {
         $user = factory('App\User')->create([

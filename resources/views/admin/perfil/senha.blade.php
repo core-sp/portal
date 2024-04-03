@@ -27,8 +27,9 @@
               @csrf
               {{ method_field('PUT') }}
 
+              <input type="hidden" id="login" value="{{ isset($user) ? $user->username : auth()->user()->username }}" />
+
               @if(!isset($user))
-              <input type="hidden" id="login" value="{{ auth()->user()->username }}" />
               <div class="form-group">
                 <label for="current-password">Senha atual</label>
                 <input type="password"
