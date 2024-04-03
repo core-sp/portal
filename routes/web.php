@@ -14,8 +14,8 @@ Route::middleware(['block_ip'])->group(function () {
     // Rotas de Configuração
     Route::prefix('perfil')->group(function(){
       Route::get('/', 'UserController@infos')->name('admin.info');
-      Route::get('/senha', 'UserController@senha');
-      Route::put('/senha', 'UserController@changePassword');
+      Route::get('/senha/{user?}', 'UserController@senha');
+      Route::put('/senha/{user?}', 'UserController@changePassword');
     });
 
     // Rotas para chamados

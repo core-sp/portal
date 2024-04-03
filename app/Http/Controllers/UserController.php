@@ -40,7 +40,7 @@ class UserController extends Controller
     public function resultados()
     {
         $resultados = User::leftJoin('sessoes', 'sessoes.idusuario', '=', 'users.idusuario')
-            ->select('users.idusuario','nome','email','idregional','idperfil')
+            ->select('users.idusuario','nome','email','idregional','idperfil','username')
             ->orderBy('sessoes.updated_at','DESC')
             ->paginate(10);
         return $resultados;
@@ -52,6 +52,7 @@ class UserController extends Controller
         $headers = [
             'Código',
             'Nome / E-mail',
+            'Username',
             'Último acesso',
             'Perfil',
             'Seccional',
@@ -59,9 +60,13 @@ class UserController extends Controller
         ];
         // Opções de conteúdo da tabela
         $contents = [];
+        $auth = auth()->user();
+        $is_admin = $auth->can('onlyAdmin', $auth);
         foreach($resultados as $resultado) {
-            if(auth()->user()->can('onlyAdmin', auth()->user())) {
+            if($is_admin) {
                 $acoes = '<a href="/admin/usuarios/editar/'.$resultado->idusuario.'" class="btn btn-sm btn-primary">Editar</a> ';
+                if($resultado->idusuario != $auth->idusuario)
+                    $acoes .= '<a href="/admin/perfil/senha/'.$resultado->idusuario.'" class="btn btn-sm btn-warning">Trocar senha</a> ';
                 $acoes .= '<form method="POST" action="/admin/usuarios/apagar/'.$resultado->idusuario.'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
@@ -86,6 +91,7 @@ class UserController extends Controller
             $conteudo = [
                 $resultado->idusuario,
                 $resultado->nome.'<br /><span style="white-space:nowrap;">'.$resultado->email.'</span>',
+                $resultado->username,
                 $acesso,
                 $perfil,
                 $resultado->regional->regional,
@@ -257,15 +263,27 @@ class UserController extends Controller
             ->with('class', 'alert-success');
     }
 
-    public function senha()
+    public function senha(User $user = null)
     {
-        return view('admin.perfil.senha');
+        if(isset($user))
+            $this->authorize('onlyAdmin', auth()->user());
+
+        if(isset($user) && ($user->idusuario == auth()->user()->idusuario))
+            return redirect()->route('admin.info');
+
+        return view('admin.perfil.senha', compact('user'));
     }
 
-    public function changePassword(Request $request)
+    public function changePassword(Request $request, User $user = null)
     {
+        if(isset($user))
+            $this->authorize('onlyAdmin', auth()->user());
+
+        if(isset($user) && ($user->idusuario == auth()->user()->idusuario))
+            return redirect()->route('admin.info');
+
         $regras = [
-            'current-password' => 'required',
+            'current-password' => isset($user) ? '' : 'required',
             'password' => 'required|min:6|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
             'password_confirmation' => 'required|same:password'
         ];
@@ -279,16 +297,17 @@ class UserController extends Controller
         $erros = $request->validate($regras, $mensagens);
 
         $current_password = Auth::User()->password;
-        if (Hash::check($request->input('current-password'), $current_password)) {
-            $user_id = Auth::id();
+        if (isset($user) || (!isset($user) && Hash::check($request->input('current-password'), $current_password))) {
+            $user_id = isset($user) ? $user->idusuario : Auth::id();
             $obj_user = User::findOrFail($user_id);
             $obj_user->password = Hash::make($request->input('password'));
             $save = $obj_user->save();
+            $txt = isset($user) ? 'do usuário '.$obj_user->nome.' alterada com sucesso!' : 'alterada com sucesso!';
             if(!$save)
                 abort(500);
-            event(new CrudEvent('perfil', 'alterou senha', $obj_user->idusuario));
-            return redirect()->route('admin.info')
-                ->with('message', '<i class="icon fa fa-check"></i>Senha alterada com sucesso!')
+            event(new CrudEvent('perfil', isset($user) ? 'alterou senha no admin do usuário' : 'alterou senha', $obj_user->idusuario));
+            return redirect()->route(isset($user) ? 'usuarios.lista' : 'admin.info')
+                ->with('message', '<i class="icon fa fa-check"></i>Senha ' . $txt)
                 ->with('class', 'alert-success');
         } else {
             return redirect()->route('admin.info')

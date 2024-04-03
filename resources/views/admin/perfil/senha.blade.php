@@ -6,7 +6,7 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-sm-12">
-      	<h1>Mudar senha</h1>
+      	<h1>Mudar senha {{ isset($user) ? 'do usuário ' . $user->nome : '' }}</h1>
       </div>
     </div>
   </div>
@@ -19,13 +19,15 @@
   	  	<div class="card card-info">
   	  	  <div class="card-header">
   	  	  	<h3 class="card-title">
-	  	  	  Preencha o formulário abaixo para alterar a senha
+	  	  	  Preencha o formulário abaixo para alterar a senha {{ isset($user) ? 'do usuário ' . $user->nome : '' }}
 	  	  	</h3>
   	  	  </div>
   	  	  <div class="card-body">
   	  	  	<form id="form-change-password" role="form" method="POST" novalidate class="form-horizontal" autocomplete="off">
               @csrf
               {{ method_field('PUT') }}
+
+              @if(!isset($user))
               <input type="hidden" id="login" value="{{ auth()->user()->username }}" />
               <div class="form-group">
                 <label for="current-password">Senha atual</label>
@@ -40,8 +42,10 @@
                 </div>
                 @endif
               </div>
+              @endif
+
               <div class="form-group">
-                <label for="password">Nova senha</label>
+                <label for="password">Nova senha {{ isset($user) ? 'do usuário ' . $user->nome : '' }}</label>
                 <input type="password"
                   class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
                   id="password"
@@ -57,7 +61,7 @@
                 @endif
               </div>
               <div class="form-group">
-                <label for="password_confirmation">Confirme a senha</label>
+                <label for="password_confirmation">Confirme a senha {{ isset($user) ? 'do usuário ' . $user->nome : '' }}</label>
                 <input type="password"
                   class="form-control {{ $errors->has('password_confirmation') ? 'is-invalid' : '' }}"
                   id="password_confirmation"
@@ -76,7 +80,7 @@
               </div>
 
               <div class="form-group text-right">
-                <a href="/admin/perfil" type="cancel" class="btn btn-default">Cancelar</a>&nbsp;
+                <a href="{{ isset($user) ? '/admin/usuarios' : '/admin/perfil' }}" type="cancel" class="btn btn-default">Cancelar</a>&nbsp;
                 <button type="submit" class="btn btn-danger">Alterar</button>
               </div>
             </form>
