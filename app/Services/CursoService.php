@@ -55,7 +55,7 @@ class CursoService implements CursoServiceInterface {
                 $acoes .= '<form method="POST" action="'.route('cursos.destroy', $resultado->idcurso).'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o curso?\')" />';
+                $acoes .= '<button type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o curso?\')">Cancelar</button>';
                 $acoes .= '</form>';
             }
             $publicado = $resultado->publicado() ? 'Publicado' : 'Rascunho';
