@@ -144,7 +144,7 @@ class CursoInscrito extends Model
 
     public function getChecksum()
     {
-        $checksum = (string) hash('sha256', $this->nome . '|' . $this->cpf . '|' . $this->idcurso . '|' . $this->idcursoinscrito . '|' . now()->timestamp);
+        $checksum = (string) hash('sha256', $this->created_at->format('Y-m-d H:i:s') . '|' . $this->cpf . '|' . $this->idcurso . '|' . $this->idcursoinscrito . '|' . now()->timestamp);
         $this->update(['checksum' => $checksum]);
 
         return $checksum;
