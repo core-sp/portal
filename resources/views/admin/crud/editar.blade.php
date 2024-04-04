@@ -52,7 +52,7 @@
 <!-- <script src="//cdn.tinymce.com/4/tinymce.min.js"></script> -->
 <!-- Tiny não aceita mais sem api-key -->
 @if(config('app.env') == "local")
-<script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
+<script src="{{ asset('js/tinymce/js/tinymce/tinymce.min.js') }}"></script>
 @else
 <script src="{{'https://cdn.tiny.cloud/1/' . env('TINY_API_KEY') . '/tinymce/5/tinymce.min.js'}}" referrerpolicy="origin"></script>
 @endif
