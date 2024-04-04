@@ -1,6 +1,7 @@
 // TinyMCE com File Manager
 var public_path = "{{ path('public') }}";  
 var editor_config = {
+  license_key: 'gpl',
   path_absolute : "/",
   selector: "textarea.my-editor",
   language: "pt_BR",
@@ -10,7 +11,7 @@ var editor_config = {
     "insertdatetime media nonbreaking save table contextmenu directionality",
     "emoticons template paste textcolor colorpicker textpattern"
   ],
-  toolbar: "insertfile undo redo | fontsizeselect | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media",
+  toolbar: "insertfile undo redo | fontsizeselect | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | btnImgPopup",
   image_caption: true,
   relative_urls: false,
   file_picker_callback : function(callback, value, meta) {
@@ -39,6 +40,30 @@ var editor_config = {
         editor.execCommand('JustifyFull');
       if(window.location.href.indexOf('admin/textos/') != -1)
         editor.editorContainer.style.height = '400px';
+    });
+
+    editor.ui.registry.addButton('btnImgPopup', {
+      text: 'Imagem pop-up',
+      tooltip: 'Alterar imagem para modo galeria pop-up',
+      onAction: function () {
+        var documento = editor.dom.doc;
+        var galeria = documento.getElementById("tinyGaleria");
+        var img = editor.selection.getNode();
+        var img_src = '';
+        if(img.hasAttribute("src")){
+          img_src = img.getAttribute("src");
+          editor.selection.getNode().remove();
+          var html = '<div class="col-sm-6">';
+          html += '<a href="' + img_src + '" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="eventorc"> ';
+          html += '<img src="' + img_src + '" alt="Core-SP" /> ';
+          html += '</a></div>';
+          if(galeria === null){
+            editor.insertContent('<div id="tinyGaleria" class="row mt-3"></div><p></p>');
+            galeria = documento.getElementById("tinyGaleria");
+          }
+          galeria.insertAdjacentHTML("beforeend", html);
+        }
+      }
     });
   },
   init_instance_callback: function(editor) {
