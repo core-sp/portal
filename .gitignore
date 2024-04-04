@@ -4,6 +4,7 @@
 /public/.htaccess
 /public/imagens
 /public/arquivos/20*
+/public/js/tinymce
 /storage/*.key
 /vendor
 .env
