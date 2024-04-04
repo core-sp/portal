@@ -44,14 +44,17 @@ var editor_config = {
 
     editor.ui.registry.addButton('btnImgPopup', {
       text: 'Imagem pop-up',
-      tooltip: 'Alterar imagem para modo galeria pop-up',
+      tooltip: 'Selecione a imagem no texto e clique aqui para alterar a imagem para modo pop-up',
       onAction: function () {
         var documento = editor.dom.doc;
         var galeria = documento.getElementById("tinyGaleria");
         var img = editor.selection.getNode();
-        var img_src = '';
-        if(img.hasAttribute("src")){
-          img_src = img.getAttribute("src");
+        var txt = '';
+
+        if(img.hasAttribute("src") && img.parentNode.hasAttribute("data-gallery"))
+          txt = 'Imagem já está como pop-up!';
+        else if(img.hasAttribute("src") && !img.parentNode.hasAttribute("data-gallery")){
+          var img_src = img.getAttribute("src");
           editor.selection.getNode().remove();
           var html = '<div class="col-sm-6">';
           html += '<a href="' + img_src + '" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="eventorc"> ';
@@ -62,7 +65,29 @@ var editor_config = {
             galeria = documento.getElementById("tinyGaleria");
           }
           galeria.insertAdjacentHTML("beforeend", html);
+          txt = 'Imagem foi adicionada para abrir como pop-up! Para desfazer, apague a imagem e insira novamente no texto.';
         }
+
+        // Mensagem informando que já foi adiconada a imagem
+        if(txt != '')
+          editor.windowManager.open({
+            title: 'Imagem pop-up',
+            body: {
+              type: 'panel',
+              items: [
+                {
+                  type: 'htmlpanel',
+                  html: txt,
+                }
+              ]
+            },
+            buttons: [
+              {
+                type: 'cancel',
+                text: 'Fechar'
+              }
+            ]
+          });
       }
     });
   },
