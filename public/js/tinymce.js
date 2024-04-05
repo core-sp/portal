@@ -1,5 +1,6 @@
 // TinyMCE com File Manager
 var public_path = "{{ path('public') }}";  
+var css_galeria_popup = ['#tinyGaleria div.g-popup:not(:has([data-gallery]))', '#tinyGaleria :not(.g-popup)'];
 var editor_config = {
   license_key: 'gpl',
   path_absolute : "/",
@@ -40,14 +41,18 @@ var editor_config = {
         editor.execCommand('JustifyFull');
       if(window.location.href.indexOf('admin/textos/') != -1)
         editor.editorContainer.style.height = '400px';
+      // remove o que não contem imagem quando possui galeria-popup
+      if(editor.dom.get("tinyGaleria") != null)
+        css_galeria_popup.forEach(function(texto){ 
+          editor.dom.remove(editor.dom.select(texto));
+        });
     });
 
     editor.ui.registry.addButton('btnImgPopup', {
       text: 'Imagem pop-up',
       tooltip: 'Selecione a imagem no texto e clique aqui para alterar a imagem para modo pop-up',
       onAction: function () {
-        var documento = editor.dom.doc;
-        var galeria = documento.getElementById("tinyGaleria");
+        var galeria = editor.dom.get("tinyGaleria");
         var img = editor.selection.getNode();
         var txt = '';
 
@@ -56,17 +61,22 @@ var editor_config = {
         else if(img.hasAttribute("src") && !img.parentNode.hasAttribute("data-gallery")){
           var img_src = img.getAttribute("src");
           editor.selection.getNode().remove();
-          var html = '<div class="col-sm-6">';
-          html += '<a href="' + img_src + '" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="eventorc"> ';
-          html += '<img src="' + img_src + '" alt="Core-SP" /> ';
+          var html = '<div class="col-sm-6 g-popup">';
+          html += '<a href="' + img_src + '" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="eventorc" class="g-popup"> ';
+          html += '<img src="' + img_src + '" alt="Core-SP" class="g-popup" /> ';
           html += '</a></div>';
           if(galeria === null){
-            editor.insertContent('<div id="tinyGaleria" class="row mt-3"></div><p></p>');
-            galeria = documento.getElementById("tinyGaleria");
+            editor.insertContent('<div id="tinyGaleria" class="row" style="border-color: red; border-top-style: solid; border-bottom-style: solid;"></div><p></p>');
+            galeria = editor.dom.get("tinyGaleria");
           }
           galeria.insertAdjacentHTML("beforeend", html);
-          txt = 'Imagem foi adicionada para abrir como pop-up! Para desfazer, apague a imagem e insira novamente no texto.';
+          txt = 'Imagem foi adicionada para abrir como pop-up! <br>Insira texto antes ou depois da marcação vermelha. <br>A marcação vermelha não será visível no site. <br>Para desfazer, apague a imagem.';
         }
+
+        // remove o que não contem imagem
+        css_galeria_popup.forEach(function(texto){ 
+          editor.dom.remove(editor.dom.select(texto));
+        });
 
         // Mensagem informando que já foi adiconada a imagem
         if(txt != '')
@@ -103,6 +113,14 @@ var editor_config = {
           editor.execCommand('JustifyFull');
         editor.selection.collapse();
       }
+    });
+
+    editor.on('focusout', function() {
+      // remove o que não contem imagem quando possui galeria-popup
+      if(editor.dom.get("tinyGaleria") != null)
+        css_galeria_popup.forEach(function(texto){ 
+          editor.dom.remove(editor.dom.select(texto));
+        });
     });
   }
 
