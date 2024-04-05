@@ -66,7 +66,7 @@ var editor_config = {
           html += '<img src="' + img_src + '" alt="Core-SP" class="g-popup" /> ';
           html += '</a></div>';
           if(galeria === null){
-            editor.insertContent('<div id="tinyGaleria" class="row" style="border-color: red; border-top-style: solid; border-bottom-style: solid;"></div><p></p>');
+            editor.insertContent('<div id="tinyGaleria" class="row"></div><p></p>');
             galeria = editor.dom.get("tinyGaleria");
           }
           galeria.insertAdjacentHTML("beforeend", html);
@@ -117,10 +117,18 @@ var editor_config = {
 
     editor.on('focusout', function() {
       // remove o que não contem imagem quando possui galeria-popup
-      if(editor.dom.get("tinyGaleria") != null)
+      if(editor.dom.get("tinyGaleria") != null){
         css_galeria_popup.forEach(function(texto){ 
           editor.dom.remove(editor.dom.select(texto));
         });
+        editor.dom.setStyles(editor.dom.get("tinyGaleria"), {'border-top-style': 'none', 'border-bottom-style': 'none'});
+      }
+    });
+
+    editor.on('focusin', function() {
+      // insere referencia visual da galeria para o usuário.
+      if(editor.dom.get("tinyGaleria") != null)
+        editor.dom.setStyles(editor.dom.get("tinyGaleria"), {'border-color': 'red', 'border-top-style': 'solid', 'border-bottom-style': 'solid'});
     });
   }
 

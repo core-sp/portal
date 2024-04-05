@@ -199,7 +199,7 @@ $(document).ready(function(){
 
 	// galeria popup feito pelo Tiny
 	if($('#tinyGaleria').length > 0)
-		$('#tinyGaleria').removeAttr('style').addClass('mb-3');
+		$('#tinyGaleria').addClass('mb-3');
 
 	// Interrogação (Descricão da Oportunidade)
 	$('#descricao-da-oportunidade').on({
