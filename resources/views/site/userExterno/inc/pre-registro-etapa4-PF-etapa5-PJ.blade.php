@@ -35,6 +35,19 @@
             />
         </div>
     </div>
+    <div class="form-row mb-2">
+        <div class="col-sm mb-2-576">
+            <label>Nome do contato</label>
+            <input
+                type="text"
+                class="form-control"
+                value="{{ isset($resultado->contabil->nome_contato) ? $resultado->contabil->nome_contato : '' }}"
+                placeholder="Obrigatório inserir um nome de contato"
+                readonly
+                disabled
+            />
+        </div>
+    </div>
 </fieldset>
 
 @endif
