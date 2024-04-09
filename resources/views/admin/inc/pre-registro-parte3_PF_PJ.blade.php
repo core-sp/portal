@@ -1,6 +1,5 @@
 @php
     $camposEditados = $resultado->getCamposEditados();
-    $arrayJustificativas = $resultado->getJustificativaArray();
 @endphp
 
 <div class="card-body bg-light">
@@ -12,7 +11,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'cep',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('cep', $camposEditados))
@@ -26,7 +24,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'bairro',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('bairro', $camposEditados))
@@ -40,7 +37,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'logradouro',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('logradouro', $camposEditados))
@@ -54,7 +50,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'numero',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('numero', $camposEditados))
@@ -68,7 +63,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'complemento',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('complemento', $camposEditados))
@@ -82,7 +76,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'cidade',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('cidade', $camposEditados))
@@ -96,7 +89,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'uf',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('uf', $camposEditados))
@@ -115,7 +107,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'checkEndEmpresa',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('checkEndEmpresa', $camposEditados))
@@ -131,7 +122,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'cep_empresa',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('cep_empresa', $camposEditados))
@@ -145,7 +135,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'bairro_empresa',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('bairro_empresa', $camposEditados))
@@ -159,7 +148,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'logradouro_empresa',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('logradouro_empresa', $camposEditados))
@@ -173,7 +161,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'numero_empresa',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('numero_empresa', $camposEditados))
@@ -187,7 +174,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'complemento_empresa',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('complemento_empresa', $camposEditados))
@@ -201,7 +187,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'cidade_empresa',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('cidade_empresa', $camposEditados))
@@ -215,7 +200,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'uf_empresa',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('uf_empresa', $camposEditados))

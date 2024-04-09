@@ -1,6 +1,6 @@
 @component('components.justificativa_pre_registro', [
     'resultado' => $resultado,
-    'correcoes' => $resultado->getTextosJustificadosByAba($codigos[4])
+    'correcoes' => $resultado->getCodigosJustificadosByAba($codigos[4])
 ])
 @endcomponent
 
@@ -65,7 +65,7 @@
     </div>
 </div>
 
-<fieldset id="opcoesCelular" {{ isset($resultado->getTelefone()[0]) && isset($resultado->getTipoTelefone()[0]) && ($resultado->getTipoTelefone()[0] == 'CELULAR') ? '' : 'disabled' }}>
+<fieldset id="opcoesCelular" {{ $resultado->tipoTelefoneCelular() ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
             <label>{{ $codigos[4]['opcional_celular'] }} <small class="bold">(opcional)</small> - Outras comunicações </label><br>
@@ -140,7 +140,7 @@
     </div>
 </div>
 
-<fieldset id="opcoesCelular_1" {{ isset($resultado->getTelefone()[1]) && isset($resultado->getTipoTelefone()[1]) && ($resultado->getTipoTelefone()[1] == 'CELULAR') ? '' : 'disabled' }}>
+<fieldset id="opcoesCelular_1" {{ $resultado->tipoTelefoneOpcionalCelular() ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
             <label for="opcional_celular_1">{{ $codigos[4]['opcional_celular_1'] }} <small class="bold">(opcional)</small> - Outras comunicações </label><br>

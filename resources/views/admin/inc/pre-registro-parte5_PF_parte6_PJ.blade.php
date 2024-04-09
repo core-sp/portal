@@ -1,5 +1,4 @@
 @php
-    $arrayJustificativas = $resultado->getJustificativaArray();
     $campoAnexo = isset($resultado->getCamposEditados()['path']) ? explode(',', $resultado->getCamposEditados()['path']) : array();
 @endphp
 
@@ -29,7 +28,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'path',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
     </p>

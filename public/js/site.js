@@ -1850,11 +1850,44 @@ $('#submitPreRegistro').click(function(){
 	$('#modalLoadingPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
 	$('#campos_contabil').attr('disabled', false);
 	$('#inserirRegistro').submit();
-})
+});
 
 $('#btnVerificaPend').click(function(){
 	$('#campos_contabil').attr('disabled', false);
-})
+});
+
+// carrega texto da justificativa
+$('.textoJust').click(function(e) {
+	e.preventDefault();
+	$('#modalJustificativaPreRegistro').modal('hide');
+	$('#modalJustificativaPreRegistro .modal-body textarea').val('');
+	$("#modalLoadingBody").html('<i class="spinner-border text-info"></i> Carregando');
+	$('#modalLoadingPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
+  
+	var item = this.innerText;
+	$.ajax({
+	  method: 'GET',
+	  dataType: 'json',
+	  url: this.value,
+	  cache: false,
+	  timeout: 60000,
+	  success: function(response) {
+		$("#modalLoadingPreRegistro").modal('hide');
+		$('#modalJustificativaPreRegistro .modal-title').html('<span class="text-danger">Justificativa </span>' + item);
+		$('#modalJustificativaPreRegistro .modal-body textarea').val(response.justificativa);
+		$('#modalJustificativaPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
+	  },
+	  error: function(request, status, error) {
+		  var errorFunction = getErrorMsg(request);
+		  $("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + errorFunction[0]);
+		  $("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
+		  setTimeout(function() {
+			$("#modalLoadingPreRegistro").modal('hide');
+		  }, errorFunction[1]); 
+		  console.clear();
+	  }
+	});
+  });
 
 //	--------------------------------------------------------------------------------------------------------
 // FIM da Funcionalidade Solicitação de Registro (Pré-registro)

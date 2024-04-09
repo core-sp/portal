@@ -1,6 +1,5 @@
 @php
     $camposEditados = $resultado->getCamposEditados();
-    $arrayJustificativas = $resultado->getJustificativaArray();
 @endphp
 
 <div class="card-body bg-light">
@@ -10,7 +9,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'cnpj_contabil',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('cnpj_contabil', $camposEditados))
@@ -24,7 +22,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'nome_contabil',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('nome_contabil', $camposEditados))
@@ -38,7 +35,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'email_contabil',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('email_contabil', $camposEditados))
@@ -52,7 +48,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'nome_contato_contabil',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('nome_contato_contabil', $camposEditados))
@@ -66,7 +61,6 @@
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'telefone_contabil',
-            'resultado' => $arrayJustificativas
         ])
         @endcomponent
         @if(array_key_exists('telefone_contabil', $camposEditados))

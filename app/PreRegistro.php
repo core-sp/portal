@@ -355,6 +355,16 @@ class PreRegistro extends Model
         return array_filter(explode(';', $this->tipo_telefone));
     }
 
+    public function tipoTelefoneCelular()
+    {
+        return isset($this->getTipoTelefone()[0]) && ($this->getTipoTelefone()[0] == mb_strtoupper(tipos_contatos()[0], 'UTF-8'));
+    }
+
+    public function tipoTelefoneOpcionalCelular()
+    {
+        return isset($this->getTipoTelefone()[1]) && ($this->getTipoTelefone()[1] == mb_strtoupper(tipos_contatos()[0], 'UTF-8'));
+    }
+
     public function getTelefone()
     {
         return array_filter(explode(';', $this->telefone));
@@ -370,6 +380,23 @@ class PreRegistro extends Model
     public function getJustificativaArray()
     {
         return isset($this->justificativa) ? $this->fromJson($this->justificativa) : array();
+    }
+
+    public function getJustificativaPorCampo($campo)
+    {
+        return Arr::get($this->getJustificativaArray(), $campo);
+    }
+
+    public function getJustificativaPorCampoData($campo, $data_hora)
+    {
+        return Arr::get(collect($this->fromJson($this->historico_justificativas))->keyBy(function ($item, $chave){
+            return array_filter(explode(';', $item))[1];
+        })
+        ->only([$data_hora])
+        ->transform(function($item_1, $key) use($campo){
+            return Arr::get($this->fromJson(explode(';', $item_1)[0]), $campo);
+        })
+        ->toArray(), $data_hora);
     }
 
     public function getConfereAnexosArray()
@@ -436,26 +463,8 @@ class PreRegistro extends Model
     {
         if($this->userPodeCorrigir())
         {
-            $array = collect($this->getJustificativaArray())->map(function ($item, $key) use($arrayAba){
-                if(isset($arrayAba[$key]))
-                    return $arrayAba[$key];
-            })
-            ->filter()
-            ->toArray();
-            
-            natsort($array);
-            return $array;
-        }
-
-        return null;
-    }
-
-    public function getTextosJustificadosByAba($arrayAba)
-    {
-        if($this->userPodeCorrigir())
-        {
-            $array = collect($this->getJustificativaArray())->keyBy(function ($item, $key) use($arrayAba){
-                return isset($arrayAba[$key]) ? $arrayAba[$key] : 'remover';
+            $array = collect(array_keys($this->getJustificativaArray()))->keyBy(function ($item, $key) use($arrayAba){
+                return isset($arrayAba[$item]) ? $arrayAba[$item] : 'remover';
             })
             ->forget('remover')
             ->toArray();
@@ -486,24 +495,32 @@ class PreRegistro extends Model
 
     public function getHistoricoStatus()
     {
-        return isset($this->historico_status) ? $this->fromJson($this->historico_status) : array();
+        return collect($this->fromJson($this->historico_status))->keyBy(function ($item, $chave){
+            return array_filter(explode(';', $item))[1];
+        })
+        ->map(function ($values){
+            return array_filter(explode(';', $values))[0];
+        })
+        ->toArray();
     }
 
     public function getHistoricoJustificativas()
     {
-        $justificados = isset($this->historico_justificativas) ? collect($this->fromJson($this->historico_justificativas)) : collect();
         $campos = collect($this->getCodigosCampos($this->userExterno->isPessoaFisica()))->mapWithKeys(function ($item){
             return $item;
         })
         ->flip()
         ->toArray();
 
-        return $justificados->map(function ($values) use($campos){
+        return collect($this->fromJson($this->historico_justificativas))->keyBy(function ($item, $chave){
+            return array_filter(explode(';', $item))[1];
+        })
+        ->transform(function ($values) use($campos){
             $temp = array_filter(explode(';', $values));
-            $textos = collect($this->fromJson($temp[0]));
+            $textos = collect(array_keys($this->fromJson($temp[0])));
             $array = $textos->keyBy(function ($item, $key) use($campos){
-                if(in_array($key, $campos))
-                    return array_keys($campos, $key, true)[0];
+                if(in_array($item, $campos))
+                    return array_keys($campos, $item, true)[0];
             })
             ->toArray();
             ksort($array, SORT_NATURAL);

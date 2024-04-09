@@ -1,6 +1,6 @@
 @component('components.justificativa_pre_registro', [
     'resultado' => $resultado,
-    'correcoes' => $resultado->getTextosJustificadosByAba($codigos[0])
+    'correcoes' => $resultado->getCodigosJustificadosByAba($codigos[0])
 ])
 @endcomponent
 

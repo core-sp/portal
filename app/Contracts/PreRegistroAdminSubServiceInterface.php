@@ -23,5 +23,7 @@ interface PreRegistroAdminSubServiceInterface {
 
     public function uploadDoc($id, $file, $tipo_doc);
 
+    public function getJustificativa($user, $id, $campo, $data_hora = null);
+
     public function executarRotina();
 }

@@ -36,25 +36,24 @@
         <ul class="list-group list-group-flush mb-2">
         @php
             $array_justificativas_hist = $resultado->getHistoricoJustificativas();
-            $cont = -1;
         @endphp
-        @foreach($resultado->getHistoricoStatus() as $status)
-            @php
-                $temp = explode(';', $status);
-                $cont = $temp[0] == $resultado::STATUS_CORRECAO ? $cont + 1 : $cont;
-            @endphp
+    
+        @foreach($resultado->getHistoricoStatus() as $data => $status)
             <li class="list-group-item pl-0">
-                <span class="rounded p-1 bg{{ $resultado->getLabelStatus($temp[0]) }}">{{ $temp[0] }}</span> - {{ organizaData($temp[1]) }}
-                @if(($temp[0] == $resultado::STATUS_CORRECAO) && (!empty($array_justificativas_hist)))
+                <span class="rounded p-1 bg{{ $resultado->getLabelStatus($status) }}">{{ $status }}</span> - {{ organizaData($data) }}
+                @if(($status == $resultado::STATUS_CORRECAO) && isset($array_justificativas_hist[$data]))
                 <p class="mt-2 ml-0 mr-0 mb-0">&nbsp;&nbsp;&nbsp;&nbsp;<strong>
-                    <i class="fas fa-user-edit text-success"></i> Justificativas:</strong></p>
-                    @foreach($array_justificativas_hist[$cont] as $chave => $texto)
-                    <span class="rounded p-1">
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <strong>{{ $chave }}:</strong> {{ $texto }}
-                    </span>
-                    <br>
+                    <i class="fas fa-user-edit text-success"></i> Justificativas:</strong>
+                    @foreach($array_justificativas_hist[$data] as $chave => $campo)
+                    <button 
+                        class="btn btn-link btn-sm pb-0 pt-0 textoJustHist" 
+                        value="{{ route('externo.preregistro.justificativa.view', ['preRegistro' => $resultado->id, 'campo' => $campo, 'data_hora' => urlencode($data)]) }}"
+                    >
+                        <strong>{{ $chave }}</strong>
+                    </button>
+                    {{ $loop->last ? '' : '|' }} 
                     @endforeach
+                </p>
                 @endif
             </li>
         @endforeach

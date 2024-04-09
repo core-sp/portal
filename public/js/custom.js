@@ -1466,6 +1466,7 @@ $('.justificativaPreRegistro').click(function() {
     var titleModal = texto.length > 0 ? ' Editar justificativa' : ' Adicionar justificativa';
     input.val(texto);
     contJustificativaPR(input);
+    $('#submitJustificativaPreRegistro').show();
     $('#submitJustificativaPreRegistro').val(campo);
     $('#modalJustificativaPreRegistro .modal-title #titulo').text(titleModal);
     $('#modalJustificativaPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
@@ -1479,6 +1480,38 @@ $('#submitJustificativaPreRegistro').click(function() {
     var campo = this.value;
     var value = $('#modalJustificativaPreRegistro .modal-body textarea').val();
     putDadosPreRegistro(campo, value, 'justificar');
+});
+
+$('.textoJustHist').click(function() {
+  $('#modalJustificativaPreRegistro').modal('hide');
+  $("#modalLoadingBody").html('<i class="spinner-border text-info"></i> Carregando');
+	$('#modalLoadingPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
+
+  var item = this.innerText;
+  $.ajax({
+    method: 'GET',
+    dataType: 'json',
+    url: this.value,
+    cache: false,
+    timeout: 60000,
+    success: function(response) {
+      $("#modalLoadingPreRegistro").modal('hide');
+      $('#modalJustificativaPreRegistro #submitJustificativaPreRegistro').hide();
+      $('#modalJustificativaPreRegistro .modal-title #titulo').html('Histórico da Justificativa <strong>' + item + ' do dia ' + response.data_hora + '</strong>');
+      $('#modalJustificativaPreRegistro .modal-body textarea').val(response.justificativa);
+      contJustificativaPR($('#modalJustificativaPreRegistro .modal-body textarea'));
+      $('#modalJustificativaPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
+    },
+    error: function(request, status, error) {
+        var errorFunction = getErrorMsg(request);
+        $("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + errorFunction[0]);
+        $("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
+        setTimeout(function() {
+          $("#modalLoadingPreRegistro").modal('hide');
+        }, errorFunction[1]); 
+        console.clear();
+    }
+  });
 });
 
 $('.addValorPreRegistro').click(function() {

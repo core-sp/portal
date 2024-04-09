@@ -13,7 +13,6 @@ class PreRegistroController extends Controller
 
     public function __construct(MediadorServiceInterface $service)
     {
-        $this->middleware(['auth', 'throttle:100,1']);
         $this->service = $service;
     }
 
@@ -129,5 +128,21 @@ class PreRegistroController extends Controller
         }
 
         return redirect()->route('preregistro.view', $preRegistro)->with($dados);
+    }
+
+    public function showJustificativa($preRegistro, $campo, $data_hora = null)
+    {
+        $user = auth()->guard('web')->check() ? auth()->guard('web')->user() : auth()->guard(getGuardExterno(auth()))->user();
+        $data_hora = auth()->guard('web')->check() ? $data_hora : null;
+
+        try{
+            $dados = $this->service->getService('PreRegistro')->admin()->getJustificativa($user, $preRegistro, $campo, $data_hora);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
+            abort(500, "Erro ao buscar justificativa ".$campo." do pré-registro ".$preRegistro.".");
+        }
+
+        return response()->json($dados);
     }
 }

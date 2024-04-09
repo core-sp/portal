@@ -323,6 +323,33 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         ];
     }
 
+    public function getJustificativa($user, $id, $campo, $data_hora = null)
+    {
+        if(($user->getTable() == 'users') && !$user->can('updateOther', $user))
+            throw new \Exception('Não permitido visualizar a justificativa do pré-registro na área administrativa sem permissão!', 401);
+
+        if(isset($data_hora))
+            $data_hora = urldecode($data_hora);
+
+        $preRegistro = PreRegistro::findOrFail($id);
+
+        if(($user->getTable() == 'users_externo') && ($preRegistro->userExterno->cpf_cnpj != $user->cpf_cnpj))
+            throw new \Exception('Não permitido visualizar a justificativa do pré-registro de outro usuário!', 401);
+
+        if(($user->getTable() == 'contabeis') && (!isset($preRegistro->contabil->cnpj) || (isset($preRegistro->contabil->cnpj) && ($preRegistro->contabil->cnpj != $user->cnpj))))
+            throw new \Exception('Não permitido visualizar a justificativa do pré-registro de outro usuário!', 401);
+
+        if(($user->getTable() != 'users') && $preRegistro->isFinalizado())
+            throw new \Exception('Não permitido visualizar a justificativa do pré-registro finalizado!', 401);
+
+        $justificativa = !isset($data_hora) ? $preRegistro->getJustificativaPorCampo($campo) : $preRegistro->getJustificativaPorCampoData($campo, $data_hora);
+
+        return [
+            'justificativa' => isset($justificativa) ? $justificativa : 'Sem justificativa',
+            'data_hora' => isset($data_hora) ? formataData($data_hora) : null,
+        ];
+    }
+
     public function executarRotina()
     {
         $diretorio = Anexo::PATH_PRE_REGISTRO . '/';

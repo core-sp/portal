@@ -336,7 +336,7 @@ Route::middleware(['block_ip'])->group(function () {
     });
 
     // Pré-Registro
-    Route::prefix('pre-registros')->group(function(){
+    Route::prefix('pre-registros')->middleware(['auth', 'throttle:100,1'])->group(function(){
       Route::get('/', 'PreRegistroController@index')->name('preregistro.index');
       Route::get('/view/{id}', 'PreRegistroController@view')->name('preregistro.view');
       // Via ajax somente as justificativas e update em alguns campos como registro secundario
@@ -425,6 +425,7 @@ Route::middleware(['block_ip'])->group(function () {
       Route::post('/inserir-registro-ajax/{preRegistro?}', 'UserExternoSiteController@inserirPreRegistroAjax')->name('externo.inserir.preregistro.ajax')->middleware('auth:user_externo,contabil', 'throttle:100,1');
       Route::get('/pre-registro-anexo/download/{id}/{preRegistro?}', 'UserExternoSiteController@preRegistroAnexoDownload')->name('externo.preregistro.anexo.download')->middleware('auth:user_externo,contabil', 'throttle:100,1');
       Route::delete('/pre-registro-anexo/excluir/{id}/{preRegistro?}', 'UserExternoSiteController@preRegistroAnexoExcluir')->name('externo.preregistro.anexo.excluir')->middleware('auth:user_externo,contabil', 'throttle:100,1');
+      Route::get('/pre-registro/{preRegistro}/justificativa/{campo}/{data_hora?}', 'PreRegistroController@showJustificativa')->name('externo.preregistro.justificativa.view')->middleware('auth:user_externo,contabil,web');
     });
     
     //Balcão de Oportunidades

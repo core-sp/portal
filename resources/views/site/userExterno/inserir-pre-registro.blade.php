@@ -31,93 +31,69 @@
         <li class="nav-item">
             <a class="nav-link active" data-toggle="tab" href="#parte1_PF_PJ">
                 {{ $abas[0] }}&nbsp;
-                @php
-                    $correcoes = $resultado->getCodigosJustificadosByAba($codigos[0]);
-                @endphp
-                @if($resultado->userPodeCorrigir() && empty($correcoes))
-                <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
-                @elseif(isset($correcoes) && !empty($correcoes))
-                    @foreach($correcoes as $correcao)
-                    <span class="badge badge-danger"> {{ $correcao }}</span>
-                    @endforeach
-                @endif
+                @component('components.justificativa_pre_registro', [
+                    'resultado' => $resultado,
+                    'correcoes' => $resultado->getCodigosJustificadosByAba($codigos[0]),
+                    'menu' => true,
+                ])
+                @endcomponent
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte2_PF_PJ">
                 {{ $abas[1] }}&nbsp;
-                @php
-                    $correcoes = $resultado->getCodigosJustificadosByAba($codigos[1]);
-                @endphp
-                @if($resultado->userPodeCorrigir() && empty($correcoes))
-                <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
-                @elseif(isset($correcoes) && !empty($correcoes))
-                    @foreach($correcoes as $correcao)
-                    <span class="badge badge-danger"> {{ $correcao }}</span>
-                    @endforeach
-                @endif
+                @component('components.justificativa_pre_registro', [
+                    'resultado' => $resultado,
+                    'correcoes' => $resultado->getCodigosJustificadosByAba($codigos[1]),
+                    'menu' => true,
+                ])
+                @endcomponent
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte3_PF_PJ">
                 {{ $abas[2] }}&nbsp;
-                @php
-                    $correcoes = $resultado->getCodigosJustificadosByAba($codigos[2]);
-                @endphp
-                @if($resultado->userPodeCorrigir() && empty($correcoes))
-                <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
-                @elseif(isset($correcoes) && !empty($correcoes))
-                    @foreach($correcoes as $correcao)
-                    <span class="badge badge-danger"> {{ $correcao }}</span>
-                    @endforeach
-                @endif
+                @component('components.justificativa_pre_registro', [
+                    'resultado' => $resultado,
+                    'correcoes' => $resultado->getCodigosJustificadosByAba($codigos[2]),
+                    'menu' => true,
+                ])
+                @endcomponent
             </a>
         </li>
         @if(!$resultado->userExterno->isPessoaFisica())
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte4_PJ">
                 {{ $abas[3] }}&nbsp;
-                @php
-                    $correcoes = $resultado->getCodigosJustificadosByAba($codigos[3]);
-                @endphp
-                @if($resultado->userPodeCorrigir() && empty($correcoes))
-                <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
-                @elseif(isset($correcoes) && !empty($correcoes))
-                    @foreach($correcoes as $correcao)
-                    <span class="badge badge-danger"> {{ $correcao }}</span>
-                    @endforeach
-                @endif
+                @component('components.justificativa_pre_registro', [
+                    'resultado' => $resultado,
+                    'correcoes' => $resultado->getCodigosJustificadosByAba($codigos[3]),
+                    'menu' => true,
+                ])
+                @endcomponent
             </a>
         </li>
         @endif
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte4_PF_parte5_PJ">
                 {{ $abas[4] }}&nbsp;
-                @php
-                    $correcoes = $resultado->getCodigosJustificadosByAba($codigos[4]);
-                @endphp
-                @if($resultado->userPodeCorrigir() && empty($correcoes))
-                <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
-                @elseif(isset($correcoes) && !empty($correcoes))
-                    @foreach($correcoes as $correcao)
-                    <span class="badge badge-danger"> {{ $correcao }}</span>
-                    @endforeach
-                @endif
+                @component('components.justificativa_pre_registro', [
+                    'resultado' => $resultado,
+                    'correcoes' => $resultado->getCodigosJustificadosByAba($codigos[4]),
+                    'menu' => true,
+                ])
+                @endcomponent
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte5_PF_parte6_PJ">
                 {{ $abas[5] }}&nbsp;
-                @php
-                    $correcoes = $resultado->getCodigosJustificadosByAba($codigos[5]);
-                @endphp
-                @if($resultado->userPodeCorrigir() && empty($correcoes))
-                <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
-                @elseif(isset($correcoes) && !empty($correcoes))
-                    @foreach($correcoes as $correcao)
-                    <span class="badge badge-danger"> {{ $correcao }}</span>
-                    @endforeach
-                @endif
+                @component('components.justificativa_pre_registro', [
+                    'resultado' => $resultado,
+                    'correcoes' => $resultado->getCodigosJustificadosByAba($codigos[5]),
+                    'menu' => true,
+                ])
+                @endcomponent
             </a>
         </li>
     </ul>
@@ -278,6 +254,29 @@
                     <a href="{{ $rotaCancelar }}" class="btn btn-secondary">Cancelar</a>
                     <button type="button" class="btn btn-success" id="submitPreRegistro" value="">Enviar</button>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hide" id="modalJustificativaPreRegistro">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title"></h4>
+            </div>
+                
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="form-group">
+                    <textarea class="form-control" rows="5" maxlength="500" value="" data-clarity-mask="True"></textarea>
+                </div>
+            </div>
+                
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Fechar</button>
             </div>
         </div>
     </div>
