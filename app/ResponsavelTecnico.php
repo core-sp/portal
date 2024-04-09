@@ -126,7 +126,7 @@ class ResponsavelTecnico extends Model
             $resultado = $this->update($arrayCampos);
         }
 
-        $resultado = $pj->update(['responsavel_tecnico_id' => $resultado == 'remover' ? null : $this->id]);
+        $resultado = $pj->update(['responsavel_tecnico_id' => $resultado === 'remover' ? null : $this->id]);
         $pj->preRegistro->touch();
 
         return $resultado;

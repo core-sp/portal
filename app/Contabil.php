@@ -123,7 +123,7 @@ class Contabil extends Authenticatable
             }
         }
 
-        $resultado = $pr->update(['contabil_id' => $resultado == 'remover' ? null : $this->id]);
+        $resultado = $pr->update(['contabil_id' => $resultado === 'remover' ? null : $this->id]);
         $pr->touch();
 
         return $resultado;
