@@ -4,6 +4,41 @@
 ])
 @endcomponent
 
+@if(isset($resultado->contabil_id))
+<fieldset class="border rounded border-secondary p-2 mb-3">
+    <legend class="w-auto">
+        <small>&nbsp;Contato da Contabilidade&nbsp;</small>
+    </legend>
+
+    <div class="form-row mb-2">
+        <div class="col-sm mb-2-576">
+            <label>E-mail</label>
+            <input
+                type="text"
+                class="form-control"
+                value="{{ isset($resultado->contabil->email) ? $resultado->contabil->email : '' }}"
+                placeholder="Obrigatório inserir um e-mail"
+                readonly
+                disabled
+            />
+        </div>
+
+        <div class="col-sm mb-2-576">
+            <label>Telefone</label>
+            <input
+                type="text"
+                class="form-control telefone2Input"
+                value="{{ isset($resultado->contabil->telefone) ? $resultado->contabil->telefone : '' }}"
+                placeholder="Obrigatório inserir um telefone"
+                readonly
+                disabled
+            />
+        </div>
+    </div>
+</fieldset>
+
+@endif
+
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
         <label for="email_pre">E-mail <span class="text-danger">*</span></label>
