@@ -127,7 +127,7 @@
         <input type="hidden" name="idPreRegistro" value="{{ $resultado->id }}" />
 
         <div class="card">
-            <a class="card-link" data-toggle="collapse" href="#parte1_PF_PJ">
+            <a class="card-link" data-toggle="collapse" href="#parte_contabilidade">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
                     1. {{ $abas[0] }}
                     @if(!empty(array_intersect_key($codigos[0], $resultado->getCamposEditados())))
@@ -135,13 +135,13 @@
                     @endif
                 </div>
             </a>
-            <div id="parte1_PF_PJ" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-parte1_PF_PJ')
+            <div id="parte_contabilidade" class="collapse" data-parent="#accordionPreRegistro">
+                @include('admin.inc.pre-registro-contabilidade')
             </div>
         </div>
 
         <div class="card">
-            <a class="card-link" data-toggle="collapse" href="#parte2_PF_PJ">
+            <a class="card-link" data-toggle="collapse" href="#parte_dados_gerais">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
                     2. {{ $abas[1] }}
                     @if(!empty(array_intersect_key($codigos[1], $resultado->getCamposEditados())))
@@ -149,13 +149,13 @@
                     @endif
                 </div>
             </a>
-            <div id="parte2_PF_PJ" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-parte2_PF_PJ')
+            <div id="parte_dados_gerais" class="collapse" data-parent="#accordionPreRegistro">
+                @include('admin.inc.pre-registro-dados-gerais')
             </div>
         </div>
         
         <div class="card">
-            <a class="card-link" data-toggle="collapse" href="#parte3_PF_PJ">
+            <a class="card-link" data-toggle="collapse" href="#parte_endereco">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
                     3. {{ $abas[2] }}
                     @if(!empty(array_intersect_key($codigos[2], $resultado->getCamposEditados())))
@@ -163,14 +163,14 @@
                     @endif
                 </div>
             </a>
-            <div id="parte3_PF_PJ" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-parte3_PF_PJ')
+            <div id="parte_endereco" class="collapse" data-parent="#accordionPreRegistro">
+                @include('admin.inc.pre-registro-endereco')
             </div>
         </div>
         
         @if(!$resultado->userExterno->isPessoaFisica())
         <div class="card">
-            <a class="card-link" data-toggle="collapse" href="#parte4_PJ">
+            <a class="card-link" data-toggle="collapse" href="#parte_contato_rt">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
                     4. {{ $abas[3] }}
                     @if(!empty(array_intersect_key($codigos[3], $resultado->getCamposEditados())))
@@ -178,14 +178,14 @@
                     @endif
                 </div>
             </a>
-            <div id="parte4_PJ" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-parte4_PJ')
+            <div id="parte_contato_rt" class="collapse" data-parent="#accordionPreRegistro">
+                @include('admin.inc.pre-registro-contato-rt')
             </div>
         </div>
         @endif
         
         <div class="card">
-            <a class="card-link" data-toggle="collapse" href="#parte4_PF_parte5_PJ">
+            <a class="card-link" data-toggle="collapse" href="#parte_canal_relacionamento">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
                     5. {{ $abas[4] }}
                     @if(!empty(array_intersect_key($codigos[4], $resultado->getCamposEditados())))
@@ -193,13 +193,13 @@
                     @endif
                 </div>
             </a>
-            <div id="parte4_PF_parte5_PJ" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-parte4_PF_parte5_PJ')
+            <div id="parte_canal_relacionamento" class="collapse" data-parent="#accordionPreRegistro">
+                @include('admin.inc.pre-registro-canal-relacionamento')
             </div>
         </div>
 
         <div class="card">
-            <a class="card-link" data-toggle="collapse" href="#parte5_PF_parte6_PJ">
+            <a class="card-link" data-toggle="collapse" href="#parte_anexos">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
                     6. {{ $abas[5] }}
                     @if(!empty(array_intersect_key($codigos[5], $resultado->getCamposEditados())))
@@ -207,8 +207,8 @@
                     @endif
                 </div>
             </a>
-            <div id="parte5_PF_parte6_PJ" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-parte5_PF_parte6_PJ')
+            <div id="parte_anexos" class="collapse" data-parent="#accordionPreRegistro">
+                @include('admin.inc.pre-registro-anexos')
             </div>
         </div>
 

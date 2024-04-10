@@ -29,7 +29,7 @@
     <!-- Nav tabs -->
     <ul class="menu-registro nav nav-pills flex-column">
         <li class="nav-item">
-            <a class="nav-link active" data-toggle="tab" href="#parte1_PF_PJ">
+            <a class="nav-link active" data-toggle="tab" href="#parte_contabilidade">
                 {{ $abas[0] }}&nbsp;
                 @component('components.justificativa_pre_registro', [
                     'resultado' => $resultado,
@@ -40,7 +40,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="pill" href="#parte2_PF_PJ">
+            <a class="nav-link" data-toggle="pill" href="#parte_dados_gerais">
                 {{ $abas[1] }}&nbsp;
                 @component('components.justificativa_pre_registro', [
                     'resultado' => $resultado,
@@ -51,7 +51,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="pill" href="#parte3_PF_PJ">
+            <a class="nav-link" data-toggle="pill" href="#parte_endereco">
                 {{ $abas[2] }}&nbsp;
                 @component('components.justificativa_pre_registro', [
                     'resultado' => $resultado,
@@ -63,7 +63,7 @@
         </li>
         @if(!$resultado->userExterno->isPessoaFisica())
         <li class="nav-item">
-            <a class="nav-link" data-toggle="pill" href="#parte4_PJ">
+            <a class="nav-link" data-toggle="pill" href="#parte_contato_rt">
                 {{ $abas[3] }}&nbsp;
                 @component('components.justificativa_pre_registro', [
                     'resultado' => $resultado,
@@ -75,7 +75,7 @@
         </li>
         @endif
         <li class="nav-item">
-            <a class="nav-link" data-toggle="pill" href="#parte4_PF_parte5_PJ">
+            <a class="nav-link" data-toggle="pill" href="#parte_canal_relacionamento">
                 {{ $abas[4] }}&nbsp;
                 @component('components.justificativa_pre_registro', [
                     'resultado' => $resultado,
@@ -86,7 +86,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="pill" href="#parte5_PF_parte6_PJ">
+            <a class="nav-link" data-toggle="pill" href="#parte_anexos">
                 {{ $abas[5] }}&nbsp;
                 @component('components.justificativa_pre_registro', [
                     'resultado' => $resultado,
@@ -123,65 +123,65 @@
         <div class="tab-content">
         
             <!-- Tab 1 -->
-            <div id="parte1_PF_PJ" class="tab-pane container active"><br>
+            <div id="parte_contabilidade" class="tab-pane container active"><br>
                 @if(!$resultado->userPodeEditar())
                 <fieldset disabled>
-                    @include('site.userExterno.inc.pre-registro-etapa1')
+                    @include('site.userExterno.inc.pre-registro-contabilidade')
                 </fieldset>
                 @else
-                    @include('site.userExterno.inc.pre-registro-etapa1')
+                    @include('site.userExterno.inc.pre-registro-contabilidade')
                 @endif
             </div>
     
             <!-- Tab 2 -->
-            <div id="parte2_PF_PJ" class="tab-pane container fade"><br>
+            <div id="parte_dados_gerais" class="tab-pane container fade"><br>
                 @if(!$resultado->userPodeEditar())
                 <fieldset disabled>
-                    @include('site.userExterno.inc.pre-registro-etapa2')
+                    @include('site.userExterno.inc.pre-registro-dados-gerais')
                 </fieldset>
                 @else
-                    @include('site.userExterno.inc.pre-registro-etapa2')
+                    @include('site.userExterno.inc.pre-registro-dados-gerais')
                 @endif
             </div>
 
             <!-- Tab 3 -->
-            <div id="parte3_PF_PJ" class="tab-pane container fade"><br>
+            <div id="parte_endereco" class="tab-pane container fade"><br>
                 @if(!$resultado->userPodeEditar())
                 <fieldset disabled>
-                    @include('site.userExterno.inc.pre-registro-etapa3')
+                    @include('site.userExterno.inc.pre-registro-endereco')
                 </fieldset>
                 @else
-                    @include('site.userExterno.inc.pre-registro-etapa3')
+                    @include('site.userExterno.inc.pre-registro-endereco')
                 @endif
             </div>
 
             <!-- Tab 4 PJ -->
             @if(!$resultado->userExterno->isPessoaFisica())
-            <div id="parte4_PJ" class="tab-pane container fade"><br>
+            <div id="parte_contato_rt" class="tab-pane container fade"><br>
                 @if(!$resultado->userPodeEditar())
                 <fieldset disabled>
-                    @include('site.userExterno.inc.pre-registro-etapa4-PJ')
+                    @include('site.userExterno.inc.pre-registro-contato-rt')
                 </fieldset>
                 @else
-                    @include('site.userExterno.inc.pre-registro-etapa4-PJ')
+                    @include('site.userExterno.inc.pre-registro-contato-rt')
                 @endif
             </div>
             @endif
 
             <!-- Tab 4 PF e Tab 5 PJ -->
-            <div id="parte4_PF_parte5_PJ" class="tab-pane container fade"><br>
+            <div id="parte_canal_relacionamento" class="tab-pane container fade"><br>
                 @if(!$resultado->userPodeEditar())
                 <fieldset disabled>
-                    @include('site.userExterno.inc.pre-registro-etapa4-PF-etapa5-PJ')
+                    @include('site.userExterno.inc.pre-registro-canal-relacionamento')
                 </fieldset>
                 @else
-                    @include('site.userExterno.inc.pre-registro-etapa4-PF-etapa5-PJ')
+                    @include('site.userExterno.inc.pre-registro-canal-relacionamento')
                 @endif
             </div>
 
             <!-- Tab 5 PF e Tab 6 PJ -->
-            <div id="parte5_PF_parte6_PJ" class="tab-pane container fade"><br>
-                @include('site.userExterno.inc.pre-registro-etapa5-PF-etapa6-PJ')
+            <div id="parte_anexos" class="tab-pane container fade"><br>
+                @include('site.userExterno.inc.pre-registro-anexos')
             </div>
 
         </div>
