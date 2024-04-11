@@ -24,7 +24,7 @@
     <hr>
 
     <p id="path" class="mb-4">
-        <span class="font-weight-bolder">{{ $codigos[5]['path'] }} - Anexos: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['path'] }} - Anexos: </span>
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'path',

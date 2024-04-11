@@ -1,6 +1,6 @@
 @component('components.justificativa_pre_registro', [
     'resultado' => $resultado,
-    'correcoes' => $resultado->getCodigosJustificadosByAba($codigos[4])
+    'correcoes' => $resultado->getCodigosJustificadosByAba($nome_campos)
 ])
 @endcomponent
 
@@ -73,11 +73,11 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="tipo_telefone">{{ $codigos[4]['tipo_telefone'] }} - Tipo de telefone <span class="text-danger">*</span></label><br>
+        <label for="tipo_telefone">{{ $nome_campos['tipo_telefone'] }} - Tipo de telefone <span class="text-danger">*</span></label><br>
         <select 
             name="tipo_telefone" 
             id="tipo_telefone"
-            class="{{ $classes[4] }} form-control {{ $errors->has('tipo_telefone') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe }} form-control {{ $errors->has('tipo_telefone') ? 'is-invalid' : '' }} obrigatorio"
         >
             <option value="">Selecione a opção...</option>
         @foreach(tipos_contatos() as $tipo)
@@ -97,9 +97,9 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="telefone">{{ $codigos[4]['telefone'] }} - Nº de telefone <span class="text-danger">*</span></label>
+        <label for="telefone">{{ $nome_campos['telefone'] }} - Nº de telefone <span class="text-danger">*</span></label>
         <input type="text"
-            class="{{ $classes[4] }} form-control telefone2Input {{ $errors->has('telefone') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe }} form-control telefone2Input {{ $errors->has('telefone') ? 'is-invalid' : '' }} obrigatorio"
             name="telefone"
             id="telefone"
             value="{{ empty(old('telefone')) && isset($resultado->getTelefone()[0]) ? $resultado->getTelefone()[0] : old('telefone') }}"
@@ -116,7 +116,7 @@
 <fieldset id="opcoesCelular" {{ $resultado->tipoTelefoneCelular() ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label>{{ $codigos[4]['opcional_celular'] }} <small class="bold">(opcional)</small> - Outras comunicações </label><br>
+            <label>{{ $nome_campos['opcional_celular'] }} <small class="bold">(opcional)</small> - Outras comunicações </label><br>
             @foreach(opcoes_celular() as $key => $tipo)
             <div class="form-check-inline">
                 <label for="{{ 'opcional_celular_' . $key }}" class="form-check-label">
@@ -124,7 +124,7 @@
                         type="checkbox" 
                         name="opcional_celular[]"
                         id="{{ 'opcional_celular_' . $key }}"
-                        class="{{ $classes[4] }} form-check-input {{ $errors->has('opcional_celular') ? 'is-invalid' : '' }}" 
+                        class="{{ $classe }} form-check-input {{ $errors->has('opcional_celular') ? 'is-invalid' : '' }}" 
                         value="{{ $tipo }}" 
                         @if(!empty(old('opcional_celular')) && is_array(old('opcional_celular')))
                         {{ in_array($tipo, old('opcional_celular')) ? 'checked' : '' }}
@@ -148,11 +148,11 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="tipo_telefone_1">{{ $codigos[4]['tipo_telefone_1'] }} <small class="bold">(opcional)</small> - Tipo de telefone </label><br>
+        <label for="tipo_telefone_1">{{ $nome_campos['tipo_telefone_1'] }} <small class="bold">(opcional)</small> - Tipo de telefone </label><br>
         <select 
             name="tipo_telefone_1" 
             id="tipo_telefone_1"
-            class="{{ $classes[4] }} form-control {{ $errors->has('tipo_telefone_1') ? 'is-invalid' : '' }}"
+            class="{{ $classe }} form-control {{ $errors->has('tipo_telefone_1') ? 'is-invalid' : '' }}"
         >
             <option value="">Selecione a opção...</option>
         @foreach(tipos_contatos() as $tipo)
@@ -172,9 +172,9 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="telefone_1">{{ $codigos[4]['telefone_1'] }} <small class="bold">(opcional)</small> - Nº de telefone </span></label>
+        <label for="telefone_1">{{ $nome_campos['telefone_1'] }} <small class="bold">(opcional)</small> - Nº de telefone </span></label>
         <input type="text"
-            class="{{ $classes[4] }} form-control telefone2Input {{ $errors->has('telefone_1') ? 'is-invalid' : '' }}"
+            class="{{ $classe }} form-control telefone2Input {{ $errors->has('telefone_1') ? 'is-invalid' : '' }}"
             name="telefone_1"
             id="telefone_1"
             value="{{ empty(old('telefone_1')) && isset($resultado->getTelefone()[1]) ? $resultado->getTelefone()[1] : old('telefone_1') }}"
@@ -191,7 +191,7 @@
 <fieldset id="opcoesCelular_1" {{ $resultado->tipoTelefoneOpcionalCelular() ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="opcional_celular_1">{{ $codigos[4]['opcional_celular_1'] }} <small class="bold">(opcional)</small> - Outras comunicações </label><br>
+            <label for="opcional_celular_1">{{ $nome_campos['opcional_celular_1'] }} <small class="bold">(opcional)</small> - Outras comunicações </label><br>
             @foreach(opcoes_celular() as $key => $tipo)
             <div class="form-check-inline">
                 <label for="{{ 'opcional_celular_' . $key }}" class="form-check-label">
@@ -199,7 +199,7 @@
                         type="checkbox" 
                         name="opcional_celular_1[]"
                         id="{{ 'opcional_celular_' . $key }}"
-                        class="{{ $classes[4] }} form-check-input {{ $errors->has('opcional_celular_1') ? 'is-invalid' : '' }}" 
+                        class="{{ $classe }} form-check-input {{ $errors->has('opcional_celular_1') ? 'is-invalid' : '' }}" 
                         value="{{ $tipo }}" 
                         @if(!empty(old('opcional_celular_1')) && is_array(old('opcional_celular_1')))
                         {{ in_array($tipo, old('opcional_celular_1')) == $tipo ? 'checked' : '' }}

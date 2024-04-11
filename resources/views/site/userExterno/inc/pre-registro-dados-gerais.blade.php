@@ -1,6 +1,6 @@
 @component('components.justificativa_pre_registro', [
     'resultado' => $resultado,
-    'correcoes' => $resultado->getCodigosJustificadosByAba($codigos[1])
+    'correcoes' => $resultado->getCodigosJustificadosByAba($nome_campos)
 ])
 @endcomponent
 
@@ -40,12 +40,12 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_social">{{ $codigos[1]['nome_social'] }} - Nome Social</label>
+        <label for="nome_social">{{ $nome_campos['nome_social'] }} - Nome Social</label>
         <input
             name="nome_social"
             id="nome_social"
             type="text"
-            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('nome_social') ? 'is-invalid' : '' }}"
+            class="{{ $classe_pf }} text-uppercase form-control {{ $errors->has('nome_social') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_social')) && isset($resultado->pessoaFisica->nome_social) ? $resultado->pessoaFisica->nome_social : old('nome_social') }}"
             maxlength="191"
         />
@@ -59,12 +59,12 @@
 
 <div class="form-row mb-2">
     <div class="col-md mb-2-576">
-        <label for="sexo">{{ $codigos[1]['sexo'] }} - Gênero <span class="text-danger">*</span></label>
+        <label for="sexo">{{ $nome_campos['sexo'] }} - Gênero <span class="text-danger">*</span></label>
         <br>
         <select 
             name="sexo"
             id="sexo"
-            class="{{ $classes[2] }} form-control {{ $errors->has('sexo') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pf }} form-control {{ $errors->has('sexo') ? 'is-invalid' : '' }} obrigatorio"
         >
             <option value="">Selecione a opção...</option>
         @foreach(generos() as $key => $genero)
@@ -84,12 +84,12 @@
         @endif
     </div>
     <div class="col-md mb-2-576">
-        <label for="dt_nascimento">{{ $codigos[1]['dt_nascimento'] }} - Data de Nascimento <span class="text-danger">*</span></label>
+        <label for="dt_nascimento">{{ $nome_campos['dt_nascimento'] }} - Data de Nascimento <span class="text-danger">*</span></label>
         <input
             name="dt_nascimento"
             id="dt_nascimento"
             type="date"
-            class="{{ $classes[2] }} form-control {{ $errors->has('dt_nascimento') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pf }} form-control {{ $errors->has('dt_nascimento') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('dt_nascimento')) && isset($resultado->pessoaFisica->dt_nascimento) ? $resultado->pessoaFisica->dt_nascimento : old('dt_nascimento') }}"
             max="{{ Carbon\Carbon::today()->subYears(18)->format('Y-m-d') }}"
         />
@@ -100,11 +100,11 @@
         @endif
     </div>
     <div class="col-md mb-2-576">
-        <label for="estado_civil">{{ $codigos[1]['estado_civil'] }} - Estado Civil</label>
+        <label for="estado_civil">{{ $nome_campos['estado_civil'] }} - Estado Civil</label>
         <select 
             name="estado_civil" 
             id="estado_civil"
-            class="{{ $classes[2] }} form-control {{ $errors->has('estado_civil') ? 'is-invalid' : '' }}" 
+            class="{{ $classe_pf }} form-control {{ $errors->has('estado_civil') ? 'is-invalid' : '' }}" 
         >
             <option value="">Selecione a opção...</option>
         @foreach(estados_civis() as $estado_civil)
@@ -127,11 +127,11 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nacionalidade">{{ $codigos[1]['nacionalidade'] }} - Nacionalidade <span class="text-danger">*</span></label>
+        <label for="nacionalidade">{{ $nome_campos['nacionalidade'] }} - Nacionalidade <span class="text-danger">*</span></label>
         <select 
             name="nacionalidade" 
             id="nacionalidade"
-            class="{{ $classes[2] }} form-control {{ $errors->has('nacionalidade') ? 'is-invalid' : '' }} obrigatorio" 
+            class="{{ $classe_pf }} form-control {{ $errors->has('nacionalidade') ? 'is-invalid' : '' }} obrigatorio" 
         >
             <option value="">Selecione a opção...</option>
         @foreach(nacionalidades() as $nacionalidade)
@@ -154,12 +154,12 @@
 
 <div class="form-row mb-2">
     <div class="col-md mb-2-576">
-        <label for="naturalidade_cidade">{{ $codigos[1]['naturalidade_cidade'] }} - Naturalidade - Cidade <span class="text-danger">*</span></label>
+        <label for="naturalidade_cidade">{{ $nome_campos['naturalidade_cidade'] }} - Naturalidade - Cidade <span class="text-danger">*</span></label>
         <input
             name="naturalidade_cidade"
             id="naturalidade_cidade"
             type="text"
-            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('naturalidade_cidade') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pf }} text-uppercase form-control {{ $errors->has('naturalidade_cidade') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('naturalidade_cidade')) && isset($resultado->pessoaFisica->naturalidade_cidade) ? $resultado->pessoaFisica->naturalidade_cidade : old('naturalidade_cidade') }}"
             maxlength="191"
             {{ isset($resultado->pessoaFisica->nacionalidade) && ($resultado->pessoaFisica->nacionalidade != 'BRASILEIRA') ? 'disabled' : '' }}
@@ -171,11 +171,11 @@
         @endif
     </div>
     <div class="col-md mb-2-576">
-        <label for="naturalidade_estado">{{ $codigos[1]['naturalidade_estado'] }} - Naturalidade - Estado <span class="text-danger">*</span></label>
+        <label for="naturalidade_estado">{{ $nome_campos['naturalidade_estado'] }} - Naturalidade - Estado <span class="text-danger">*</span></label>
         <select 
             name="naturalidade_estado" 
             id="naturalidade_estado"
-            class="{{ $classes[2] }} form-control {{ $errors->has('naturalidade_estado') ? 'is-invalid' : '' }} obrigatorio" 
+            class="{{ $classe_pf }} form-control {{ $errors->has('naturalidade_estado') ? 'is-invalid' : '' }} obrigatorio" 
             {{ isset($resultado->pessoaFisica->nacionalidade) && ($resultado->pessoaFisica->nacionalidade != 'BRASILEIRA') ? 'disabled' : '' }}
         >
             <option value="">Selecione a opção...</option>
@@ -199,12 +199,12 @@
 
 <div class="form-row mb-2">
     <div class="col-lg mb-2-576">
-        <label for="nome_mae">{{ $codigos[1]['nome_mae'] }} - Nome da Mãe <span class="text-danger">*</span></label>
+        <label for="nome_mae">{{ $nome_campos['nome_mae'] }} - Nome da Mãe <span class="text-danger">*</span></label>
         <input
             name="nome_mae"
             id="nome_mae"
             type="text"
-            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('nome_mae') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pf }} text-uppercase form-control {{ $errors->has('nome_mae') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('nome_mae')) && isset($resultado->pessoaFisica->nome_mae) ? $resultado->pessoaFisica->nome_mae : old('nome_mae') }}"
             maxlength="191"
         />
@@ -215,12 +215,12 @@
         @endif
     </div>
     <div class="col-lg mb-2-576">
-        <label for="nome_pai">{{ $codigos[1]['nome_pai'] }} - Nome do Pai</label>
+        <label for="nome_pai">{{ $nome_campos['nome_pai'] }} - Nome do Pai</label>
         <input
             name="nome_pai"
             id="nome_pai"
             type="text"
-            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('nome_pai') ? 'is-invalid' : '' }}"
+            class="{{ $classe_pf }} text-uppercase form-control {{ $errors->has('nome_pai') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_pai')) && isset($resultado->pessoaFisica->nome_pai) ? $resultado->pessoaFisica->nome_pai : old('nome_pai') }}"
             maxlength="191"
         />
@@ -234,11 +234,11 @@
 
 <div class="form-row mb-2">
     <div class="col-md mb-2-576">
-        <label for="tipo_identidade">{{ $codigos[1]['tipo_identidade'] }} - Tipo do documento de identidade <span class="text-danger">*</span></label><br>
+        <label for="tipo_identidade">{{ $nome_campos['tipo_identidade'] }} - Tipo do documento de identidade <span class="text-danger">*</span></label><br>
         <select 
             name="tipo_identidade" 
             id="tipo_identidade"
-            class="{{ $classes[2] }} form-control {{ $errors->has('tipo_identidade') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pf }} form-control {{ $errors->has('tipo_identidade') ? 'is-invalid' : '' }} obrigatorio"
         >
             <option value="">Selecione a opção...</option>
         @foreach(tipos_identidade() as $tipo)
@@ -258,13 +258,13 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label>{{ $codigos[1]['identidade'] }} - </label>
+        <label>{{ $nome_campos['identidade'] }} - </label>
         <label for="identidade">N° do documento de identidade <span class="text-danger">*</span></label>
         <input
             name="identidade"
             id="identidade"
             type="text"
-            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('identidade') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pf }} text-uppercase form-control {{ $errors->has('identidade') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('identidade')) && isset($resultado->pessoaFisica->identidade) ? $resultado->pessoaFisica->identidade : old('identidade') }}"
             maxlength="30"
         />
@@ -278,12 +278,12 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="orgao_emissor">{{ $codigos[1]['orgao_emissor'] }} - Órgão Emissor <span class="text-danger">*</span></label>
+        <label for="orgao_emissor">{{ $nome_campos['orgao_emissor'] }} - Órgão Emissor <span class="text-danger">*</span></label>
         <input
             name="orgao_emissor"
             id="orgao_emissor"
             type="text"
-            class="{{ $classes[2] }} form-control text-uppercase {{ $errors->has('orgao_emissor') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pf }} form-control text-uppercase {{ $errors->has('orgao_emissor') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('orgao_emissor')) && isset($resultado->pessoaFisica->orgao_emissor) ? $resultado->pessoaFisica->orgao_emissor : old('orgao_emissor') }}"
             maxlength="191"
         />
@@ -294,12 +294,12 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="dt_expedicao">{{ $codigos[1]['dt_expedicao'] }} - Data de Expedição <span class="text-danger">*</span></label>
+        <label for="dt_expedicao">{{ $nome_campos['dt_expedicao'] }} - Data de Expedição <span class="text-danger">*</span></label>
         <input
             name="dt_expedicao"
             id="dt_expedicao"
             type="date"
-            class="{{ $classes[2] }} form-control {{ $errors->has('dt_expedicao') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pf }} form-control {{ $errors->has('dt_expedicao') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('dt_expedicao')) && isset($resultado->pessoaFisica->dt_expedicao) ? $resultado->pessoaFisica->dt_expedicao : old('dt_expedicao') }}"
             max="{{ date('Y-m-d') }}"
         />
@@ -315,14 +315,14 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="titulo_eleitor">{{ $codigos[1]['titulo_eleitor'] }} - Título de Eleitor <span class="text-danger">*</span>
+        <label for="titulo_eleitor">{{ $nome_campos['titulo_eleitor'] }} - Título de Eleitor <span class="text-danger">*</span>
         <small><em>(obrigatório para nacionalidade Brasileira)</em></small></label>
         </label>
         <input
             name="titulo_eleitor"
             id="titulo_eleitor"
             type="text"
-            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('titulo_eleitor') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pf }} text-uppercase form-control {{ $errors->has('titulo_eleitor') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('titulo_eleitor')) && isset($resultado->pessoaFisica->titulo_eleitor) ? $resultado->pessoaFisica->titulo_eleitor : old('titulo_eleitor') }}"
             maxlength="15"
         />
@@ -333,12 +333,12 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="zona">{{ $codigos[1]['zona'] }} - Zona Eleitoral <span class="text-danger">*</span></label>
+        <label for="zona">{{ $nome_campos['zona'] }} - Zona Eleitoral <span class="text-danger">*</span></label>
         <input
             name="zona"
             id="zona"
             type="text"
-            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('zona') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pf }} text-uppercase form-control {{ $errors->has('zona') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('zona')) && isset($resultado->pessoaFisica->zona) ? $resultado->pessoaFisica->zona : old('zona') }}"
             maxlength="6"
         />
@@ -352,12 +352,12 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="secao">{{ $codigos[1]['secao'] }} - Seção Eleitoral <span class="text-danger">*</span></label>
+        <label for="secao">{{ $nome_campos['secao'] }} - Seção Eleitoral <span class="text-danger">*</span></label>
         <input
             name="secao"
             id="secao"
             type="text"
-            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('secao') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pf }} text-uppercase form-control {{ $errors->has('secao') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('secao')) && isset($resultado->pessoaFisica->secao) ? $resultado->pessoaFisica->secao : old('secao') }}"
             maxlength="8"
         />
@@ -368,13 +368,13 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="ra_reservista">{{ $codigos[1]['ra_reservista'] }} - RA Reservista <span class="text-danger">*</span> 
+        <label for="ra_reservista">{{ $nome_campos['ra_reservista'] }} - RA Reservista <span class="text-danger">*</span> 
         <small><em>(obrigatório para gênero Masculino até 45 anos)</em></small></label>
         <input
             name="ra_reservista"
             id="ra_reservista"
             type="text"
-            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('ra_reservista') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pf }} text-uppercase form-control {{ $errors->has('ra_reservista') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('ra_reservista')) && isset($resultado->pessoaFisica->ra_reservista) ? $resultado->pessoaFisica->ra_reservista : old('ra_reservista') }}"
             maxlength="15"
         />
@@ -390,12 +390,12 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="razao_social">{{ $codigos[1]['razao_social'] }} - Razão Social <span class="text-danger">*</span></label>
+        <label for="razao_social">{{ $nome_campos['razao_social'] }} - Razão Social <span class="text-danger">*</span></label>
         <input
             id="razao_social"
             name="razao_social"
             type="text"
-            class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('razao_social') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pj }} text-uppercase form-control {{ $errors->has('razao_social') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('razao_social')) && isset($resultado->pessoaJuridica->razao_social) ? $resultado->pessoaJuridica->razao_social : old('razao_social') }}"
             maxlength="191"
         />
@@ -409,12 +409,12 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_fantasia">{{ $codigos[1]['nome_fantasia'] }} - Nome Fantasia <span class="text-danger">*</span></label>
+        <label for="nome_fantasia">{{ $nome_campos['nome_fantasia'] }} - Nome Fantasia <span class="text-danger">*</span></label>
         <input
             type="text"
             name="nome_fantasia"
             id="nome_fantasia"
-            class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('nome_fantasia') ? 'is-invalid' : '' }}"
+            class="{{ $classe_pj }} text-uppercase form-control {{ $errors->has('nome_fantasia') ? 'is-invalid' : '' }}"
             placeholder=""
             value="{{ empty(old('nome_fantasia')) && isset($resultado->pessoaJuridica->nome_fantasia) ? $resultado->pessoaJuridica->nome_fantasia : old('nome_fantasia') }}"
             maxlength="191"
@@ -429,12 +429,12 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="capital_social">{{ $codigos[1]['capital_social'] }} - Capital Social em R$ <span class="text-danger">*</span></label>
+        <label for="capital_social">{{ $nome_campos['capital_social'] }} - Capital Social em R$ <span class="text-danger">*</span></label>
         <input
             type="text"
             name="capital_social"
             id="capital_social"
-            class="{{ $classes[3] }} form-control capitalSocial {{ $errors->has('capital_social') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pj }} form-control capitalSocial {{ $errors->has('capital_social') ? 'is-invalid' : '' }} obrigatorio"
             placeholder="1.000,00"
             value="{{ empty(old('capital_social')) && isset($resultado->pessoaJuridica->capital_social) ? $resultado->pessoaJuridica->capital_social : old('capital_social') }}"
             maxlength="16"
@@ -446,12 +446,12 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="nire">{{ $codigos[1]['nire'] }} - NIRE</label>
+        <label for="nire">{{ $nome_campos['nire'] }} - NIRE</label>
         <input
             type="text"
             name="nire"
             id="nire"
-            class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('nire') ? 'is-invalid' : '' }}"
+            class="{{ $classe_pj }} text-uppercase form-control {{ $errors->has('nire') ? 'is-invalid' : '' }}"
             placeholder="NIRE"
             value="{{ empty(old('nire')) && isset($resultado->pessoaJuridica->nire) ? $resultado->pessoaJuridica->nire : old('nire') }}"
             maxlength="20"
@@ -466,12 +466,12 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="tipo_empresa">{{ $codigos[1]['tipo_empresa'] }} - Tipo da Empresa <span class="text-danger">*</span></label>
+        <label for="tipo_empresa">{{ $nome_campos['tipo_empresa'] }} - Tipo da Empresa <span class="text-danger">*</span></label>
         <br>
         <select 
             name="tipo_empresa" 
             id="tipo_empresa"
-            class="{{ $classes[3] }} form-control {{ $errors->has('tipo_empresa') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pj }} form-control {{ $errors->has('tipo_empresa') ? 'is-invalid' : '' }} obrigatorio"
         >
             <option value="">Selecione a opção...</option>
         @foreach(tipos_empresa() as $tipo)
@@ -491,12 +491,12 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="dt_inicio_atividade">{{ $codigos[1]['dt_inicio_atividade'] }} - Data início da atividade <span class="text-danger">*</span></label>
+        <label for="dt_inicio_atividade">{{ $nome_campos['dt_inicio_atividade'] }} - Data início da atividade <span class="text-danger">*</span></label>
         <input
             type="date"
             name="dt_inicio_atividade"
             id="dt_inicio_atividade"
-            class="{{ $classes[3] }} form-control {{ $errors->has('dt_inicio_atividade') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe_pj }} form-control {{ $errors->has('dt_inicio_atividade') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('dt_inicio_atividade')) && isset($resultado->pessoaJuridica->dt_inicio_atividade) ? $resultado->pessoaJuridica->dt_inicio_atividade : old('dt_inicio_atividade') }}"
             max="{{ date('Y-m-d') }}"
         />
@@ -517,14 +517,14 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="segmento">{{ $codigos[1]['segmento'] }} - Segmento</label>
+        <label for="segmento">{{ $nome_campos['segmento'] }} - Segmento</label>
         <i class="fas fa-info-circle d-inline azul" data-toggle="popover" data-placement="right" 
             data-content='<strong>Na área restrita do Representante Comercial você receberá oportunidades de acordo com o seu segmento e seccional através do <u><i>{{ $link }}</i></u>.</strong>'>
         </i>
         <select 
             name="segmento" 
             id="segmento"
-            class="{{ $classes[4] }} form-control {{ $errors->has('segmento') || isset($justificativas) ? 'is-invalid' : '' }}" 
+            class="{{ $classe }} form-control {{ $errors->has('segmento') || isset($justificativas) ? 'is-invalid' : '' }}" 
         >
             <option value="">Selecione a opção...</option>
         @foreach(segmentos() as $segmento)
@@ -544,11 +544,11 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="idregional_pr">{{ $codigos[1]['idregional'] }} - Região de Atuação <span class="text-danger">*</span></label>
+        <label for="idregional_pr">{{ $nome_campos['idregional'] }} - Região de Atuação <span class="text-danger">*</span></label>
         <select 
             name="idregional" 
             id="idregional_pr"
-            class="{{ $classes[4] }} form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }} obrigatorio" 
+            class="{{ $classe }} form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }} obrigatorio" 
         >
             <option value="">Selecione a opção...</option>
         @foreach($regionais as $regional)
@@ -572,12 +572,12 @@
 {{-- Deixar sempre no final do form a pergunta para não afetar a ordenação para o atendente no admin --}}
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="pergunta">{{ $codigos[1]['pergunta'] }} - Quanto tempo possui de experiência no ramo de vendas? <span class="text-danger">*</span></label>
+        <label for="pergunta">{{ $nome_campos['pergunta'] }} - Quanto tempo possui de experiência no ramo de vendas? <span class="text-danger">*</span></label>
         <input
             type="text"
             name="pergunta"
             id="pergunta"
-            class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('pergunta') ? 'is-invalid' : '' }}"
+            class="{{ $classe }} text-uppercase form-control {{ $errors->has('pergunta') ? 'is-invalid' : '' }}"
             placeholder=""
             maxlength="191"
             {{ $resultado->status != $resultado::STATUS_CRIADO ? 'readonly' : '' }}

@@ -136,7 +136,7 @@
                 </div>
             </a>
             <div id="parte_contabilidade" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-contabilidade')
+                @include('admin.inc.pre-registro-contabilidade', ['nome_campos' => $codigos[0]])
             </div>
         </div>
 
@@ -150,7 +150,7 @@
                 </div>
             </a>
             <div id="parte_dados_gerais" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-dados-gerais')
+                @include('admin.inc.pre-registro-dados-gerais', ['nome_campos' => $codigos[1]])
             </div>
         </div>
         
@@ -164,7 +164,7 @@
                 </div>
             </a>
             <div id="parte_endereco" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-endereco')
+                @include('admin.inc.pre-registro-endereco', ['nome_campos' => $codigos[2]])
             </div>
         </div>
         
@@ -179,13 +179,13 @@
                 </div>
             </a>
             <div id="parte_contato_rt" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-contato-rt')
+                @include('admin.inc.pre-registro-contato-rt', ['nome_campos' => $codigos[3]])
             </div>
         </div>
-        @endif
-        
+
+        <!-- socios -->
         <div class="card">
-            <a class="card-link" data-toggle="collapse" href="#parte_canal_relacionamento">
+            <a class="card-link" data-toggle="collapse" href="#parte_socios">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
                     5. {{ $abas[4] }}
                     @if(!empty(array_intersect_key($codigos[4], $resultado->getCamposEditados())))
@@ -193,22 +193,37 @@
                     @endif
                 </div>
             </a>
+            <div id="parte_socios" class="collapse" data-parent="#accordionPreRegistro">
+                @include('admin.inc.pre-registro-socios', ['nome_campos' => $codigos[4]])
+            </div>
+        </div>
+        @endif
+        
+        <div class="card">
+            <a class="card-link" data-toggle="collapse" href="#parte_canal_relacionamento">
+                <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
+                    6. {{ $abas[5] }}
+                    @if(!empty(array_intersect_key($codigos[5], $resultado->getCamposEditados())))
+                    <span class="badge badge-danger ml-2">Campos alterados</span>
+                    @endif
+                </div>
+            </a>
             <div id="parte_canal_relacionamento" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-canal-relacionamento')
+                @include('admin.inc.pre-registro-canal-relacionamento', ['nome_campos' => $codigos[5]])
             </div>
         </div>
 
         <div class="card">
             <a class="card-link" data-toggle="collapse" href="#parte_anexos">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
-                    6. {{ $abas[5] }}
-                    @if(!empty(array_intersect_key($codigos[5], $resultado->getCamposEditados())))
+                    7. {{ $abas[6] }}
+                    @if(!empty(array_intersect_key($codigos[6], $resultado->getCamposEditados())))
                     <span class="badge badge-success ml-2">Novos anexos</span>
                     @endif
                 </div>
             </a>
             <div id="parte_anexos" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-anexos')
+                @include('admin.inc.pre-registro-anexos', ['nome_campos' => $codigos[6]])
             </div>
         </div>
 

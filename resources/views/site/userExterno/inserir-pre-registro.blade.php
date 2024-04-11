@@ -73,9 +73,9 @@
                 @endcomponent
             </a>
         </li>
-        @endif
+        <!-- socios -->
         <li class="nav-item">
-            <a class="nav-link" data-toggle="pill" href="#parte_canal_relacionamento">
+            <a class="nav-link" data-toggle="pill" href="#parte_socios">
                 {{ $abas[4] }}&nbsp;
                 @component('components.justificativa_pre_registro', [
                     'resultado' => $resultado,
@@ -85,12 +85,24 @@
                 @endcomponent
             </a>
         </li>
+        @endif
         <li class="nav-item">
-            <a class="nav-link" data-toggle="pill" href="#parte_anexos">
+            <a class="nav-link" data-toggle="pill" href="#parte_canal_relacionamento">
                 {{ $abas[5] }}&nbsp;
                 @component('components.justificativa_pre_registro', [
                     'resultado' => $resultado,
                     'correcoes' => $resultado->getCodigosJustificadosByAba($codigos[5]),
+                    'menu' => true,
+                ])
+                @endcomponent
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="pill" href="#parte_anexos">
+                {{ $abas[6] }}&nbsp;
+                @component('components.justificativa_pre_registro', [
+                    'resultado' => $resultado,
+                    'correcoes' => $resultado->getCodigosJustificadosByAba($codigos[6]),
                     'menu' => true,
                 ])
                 @endcomponent
@@ -126,10 +138,10 @@
             <div id="parte_contabilidade" class="tab-pane container active"><br>
                 @if(!$resultado->userPodeEditar())
                 <fieldset disabled>
-                    @include('site.userExterno.inc.pre-registro-contabilidade')
+                    @include('site.userExterno.inc.pre-registro-contabilidade', ['nome_campos' => $codigos[0], 'classe' => $classes[1]])
                 </fieldset>
                 @else
-                    @include('site.userExterno.inc.pre-registro-contabilidade')
+                    @include('site.userExterno.inc.pre-registro-contabilidade', ['nome_campos' => $codigos[0], 'classe' => $classes[1]])
                 @endif
             </div>
     
@@ -137,10 +149,10 @@
             <div id="parte_dados_gerais" class="tab-pane container fade"><br>
                 @if(!$resultado->userPodeEditar())
                 <fieldset disabled>
-                    @include('site.userExterno.inc.pre-registro-dados-gerais')
+                    @include('site.userExterno.inc.pre-registro-dados-gerais', ['nome_campos' => $codigos[1], 'classe' => $classes[4], 'classe_pf' => $classes[2], 'classe_pj' => $classes[3]])
                 </fieldset>
                 @else
-                    @include('site.userExterno.inc.pre-registro-dados-gerais')
+                    @include('site.userExterno.inc.pre-registro-dados-gerais', ['nome_campos' => $codigos[1], 'classe' => $classes[4], 'classe_pf' => $classes[2], 'classe_pj' => $classes[3]])
                 @endif
             </div>
 
@@ -148,10 +160,10 @@
             <div id="parte_endereco" class="tab-pane container fade"><br>
                 @if(!$resultado->userPodeEditar())
                 <fieldset disabled>
-                    @include('site.userExterno.inc.pre-registro-endereco')
+                    @include('site.userExterno.inc.pre-registro-endereco', ['nome_campos' => $codigos[2], 'classe' => $classes[4], 'classe_pj' => $classes[3]])
                 </fieldset>
                 @else
-                    @include('site.userExterno.inc.pre-registro-endereco')
+                    @include('site.userExterno.inc.pre-registro-endereco', ['nome_campos' => $codigos[2], 'classe' => $classes[4], 'classe_pj' => $classes[3]])
                 @endif
             </div>
 
@@ -160,10 +172,20 @@
             <div id="parte_contato_rt" class="tab-pane container fade"><br>
                 @if(!$resultado->userPodeEditar())
                 <fieldset disabled>
-                    @include('site.userExterno.inc.pre-registro-contato-rt')
+                    @include('site.userExterno.inc.pre-registro-contato-rt', ['nome_campos' => $codigos[3], 'classe' => $classes[5]])
                 </fieldset>
                 @else
-                    @include('site.userExterno.inc.pre-registro-contato-rt')
+                    @include('site.userExterno.inc.pre-registro-contato-rt', ['nome_campos' => $codigos[3], 'classe' => $classes[5]])
+                @endif
+            </div>
+            <!-- socios -->
+            <div id="parte_socios" class="tab-pane container fade"><br>
+                @if(!$resultado->userPodeEditar())
+                <fieldset disabled>
+                    @include('site.userExterno.inc.pre-registro-socios', ['nome_campos' => $codigos[4], 'classe' => $classes[6]])
+                </fieldset>
+                @else
+                    @include('site.userExterno.inc.pre-registro-socios', ['nome_campos' => $codigos[4], 'classe' => $classes[6]])
                 @endif
             </div>
             @endif
@@ -172,16 +194,16 @@
             <div id="parte_canal_relacionamento" class="tab-pane container fade"><br>
                 @if(!$resultado->userPodeEditar())
                 <fieldset disabled>
-                    @include('site.userExterno.inc.pre-registro-canal-relacionamento')
+                    @include('site.userExterno.inc.pre-registro-canal-relacionamento', ['nome_campos' => $codigos[5], 'classe' => $classes[4]])
                 </fieldset>
                 @else
-                    @include('site.userExterno.inc.pre-registro-canal-relacionamento')
+                    @include('site.userExterno.inc.pre-registro-canal-relacionamento', ['nome_campos' => $codigos[5], 'classe' => $classes[4]])
                 @endif
             </div>
 
             <!-- Tab 5 PF e Tab 6 PJ -->
             <div id="parte_anexos" class="tab-pane container fade"><br>
-                @include('site.userExterno.inc.pre-registro-anexos')
+                @include('site.userExterno.inc.pre-registro-anexos', ['nome_campos' => $codigos[6], 'classe' => $classes[0]])
             </div>
 
         </div>

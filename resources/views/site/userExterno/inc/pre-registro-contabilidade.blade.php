@@ -1,6 +1,6 @@
 @component('components.justificativa_pre_registro', [
     'resultado' => $resultado,
-    'correcoes' => $resultado->getCodigosJustificadosByAba($codigos[0])
+    'correcoes' => $resultado->getCodigosJustificadosByAba($nome_campos)
 ])
 @endcomponent
 
@@ -19,7 +19,7 @@
 
 <div class="form-row mb-3 mt-4">
     <div class="col-sm mb-2-576">
-        <label {{ !auth()->guard('contabil')->check() ? 'for=cnpj_contabil' : '' }}>{{ $codigos[0]['cnpj_contabil'] }} - CNPJ</label> 
+        <label {{ !auth()->guard('contabil')->check() ? 'for=cnpj_contabil' : '' }}>{{ $nome_campos['cnpj_contabil'] }} - CNPJ</label> 
         <small class="text-muted text-left ml-2">
             <em>
                 {{ auth()->guard('contabil')->check() ? 
@@ -27,7 +27,7 @@
             </em>
         </small>
         <input
-            class="{{ $classes[1] }} form-control cnpjInput {{ $errors->has('cnpj_contabil') ? 'is-invalid' : '' }}"
+            class="{{ $classe }} form-control cnpjInput {{ $errors->has('cnpj_contabil') ? 'is-invalid' : '' }}"
             value="{{ empty(old('cnpj_contabil')) && isset($resultado->contabil->cnpj) ? $resultado->contabil->cnpj : old('cnpj_contabil') }}"
             placeholder="00.000.000/0000-00"
         @if(!auth()->guard('contabil')->check())
@@ -49,12 +49,12 @@
 <fieldset id="campos_contabil" {{ isset($resultado->contabil->cnpj) && !$resultado->contabil->possuiLogin() ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="nome_contabil">{{ $codigos[0]['nome_contabil'] }} - Nome da Contabilidade <span class="text-danger">*</span></label>
+            <label for="nome_contabil">{{ $nome_campos['nome_contabil'] }} - Nome da Contabilidade <span class="text-danger">*</span></label>
             <input
                 name="nome_contabil"
                 id="nome_contabil"
                 type="text"
-                class="{{ $classes[1] }} text-uppercase form-control {{ $errors->has('nome_contabil') ? 'is-invalid' : '' }} obrigatorio"
+                class="{{ $classe }} text-uppercase form-control {{ $errors->has('nome_contabil') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('nome_contabil')) && isset($resultado->contabil->nome) ? $resultado->contabil->nome : old('nome_contabil') }}"
                 maxlength="191"
             />
@@ -68,12 +68,12 @@
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="email_contabil">{{ $codigos[0]['email_contabil'] }} - E-mail <span class="text-danger">*</span></label>
+            <label for="email_contabil">{{ $nome_campos['email_contabil'] }} - E-mail <span class="text-danger">*</span></label>
             <input
                 name="email_contabil"
                 id="email_contabil"
                 type="email"
-                class="{{ $classes[1] }} form-control {{ $errors->has('email_contabil') ? 'is-invalid' : '' }} obrigatorio"
+                class="{{ $classe }} form-control {{ $errors->has('email_contabil') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('email_contabil')) && isset($resultado->contabil->email) ? $resultado->contabil->email : old('email_contabil') }}"
                 maxlength="191"
             />
@@ -87,12 +87,12 @@
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="nome_contato_contabil">{{ $codigos[0]['nome_contato_contabil'] }} - Nome de Contato <span class="text-danger">*</span></label>
+            <label for="nome_contato_contabil">{{ $nome_campos['nome_contato_contabil'] }} - Nome de Contato <span class="text-danger">*</span></label>
             <input
                 name="nome_contato_contabil"
                 id="nome_contato_contabil"
                 type="text"
-                class="{{ $classes[1] }} text-uppercase form-control {{ $errors->has('nome_contato_contabil') ? 'is-invalid' : '' }} obrigatorio"
+                class="{{ $classe }} text-uppercase form-control {{ $errors->has('nome_contato_contabil') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('nome_contato_contabil')) && isset($resultado->contabil->nome_contato) ? $resultado->contabil->nome_contato : old('nome_contato_contabil') }}"
                 maxlength="191"
             />
@@ -103,9 +103,9 @@
             @endif
         </div>
         <div class="col-sm mb-2-576">
-            <label for="telefone_contabil">{{ $codigos[0]['telefone_contabil'] }} - Telefone <span class="text-danger">*</span></label>
+            <label for="telefone_contabil">{{ $nome_campos['telefone_contabil'] }} - Telefone <span class="text-danger">*</span></label>
             <input type="text"
-                class="{{ $classes[1] }} form-control telefone2Input {{ $errors->has('telefone_contabil') ? 'is-invalid' : '' }} obrigatorio"
+                class="{{ $classe }} form-control telefone2Input {{ $errors->has('telefone_contabil') ? 'is-invalid' : '' }} obrigatorio"
                 name="telefone_contabil"
                 id="telefone_contabil"
                 value="{{ empty(old('telefone_contabil')) && isset($resultado->contabil->telefone) ? $resultado->contabil->telefone : old('telefone_contabil') }}"

@@ -1,6 +1,6 @@
 @component('components.justificativa_pre_registro', [
     'resultado' => $resultado,
-    'correcoes' => $resultado->getCodigosJustificadosByAba($codigos[5])
+    'correcoes' => $resultado->getCodigosJustificadosByAba($nome_campos)
 ])
 @endcomponent
 
@@ -40,7 +40,7 @@
 
 <!-- Carrega os arquivos do bd com seus botoes de controle -->	
 @if(!\Route::is('externo.verifica.inserir.preregistro'))
-    <label class="mt-3" for="anexos">{{ $codigos[5]['path'] }} - Anexo <span class="text-danger">*</span></label>
+    <label class="mt-3" for="anexos">{{ $nome_campos['path'] }} - Anexo <span class="text-danger">*</span></label>
     @if($resultado->anexos->count() == 0)
 
         @component('components.arquivosBD', [
@@ -81,7 +81,7 @@
     @if($resultado->userPodeEditar())
         @component('components.arquivos_form', [
             'nome' => 'anexo', 
-            'classes' => $classes[0],
+            'classes' => $classe,
             'errors' => $errors,
             'accept' => 'application/pdf,image/jpeg,image/png',
             'multiple' => true,

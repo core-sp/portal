@@ -4,7 +4,7 @@
 
 <div class="card-body bg-light">
     <p id="cnpj_contabil">
-        <span class="font-weight-bolder">{{ $codigos[0]['cnpj_contabil'] }} - CNPJ: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['cnpj_contabil'] }} - CNPJ: </span>
         {{ isset($resultado->contabil->cnpj) ? formataCpfCnpj($resultado->contabil->cnpj) : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -17,7 +17,7 @@
     </p>
 
     <p id="nome_contabil">
-        <span class="font-weight-bolder">{{ $codigos[0]['nome_contabil'] }} - Nome da contabilidade: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['nome_contabil'] }} - Nome da contabilidade: </span>
         {{ isset($resultado->contabil->nome) ? $resultado->contabil->nome : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -30,7 +30,7 @@
     </p>
 
     <p id="email_contabil">
-        <span class="font-weight-bolder">{{ $codigos[0]['email_contabil'] }} - E-mail da contabilidade: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['email_contabil'] }} - E-mail da contabilidade: </span>
         {{ isset($resultado->contabil->email) ? $resultado->contabil->email : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -43,7 +43,7 @@
     </p>
 
     <p id="nome_contato_contabil">
-        <span class="font-weight-bolder">{{ $codigos[0]['nome_contato_contabil'] }} - Nome de contato da contabilidade: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['nome_contato_contabil'] }} - Nome de contato da contabilidade: </span>
         {{ isset($resultado->contabil->nome_contato) ? $resultado->contabil->nome_contato : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -56,7 +56,7 @@
     </p>
 
     <p id="telefone_contabil">
-        <span class="font-weight-bolder">{{ $codigos[0]['telefone_contabil'] }} - Telefone da contabilidade: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['telefone_contabil'] }} - Telefone da contabilidade: </span>
         {{ isset($resultado->contabil->telefone) ? $resultado->contabil->telefone : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,

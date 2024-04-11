@@ -15,6 +15,7 @@ trait PreRegistroApoio {
     private $relation_pj = "pessoaJuridica";
     private $relation_pre_registro = "preRegistro";
     private $relation_rt = "pessoaJuridica.responsavelTecnico";
+    private $relation_socio = "pessoaJuridica.socios";
 
     private function criarAjax($relacao, $campo, $valor, $gerenti)
     {
@@ -90,6 +91,7 @@ trait PreRegistroApoio {
             'App\PreRegistroCnpj' => $this->relation_pj,
             'App\PreRegistro' => $this->relation_pre_registro,
             'App\ResponsavelTecnico' => $this->relation_rt,
+            'App\Socio' => $this->relation_socio,
         ];
     }
 
@@ -106,6 +108,7 @@ trait PreRegistroApoio {
             $dadosGerais . ',segmento,idregional,pergunta',
             'cep,bairro,logradouro,numero,complemento,cidade,uf,checkEndEmpresa,cep_empresa,bairro_empresa,logradouro_empresa,numero_empresa,complemento_empresa,cidade_empresa,uf_empresa',
             'cpf_rt,registro,nome_rt,nome_social_rt,dt_nascimento_rt,sexo_rt,tipo_identidade_rt,identidade_rt,orgao_emissor_rt,dt_expedicao_rt,titulo_eleitor_rt,zona_rt,secao_rt,ra_reservista_rt,cep_rt,bairro_rt,logradouro_rt,numero_rt,complemento_rt,cidade_rt,uf_rt,nome_mae_rt,nome_pai_rt',
+            'cpf_cnpj_socio,registro_socio,nome_socio,nome_social_socio,dt_nascimento_socio,identidade_socio,orgao_emissor_socio,cep_socio,bairro_socio,logradouro_socio,numero_socio,complemento_socio,cidade_socio,uf_socio,nome_mae_socio,nome_pai_socio,nacionalidade_socio,naturalidade_estado_socio',
             'tipo_telefone,telefone,opcional_celular,tipo_telefone_1,telefone_1,opcional_celular_1',
             'path',
         ];
@@ -113,7 +116,7 @@ trait PreRegistroApoio {
 
     public function getMenu()
     {
-        return explode(',', 'Contabilidade,Dados Gerais,Endereço,Contato / RT,Canal de Relacionamento,Anexos');
+        return explode(',', 'Contabilidade,Dados Gerais,Endereço,Contato / RT,Sócios,Canal de Relacionamento,Anexos');
     }
 
     public function getCodigos($classe)
@@ -139,6 +142,9 @@ trait PreRegistroApoio {
                 break;
             case $this->relation_rt:
                 $siglas = '_rt';
+                break;
+            case $this->relation_socio:
+                $siglas = '_socio';
                 break;
             default:
                 $siglas = null;
@@ -203,7 +209,8 @@ trait PreRegistroApoio {
             $this->relation_pre_registro => 'segmento,idregional,cep,bairro,logradouro,numero,complemento,cidade,uf,tipo_telefone,telefone,opcional_celular,tipo_telefone_1,telefone_1,opcional_celular_1,pergunta',
             $this->relation_pf => 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade_cidade,naturalidade_estado,nome_mae,nome_pai,tipo_identidade,identidade,orgao_emissor,dt_expedicao,titulo_eleitor,zona,secao,ra_reservista',
             $this->relation_pj => 'razao_social,nome_fantasia,capital_social,nire,tipo_empresa,dt_inicio_atividade,checkEndEmpresa,cep_empresa,bairro_empresa,logradouro_empresa,numero_empresa,complemento_empresa,cidade_empresa,uf_empresa',
-            $this->relation_rt => 'nome_rt,nome_social_rt,sexo_rt,dt_nascimento_rt,cpf_rt,tipo_identidade_rt,identidade_rt,orgao_emissor_rt,dt_expedicao_rt,titulo_eleitor_rt,zona_rt,secao_rt,ra_reservista_rt,cep_rt,bairro_rt,logradouro_rt,numero_rt,complemento_rt,cidade_rt,uf_rt,nome_mae_rt,nome_pai_rt'
+            $this->relation_rt => 'nome_rt,nome_social_rt,sexo_rt,dt_nascimento_rt,cpf_rt,tipo_identidade_rt,identidade_rt,orgao_emissor_rt,dt_expedicao_rt,titulo_eleitor_rt,zona_rt,secao_rt,ra_reservista_rt,cep_rt,bairro_rt,logradouro_rt,numero_rt,complemento_rt,cidade_rt,uf_rt,nome_mae_rt,nome_pai_rt',
+            $this->relation_socio => 'cpf_cnpj_socio,registro_socio,nome_socio,nome_social_socio,dt_nascimento_socio,identidade_socio,orgao_emissor_socio,cep_socio,bairro_socio,logradouro_socio,numero_socio,complemento_socio,cidade_socio,uf_socio,nome_mae_socio,nome_pai_socio,nacionalidade_socio,naturalidade_estado_socio',
         ];
     }
 
@@ -219,6 +226,7 @@ trait PreRegistroApoio {
             $this->relation_contabil => explode(',', $camposView[$this->relation_contabil]),
             $this->relation_pj => explode(',', $camposView[$this->relation_pj]),
             $this->relation_rt => explode(',', $camposView[$this->relation_rt]),
+            $this->relation_socio => explode(',', $camposView[$this->relation_socio]),
         ];
     }
 

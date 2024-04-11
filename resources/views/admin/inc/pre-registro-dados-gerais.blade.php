@@ -15,7 +15,7 @@
     </p>
 
     <p id="nome_social">
-        <span class="font-weight-bolder">{{ $codigos[1]['nome_social'] }} - Nome Social: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['nome_social'] }} - Nome Social: </span>
         {{ isset($resultado->pessoaFisica->nome_social) ? $resultado->pessoaFisica->nome_social : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -28,7 +28,7 @@
     </p>
 
     <p id="sexo">
-        <span class="font-weight-bolder">{{ $codigos[1]['sexo'] }} - Gênero: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['sexo'] }} - Gênero: </span>
         {{ isset($resultado->pessoaFisica->sexo) ? generos()[$resultado->pessoaFisica->sexo] : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -41,7 +41,7 @@
     </p>
 
     <p id="dt_nascimento">
-        <span class="font-weight-bolder">{{ $codigos[1]['dt_nascimento'] }} - Data de Nascimento: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['dt_nascimento'] }} - Data de Nascimento: </span>
         {{ isset($resultado->pessoaFisica->dt_nascimento) ? onlyDate($resultado->pessoaFisica->dt_nascimento) : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -54,7 +54,7 @@
     </p>
 
     <p id="estado_civil">
-        <span class="font-weight-bolder">{{ $codigos[1]['estado_civil'] }} - Estado Civil: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['estado_civil'] }} - Estado Civil: </span>
         {{ isset($resultado->pessoaFisica->estado_civil) ? $resultado->pessoaFisica->estado_civil : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -67,7 +67,7 @@
     </p>
 
     <p id="nacionalidade">
-        <span class="font-weight-bolder">{{ $codigos[1]['nacionalidade'] }} - Nacionalidade: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['nacionalidade'] }} - Nacionalidade: </span>
         {{ isset($resultado->pessoaFisica->nacionalidade) ? $resultado->pessoaFisica->nacionalidade : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -80,7 +80,7 @@
     </p>
 
     <p id="naturalidade_cidade">
-        <span class="font-weight-bolder">{{ $codigos[1]['naturalidade_cidade'] }} - Naturalidade - Cidade: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['naturalidade_cidade'] }} - Naturalidade - Cidade: </span>
         {{ isset($resultado->pessoaFisica->naturalidade_cidade) ? $resultado->pessoaFisica->naturalidade_cidade : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -93,7 +93,7 @@
     </p>
 
     <p id="naturalidade_estado">
-        <span class="font-weight-bolder">{{ $codigos[1]['naturalidade_estado'] }} - Naturalidade - Estado: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['naturalidade_estado'] }} - Naturalidade - Estado: </span>
         {{ isset($resultado->pessoaFisica->naturalidade_estado) ? $resultado->pessoaFisica->naturalidade_estado : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -106,7 +106,7 @@
     </p>
 
     <p id="nome_mae">
-        <span class="font-weight-bolder">{{ $codigos[1]['nome_mae'] }} - Nome da Mãe: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['nome_mae'] }} - Nome da Mãe: </span>
         {{ isset($resultado->pessoaFisica->nome_mae) ? $resultado->pessoaFisica->nome_mae : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -119,7 +119,7 @@
     </p>
 
     <p id="nome_pai">
-        <span class="font-weight-bolder">{{ $codigos[1]['nome_pai'] }} - Nome do Pai: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['nome_pai'] }} - Nome do Pai: </span>
         {{ isset($resultado->pessoaFisica->nome_pai) ? $resultado->pessoaFisica->nome_pai : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -132,7 +132,7 @@
     </p>
 
     <p id="tipo_identidade">
-        <span class="font-weight-bolder">{{ $codigos[1]['tipo_identidade'] }} - Tipo do documento de identidade: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['tipo_identidade'] }} - Tipo do documento de identidade: </span>
         {{ isset($resultado->pessoaFisica->tipo_identidade) ? $resultado->pessoaFisica->tipo_identidade : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -145,7 +145,7 @@
     </p>
 
     <p id="identidade">
-        <span class="font-weight-bolder">{{ $codigos[1]['identidade'] }} - N° do documento de identidade: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['identidade'] }} - N° do documento de identidade: </span>
         {{ isset($resultado->pessoaFisica->identidade) ? $resultado->pessoaFisica->identidade : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -158,7 +158,7 @@
     </p>
 
     <p id="orgao_emissor">
-        <span class="font-weight-bolder">{{ $codigos[1]['orgao_emissor'] }} - Órgão Emissor: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['orgao_emissor'] }} - Órgão Emissor: </span>
         {{ isset($resultado->pessoaFisica->orgao_emissor) ? $resultado->pessoaFisica->orgao_emissor : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -171,7 +171,7 @@
     </p>
 
     <p id="dt_expedicao">
-        <span class="font-weight-bolder">{{ $codigos[1]['dt_expedicao'] }} - Data de Expedição: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['dt_expedicao'] }} - Data de Expedição: </span>
         {{ isset($resultado->pessoaFisica->dt_expedicao) ? onlyDate($resultado->pessoaFisica->dt_expedicao) : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -184,7 +184,7 @@
     </p>
 
     <p id="titulo_eleitor">
-        <span class="font-weight-bolder">{{ $codigos[1]['titulo_eleitor'] }} - Título de Eleitor: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['titulo_eleitor'] }} - Título de Eleitor: </span>
         {{ isset($resultado->pessoaFisica->titulo_eleitor) ? $resultado->pessoaFisica->titulo_eleitor : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -197,7 +197,7 @@
     </p>
 
     <p id="zona">
-        <span class="font-weight-bolder">{{ $codigos[1]['zona'] }} - Zona Eleitoral: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['zona'] }} - Zona Eleitoral: </span>
         {{ isset($resultado->pessoaFisica->zona) ? $resultado->pessoaFisica->zona : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -210,7 +210,7 @@
     </p>
 
     <p id="secao">
-        <span class="font-weight-bolder">{{ $codigos[1]['secao'] }} - Seção Eleitoral: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['secao'] }} - Seção Eleitoral: </span>
         {{ isset($resultado->pessoaFisica->secao) ? $resultado->pessoaFisica->secao : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -223,7 +223,7 @@
     </p>
 
     <p id="ra_reservista">
-        <span class="font-weight-bolder">{{ $codigos[1]['ra_reservista'] }} - RA Reservista: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['ra_reservista'] }} - RA Reservista: </span>
         {{ isset($resultado->pessoaFisica->ra_reservista) ? $resultado->pessoaFisica->ra_reservista : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -238,7 +238,7 @@
 @else
 
     <p id="razao_social">
-        <span class="font-weight-bolder">{{ $codigos[1]['razao_social'] }} - Razão Social: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['razao_social'] }} - Razão Social: </span>
         {{ isset($resultado->pessoaJuridica->razao_social) ? $resultado->pessoaJuridica->razao_social : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -251,7 +251,7 @@
     </p>
 
     <p id="nome_fantasia">
-        <span class="font-weight-bolder">{{ $codigos[1]['nome_fantasia'] }} - Nome Fantasia: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['nome_fantasia'] }} - Nome Fantasia: </span>
         {{ isset($resultado->pessoaJuridica->nome_fantasia) ? $resultado->pessoaJuridica->nome_fantasia : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -264,7 +264,7 @@
     </p>
 
     <p id="capital_social">
-        <span class="font-weight-bolder">{{ $codigos[1]['capital_social'] }} - Capital Social: R$ </span>
+        <span class="font-weight-bolder">{{ $nome_campos['capital_social'] }} - Capital Social: R$ </span>
         {{ isset($resultado->pessoaJuridica->capital_social) ? $resultado->pessoaJuridica->capital_social : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -277,7 +277,7 @@
     </p>
 
     <p id="nire">
-        <span class="font-weight-bolder">{{ $codigos[1]['nire'] }} - NIRE: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['nire'] }} - NIRE: </span>
         {{ isset($resultado->pessoaJuridica->nire) ? $resultado->pessoaJuridica->nire : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -290,7 +290,7 @@
     </p>
 
     <p id="tipo_empresa">
-        <span class="font-weight-bolder">{{ $codigos[1]['tipo_empresa'] }} - Tipo da Empresa: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['tipo_empresa'] }} - Tipo da Empresa: </span>
         {{ isset($resultado->pessoaJuridica->tipo_empresa) ? $resultado->pessoaJuridica->tipo_empresa : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -303,7 +303,7 @@
     </p>
 
     <p id="dt_inicio_atividade">
-        <span class="font-weight-bolder">{{ $codigos[1]['dt_inicio_atividade'] }} - Data início da atividade: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['dt_inicio_atividade'] }} - Data início da atividade: </span>
         {{ isset($resultado->pessoaJuridica->dt_inicio_atividade) ? onlyDate($resultado->pessoaJuridica->dt_inicio_atividade) : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -319,7 +319,7 @@
 @endif
 
     <p id="segmento">
-        <span class="font-weight-bolder">{{ $codigos[1]['segmento'] }} - Segmento: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['segmento'] }} - Segmento: </span>
         {{ isset($resultado->segmento) ? $resultado->segmento : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
@@ -332,7 +332,7 @@
     </p>
 
     <p id="idregional">
-        <span class="font-weight-bolder">{{ $codigos[1]['idregional'] }} - Região de Atuação: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['idregional'] }} - Região de Atuação: </span>
         {{ isset($resultado->idregional) ? $resultado->regional->regional : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
