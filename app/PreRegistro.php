@@ -576,12 +576,13 @@ class PreRegistro extends Model
     {
         $classe = $request['classe'];
         $request['campo'] = $this->limparNomeCamposAjax($request['classe'], $request['campo']);
-        $gerenti = $this->getRTGerenti($request['classe'], $gerentiRepository, $request['campo'] == 'cpf' ? $request['valor'] : '');
+        $cpf_cnpj = (is_array($request['campo']) && ($request['campo'][1] == 'cpf_cnpj')) || (!is_array($request['campo']) && ($request['campo'] == 'cpf')) ? $request['valor'] : '';
+        $gerenti = $this->getRTGerenti($request['classe'], $gerentiRepository, $cpf_cnpj);
         $campo = $request['campo'];
         $valor = $request['valor'];
 
-        if(($classe != $this->getNomeClasses()[0]) && ($classe != $this->getNomeClasses()[4]))
-            return !$this->has($classe)->where('id', $this->id)->exists() ? $this->criarAjax($classe, $campo, $valor, $gerenti) : $this->atualizarAjax($classe, $campo, $valor, $gerenti);
+        if((($classe == $this->getNomeClasses()[6]) && is_array($campo)) || (($classe != $this->getNomeClasses()[0]) && ($classe != $this->getNomeClasses()[4])))
+            return (is_array($campo) && ($campo[0] == 0)) || !$this->has($classe)->where('id', $this->id)->exists() ? $this->criarAjax($classe, $campo, $valor, $gerenti) : $this->atualizarAjax($classe, $campo, $valor, $gerenti);
 
         if($classe == $this->getNomeClasses()[4])
             return $this->atualizarAjax($classe, $campo, $valor, $gerenti);

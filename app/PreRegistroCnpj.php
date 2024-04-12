@@ -15,14 +15,20 @@ class PreRegistroCnpj extends Model
     protected $touches = ['preRegistro'];
 
     const TOTAL_HIST = 1;
+    const TOTAL_HIST_SOCIO = 10;
 
-    private function horaUpdateHistorico()
+    private function horaUpdateHistorico($classe = null)
     {
-        $update = $this->getHistoricoArray()['update'];
+        $update = $this->getHistoricoArray($classe)['update'];
         $updateCarbon = Carbon::createFromFormat('Y-m-d H:i:s', $update);
-        $updateCarbon->addDay();
 
-        return $updateCarbon;
+        switch ($classe) {
+            case 'App\Socio':
+                return $updateCarbon->addDays(2);
+                break;
+            default:
+                return $updateCarbon->addDay();
+        }
     }
 
     private function validarUpdateAjax($campo, $valor)
@@ -71,7 +77,7 @@ class PreRegistroCnpj extends Model
 
     public function socios()
     {
-        return $this->belongsToMany('App\Socio', 'socio_pre_registro_cnpj', 'pre_registro_cnpj_id', 'socio_id')->withPivot('historico_socio');
+        return $this->belongsToMany('App\Socio', 'socio_pre_registro_cnpj', 'pre_registro_cnpj_id', 'socio_id');
     }
 
     public function canUpdateStatus()
@@ -79,29 +85,49 @@ class PreRegistroCnpj extends Model
         return isset($this->responsavelTecnico->registro) && (strlen($this->responsavelTecnico->registro) > 4);
     }
 
-    public function getHistoricoCanEdit()
+    public function getHistoricoCanEdit($classe = null)
     {
-        $array = $this->getHistoricoArray();
-        $can = intval($array['tentativas']) < self::TOTAL_HIST;
-        $horaUpdate = $this->horaUpdateHistorico();
+        $array = $this->getHistoricoArray($classe);
+        switch ($classe) {
+            case 'App\Socio':
+                $can = intval($array['tentativas']) < self::TOTAL_HIST_SOCIO;
+                break;
+            default:
+                $can = intval($array['tentativas']) < self::TOTAL_HIST;
+        }
+        
+        $horaUpdate = $this->horaUpdateHistorico($classe);
 
         return $can || (!$can && ($horaUpdate < now()));
     }
 
-    public function getHistoricoArray()
+    public function getHistoricoArray($classe = null)
     {
-        return $this->fromJson(isset($this->historico_rt) ? $this->historico_rt : array());
+        switch ($classe) {
+            case 'App\Socio':
+                return $this->fromJson(isset($this->historico_socio) ? $this->historico_socio : array());
+                break;
+            default:
+                return $this->fromJson(isset($this->historico_rt) ? $this->historico_rt : array());
+        }
     }
 
-    public function getNextUpdateHistorico()
+    public function getNextUpdateHistorico($classe = null)
     {
-        return $this->horaUpdateHistorico()->format('d\/m\/Y, \à\s H:i');
+        return $this->horaUpdateHistorico($classe)->format('d\/m\/Y, \à\s H:i');
     }
 
-    public function setHistorico()
+    public function setHistorico($classe = null)
     {
-        $array = $this->getHistoricoArray();
-        $totalTentativas = intval($array['tentativas']) < self::TOTAL_HIST;
+        $array = $this->getHistoricoArray($classe);
+
+        switch ($classe) {
+            case 'App\Socio':
+                $totalTentativas = intval($array['tentativas']) < self::TOTAL_HIST_SOCIO;
+                break;
+            default:
+                $totalTentativas = intval($array['tentativas']) < self::TOTAL_HIST;
+        }
 
         if($totalTentativas)
             $array['tentativas'] = intval($array['tentativas']) + 1;

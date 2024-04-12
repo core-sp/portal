@@ -91,7 +91,10 @@ class UserExterno extends Authenticatable
         if(!$this->isPessoaFisica())
         {
             $pj = $resultado->pessoaJuridica()->create();
-            $pj->update(['historico_rt' => $this->asJson(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')])]);
+            $pj->update([
+                'historico_rt' => $this->asJson(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')]),
+                'historico_socio' => $this->asJson(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')])
+            ]);
         }else
             $resultado->pessoaFisica()->create();
         $resultado->update([

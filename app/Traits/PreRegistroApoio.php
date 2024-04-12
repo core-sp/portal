@@ -25,6 +25,9 @@ trait PreRegistroApoio {
             case $this->relation_rt:
                 return $classe::criarFinal($campo, $valor, $gerenti, $this);
                 break;
+            case $this->relation_socio:
+                return !is_array($campo) || ($campo[0] > 0) ? null : $classe::criarFinal($campo[1], $valor, $gerenti, $this);
+                break;
             case $this->relation_contabil:
             case $this->relation_anexos:
                 return $classe::criarFinal($campo, $valor, $this);
@@ -50,6 +53,13 @@ trait PreRegistroApoio {
             case $this->relation_rt:
                 $pj = $this->loadMissing($classe)->pessoaJuridica;
                 return $pj->responsavelTecnico->atualizarFinal($campo, $valor, $gerenti, $pj);
+                break;
+            case $this->relation_socio:
+                $pj = $this->loadMissing($classe)->pessoaJuridica;
+                $socio = $pj->socios->where('id', $campo[0])->first();
+                if(!isset($socio))
+                    throw new \Exception('Não há sócio com a ID '. $campo[0] . ' relacionado com o pré-registro de ID ' . $this->id . '.', 404);
+                return $socio->atualizarFinal($campo[1], $valor, $gerenti, $pj);
                 break;
             default:
                 return null;
@@ -153,6 +163,11 @@ trait PreRegistroApoio {
         foreach($campos as $key => $cp)
         {
             $temp = $cp . $siglas;
+            if(is_array($campo) && (($campo[1] == $cp) || ($campo[1] == $temp)))
+                return [
+                    $campo[0], $campos[$key]
+                ];
+
             if(($campo == $cp) || ($campo == $temp))
                 return $campos[$key];
         }

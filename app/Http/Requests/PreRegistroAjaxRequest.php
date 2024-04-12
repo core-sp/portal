@@ -118,6 +118,21 @@ class PreRegistroAjaxRequest extends FormRequest
             $this->merge([
                 'valor' => mb_strtoupper($this->valor, 'UTF-8')
             ]);
+
+        // Sócios
+        $this->merge([
+            'id_socio' => ($this->campo == 'cpf_cnpj_socio') && (strlen($this->valor) >= 11) ? 0 : 1// temp,
+        ]);
+
+        if((strpos($this->campo, '_socio') !== false) && !isset($this->id_socio))
+            $this->merge([
+                'campo' => null,
+            ]);
+
+        if(strpos($this->campo, '_socio') !== false)
+            $this->merge([
+                'campo' => [$this->id_socio, $this->campo],
+            ]);
     }
 
     public function rules()
@@ -129,6 +144,13 @@ class PreRegistroAjaxRequest extends FormRequest
                 'campo' => 'required|in:'.$this->todos,
                 'classe' => 'required|in:'.$this->classes,
                 'total' => 'required',
+            ];
+
+        if(is_array($this->campo))
+            return [
+                'valor' => $this->regraValor,
+                'campo.*' => 'required|in:'.$this->todos . ',' . $this->campo[0],
+                'classe' => 'required|in:'.$this->classes,
             ];
 
         return [

@@ -29,6 +29,7 @@ class CreatePreRegistrosCnpjTable extends Migration
             $table->string('cidade')->nullable();
             $table->char('uf', 2)->nullable();
             $table->string('historico_rt')->nullable();
+            $table->string('historico_socio')->nullable();
             $table->bigInteger('responsavel_tecnico_id')->unsigned()->nullable();
             $table->foreign('responsavel_tecnico_id')->references('id')->on('responsaveis_tecnicos');
             $table->bigInteger('pre_registro_id')->unsigned();
