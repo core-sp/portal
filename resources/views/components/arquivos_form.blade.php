@@ -27,27 +27,3 @@
         </div>
     </div>
 </div>
-
-<!-- The Modal -->
-<div class="modal fade" id="modalExcluirFile">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <!-- Modal Header -->
-            <div class="modal-header">
-                <h4 class="modal-title"><i class="fas fa-trash-alt text-danger"></i> Excluir Arquivo</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            
-            <!-- Modal body -->
-            <div class="modal-body">
-                Tem certeza que deseja excluir o anexo: <strong><span id="textoExcluir" data-clarity-mask="True"></span></strong>?
-            </div>
-            
-            <!-- Modal footer -->
-            <div class="modal-footer">
-                <button type="button" class="Arquivo-Excluir btn btn-danger" value="">Sim</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-            </div>
-        </div>
-    </div>
-</div>

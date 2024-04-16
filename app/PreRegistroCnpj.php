@@ -77,12 +77,22 @@ class PreRegistroCnpj extends Model
 
     public function socios()
     {
-        return $this->belongsToMany('App\Socio', 'socio_pre_registro_cnpj', 'pre_registro_cnpj_id', 'socio_id');
+        return $this->belongsToMany('App\Socio', 'socio_pre_registro_cnpj', 'pre_registro_cnpj_id', 'socio_id')->withTimestamps();
+    }
+
+    public function podeCriarSocio()
+    {
+        return $this->socios->count() < self::TOTAL_HIST_SOCIO;
     }
 
     public function canUpdateStatus()
     {
         return isset($this->responsavelTecnico->registro) && (strlen($this->responsavelTecnico->registro) > 4);
+    }
+
+    public function possuiSocio()
+    {
+        return isset($this->socios) && $this->socios->isNotEmpty();
     }
 
     public function getHistoricoCanEdit($classe = null)

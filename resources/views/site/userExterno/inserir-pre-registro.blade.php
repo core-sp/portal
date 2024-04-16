@@ -304,6 +304,30 @@
     </div>
 </div>
 
+<!-- The Modal -->
+<div class="modal fade" id="modalExcluir">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fas fa-trash-alt text-danger"></i> Excluir <span id="completa-titulo-excluir"></span></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="modal-body">
+                Tem certeza que deseja excluir <span id="completa-texto-excluir"></span>: <strong><span id="textoExcluir" data-clarity-mask="True"></span></strong>?
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" id="excluir-geral" class="Arquivo-Excluir btn btn-danger" value="">Sim</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="col d-flex justify-content-between mt-2 pl-0 pr-0">
     <small class="text-muted text-left">
         <em><span class="text-danger font-weight-bolder">*</span> Preencha todos os campos obrigatórios</em>

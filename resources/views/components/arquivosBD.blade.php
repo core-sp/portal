@@ -22,7 +22,7 @@
                     value="{{ $id }}"
                     type="button" 
                     data-toggle="modal"
-                    data-target="#modalExcluirFile"
+                    data-target="#modalExcluir"
                     data-backdrop="static"
                 >
                     <i class="fas fa-trash-alt"></i>

@@ -1391,6 +1391,11 @@ function putDadosPreRegistro(objeto)
 	if((campo == "") || (classe == ""))
 		return;
 
+	if(classe == 'Socio-Excluir'){
+		classe = 'pessoaJuridica.socios';
+		campo = 'cpf_cnpj_socio';
+	}
+
 	if(classe == 'Arquivo-Excluir')
 		dados = {
 			'_method': 'delete',
@@ -1398,6 +1403,7 @@ function putDadosPreRegistro(objeto)
 		};
 	else
 		dados = {
+			'id_socio': classe == 'pessoaJuridica.socios' ? $('#form_socio [name="id_socio"]').val() : null,
 			'classe': classe,
 			'campo': campo,
 			'valor': valor
@@ -1435,12 +1441,19 @@ function putDadosPreRegistro(objeto)
 				preencheFile(response['resultado']);
 			if(classe == 'Arquivo-Excluir')
 				removeFile(response['resultado']);
+			if(classe == 'pessoaJuridica.socios'){
+				removeSocio(response['resultado'], $('#form_socio [name="id_socio"]').val());
+				preencheSocio(response['resultado']);
+			}
 			removerMsgErroServer(objeto, campo);
 			$('#atualizacaoPreRegistro').text(response['dt_atualizado']);
 			valorPreRegistro = valor;
 			// confereObrigatorios();
 		},
 		error: function(request, status, error) {
+			if(campo == 'cpf_cnpj_socio')
+				$('#mostrar_socios').click();
+
 			var errorFunction = getErrorMsg(request);
 			$("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + errorFunction[0]);
 			$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
@@ -1482,11 +1495,11 @@ function getErrorMsg(request)
 			if(msg != undefined)
 				errorMessage = msg[0];
 		}
-		time = 2000;
+		time = 3000;
 	}
 	if(request.status == 401){
 		errorMessage = request.responseJSON.message;
-		time = 2000;
+		time = 3000;
 	}
 	if(request.status == 419){
 		errorMessage = "Sua sessão expirou! Recarregue a página";
@@ -1587,6 +1600,46 @@ function removeFile(dados)
 	}
 }
 
+function atualizaOrdemSocios(){
+	$('#acoes_socio .ordem-socio').each(function(index){
+		var count = index + 1;
+		$(this).text(count);
+	});
+}
+
+function removeSocio(dados, id)
+{
+	if(dados == 'remover'){
+		$('#acoes_socio #socio_' + id + '_box').remove();
+		atualizaOrdemSocios();
+	}
+}
+
+function preencheSocio(dados)
+{
+	if(_.has(dados,"update") || _.has(dados,"existente") || _.has(dados,"limite")){
+		var texto = _.has(dados,"update") ? "Somente pode trocar o CPF/CNPJ novamente dia: <br>" + dados.update : dados.existente;
+		texto = _.has(dados,"limite") ? dados.limite : texto;
+
+		$("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + texto);
+		$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
+		$('#mostrar_socios').click();
+		setTimeout(function() {
+			$("#modalLoadingPreRegistro").modal('hide');
+		}, 3000);
+	}else if(_.has(dados,"tab") && ($('#inserirRegistro input[name="cpf_cnpj_socio"]').val() != "")){
+		$('#inserirRegistro input[name="cpf_cnpj_socio"]').prop('disabled', true);
+		$('#acoes_socio').append(dados.tab);
+		$('#acoes_socio .editar_socio:last').click();
+	}else if(_.has(dados,"atualizado")){
+		removeSocio('remover', dados.id);
+		$('#acoes_socio').append(dados.atualizado);
+	}
+
+	var limite = $('#acoes_socio .ordem-socio').length >= parseInt($('#limite-socios').text());
+	$('#criar_socio').prop('disabled', limite);
+}
+
 async function callbackEnderecoPreRegistro(restoId)
 {
 	var dadosAntigos = [$("#rua_" + restoId).val(), $("#bairro_" + restoId).val(), $("#cidade_" + restoId).val(), $("#uf_" + restoId).val()];
@@ -1664,6 +1717,11 @@ function disabledOptionsSelect(name, valor)
 		$('#inserirRegistro #opcoesCelular_1').prop("disabled", false);
 }
 
+function desabilitaNatSocio(){
+	var desabilita = ($('#nacionalidade_socio').val() != 'Brasileira') && ($('#nacionalidade_socio').val() != '');
+	$('select[name="naturalidade_estado_socio"]').prop("disabled", desabilita);
+}
+
 function changeLabelIdentidade(objeto)
 {
 	if((objeto.attr('name') == 'tipo_identidade') || (objeto.attr('name') == 'tipo_identidade_rt')){
@@ -1681,6 +1739,50 @@ function changeLabelIdentidade(objeto)
 
 function getFullNameFile(item) {
 	return [item.name] + ', ';
+}
+
+function limparFormSocio(){
+	$('#form_socio [name$="_socio"]').each(function(){
+		this.tagName != "SELECT" ? this.value = "" : this.selectedIndex = 0;
+	});
+}
+
+function criarFormSocio(){
+	$('#cpf_cnpj_socio').prop("disabled", false);
+	$('#campos_socio').prop("disabled", true);
+	$('.esconder-campo-socio').show();
+}
+
+function editarFormSocio(objeto){
+	$('#cpf_cnpj_socio').prop("disabled", true);
+	$('#campos_socio').prop("disabled", false);
+	objeto.find('.editar_dado').each(function(){
+		var nome = '#form_socio [name="' + this.classList[0] + '"]';
+		var texto = $(this).text();
+
+		if((texto != '-----') && ($(nome).length > 0)){
+			if(['text', 'date', 'hidden'].indexOf($(nome).attr('type')) >= 0)
+				$(nome).val(texto);
+			else
+				['naturalidade_estado_socio', 'uf_socio'].indexOf(this.classList[0]) >= 0 ? $(nome + ' option[value="' + texto + '"]').prop('selected', true) : 
+				$(nome + ' option:contains("' + texto + '"):first').prop('selected', true);
+		}
+	});
+
+	desabilitaNatSocio();
+	$('#form_socio [name="cpf_cnpj_socio"]').val().length > 14 ? $('.esconder-campo-socio').hide() : $('.esconder-campo-socio').show();
+
+}
+
+function modalExcluirPR(id, conteudo, titulo_exclusao, texto_tipo_exclusao){
+	var novo = titulo_exclusao == "Sócio" ? "Socio-Excluir" : "Arquivo-Excluir";
+	var trocar = titulo_exclusao == "Sócio" ? "Arquivo-Excluir" : "Socio-Excluir";
+	$('#modalExcluir #completa-texto-excluir').text(texto_tipo_exclusao);
+	$('#modalExcluir #completa-titulo-excluir').text(titulo_exclusao);
+	$('#modalExcluir #excluir-geral').val(id);
+	$('#modalExcluir #textoExcluir').text(conteudo);
+	const classes = $('#modalExcluir #excluir-geral')[0].classList;
+	classes.replace(trocar, novo);
 }
 
 $('#inserirPreRegistro').ready(function(){
@@ -1720,13 +1822,12 @@ $("#checkEndEmpresa").change(function(){
 $('#inserirRegistro .modalExcluir').click(function(){
 	var id = $(this).val();
 	var texto = $(this).parent().parent().find("input").val();
-	$('#inserirRegistro .Arquivo-Excluir').val(id);
-	$('#inserirRegistro #textoExcluir').text(texto);
+	modalExcluirPR(id, texto, "Arquivo", "o anexo");
 });
 
-$('#inserirRegistro .Arquivo-Excluir').click(function(){
+$('#modalExcluir #excluir-geral').click(function(e){
 	putDadosPreRegistro($(this));
-	$('#inserirRegistro #modalExcluirFile').modal('hide');
+	$('#modalExcluir').modal('hide');
 });
 
 // gerencia os arquivos, cria os inputs, remove os inputs, controla as quantidades de inputs e files vindo do bd
@@ -1782,11 +1883,11 @@ $('#inserirRegistro input:not(:checkbox,:file)').focus(function(){
 	valorPreRegistro = $(this).val();
 });
 
-$('#inserirRegistro input[name="cpf_rt"], #inserirRegistro input[name="cnpj_contabil"]').on('keyup', function(){
+$('#inserirRegistro input[name="cpf_rt"], #inserirRegistro input[name="cnpj_contabil"], #inserirRegistro input[name="cpf_cnpj_socio"]').on('keyup', function(){
 	var objeto = $(this);
-	var vazio = objeto.val() == "";
-	var validaCpf = (objeto.attr('name') == 'cpf_rt') && (objeto.val().length == 14);
-	var validaCnpj = (objeto.attr('name') == 'cnpj_contabil') && (objeto.val().length == 18);
+	var vazio = (objeto.attr('name') != 'cpf_cnpj_socio') && (objeto.val() == "");
+	var validaCpf = (['cpf_rt'].indexOf(objeto.attr('name')) >= 0) && (objeto.val().length == 14);
+	var validaCnpj = (['cnpj_contabil', 'cpf_cnpj_socio'].indexOf(objeto.attr('name')) >= 0) && (objeto.val().length == 18);
 	var diferente = valorPreRegistro != $(this).val();
 
 	if(diferente && (validaCpf || validaCnpj || vazio)){
@@ -1799,8 +1900,12 @@ $('#inserirRegistro input[name="cpf_rt"], #inserirRegistro input[name="cnpj_cont
 
 $('#inserirRegistro input:not(:checkbox,:file,[name="cpf_rt"],[name="cnpj_contabil"])').blur(function(){
 	var name = $(this).attr('name');
+
+	if((name == 'cpf_cnpj_socio') && ($(this).val().length < 14))
+		return;
+
 	if(valorPreRegistro != $(this).val())
-		if((name.includes('cep_') && ($(this).val() == '')) || (!name.includes('cep_'))){
+		if((name.includes('cep_') && ($(this).val() == '')) || !name.includes('cep_')){
 			putDadosPreRegistro($(this));
 			valorPreRegistro = null;
 		}
@@ -1887,7 +1992,41 @@ $('.textoJust').click(function(e) {
 		  console.clear();
 	  }
 	});
-  });
+});
+
+$('#mostrar_socios').click(function() {
+	$("#acoes_socio .collapse").each(function(){
+		$(this).collapse('hide');
+	});
+	$('#form_socio').hide();
+	$('#acoes_socio').show();
+});
+
+$('#acoes_socio').on('click', '#criar_socio', function() {
+	$('#form_socio').show();
+	limparFormSocio();
+	$('#acoes_socio').hide();
+	criarFormSocio();
+});
+
+$('#acoes_socio').on('click', '.editar_socio', function() {
+	$('#form_socio').show();
+	limparFormSocio();
+	$('#acoes_socio').hide();
+	editarFormSocio($(this).parents('.dados_socio'));
+});
+
+$('#acoes_socio').on('click', '.excluir_socio', function() {
+	var id = $(this).parents('.dados_socio').find('.id_socio').text();
+	var texto = $(this).parents('.dados_socio').find('.cpf_cnpj_socio').text();
+	$('#form_socio [name="id_socio"]').val(id);
+	$('#form_socio [name="cpf_cnpj_socio"]').val('');
+	modalExcluirPR(null, texto, "Sócio", "o sócio");
+});
+
+$('#nacionalidade_socio').change(function(){
+	desabilitaNatSocio();
+});
 
 //	--------------------------------------------------------------------------------------------------------
 // FIM da Funcionalidade Solicitação de Registro (Pré-registro)
