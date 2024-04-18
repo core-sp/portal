@@ -19,6 +19,7 @@ class CreateSocioPreRegistroCnpjTable extends Migration
             $table->foreign('pre_registro_cnpj_id')->references('id')->on('pre_registros_cnpj');
             $table->bigInteger('socio_id')->unsigned();
             $table->foreign('socio_id')->references('id')->on('socios');
+            $table->boolean('rt')->default(false);
             $table->timestamps();
         });
     }

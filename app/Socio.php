@@ -38,7 +38,7 @@ class Socio extends Model
 
     private function validarUpdateAjax($campo, $valor, $gerenti, $canEdit = null)
     {
-        if($campo == 'cpf_cnpj')
+        if(($campo == 'cpf_cnpj') || (($campo == 'checkRT_socio') && ($valor == 'off')))
         {
             if(isset($valor) && ((strlen($valor) == 11) || (strlen($valor) == 14))) 
                 return self::buscar($valor, $gerenti, $canEdit);
@@ -50,8 +50,25 @@ class Socio extends Model
 
     private function updateAjax($campo, $valor)
     {
-        if($campo != 'cpf_cnpj')
+        $dados_pf = ['nome_social', 'dt_nascimento', 'identidade', 'orgao_emissor', 'nacionalidade', 'naturalidade_estado', 'nome_mae', 'nome_pai'];
+
+        if(($campo != 'cpf_cnpj') || (!$this->socioPF() && !in_array($campo, $dados_pf)))
             $this->update([$campo => $valor]);
+    }
+
+    private static function confereRTSocio(&$campo, &$valor, $pj)
+    {
+        if(($campo == 'checkRT_socio') && ($valor == 'on'))
+        {
+            $campo = 'cpf_cnpj';
+            $valor = $pj->responsavelTecnico->cpf;
+
+            return collect($pj->responsavelTecnico->dadosRTSocio())->map(function ($item, $key) {
+                return null;
+            })->toArray();
+        }
+
+        return null;
     }
 
     protected static function criarFinal($campo, $valor, $gerenti, $pr)
@@ -59,7 +76,9 @@ class Socio extends Model
         if(!$pr->pessoaJuridica->podeCriarSocio())
             return ['limite' => 'Já alcançou o limite de sócios permitido'];
         
-        $valido = $campo == 'cpf_cnpj' ? self::buscar($valor, $gerenti, $pr->pessoaJuridica->getHistoricoCanEdit(self::class)) : null;
+        $dadosRT = self::confereRTSocio($campo, $valor, $pr->pessoaJuridica);
+
+        $valido = $campo == 'cpf_cnpj' ? self::buscar($valor, $gerenti, $pr->pessoaJuridica->getHistoricoCanEdit(self::class), $dadosRT) : null;
         if(isset($valido))
         {
             if($valido == 'notUpdate')
@@ -67,23 +86,29 @@ class Socio extends Model
             elseif($pr->pessoaJuridica->socios->where('id', $valido->id)->first() !== null)
                 return ['existente' => 'O sócio com o CPF / CNPJ <strong>' . formataCpfCnpj($valido->cpf_cnpj) . '</strong> já está relacionado!'];
             else{
-                $pr->pessoaJuridica->socios()->attach($valido->id);
+                $pr->pessoaJuridica->socios()->attach($valido->id, ['rt' => is_array($dadosRT)]);
                 $pr->pessoaJuridica->update(['historico_socio' => $pr->pessoaJuridica->setHistorico(self::class)]);
+                $valido = $pr->pessoaJuridica->fresh()->socios->find($valido->id);
             }
         }
 
         return isset($valido) && (gettype($valido) == "object") && (get_class($valido) == self::class) ? 
-        ['tab' => $valido->tabHTML($pr->pessoaJuridica->socios->count() + 1)] : $valido;
+        ['tab' => $valido->tabHTML($pr->pessoaJuridica->socios->count() + 1), 'rt' => is_array($dadosRT)] : $valido;
     }
 
     public function pessoasJuridicas()
     {
-        return $this->belongsToMany('App\PreRegistroCnpj', 'socio_pre_registro_cnpj', 'socio_id', 'pre_registro_cnpj_id')->withTimestamps();
+        return $this->belongsToMany('App\PreRegistroCnpj', 'socio_pre_registro_cnpj', 'socio_id', 'pre_registro_cnpj_id')->withPivot('rt')->withTimestamps();
     }
 
     public function socioPF()
     {
         return strlen($this->cpf_cnpj) == 11;
+    }
+
+    public function socioRT()
+    {
+        return isset($this->pivot) && $this->pivot->rt;
     }
 
     public function atualizarFinal($campo, $valor, $gerenti, $pj)
@@ -107,7 +132,7 @@ class Socio extends Model
         return $valido;
     }
 
-    public static function buscar($cpf_cnpj, $gerenti, $canEdit = null)
+    public static function buscar($cpf_cnpj, $gerenti, $canEdit = null, $dadosRT = null)
     {
         if(isset($cpf_cnpj) && ((strlen($cpf_cnpj) == 11) || (strlen($cpf_cnpj) == 14)))
         {   
@@ -118,6 +143,8 @@ class Socio extends Model
 
             if(!isset($existe))
                 $existe = isset($gerenti["registro"]) ? self::create($gerenti) : self::create(['cpf_cnpj' => $cpf_cnpj]);
+            if(isset($dadosRT))
+                $existe->update($dadosRT);
 
             return $existe;
         }
@@ -147,16 +174,6 @@ class Socio extends Model
         $texto .= !isset($this->orgao_emissor) ? '-----' : $this->orgao_emissor;
         $texto .= '</span>' . $final;
 
-        // Nacionalidade
-        $texto .= $inicio . '<span class="label_nacionalidade bold">Nacionalidade:</span> <span class="nacionalidade_socio editar_dado">';
-        $texto .= !isset($this->nacionalidade) ? '-----' : $this->nacionalidade;
-        $texto .= '</span>' . $final;
-
-        // Naturalidade
-        $texto .= $inicio . '<span class="label_naturalidade_estado bold">Naturalidade:</span> <span class="naturalidade_estado_socio editar_dado">';
-        $texto .= !isset($this->naturalidade_estado) ? '-----' : $this->naturalidade_estado;
-        $texto .= '</span>' . $final;
-
         // Nome Mãe
         $texto .= $inicio . '<span class="label_nome_mae bold">Nome da Mãe:</span> <span class="nome_mae_socio editar_dado">';
         $texto .= !isset($this->nome_mae) ? '-----' : $this->nome_mae;
@@ -165,6 +182,19 @@ class Socio extends Model
         // Nome Pai
         $texto .= $inicio . '<span class="label_nome_pai bold">Nome do Pai:</span> <span class="nome_pai_socio editar_dado">';
         $texto .= !isset($this->nome_pai) ? '-----' : $this->nome_pai;
+        $texto .= '</span>' . $final;
+
+        if($this->socioRT())
+            $texto = '';
+
+        // Nacionalidade
+        $texto .= $inicio . '<span class="label_nacionalidade bold">Nacionalidade:</span> <span class="nacionalidade_socio editar_dado">';
+        $texto .= !isset($this->nacionalidade) ? '-----' : $this->nacionalidade;
+        $texto .= '</span>' . $final;
+
+        // Naturalidade
+        $texto .= $inicio . '<span class="label_naturalidade_estado bold">Naturalidade:</span> <span class="naturalidade_estado_socio editar_dado">';
+        $texto .= !isset($this->naturalidade_estado) ? '-----' : $this->naturalidade_estado;
         $texto .= '</span>' . $final;
 
         return $texto;
@@ -179,8 +209,13 @@ class Socio extends Model
         $texto = '<div id="socio_' . $this->id .'_box">';
         $texto .= '<button type="button" class="btn btn-primary btn-sm btn-block mt-3" data-toggle="collapse" data-target="#socio_'. $this->id .'">';
         $texto .= '<strong>Sócio <span class="ordem-socio">' . $index . '</span></strong> - '. $cpf_cnpj_txt . ': <strong>'. formataCpfCnpj($this->cpf_cnpj) .'</strong>';
+        if($this->socioRT())
+            $texto .= '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>';
         $texto .= '</button>';
         $texto .= '<div id="socio_'.$this->id . '" class="collapse border border-top-0 border-secondary p-2 dados_socio">';
+
+        if($this->socioRT())
+            $texto .= '<p class="text-danger mb-2"><strong><i>Dados do Responsável Técnico na aba "Contato / RT", em "Sócios" somente dados complementares.</i></strong></p>';
 
         // ID
         $texto .= $inicio;
@@ -192,53 +227,57 @@ class Socio extends Model
         $texto .= '<span class="label_cpf_cnpj bold">'. $cpf_cnpj_txt .':</span> <span class="cpf_cnpj_socio editar_dado">' . formataCpfCnpj($this->cpf_cnpj) .'</span>';
         $texto .= $final;
 
-        // Registro
-        $texto .= $inicio . '<span class="label_registro bold">Registro:</span> <span class="registro_socio editar_dado">';
-        $texto .= !isset($this->registro) ? '-----' : formataRegistro($this->registro);
-        $texto .= '</span>' . $final;
-
-        // Nome
-        $texto .= $inicio . '<span class="label_nome bold">Nome:</span> <span class="nome_socio editar_dado">';
-        $texto .= !isset($this->nome) ? '-----' : $this->nome;
-        $texto .= '</span>' . $final;
-
-        if($this->socioPF())
+        if($this->socioRT())
             $texto .= $this->tabHTMLpf($inicio, $final);
+        else{
+            // Registro
+            $texto .= $inicio . '<span class="label_registro bold">Registro:</span> <span class="registro_socio editar_dado">';
+            $texto .= !isset($this->registro) ? '-----' : formataRegistro($this->registro);
+            $texto .= '</span>' . $final;
 
-        // Cep
-        $texto .= $inicio . '<span class="label_cep bold">Cep:</span> <span class="cep_socio editar_dado">';
-        $texto .= !isset($this->cep) ? '-----' : $this->cep;
-        $texto .= '</span>' . $final;
+            // Nome
+            $texto .= $inicio . '<span class="label_nome bold">Nome:</span> <span class="nome_socio editar_dado">';
+            $texto .= !isset($this->nome) ? '-----' : $this->nome;
+            $texto .= '</span>' . $final;
 
-        // Logradouro
-        $texto .= $inicio . '<span class="label_logradouro bold">Logradouro:</span> <span class="logradouro_socio editar_dado">';
-        $texto .= !isset($this->logradouro) ? '-----' : $this->logradouro;
-        $texto .= '</span>' . $final;
+            if($this->socioPF())
+                $texto .= $this->tabHTMLpf($inicio, $final);
 
-        // Número
-        $texto .= $inicio . '<span class="label_numero bold">Número:</span> <span class="numero_socio editar_dado">';
-        $texto .= !isset($this->numero) ? '-----' : $this->numero;
-        $texto .= '</span>' . $final;
+            // Cep
+            $texto .= $inicio . '<span class="label_cep bold">Cep:</span> <span class="cep_socio editar_dado">';
+            $texto .= !isset($this->cep) ? '-----' : $this->cep;
+            $texto .= '</span>' . $final;
 
-        // Complemento
-        $texto .= $inicio . '<span class="label_complemento bold">Complemento:</span> <span class="complemento_socio editar_dado">';
-        $texto .= !isset($this->complemento) ? '-----' : $this->complemento;
-        $texto .= '</span>' . $final;
+            // Logradouro
+            $texto .= $inicio . '<span class="label_logradouro bold">Logradouro:</span> <span class="logradouro_socio editar_dado">';
+            $texto .= !isset($this->logradouro) ? '-----' : $this->logradouro;
+            $texto .= '</span>' . $final;
 
-        // Complemento
-        $texto .= $inicio . '<span class="label_bairro bold">Bairro:</span> <span class="bairro_socio editar_dado">';
-        $texto .= !isset($this->bairro) ? '-----' : $this->bairro;
-        $texto .= '</span>' . $final;
+            // Número
+            $texto .= $inicio . '<span class="label_numero bold">Número:</span> <span class="numero_socio editar_dado">';
+            $texto .= !isset($this->numero) ? '-----' : $this->numero;
+            $texto .= '</span>' . $final;
 
-        // Município
-        $texto .= $inicio . '<span class="label_cidade bold">Município:</span> <span class="cidade_socio editar_dado">';
-        $texto .= !isset($this->cidade) ? '-----' : $this->cidade;
-        $texto .= '</span>' . $final;
+            // Complemento
+            $texto .= $inicio . '<span class="label_complemento bold">Complemento:</span> <span class="complemento_socio editar_dado">';
+            $texto .= !isset($this->complemento) ? '-----' : $this->complemento;
+            $texto .= '</span>' . $final;
 
-        // Estado
-        $texto .= $inicio . '<span class="label_uf bold">Estado:</span> <span class="uf_socio editar_dado">';
-        $texto .= !isset($this->uf) ? '-----' : $this->uf;
-        $texto .= '</span>' . $final;
+            // Complemento
+            $texto .= $inicio . '<span class="label_bairro bold">Bairro:</span> <span class="bairro_socio editar_dado">';
+            $texto .= !isset($this->bairro) ? '-----' : $this->bairro;
+            $texto .= '</span>' . $final;
+
+            // Município
+            $texto .= $inicio . '<span class="label_cidade bold">Município:</span> <span class="cidade_socio editar_dado">';
+            $texto .= !isset($this->cidade) ? '-----' : $this->cidade;
+            $texto .= '</span>' . $final;
+
+            // Estado
+            $texto .= $inicio . '<span class="label_uf bold">Estado:</span> <span class="uf_socio editar_dado">';
+            $texto .= !isset($this->uf) ? '-----' : $this->uf;
+            $texto .= '</span>' . $final;
+        }
 
         $texto .= '<div class="d-flex justify-content-center acoes_socio mt-3">';
         $texto .= '<button type="button" class="btn btn-warning btn-sm mr-3 editar_socio"><i class="fas fa-edit"></i></button>';

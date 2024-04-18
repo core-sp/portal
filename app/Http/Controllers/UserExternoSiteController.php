@@ -219,7 +219,7 @@ class UserExternoSiteController extends Controller
                 return redirect()->route('externo.dashboard');
 
             $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
-            auth()->guard('contabil')->user()->preRegistros()->findOrFail($preRegistro)->userExterno :
+            auth()->guard('contabil')->user()->preRegistros->find($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
 
             $contabil = auth()->guard('contabil')->user();

@@ -37,8 +37,16 @@ class ResponsavelTecnico extends Model
         {
             if($valido == 'notUpdate')
                 $valido = ['update' => $pr->pessoaJuridica->getNextUpdateHistorico()];
-            else
+            else{
                 $pr->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id, 'historico_rt' => $pr->pessoaJuridica->setHistorico()]);
+                $socio = $pr->pessoaJuridica->socios->where('cpf_cnpj', $valor)->first();
+                if(isset($socio) && !$socio->pivot->rt){
+                    $socio->pivot->update(['rt' => true]);
+                    $valido['tab'] = $pr->pessoaJuridica->socioRT->first()->tabHTML($pr->pessoaJuridica->socios->count());
+                    $valido['id_socio'] = $socio->id;
+                    $valido['rt'] = true;
+                }
+            }
         }
 
         return $valido;
@@ -52,8 +60,11 @@ class ResponsavelTecnico extends Model
             if($valido == 'notUpdate')
                 $valido = ['update' => $pj->getNextUpdateHistorico()];
             else
-                $valido == 'remover' ? $pj->update(['responsavel_tecnico_id' => null]) : 
-                $pj->update(['responsavel_tecnico_id' => $valido->id, 'historico_rt' => $pj->setHistorico()]);
+                if($valido == 'remover'){
+                    $pj->possuiRTSocio() ? $pj->socios()->detach($pj->socios->where('pivot.rt', true)->first()->pivot->socio_id) : null;
+                    $pj->update(['responsavel_tecnico_id' => null]);
+                }else
+                    $pj->update(['responsavel_tecnico_id' => $valido->id, 'historico_rt' => $pj->setHistorico()]);
         }
         else
         {
@@ -98,6 +109,13 @@ class ResponsavelTecnico extends Model
         return $this->hasMany('App\PreRegistroCnpj')->withTrashed();
     }
 
+    public function dadosRTSocio()
+    {
+        return $this->makeHidden([
+            'cpf', 'sexo', 'tipo_identidade', 'dt_expedicao', 'titulo_eleitor', 'zona', 'secao', 'ra_reservista', 'id', 'created_at', 'updated_at', 'deleted_at'
+        ]);
+    }
+
     public static function buscar($cpf, $gerenti, $canEdit = null)
     {
         if(isset($cpf) && (strlen($cpf) == 11))
@@ -126,6 +144,8 @@ class ResponsavelTecnico extends Model
             $resultado = $this->update($arrayCampos);
         }
 
+        if(($resultado === 'remover') && $pj->possuiRTSocio())
+            $pj->socios()->detach($pj->socios->where('pivot.rt', true)->first()->pivot->socio_id);
         $resultado = $pj->update(['responsavel_tecnico_id' => $resultado === 'remover' ? null : $this->id]);
         $pj->preRegistro->touch();
 

@@ -6,9 +6,23 @@
 
 <div id="acoes_socio">
 
-    <button type="button" id="criar_socio" class="btn btn-success btn-sm" {{ $resultado->pessoaJuridica->podeCriarSocio() ? '' : 'disabled' }}>
+    <button type="button" id="criar_socio" class="btn btn-success btn-sm mr-4" {{ $resultado->pessoaJuridica->podeCriarSocio() ? '' : 'disabled' }}>
         <i class="fas fa-plus"></i> Sócio
     </button>
+
+    <div id="checkSocio" class="form-check-inline mt-3 mt-sm-3">
+        <label for="checkRT_socio" class="form-check-label">
+            <input type="checkbox" 
+                id="checkRT_socio" 
+                class="{{ $classe }} form-check-input" 
+                name="checkRT_socio" 
+                value="{{ $resultado->pessoaJuridica->possuiRTSocio() ? 'on' : 'off' }}"
+                {{ $resultado->pessoaJuridica->possuiRT() ? '' : 'disabled' }}
+                {{ $resultado->pessoaJuridica->possuiRTSocio() ? 'checked' : '' }}
+            >
+            <span class="bold">{{ $nome_campos['checkRT_socio'] }} - &nbsp;<span class="badge badge-warning pt-1">RT</span> Responsável Técnico pertence ao quadro societário</span>
+        </label>
+    </div>
 
     @if($resultado->pessoaJuridica->possuiSocio())
         <p class="mt-3">
@@ -33,7 +47,7 @@
     <br>
 
     <small class="text-muted text-left">
-        <em>Após inserir um CPF / CNPJ válido aguarde 48h para trocar caso alcance o limite de <span id="limite-socios">{{ $resultado->pessoaJuridica::TOTAL_HIST_SOCIO }}</span> sócios.</em>
+        <em>Após inserir um CPF / CNPJ válido, aguarde {{ $resultado->pessoaJuridica::TOTAL_HIST_DIAS_UPDATE_SOCIO * 24 }}h para trocar caso alcance o limite de <span id="limite-socios">{{ $resultado->pessoaJuridica::TOTAL_HIST_SOCIO }}</span> sócios.</em>
     </small>
 
     <div class="form-row mb-2 mt-2">
@@ -49,7 +63,7 @@
             />
         </div>
 
-        <div class="col-lg mb-2-576">
+        <div class="col-lg mb-2-576 esconder-rt-socio">
             <label for="registro_socio">{{ $nome_campos['registro_socio'] }} - Registro</label>
             <input
                 type="text"
@@ -64,7 +78,7 @@
     </div>
 
     <fieldset id="campos_socio">
-        <div class="form-row mb-2">
+        <div class="form-row mb-2 esconder-rt-socio">
             <div class="col-sm mb-2-576">
                 <label for="nome_socio">{{ $nome_campos['nome_socio'] }} - Nome Completo <span class="text-danger">*</span></label>
                 <input
@@ -78,7 +92,7 @@
             </div>
         </div>
 
-        <div class="form-row mb-2 esconder-campo-socio">
+        <div class="form-row mb-2 esconder-campo-socio esconder-rt-socio">
             <div class="col-sm mb-2-576">
                 <label for="nome_social_socio">{{ $nome_campos['nome_social_socio'] }} - Nome Social</label>
                 <input
@@ -92,7 +106,7 @@
             </div>
         </div>
 
-        <div class="form-row mb-2 esconder-campo-socio">
+        <div class="form-row mb-2 esconder-campo-socio esconder-rt-socio">
             <div class="col-sm mb-2-576">
                 <label for="dt_nascimento_socio">{{ $nome_campos['dt_nascimento_socio'] }} - Data de Nascimento <span class="text-danger">*</span></label>
                 <input
@@ -131,9 +145,9 @@
             </div>
         </div>
 
-        <div class="linha-lg-mini mt-3 mb-3"></div>
+        <div class="linha-lg-mini mt-3 mb-3 esconder-rt-socio"></div>
 
-        <div class="form-row mb-2">
+        <div class="form-row mb-2 esconder-rt-socio">
             <div class="col-sm-4 mb-2-576">
                 <label for="cep_socio">{{ $nome_campos['cep_socio'] }} - CEP <span class="text-danger">*</span></label>
                 <input
@@ -158,7 +172,7 @@
             </div>
         </div>
 
-        <div class="form-row mb-2">
+        <div class="form-row mb-2 esconder-rt-socio">
             <div class="col-md col-lg mb-2-576">
                 <label for="rua_socio">{{ $nome_campos['logradouro_socio'] }} - Logradouro <span class="text-danger">*</span></label>
                 <input
@@ -184,7 +198,7 @@
             </div>
         </div>
 
-        <div class="form-row mb-2">
+        <div class="form-row mb-2 esconder-rt-socio">
             <div class="col-md-3 col-lg-3 col-xl-3 mb-2-576">
                 <label for="complemento_socio">{{ $nome_campos['complemento_socio'] }} - Complemento</label>
                 <input
@@ -224,9 +238,9 @@
             </div>
         </div>
 
-        <div class="linha-lg-mini mt-3 mb-3 esconder-campo-socio"></div>
+        <div class="linha-lg-mini mt-3 mb-3 esconder-campo-socio esconder-rt-socio"></div>
 
-        <div class="form-row mb-2 esconder-campo-socio">
+        <div class="form-row mb-2 esconder-campo-socio esconder-rt-socio">
             <div class="col-lg mb-2-576">
                 <label for="nome_mae_socio">{{ $nome_campos['nome_mae_socio'] }} - Nome da Mãe <span class="text-danger">*</span></label>
                 <input

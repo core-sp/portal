@@ -15,7 +15,7 @@
         <label for="cpf_rt">{{ $nome_campos['cpf_rt'] }} - CPF <span class="text-danger">*</span></label>
         <small class="text-muted text-left ml-2">
             <em>
-                Após inserir um CPF válido aguarde 24h para trocar
+                Após inserir um CPF válido aguarde {{ $resultado->pessoaJuridica::TOTAL_HIST_DIAS_UPDATE * 24 }}h para trocar
             </em>
         </small>
         <input

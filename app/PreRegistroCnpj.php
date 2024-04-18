@@ -16,6 +16,8 @@ class PreRegistroCnpj extends Model
 
     const TOTAL_HIST = 1;
     const TOTAL_HIST_SOCIO = 10;
+    const TOTAL_HIST_DIAS_UPDATE = 1;
+    const TOTAL_HIST_DIAS_UPDATE_SOCIO = 2;
 
     private function horaUpdateHistorico($classe = null)
     {
@@ -24,10 +26,10 @@ class PreRegistroCnpj extends Model
 
         switch ($classe) {
             case 'App\Socio':
-                return $updateCarbon->addDays(2);
+                return $updateCarbon->addDays(self::TOTAL_HIST_DIAS_UPDATE_SOCIO);
                 break;
             default:
-                return $updateCarbon->addDay();
+                return $updateCarbon->addDays(self::TOTAL_HIST_DIAS_UPDATE);
         }
     }
 
@@ -77,7 +79,12 @@ class PreRegistroCnpj extends Model
 
     public function socios()
     {
-        return $this->belongsToMany('App\Socio', 'socio_pre_registro_cnpj', 'pre_registro_cnpj_id', 'socio_id')->withTimestamps();
+        return $this->belongsToMany('App\Socio', 'socio_pre_registro_cnpj', 'pre_registro_cnpj_id', 'socio_id')->withPivot('rt')->withTimestamps();
+    }
+
+    public function socioRT()
+    {
+        return $this->belongsToMany('App\Socio', 'socio_pre_registro_cnpj', 'pre_registro_cnpj_id', 'socio_id')->withPivot('rt')->withTimestamps()->wherePivot('rt', true);
     }
 
     public function podeCriarSocio()
@@ -93,6 +100,16 @@ class PreRegistroCnpj extends Model
     public function possuiSocio()
     {
         return isset($this->socios) && $this->socios->isNotEmpty();
+    }
+
+    public function possuiRT()
+    {
+        return isset($this->responsavel_tecnico_id);
+    }
+
+    public function possuiRTSocio()
+    {
+        return $this->possuiSocio() && $this->possuiRT() && $this->socios->where('cpf_cnpj', $this->responsavelTecnico->cpf)->isNotEmpty();
     }
 
     public function getHistoricoCanEdit($classe = null)

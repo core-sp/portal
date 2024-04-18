@@ -23,6 +23,7 @@ class PreRegistro extends Model
     const STATUS_APROVADO = 'Aprovado';
     const STATUS_NEGADO = 'Negado';
     const TOTAL_HIST = 1;
+    const TOTAL_HIST_DIAS_UPDATE = 1;
 
     private function atualizarCampoEspelho($request, $final)
     {
@@ -41,7 +42,7 @@ class PreRegistro extends Model
     {
         $update = $this->getHistoricoArray()['update'];
         $updateCarbon = Carbon::createFromFormat('Y-m-d H:i:s', $update);
-        $updateCarbon->addDay();
+        $updateCarbon->addDays(self::TOTAL_HIST_DIAS_UPDATE);
 
         return $updateCarbon;
     }

@@ -30,10 +30,7 @@ class PreRegistroAjaxRequest extends FormRequest
         $this->classes = implode(',', array_keys($this->service->getService('PreRegistro')->getNomesCampos()));
         $this->todos = implode(',', array_values($this->service->getService('PreRegistro')->getNomesCampos()));
 
-        $user_externo_cpf_cnpj = auth()->guard('user_externo')->check() ? auth()->guard('user_externo')->user()->cpf_cnpj : 
-        auth()->guard('contabil')->user()->preRegistros()->findOrFail($this->preRegistro)->userExterno->cpf_cnpj;
-
-        if(auth()->guard('contabil')->check() && (strpos($this->campo, 'contabil') !== false))
+        if((strpos($this->campo, 'contabil') !== false) && auth()->guard('contabil')->check())
             $this->merge([
                 'campo' => null,
             ]);
@@ -78,9 +75,14 @@ class PreRegistroAjaxRequest extends FormRequest
                     $this->msgUnique = 'O CNPJ fornecido já consta no Portal com outro tipo de conta';
                     break;
                 case 'cpf_cnpj_socio':
-                    $this->regraValor = ['nullable', new CpfCnpj, 'unique:contabeis,cnpj', 'not_in:' . $user_externo_cpf_cnpj];
+                    $pr = auth()->guard('user_externo')->check() ? auth()->guard('user_externo')->user()->preRegistro : 
+                    auth()->guard('contabil')->user()->preRegistros->find($this->preRegistro);
+
+                    $rt_cpf_socio = !$pr->userExterno->isPessoaFisica() && $pr->pessoaJuridica->possuiRT()? $pr->pessoaJuridica->responsavelTecnico->cpf : '';
+
+                    $this->regraValor = ['nullable', new CpfCnpj, 'unique:contabeis,cnpj', 'not_in:' . $pr->userExterno->cpf_cnpj . ',' . $rt_cpf_socio];
                     $this->msgUnique = 'O CNPJ fornecido já consta no Portal como Contabilidade, não pode ser sócio';
-                    $this->msgNotIn = 'O CPF / CNPJ do usuário externo deste pré-registro não pode ser sócio';
+                    $this->msgNotIn = $rt_cpf_socio == $this->valor ? 'Para incluir o CPF do RT, deve confirmar no item 5.1' : 'O CNPJ do usuário externo deste pré-registro não pode ser sócio';
                     break;
                 default:
                     $this->regraValor = ['nullable', new CpfCnpj];
@@ -123,7 +125,7 @@ class PreRegistroAjaxRequest extends FormRequest
                 'exists:regionais,idregional'
             ];
 
-        $notUpper = ['path', 'checkEndEmpresa', 'email_contabil'];
+        $notUpper = ['path', 'checkEndEmpresa', 'email_contabil', 'checkRT_socio'];
         if(!in_array($this->campo, $notUpper) && isset($this->valor) && !is_array($this->valor))
             $this->merge([
                 'valor' => mb_strtoupper($this->valor, 'UTF-8')
@@ -131,7 +133,8 @@ class PreRegistroAjaxRequest extends FormRequest
 
         // Sócios
         $this->merge([
-            'id_socio' => ($this->campo == 'cpf_cnpj_socio') && (strlen($this->valor) >= 11) ? 0 : $this->id_socio,
+            'id_socio' => (($this->campo == 'cpf_cnpj_socio') && (strlen($this->valor) >= 11)) || 
+            (($this->campo == 'checkRT_socio') && ($this->valor == 'on')) ? 0 : $this->id_socio,
         ]);
 
         if((strpos($this->campo, '_socio') !== false) && !isset($this->id_socio))
@@ -176,6 +179,7 @@ class PreRegistroAjaxRequest extends FormRequest
             'max' => request()->campo != 'path' ? 'Limite de :max caracteres' : 'Existe mais de 15 arquivos',
             'total.required' => 'A soma do tamanho dos arquivos ultrapassa 5 MB',
             'campo.in' => 'Campo não encontrado ou não permitido alterar',
+            'campo.*.in' => 'Campo não encontrado ou não permitido alterar',
             'valor.in' => 'Valor não encontrado',
             'valor.not_in' => $this->msgNotIn,
             'valor.unique' => $this->msgUnique,
