@@ -42,7 +42,7 @@ class ResponsavelTecnico extends Model
                 $socio = $pr->pessoaJuridica->socios->where('cpf_cnpj', $valor)->first();
                 if(isset($socio) && !$socio->pivot->rt){
                     $socio->pivot->update(['rt' => true]);
-                    $valido['tab'] = $pr->pessoaJuridica->socioRT->first()->tabHTML($pr->pessoaJuridica->socios->count());
+                    $valido['tab'] = $pr->pessoaJuridica->socioRT->first()->tabHTML();
                     $valido['id_socio'] = $socio->id;
                     $valido['rt'] = true;
                 }

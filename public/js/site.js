@@ -1617,10 +1617,11 @@ function removeFile(dados)
 }
 
 function atualizaOrdemSocios(){
-	$('#acoes_socio .ordem-socio').each(function(index){
-		var count = index + 1;
-		$(this).text(count);
-	});
+	if($('#acoes_socio .ordem-socio').length > 0)
+		$('#acoes_socio .ordem-socio').each(function(index){
+			var count = index + 1;
+			$(this).text(count);
+		});
 }
 
 function removeSocio(dados, id)
@@ -1660,6 +1661,8 @@ function preencheSocio(dados, campo, valor)
 		removeSocio('remover', dados.id);
 		$('#acoes_socio').append(dados.atualizado);
 	}
+
+	atualizaOrdemSocios();
 
 	var limite = $('#acoes_socio .ordem-socio').length >= parseInt($('#limite-socios').text());
 	$('#criar_socio').prop('disabled', limite);
@@ -1885,6 +1888,7 @@ var pre_registro_total_files = $('#totalFilesServer').length ? $('#totalFilesSer
 
 // ao carregar a pagina, verifica se possui o limite maximo de arquivos permitidos, caso sim, ele impede de adicionar mais
 $('form #inserirRegistro').ready(function(){
+	atualizaOrdemSocios();
 	if($(".ArquivoBD_anexo").length == pre_registro_total_files)
 		$(".Arquivo_anexo").hide();
 }); 

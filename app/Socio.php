@@ -93,7 +93,7 @@ class Socio extends Model
         }
 
         return isset($valido) && (gettype($valido) == "object") && (get_class($valido) == self::class) ? 
-        ['tab' => $valido->tabHTML($pr->pessoaJuridica->socios->count() + 1), 'rt' => is_array($dadosRT)] : $valido;
+        ['tab' => $valido->tabHTML(), 'rt' => is_array($dadosRT)] : $valido;
     }
 
     public function pessoasJuridicas()
@@ -126,7 +126,7 @@ class Socio extends Model
             $this->updateAjax($campo, $valor);
             $this->pivot->update(['updated_at' => now()]);
             $pj->preRegistro->touch();
-            $valido = ['atualizado' => $this->tabHTML($pj->socios->count()), 'id' => $this->id];
+            $valido = ['atualizado' => $this->tabHTML(), 'id' => $this->id];
         }
 
         return $valido;
@@ -202,7 +202,7 @@ class Socio extends Model
         return $texto;
     }
 
-    public function tabHTML($index)
+    public function tabHTML()
     {
         $inicio = '<span class="p-1 mr-2 mb-2">';
         $final = '</span>';
@@ -210,7 +210,7 @@ class Socio extends Model
         
         $texto = '<div id="socio_' . $this->id .'_box">';
         $texto .= '<button type="button" class="btn btn-primary btn-sm btn-block mt-3" data-toggle="collapse" data-target="#socio_'. $this->id .'">';
-        $texto .= '<strong>Sócio <span class="ordem-socio">' . $index . '</span></strong> - '. $cpf_cnpj_txt . ': <strong>'. formataCpfCnpj($this->cpf_cnpj) .'</strong>';
+        $texto .= '<strong>Sócio <span class="ordem-socio"></span></strong> - ID <strong>' . $this->id . '</strong> - '. $cpf_cnpj_txt . ': <strong>'. formataCpfCnpj($this->cpf_cnpj) .'</strong>';
         if($this->socioRT())
             $texto .= '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>';
         $texto .= '</button>';

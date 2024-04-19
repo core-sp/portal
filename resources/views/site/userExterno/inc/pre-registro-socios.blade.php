@@ -31,7 +31,7 @@
             </small>
         </p>
         @foreach($resultado->pessoaJuridica->socios->sortBy('pivot.updated_at') as $socio)
-            {!! $socio->tabHTML($loop->iteration) !!}
+            {!! $socio->tabHTML() !!}
         @endforeach
 
     @else

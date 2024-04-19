@@ -109,7 +109,7 @@ class PreRegistroCnpj extends Model
 
     public function possuiRTSocio()
     {
-        return $this->possuiSocio() && $this->possuiRT() && $this->socios->where('cpf_cnpj', $this->responsavelTecnico->cpf)->isNotEmpty();
+        return $this->possuiSocio() && $this->possuiRT() && $this->socios->where('cpf_cnpj', $this->responsavelTecnico->cpf)->where('pivot.rt', true)->isNotEmpty();
     }
 
     public function getHistoricoCanEdit($classe = null)
