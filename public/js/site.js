@@ -1630,6 +1630,9 @@ function removeSocio(dados, id)
 		if(($('#acoes_socio button > span.badge').length == 0) && $('#checkRT_socio')[0].checked)
 			$('#checkRT_socio').prop('checked', false);
 	}
+
+	var limite = $('#acoes_socio .ordem-socio').length >= parseInt($('#limite-socios').text());
+	$('#criar_socio').prop('disabled', limite);
 }
 
 function preencheSocio(dados, campo, valor)
