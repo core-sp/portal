@@ -37,7 +37,7 @@
         <label for="registro_preRegistro">{{ $nome_campos['registro'] }} - Registro</label>
         <input
             type="text"
-            class="{{ $classe }} form-control"
+            class="{{ $classe }} form-control registro_core_format"
             id="registro_preRegistro"
             value="{{ isset($resultado->pessoaJuridica->responsavelTecnico->registro) ? $resultado->pessoaJuridica->responsavelTecnico->registro : '' }}"
             disabled

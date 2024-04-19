@@ -578,7 +578,7 @@ class PreRegistro extends Model
         $classe = $request['classe'];
         $request['campo'] = $this->limparNomeCamposAjax($request['classe'], $request['campo']);
         $cpf_cnpj = (is_array($request['campo']) && ($request['campo'][1] == 'cpf_cnpj')) || (!is_array($request['campo']) && ($request['campo'] == 'cpf')) ? $request['valor'] : '';
-        $gerenti = $this->getRTGerenti($request['classe'], $gerentiRepository, $cpf_cnpj);
+        $gerenti = $this->getRegistradoGerenti($request['classe'], $gerentiRepository, $cpf_cnpj);
         $campo = $request['campo'];
         $valor = $request['valor'];
 
@@ -597,8 +597,11 @@ class PreRegistro extends Model
             $camposLimpos = $this->getCamposLimpos($request, $this->userExterno->getCamposPreRegistro());
             unset($request);
 
-            foreach($camposLimpos as $classe => $arrayCampos)
-                $resultado = $this->salvarArray($classe, $arrayCampos, $this->getRTGerenti($classe, $gerentiRepository, isset($arrayCampos['cpf']) ? $arrayCampos['cpf'] : ''));
+            foreach($camposLimpos as $classe => $arrayCampos){
+                $cpf_cnpj = isset($arrayCampos['cpf']) ? $arrayCampos['cpf'] : '';
+                $cpf_cnpj = isset($arrayCampos['cpf_cnpj']) ? $arrayCampos['cpf_cnpj'] : $cpf_cnpj;
+                $resultado = $this->salvarArray($classe, $arrayCampos, $this->getRegistradoGerenti($classe, $gerentiRepository, $cpf_cnpj));
+            }
 
             unset($camposLimpos);
             $status = $this->criado() ? self::STATUS_ANALISE_INICIAL : self::STATUS_ANALISE_CORRECAO;

@@ -275,49 +275,84 @@ trait PreRegistroApoio {
         ->toArray();
     }
 
-    public function getRTGerenti($relacao, $gerentiRepository, $cpf)
+    private function getRTGerenti($ass_id, $gerentiRepository, $cpf_cnpj, &$gerenti)
+    {
+        $resultadosGerenti = utf8_converter($gerentiRepository->gerentiDadosGeraisPF($ass_id));
+
+        $gerenti['nome_mae'] = isset($resultadosGerenti['Nome da mãe']) ? mb_strtoupper($resultadosGerenti['Nome da mãe'], 'UTF-8') : null;
+        $gerenti['nome_pai'] = isset($resultadosGerenti['Nome do pai']) ? mb_strtoupper($resultadosGerenti['Nome do pai'], 'UTF-8') : null;
+        $gerenti['identidade'] = isset($resultadosGerenti['identidade']) ? mb_strtoupper(apenasNumerosLetras($resultadosGerenti['identidade']), 'UTF-8') : null;
+        $gerenti['orgao_emissor'] = isset($resultadosGerenti['emissor']) ? mb_strtoupper($resultadosGerenti['emissor'], 'UTF-8') : null;
+        $gerenti['dt_expedicao'] = isset($resultadosGerenti['expedicao']) && Carbon::hasFormat($resultadosGerenti['expedicao'], 'd/m/Y') ? 
+            Carbon::createFromFormat('d/m/Y', $resultadosGerenti['expedicao'])->format('Y-m-d') : null;
+        $gerenti['dt_nascimento'] = isset($resultadosGerenti['Data de nascimento']) && Carbon::hasFormat($resultadosGerenti['Data de nascimento'], 'd/m/Y') ? 
+            Carbon::createFromFormat('d/m/Y', $resultadosGerenti['Data de nascimento'])->format('Y-m-d') : null;
+        $gerenti['sexo'] = null;
+        if(isset($resultadosGerenti['Sexo']))
+            $gerenti['sexo'] = $resultadosGerenti['Sexo'] == "MASCULINO" ? "M" : "F";
+        $gerenti['cpf'] = $cpf_cnpj;
+    }
+
+    private function getSocioGerenti($ass_id, $gerentiRepository, $cpf_cnpj, &$gerenti, $tipo_pessoa)
+    {
+        $gerenti['cpf_cnpj'] = $cpf_cnpj;
+
+        if($tipo_pessoa == "J")
+            return;
+
+        $resultadosGerenti = utf8_converter($gerentiRepository->gerentiDadosGeraisPF($ass_id));
+
+        $gerenti['nome_mae'] = isset($resultadosGerenti['Nome da mãe']) ? mb_strtoupper($resultadosGerenti['Nome da mãe'], 'UTF-8') : null;
+        $gerenti['nome_pai'] = isset($resultadosGerenti['Nome do pai']) ? mb_strtoupper($resultadosGerenti['Nome do pai'], 'UTF-8') : null;
+        $gerenti['identidade'] = isset($resultadosGerenti['identidade']) ? mb_strtoupper(apenasNumerosLetras($resultadosGerenti['identidade']), 'UTF-8') : null;
+        $gerenti['orgao_emissor'] = isset($resultadosGerenti['emissor']) ? mb_strtoupper($resultadosGerenti['emissor'], 'UTF-8') : null;
+        $gerenti['dt_nascimento'] = isset($resultadosGerenti['Data de nascimento']) && Carbon::hasFormat($resultadosGerenti['Data de nascimento'], 'd/m/Y') ? 
+            Carbon::createFromFormat('d/m/Y', $resultadosGerenti['Data de nascimento'])->format('Y-m-d') : null;
+    }
+
+    public function getRegistradoGerenti($relacao, $gerentiRepository, $cpf_cnpj)
     {
         if(!isset($gerentiRepository) || !isset(class_implements($gerentiRepository)["App\Repositories\GerentiRepositoryInterface"]))
             return null;
-        if(($relacao != $this->relation_rt) && (!isset($cpf) || (strlen($cpf) != 11)))
+        if(!isset($cpf_cnpj))
+            return null;
+        if(($relacao != $this->relation_socio) && ($relacao != $this->relation_rt))
+            return null;
+        if(
+            (($relacao == $this->relation_socio) && !((strlen($cpf_cnpj) == 11) || (strlen($cpf_cnpj) == 14))) || 
+            (($relacao == $this->relation_rt) && (strlen($cpf_cnpj) != 11))
+        )
             return null;
 
-        $resultadosGerenti = $gerentiRepository->gerentiBusca("", null, $cpf);
+        $resultadosGerenti = $gerentiRepository->gerentiBusca("", null, $cpf_cnpj);
         $ass_id = null;
+        $tipo_pessoa = null;
         $gerenti = array();
 
-        // Para testar: colocar 5 em "ASS_TP_ASSOC" em gerentiBusca() em GerentiRepositoryMock
+        // Para testar: em caso de relation_rt, colocar 5 em "ASS_TP_ASSOC" em gerentiBusca() em GerentiRepositoryMock
         foreach($resultadosGerenti as $resultado)
         {
             $naoCancelado = $resultado['CANCELADO'] == "F";
             $ativo = $resultado['ASS_ATIVO'] == "T";
-            $tipo = $resultado["ASS_TP_ASSOC"] == $this->getCodigoRT();
+            $tipo = $this->getTipoPessoaByCodigo($resultado["ASS_TP_ASSOC"]);
+            $tipo_pessoa = $resultado['ASS_TP_PESSOA'];
 
-            if($naoCancelado && $ativo && $tipo)
+            if($naoCancelado && $ativo && ((($relacao == $this->relation_rt) && ($tipo == 'RT')) || (($relacao == $this->relation_socio) && ($tipo != 'Indefinida'))))
             {
                 $ass_id = $resultado["ASS_ID"];
-                $gerenti['nome'] = $resultado["ASS_NOME"];
+                $gerenti['nome'] = mb_strtoupper($resultado["ASS_NOME"], 'UTF-8');
                 $gerenti['registro'] = apenasNumeros($resultado["ASS_REGISTRO"]);
+                if(
+                    (($relacao == $this->relation_socio) && ($resultado['ASS_TP_PESSOA'] != "J") && (strlen($cpf_cnpj) == 11)) || 
+                    (($relacao == $this->relation_socio) && ($resultado['ASS_TP_PESSOA'] == "J") && (strlen($cpf_cnpj) == 14))
+                )
+                    break;
             }
         }
-        
-        if(isset($ass_id))
-        {
-            $resultadosGerenti = utf8_converter($gerentiRepository->gerentiDadosGeraisPF($ass_id));
 
-            $gerenti['nome_mae'] = isset($resultadosGerenti['Nome da mãe']) ? $resultadosGerenti['Nome da mãe'] : null;
-            $gerenti['nome_pai'] = isset($resultadosGerenti['Nome do pai']) ? $resultadosGerenti['Nome do pai'] : null;
-            $gerenti['identidade'] = isset($resultadosGerenti['identidade']) ? $resultadosGerenti['identidade'] : null;
-            $gerenti['orgao_emissor'] = isset($resultadosGerenti['emissor']) ? $resultadosGerenti['emissor'] : null;
-            $gerenti['dt_expedicao'] = isset($resultadosGerenti['expedicao']) && Carbon::hasFormat($resultadosGerenti['expedicao'], 'd/m/Y') ? 
-                Carbon::createFromFormat('d/m/Y', $resultadosGerenti['expedicao'])->format('Y-m-d') : null;
-            $gerenti['dt_nascimento'] = isset($resultadosGerenti['Data de nascimento']) && Carbon::hasFormat($resultadosGerenti['Data de nascimento'], 'd/m/Y') ? 
-                Carbon::createFromFormat('d/m/Y', $resultadosGerenti['Data de nascimento'])->format('Y-m-d') : null;
-            $gerenti['sexo'] = null;
-            if(isset($resultadosGerenti['Sexo']))
-                $gerenti['sexo'] = $resultadosGerenti['Sexo'] == "MASCULINO" ? "M" : "F";
-            $gerenti['cpf'] = $cpf;
-        }
+        if(isset($ass_id))
+            $relacao == $this->relation_rt ? $this->getRTGerenti($ass_id, $gerentiRepository, $cpf_cnpj, $gerenti) : 
+            $this->getSocioGerenti($ass_id, $gerentiRepository, $cpf_cnpj, $gerenti, $tipo_pessoa);
 
         return $gerenti;
     }
