@@ -63,9 +63,7 @@ class Socio extends Model
             $campo = 'cpf_cnpj';
             $valor = $pj->responsavelTecnico->cpf;
 
-            return collect($pj->responsavelTecnico->dadosRTSocio())->map(function ($item, $key) {
-                return null;
-            })->toArray();
+            return $pj->responsavelTecnico->dadosRTSocio()->toArray();
         }
 
         return null;
@@ -78,7 +76,7 @@ class Socio extends Model
         
         $dadosRT = self::confereRTSocio($campo, $valor, $pr->pessoaJuridica);
 
-        $valido = $campo == 'cpf_cnpj' ? self::buscar($valor, $gerenti, $pr->pessoaJuridica->getHistoricoCanEdit(self::class), $dadosRT) : null;
+        $valido = $campo == 'cpf_cnpj' ? self::buscar($valor, $gerenti, $pr->pessoaJuridica->getHistoricoCanEdit(self::class)) : null;
         if(isset($valido))
         {
             if($valido == 'notUpdate')
@@ -132,7 +130,7 @@ class Socio extends Model
         return $valido;
     }
 
-    public static function buscar($cpf_cnpj, $gerenti, $canEdit = null, $dadosRT = null)
+    public static function buscar($cpf_cnpj, $gerenti, $canEdit = null)
     {
         if(isset($cpf_cnpj) && ((strlen($cpf_cnpj) == 11) || (strlen($cpf_cnpj) == 14)))
         {   
@@ -140,13 +138,11 @@ class Socio extends Model
                 return 'notUpdate';
 
             $existe = self::where('cpf_cnpj', $cpf_cnpj)->first();
-            if(isset($existe) && isset($gerenti["registro"]) && !isset($existe->registro))
+            if(isset($existe) && isset($gerenti["registro"]) && (!isset($existe->registro) || ($existe->registro != $gerenti["registro"])))
                 $existe->update($gerenti);
 
             if(!isset($existe))
                 $existe = isset($gerenti["registro"]) ? self::create($gerenti) : self::create(['cpf_cnpj' => $cpf_cnpj]);
-            if(isset($dadosRT))
-                $existe->update($dadosRT);
 
             return $existe;
         }
