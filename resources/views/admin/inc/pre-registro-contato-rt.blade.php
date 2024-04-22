@@ -4,6 +4,11 @@
 
 <div class="card-body bg-light">
 
+    @if(!$resultado->pessoaJuridica->possuiRT())
+    <p><i>Ainda não possui Responsável Técnico.</i></p>
+
+    @else
+
     <p id="cpf_rt">
         <span class="font-weight-bolder">{{ $nome_campos['cpf_rt'] }} - CPF: </span>
         {{ isset($resultado->pessoaJuridica->responsavelTecnico->cpf) ? formataCpfCnpj($resultado->pessoaJuridica->responsavelTecnico->cpf) : '------' }}
@@ -311,4 +316,5 @@
         @endif
     </p>
 
+    @endif
 </div>

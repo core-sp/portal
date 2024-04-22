@@ -1,9 +1,13 @@
 @php
     $camposEditados = $resultado->getCamposEditados();
-    $socios = $resultado->pessoaJuridica->possuiSocio() ? $resultado->pessoaJuridica->socios : collect();
 @endphp
 
 <div class="card-body bg-light">
+
+    @if(!$resultado->pessoaJuridica->possuiSocio())
+    <p><i>Ainda não possui sócio(s).</i></p>
+
+    @else
 
     <p><strong><i>Legenda:</i></strong>&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span> Indica que o sócio é também Responsável Técnico neste pré-registro.</p>
 
@@ -27,11 +31,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -58,11 +62,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -93,11 +97,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -128,11 +132,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -163,11 +167,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -198,11 +202,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -233,11 +237,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -268,11 +272,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -303,11 +307,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -338,11 +342,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -373,11 +377,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -408,11 +412,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -443,11 +447,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -478,11 +482,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -513,11 +517,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -548,11 +552,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -583,11 +587,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -618,11 +622,11 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
 
-        @if($socios->isNotEmpty())
+        @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
         @endif
 
-        @foreach($socios as $socio)
+        @foreach($resultado->pessoaJuridica->socios as $socio)
             <span class="text-nowrap">
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
@@ -639,4 +643,6 @@
 
         @endforeach
     </p>
+
+    @endif
 </div>

@@ -97,8 +97,8 @@
     </p>
 
 @if(!$resultado->userExterno->isPessoaFisica())
-<br>
-<h5 class="font-weight-bolder mb-3">Endereço da empresa</h5>
+    <br>
+    <h5 class="font-weight-bolder mb-3">Endereço da empresa</h5>
 
     @if(isset($resultado->pessoaJuridica) && $resultado->pessoaJuridica->mesmoEndereco())
 

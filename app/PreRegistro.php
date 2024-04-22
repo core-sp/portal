@@ -261,6 +261,11 @@ class PreRegistro extends Model
         return $this->hasMany('App\Anexo');
     }
 
+    public function possuiContabil()
+    {
+        return isset($this->contabil_id);
+    }
+
     public function excluirAnexos()
     {
         if($this->anexos->count() > 0)
