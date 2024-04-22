@@ -463,8 +463,9 @@ function secondLine($situacao, $vencimento = null, $link = null, $descricao = nu
         $str = '<strong class="text-success">PAGO</strong>';
     } elseif($situacao === 'Pago em Parcelamento') {
         $str = '<strong class="text-success">PAGO EM PARCELAMENTO</strong>';
-    } elseif($situacao === 'Proc. Adm.') {
-        $str = '<strong class="text-info">PROC. ADM.</strong>';
+    } elseif($situacao === 'Proc. Adm.'){
+        $str = $link !== null ? '<strong class="text-info">PROC. ADM.</strong> ⋅ <a href="' . $link . '" class="normal text-info" onclick="clickBoleto(\''. $descricao .'\')">BAIXAR BOLETO</a>' : 
+        '<strong class="text-info">PROC. ADM.</strong>';
     } else {
         $str = '<strong class="text-info">INDEFINIDO</strong>';
     }
