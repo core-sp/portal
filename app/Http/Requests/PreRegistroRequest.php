@@ -16,14 +16,19 @@ class PreRegistroRequest extends FormRequest
     private $regraReservistaPF;
     private $regraReservistaRT;
     private $externo;
+    private $socios;
+    private $msg_socios;
 
-    private function getRules($externo)
+    private function getRules()
     {
-        $contabilCriarPR = [
-            'cpf_cnpj' => ['required', new CpfCnpj, 'unique:contabeis,cnpj'],
-            'nome' => 'required|min:5|max:191',
-            'email' => 'required|email:rfc,filter|min:10|max:191|unique:contabeis,email',
-        ];
+        if(\Route::is('externo.contabil.inserir.preregistro'))
+            return [
+                'cpf_cnpj' => ['required', new CpfCnpj, 'unique:contabeis,cnpj'],
+                'nome' => 'required|min:5|max:191',
+                'email' => 'required|email:rfc,filter|min:10|max:191|unique:contabeis,email',
+            ];
+
+        $pessoa = null;
 
         $rules = [
             'path' => $this->regraPath,
@@ -52,85 +57,83 @@ class PreRegistroRequest extends FormRequest
             'pergunta' => 'required|min:2|max:191'
         ];
 
-        $pessoaFisica = [
-            'nome_social' => 'nullable|min:5|max:191|regex:/^\D*$/',
-            'sexo' => 'required|in:'.implode(',', array_keys(generos())),
-            'dt_nascimento' => 'required|date_format:Y-m-d|before_or_equal:'.$this->regraDtNasc,
-            'estado_civil' => 'nullable|in:'.implode(',', estados_civis()),
-            'nacionalidade' => 'required|in:'.implode(',', nacionalidades()),
-            'naturalidade_cidade' => 'required_if:nacionalidade,Brasileira|nullable|string|min:4|max:191',
-            'naturalidade_estado' => 'required_if:nacionalidade,Brasileira|nullable|in:'.implode(',', array_keys(estados())),
-            'nome_mae' => 'required|min:5|max:191|regex:/^\D*$/',
-            'nome_pai' => 'nullable|min:5|max:191|regex:/^\D*$/',
-            'tipo_identidade' => 'required|in:'.implode(',', tipos_identidade()),
-            'identidade' => 'required|min:4|max:30',
-            'orgao_emissor' => 'required|min:3|max:191',
-            'dt_expedicao' => 'required|date_format:Y-m-d|before_or_equal:today',
-            'titulo_eleitor' => 'required_if:nacionalidade,Brasileira|nullable|min:12|max:15',
-            'zona' => 'required_if:nacionalidade,Brasileira|max:6',
-            'secao' => 'required_if:nacionalidade,Brasileira|max:8',
-            'ra_reservista' => [
-                Rule::requiredIf(function () {
-                    return ($this->sexo == 'M') && $this->regraReservistaPF;
-                }),
-                'nullable',
-                'min:12',
-                'max:15',
-            ],
-        ];
+        if($this->externo->isPessoaFisica())
+            $pessoa = [
+                'nome_social' => 'nullable|min:5|max:191|regex:/^\D*$/',
+                'sexo' => 'required|in:'.implode(',', array_keys(generos())),
+                'dt_nascimento' => 'required|date_format:Y-m-d|before_or_equal:'.$this->regraDtNasc,
+                'estado_civil' => 'nullable|in:'.implode(',', estados_civis()),
+                'nacionalidade' => 'required|in:'.implode(',', nacionalidades()),
+                'naturalidade_cidade' => 'required_if:nacionalidade,Brasileira|nullable|string|min:4|max:191',
+                'naturalidade_estado' => 'required_if:nacionalidade,Brasileira|nullable|in:'.implode(',', array_keys(estados())),
+                'nome_mae' => 'required|min:5|max:191|regex:/^\D*$/',
+                'nome_pai' => 'nullable|min:5|max:191|regex:/^\D*$/',
+                'tipo_identidade' => 'required|in:'.implode(',', tipos_identidade()),
+                'identidade' => 'required|min:4|max:30',
+                'orgao_emissor' => 'required|min:3|max:191',
+                'dt_expedicao' => 'required|date_format:Y-m-d|before_or_equal:today',
+                'titulo_eleitor' => 'required_if:nacionalidade,Brasileira|nullable|min:12|max:15',
+                'zona' => 'required_if:nacionalidade,Brasileira|max:6',
+                'secao' => 'required_if:nacionalidade,Brasileira|max:8',
+                'ra_reservista' => [
+                    Rule::requiredIf(function () {
+                        return ($this->sexo == 'M') && $this->regraReservistaPF;
+                    }),
+                    'nullable',
+                    'min:12',
+                    'max:15',
+                ],
+            ];
         
-        $pessoaJuridica = [
-            'razao_social' => 'required|min:5|max:191|regex:/^\D*$/',
-            'capital_social' => 'required|min:4|max:16|regex:/^((?!(0))[0-9\.]{1,}),([0-9]{2})$/',
-            'nire' => 'nullable|min:5|max:20',
-            'tipo_empresa' => 'required|in:'.implode(',', tipos_empresa()),
-            'dt_inicio_atividade' => 'required|date_format:Y-m-d|before_or_equal:today',
-            'nome_fantasia' => 'required|min:5|max:191',
-            'checkEndEmpresa' => 'present',
-            'cep_empresa' => 'required_if:checkEndEmpresa,off|nullable|size:9|regex:/([0-9]{5})\-([0-9]{3})$/',
-            'bairro_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191',
-            'logradouro_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191',
-            'numero_empresa' => 'required_if:checkEndEmpresa,off|nullable|max:10',
-            'complemento_empresa' => 'nullable|max:50',
-            'cidade_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191|regex:/^\D*$/',
-            'uf_empresa' => 'required_if:checkEndEmpresa,off|nullable|in:'.implode(',', array_keys(estados())),
-            'nome_rt' => 'required|min:5|max:191|regex:/^\D*$/',
-            'nome_social_rt' => 'nullable|min:5|max:191|regex:/^\D*$/',
-            'sexo_rt' => 'required|in:'.implode(',', array_keys(generos())),
-            'dt_nascimento_rt' => 'required|date_format:Y-m-d|before_or_equal:'.$this->regraDtNasc,
-            'cpf_rt' => ['required', new Cpf],
-            'tipo_identidade_rt' => 'required|in:'.implode(',', tipos_identidade()),
-            'identidade_rt' => 'required|min:4|max:30',
-            'orgao_emissor_rt' => 'required|min:3|max:191',
-            'dt_expedicao_rt' => 'required|date_format:Y-m-d|before_or_equal:today',
-            'cep_rt' => 'required|size:9|regex:/([0-9]{5})\-([0-9]{3})$/',
-            'bairro_rt' => 'required|min:4|max:191',
-            'logradouro_rt' => 'required|min:4|max:191',
-            'numero_rt' => 'required|min:1|max:10',
-            'complemento_rt' => 'nullable|max:50',
-            'cidade_rt' => 'required|min:4|max:191',
-            'uf_rt' => 'required|in:'.implode(',', array_keys(estados())),
-            'nome_mae_rt' => 'required|min:5|max:191|regex:/^\D*$/',
-            'nome_pai_rt' => 'nullable|min:5|max:191|regex:/^\D*$/',
-            'titulo_eleitor_rt' => 'required|nullable|min:12|max:15',
-            'zona_rt' => 'required|max:6',
-            'secao_rt' => 'required|max:8',
-            'ra_reservista_rt' => [
-                Rule::requiredIf(function () {
-                    return ($this->sexo_rt == 'M') && $this->regraReservistaRT;
-                }),
-                'nullable',
-                'min:12',
-                'max:15',
-            ],
-        ];
+        if(!$this->externo->isPessoaFisica()){
+            $pessoa = [
+                'razao_social' => 'required|min:5|max:191|regex:/^\D*$/',
+                'capital_social' => 'required|min:4|max:16|regex:/^((?!(0))[0-9\.]{1,}),([0-9]{2})$/',
+                'nire' => 'nullable|min:5|max:20',
+                'tipo_empresa' => 'required|in:'.implode(',', tipos_empresa()),
+                'dt_inicio_atividade' => 'required|date_format:Y-m-d|before_or_equal:today',
+                'nome_fantasia' => 'required|min:5|max:191',
+                'checkEndEmpresa' => 'present',
+                'cep_empresa' => 'required_if:checkEndEmpresa,off|nullable|size:9|regex:/([0-9]{5})\-([0-9]{3})$/',
+                'bairro_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191',
+                'logradouro_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191',
+                'numero_empresa' => 'required_if:checkEndEmpresa,off|nullable|max:10',
+                'complemento_empresa' => 'nullable|max:50',
+                'cidade_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191|regex:/^\D*$/',
+                'uf_empresa' => 'required_if:checkEndEmpresa,off|nullable|in:'.implode(',', array_keys(estados())),
+                'nome_rt' => 'required|min:5|max:191|regex:/^\D*$/',
+                'nome_social_rt' => 'nullable|min:5|max:191|regex:/^\D*$/',
+                'sexo_rt' => 'required|in:'.implode(',', array_keys(generos())),
+                'dt_nascimento_rt' => 'required|date_format:Y-m-d|before_or_equal:'.$this->regraDtNasc,
+                'cpf_rt' => ['required', new Cpf],
+                'tipo_identidade_rt' => 'required|in:'.implode(',', tipos_identidade()),
+                'identidade_rt' => 'required|min:4|max:30',
+                'orgao_emissor_rt' => 'required|min:3|max:191',
+                'dt_expedicao_rt' => 'required|date_format:Y-m-d|before_or_equal:today',
+                'cep_rt' => 'required|size:9|regex:/([0-9]{5})\-([0-9]{3})$/',
+                'bairro_rt' => 'required|min:4|max:191',
+                'logradouro_rt' => 'required|min:4|max:191',
+                'numero_rt' => 'required|min:1|max:10',
+                'complemento_rt' => 'nullable|max:50',
+                'cidade_rt' => 'required|min:4|max:191',
+                'uf_rt' => 'required|in:'.implode(',', array_keys(estados())),
+                'nome_mae_rt' => 'required|min:5|max:191|regex:/^\D*$/',
+                'nome_pai_rt' => 'nullable|min:5|max:191|regex:/^\D*$/',
+                'titulo_eleitor_rt' => 'required|nullable|min:12|max:15',
+                'zona_rt' => 'required|max:6',
+                'secao_rt' => 'required|max:8',
+                'ra_reservista_rt' => [
+                    Rule::requiredIf(function () {
+                        return ($this->sexo_rt == 'M') && $this->regraReservistaRT;
+                    }),
+                    'nullable',
+                    'min:12',
+                    'max:15',
+                ],
+            ];
+        }
 
-        if(\Route::is('externo.contabil.inserir.preregistro'))
-            return $contabilCriarPR;
-
-        $outrasRules = $externo->isPessoaFisica() ? $pessoaFisica : $pessoaJuridica;
-
-        return array_merge($rules, $outrasRules);
+        return array_merge($rules, $pessoa, $this->socios);
     }
 
     protected function prepareForValidation()
@@ -144,8 +147,11 @@ class PreRegistroRequest extends FormRequest
         }
         
         $this->externo = auth()->guard('contabil')->check() ? 
-        auth()->guard('contabil')->user()->preRegistros()->findOrFail($this->preRegistro)->userExterno : 
+        auth()->guard('contabil')->user()->preRegistros->find($this->preRegistro)->userExterno : 
         auth()->guard('user_externo')->user();
+
+        $this->socios = array();
+        $this->msg_socios = array();
 
         $preRegistro = $this->externo->load('preRegistro')->preRegistro;
 
@@ -181,6 +187,21 @@ class PreRegistroRequest extends FormRequest
                 'cpf_rt' => apenasNumeros(request()->cpf_rt),
                 'identidade_rt' => mb_strtoupper(apenasNumerosLetras(request()->identidade_rt))
             ]);
+
+            // confere os sócios
+            $socios = $preRegistro->pessoaJuridica->possuiSocio() ? $preRegistro->pessoaJuridica->socios : null;
+            if(isset($socios)){
+                foreach($socios as $socio){
+                    $this->socios = array_merge($this->socios, $socio->arrayValidacao());
+                    $this->msg_socios = array_merge($this->msg_socios, $socio->arrayValidacaoMsg());
+                    $this->merge($socio->arrayValidacaoInputs());
+                }
+            }
+            else{
+                $this->socios = ['cpf_cnpj_socio_' => 'required'];
+                $this->msg_socios = ['cpf_cnpj_socio_' => '"CPF / CNPJ do Sócio"'];
+            }
+            $socios = null;
         }
         
         if($this->externo->isPessoaFisica())
@@ -218,7 +239,7 @@ class PreRegistroRequest extends FormRequest
 
     public function rules()
     {
-        return $this->getRules($this->externo);
+        return $this->getRules();
     }
 
     public function messages()
@@ -266,11 +287,14 @@ class PreRegistroRequest extends FormRequest
      */
     public function attributes()
     {
-        $contabilCriarPR = [
-            'cpf_cnpj' => 'CPF / CNPJ',
-            'nome' => 'Nome',
-            'email' => 'E-mail',
-        ];
+        if(\Route::is('externo.contabil.inserir.preregistro'))
+            return [
+                'cpf_cnpj' => 'CPF / CNPJ',
+                'nome' => 'Nome',
+                'email' => 'E-mail',
+            ];
+
+        $pessoa = null;
 
         $rules = [
             'path' => '"Anexo"',
@@ -297,70 +321,67 @@ class PreRegistroRequest extends FormRequest
             'pergunta' => '"Pergunta"',
         ];
 
-        $pessoaFisica = [
-            'nome_social' => '"Nome social"',
-            'sexo' => '"Gênero"',
-            'dt_nascimento' => '"Data de nascimento"',
-            'estado_civil' => '"Estado civil"',
-            'nacionalidade' => '"Nacionalidade"',
-            'naturalidade_cidade' => '"Naturalidade - Cidade"',
-            'naturalidade_estado' => '"Naturalidade - Estado"',
-            'nome_mae' => '"Nome da mãe"',
-            'nome_pai' => '"Nome do pai"',
-            'tipo_identidade' => '"Tipo do documento de identidade"',
-            'identidade' => '"Número de identidade"',
-            'orgao_emissor' => '"Órgão emissor"',
-            'dt_expedicao' => '"Data de expedição"',
-            'titulo_eleitor' => '"Título de Eleitor"',
-            'zona' => '"Zona Eleitoral"',
-            'secao' => '"Seção Eleitoral"',
-            'ra_reservista' => 'RA Reservista',
-        ];
+        if($this->externo->isPessoaFisica())
+            $pessoa = [
+                'nome_social' => '"Nome social"',
+                'sexo' => '"Gênero"',
+                'dt_nascimento' => '"Data de nascimento"',
+                'estado_civil' => '"Estado civil"',
+                'nacionalidade' => '"Nacionalidade"',
+                'naturalidade_cidade' => '"Naturalidade - Cidade"',
+                'naturalidade_estado' => '"Naturalidade - Estado"',
+                'nome_mae' => '"Nome da mãe"',
+                'nome_pai' => '"Nome do pai"',
+                'tipo_identidade' => '"Tipo do documento de identidade"',
+                'identidade' => '"Número de identidade"',
+                'orgao_emissor' => '"Órgão emissor"',
+                'dt_expedicao' => '"Data de expedição"',
+                'titulo_eleitor' => '"Título de Eleitor"',
+                'zona' => '"Zona Eleitoral"',
+                'secao' => '"Seção Eleitoral"',
+                'ra_reservista' => 'RA Reservista',
+            ];
 
-        $pessoaJuridica = [
-            'razao_social' => '"Razão social"',
-            'capital_social' => '"Capital social"',
-            'nire' => '"Nire"',
-            'tipo_empresa' => '"Tipo da empresa"',
-            'dt_inicio_atividade' => '"Data de início das atividades"',
-            'nome_fantasia' => '"Nome Fantasia"',
-            'checkEndEmpresa' => '"Opção Mesmo endereço"',
-            'cep_empresa' => '"Cep da empresa"',
-            'bairro_empresa' => '"Bairro da empresa"',
-            'logradouro_empresa' => '"Logradouro da empresa"',
-            'numero_empresa' => '"Número da empresa"',
-            'complemento_empresa' => '"Complemento da empresa"',
-            'cidade_empresa' => '"Município da empresa"',
-            'uf_empresa' => '"Estado da empresa"',
-            'nome_rt' => '"Nome do responsável técnico"',
-            'nome_social_rt' => '"Nome social do responsável técnico"',
-            'sexo_rt' => '"Gênero do responsável técnico"',
-            'dt_nascimento_rt' => '"Data de nascimento do responsável técnico"',
-            'cpf_rt' => '"CPF do responsável técnico"',
-            'tipo_identidade_rt' => '"Tipo do documento de identidade do responsável técnico"',
-            'identidade_rt' => '"Número de identidade do responsável técnico"',
-            'orgao_emissor_rt' => '"Órgão emissor do responsável técnico"',
-            'dt_expedicao_rt' => '"Data de expedição do responsável técnico"',
-            'cep_rt' => '"Cep do responsável técnico"',
-            'bairro_rt' => '"Bairro do responsável técnico"',
-            'logradouro_rt' => '"Logradouro do responsável técnico"',
-            'numero_rt' => '"Número do responsável técnico"',
-            'complemento_rt' => '"Complemento do responsável técnico"',
-            'cidade_rt' => '"Município do responsável técnico"',
-            'uf_rt' => '"Estado do responsável técnico"',
-            'nome_mae_rt' => '"Nome da mãe do responsável técnico"',
-            'nome_pai_rt' => '"Nome do pai do responsável técnico"',
-            'titulo_eleitor_rt' => '"Título de Eleitor do responsável técnico"',
-            'zona_rt' => '"Zona Eleitoral do responsável técnico"',
-            'secao_rt' => '"Seção Eleitoral do responsável técnico"',
-            'ra_reservista_rt' => 'RA Reservista do responsável técnico',
-        ];
-
-        if(\Route::is('externo.contabil.inserir.preregistro'))
-            return $contabilCriarPR;
+        if(!$this->externo->isPessoaFisica())
+            $pessoa = [
+                'razao_social' => '"Razão social"',
+                'capital_social' => '"Capital social"',
+                'nire' => '"Nire"',
+                'tipo_empresa' => '"Tipo da empresa"',
+                'dt_inicio_atividade' => '"Data de início das atividades"',
+                'nome_fantasia' => '"Nome Fantasia"',
+                'checkEndEmpresa' => '"Opção Mesmo endereço"',
+                'cep_empresa' => '"Cep da empresa"',
+                'bairro_empresa' => '"Bairro da empresa"',
+                'logradouro_empresa' => '"Logradouro da empresa"',
+                'numero_empresa' => '"Número da empresa"',
+                'complemento_empresa' => '"Complemento da empresa"',
+                'cidade_empresa' => '"Município da empresa"',
+                'uf_empresa' => '"Estado da empresa"',
+                'nome_rt' => '"Nome do responsável técnico"',
+                'nome_social_rt' => '"Nome social do responsável técnico"',
+                'sexo_rt' => '"Gênero do responsável técnico"',
+                'dt_nascimento_rt' => '"Data de nascimento do responsável técnico"',
+                'cpf_rt' => '"CPF do responsável técnico"',
+                'tipo_identidade_rt' => '"Tipo do documento de identidade do responsável técnico"',
+                'identidade_rt' => '"Número de identidade do responsável técnico"',
+                'orgao_emissor_rt' => '"Órgão emissor do responsável técnico"',
+                'dt_expedicao_rt' => '"Data de expedição do responsável técnico"',
+                'cep_rt' => '"Cep do responsável técnico"',
+                'bairro_rt' => '"Bairro do responsável técnico"',
+                'logradouro_rt' => '"Logradouro do responsável técnico"',
+                'numero_rt' => '"Número do responsável técnico"',
+                'complemento_rt' => '"Complemento do responsável técnico"',
+                'cidade_rt' => '"Município do responsável técnico"',
+                'uf_rt' => '"Estado do responsável técnico"',
+                'nome_mae_rt' => '"Nome da mãe do responsável técnico"',
+                'nome_pai_rt' => '"Nome do pai do responsável técnico"',
+                'titulo_eleitor_rt' => '"Título de Eleitor do responsável técnico"',
+                'zona_rt' => '"Zona Eleitoral do responsável técnico"',
+                'secao_rt' => '"Seção Eleitoral do responsável técnico"',
+                'ra_reservista_rt' => 'RA Reservista do responsável técnico',
+            ];
             
-        $outrasRules = $this->externo->isPessoaFisica() ? $pessoaFisica : $pessoaJuridica;
-
-        return array_merge($rules, $outrasRules);
+        return array_merge($rules, $pessoa, $this->msg_socios);
     }
 }

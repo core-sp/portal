@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 
 class Socio extends Model
 {
@@ -283,5 +284,90 @@ class Socio extends Model
         $texto .= '<i class="fas fa-trash-alt"></i></button></div></div></div>';
 
         return $texto;
+    }
+
+    private function arrayInputs($array)
+    {
+        return collect(Arr::only($this->attributesToArray(), $array))->keyBy(function ($item, $key) {
+            return $key . '_socio_' . $this->id;
+        })->toArray();
+    }
+
+    public function arrayValidacao()
+    {
+        $rt = [
+            'nacionalidade_socio_' . $this->id => 'required|in:'.implode(',',
+                collect(nacionalidades())->map(function ($item, $key) {
+                    return mb_strtoupper($item, 'UTF-8');
+                })->toArray()),
+            'naturalidade_estado_socio_' . $this->id => 'required_if:nacionalidade_socio_'.$this->id.',BRASILEIRA|nullable|in:'.implode(',', array_keys(estados())),
+        ];
+
+        if($this->socioRT())
+            return $rt;
+
+        $geral = [
+            'nome_socio_' . $this->id => 'required|min:5|max:191|regex:/^\D*$/',
+            'cep_socio_' . $this->id => 'required|size:9|regex:/([0-9]{5})\-([0-9]{3})$/',
+            'bairro_socio_' . $this->id => 'required|min:4|max:191',
+            'logradouro_socio_' . $this->id => 'required|min:4|max:191',
+            'numero_socio_' . $this->id => 'required|min:1|max:10',
+            'complemento_socio_' . $this->id => 'nullable|max:50',
+            'cidade_socio_' . $this->id => 'required|min:4|max:191',
+            'uf_socio_' . $this->id => 'required|in:'.implode(',', array_keys(estados())),
+        ];
+
+        return $this->socioPF() ? array_merge([
+            'nome_social_socio_' . $this->id => 'nullable|min:5|max:191|regex:/^\D*$/',
+            'dt_nascimento_socio_' . $this->id => 'required|date_format:Y-m-d|before_or_equal:'.now()->subYears(18)->format('Y-m-d'),
+            'identidade_socio_' . $this->id => 'required|min:4|max:30',
+            'orgao_emissor_socio_' . $this->id => 'required|min:3|max:191',
+            'nome_mae_socio_' . $this->id => 'required|min:5|max:191|regex:/^\D*$/',
+            'nome_pai_socio_' . $this->id => 'required|min:5|max:191|regex:/^\D*$/',
+        ], $rt, $geral) : $geral;
+    }
+
+    public function arrayValidacaoInputs()
+    {
+        $rt = $this->arrayInputs(['nacionalidade', 'naturalidade_estado']);
+
+        if($this->socioRT())
+            return $rt;
+
+        $geral = $this->arrayInputs(['nome', 'cep', 'bairro', 'logradouro', 'numero', 'complemento', 'cidade', 'uf']);
+
+        return !$this->socioPF() ? $geral : 
+        array_merge($this->arrayInputs(['nome_social', 'dt_nascimento', 'identidade', 'orgao_emissor', 'nome_mae', 'nome_pai']), $rt, $geral);
+    }
+
+    public function arrayValidacaoMsg()
+    {
+        $rt = [
+            'nacionalidade_socio_' . $this->id => '"Nacionalidade do Sócio com ID ' . $this->id . '"',
+            'naturalidade_estado_socio_' . $this->id => '"Naturalidade - Estado do Sócio com ID ' . $this->id . '"',
+        ];
+
+        if($this->socioRT())
+            return $rt;
+
+        $geral = [
+            'nome_socio_' . $this->id => '"Nome do Sócio com ID ' . $this->id . '"',
+            'cep_socio_' . $this->id => '"Cep do Sócio com ID ' . $this->id . '"',
+            'bairro_socio_' . $this->id => '"Bairro do Sócio com ID ' . $this->id . '"',
+            'logradouro_socio_' . $this->id => '"Logradouro do Sócio com ID ' . $this->id . '"',
+            'numero_socio_' . $this->id => '"Número do logradouro do Sócio com ID ' . $this->id . '"',
+            'complemento_socio_' . $this->id => '"Complemento do logradouro do Sócio com ID ' . $this->id . '"',
+            'cidade_socio_' . $this->id => '"Município do Sócio com ID ' . $this->id . '"',
+            'uf_socio_' . $this->id => '"Estado do Sócio com ID ' . $this->id . '"',
+        ];
+
+        return $this->socioPF() ? array_merge([
+            'nome_social_socio_' . $this->id => '"Nome Social do Sócio com ID ' . $this->id . '"',
+            'dt_nascimento_socio_' . $this->id => '"Data de Nascimento do Sócio com ID ' . $this->id . '"',
+            'identidade_socio_' . $this->id => '"Identidade do Sócio com ID ' . $this->id . '"',
+            'orgao_emissor_socio_' . $this->id => '"Órgão Emissor do Sócio com ID ' . $this->id . '"',
+            'nome_mae_socio_' . $this->id => '"Nome da Mãe do Sócio com ID ' . $this->id . '"',
+            'nome_pai_socio_' . $this->id => '"Nome do Pai do Sócio com ID ' . $this->id . '"',
+        ], $rt, $geral) : $geral;
     }
 }
