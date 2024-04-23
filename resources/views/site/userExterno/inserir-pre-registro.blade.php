@@ -12,8 +12,6 @@
         @php
             if(in_array($key, ['opcional_celular', 'opcional_celular_1']))
                 $key .= '[]';
-            if(strpos($key, '_socio_') !== false)
-                $key = 'checkRT_socio';
         @endphp
         <span>
             <button class="btn btn-sm btn-link erroPreRegistro" value="{{ $key }}">

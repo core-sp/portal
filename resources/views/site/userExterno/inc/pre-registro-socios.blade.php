@@ -51,8 +51,18 @@
     </small>
 
     <div class="form-row mb-2 mt-2">
+        <div class="col-sm-2 mb-2-576">
+            <label for="id_socio">ID</label>
+            <input 
+                type="text" 
+                class="form-control" 
+                name="id_socio" 
+                value="" 
+                readonly 
+            />
+        </div>
+
         <div class="col-lg mb-2-576">
-            <input type="hidden" name="id_socio" value="">
             <label for="cpf_cnpj_socio">{{ $nome_campos['cpf_cnpj_socio'] }} - CPF / CNPJ <span class="text-danger">*</span></label>
             <input
                 type="text"

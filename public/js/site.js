@@ -1446,7 +1446,7 @@ function putDadosPreRegistro(objeto)
 				removeSocio(response['resultado'], $('#form_socio [name="id_socio"]').val());
 				preencheSocio(response['resultado'], campo, valor);
 			}
-			removerMsgErroServer(objeto, campo);
+			removerMsgErroServer(objeto, campo, campo.indexOf('_socio') >= 0 ? dados : null);
 			$('#atualizacaoPreRegistro').text(response['dt_atualizado']);
 			valorPreRegistro = valor;
 			// confereObrigatorios();
@@ -1467,17 +1467,23 @@ function putDadosPreRegistro(objeto)
 	});
 }
 
-function removerMsgErroServer(objeto, campo)
+function removerMsgErroServer(objeto, campo, dadosSocio = null)
 {
 	var endEmpresa = '.erroPreRegistro[value="cep_empresa"], .erroPreRegistro[value="bairro_empresa"], ';
 	endEmpresa += '.erroPreRegistro[value="logradouro_empresa"], .erroPreRegistro[value="numero_empresa"], ';
 	endEmpresa += '.erroPreRegistro[value="complemento_empresa"], .erroPreRegistro[value="cidade_empresa"], .erroPreRegistro[value="uf_empresa"]';
 
-	// remove mensagem de validação do servidor
-	if(objeto.next().hasClass('invalid-feedback'))
-		objeto.removeClass('is-invalid').next().remove();
-	if($('.erroPreRegistro[value="' + campo + '"]').length > 0)
-		$('.erroPreRegistro[value="' + campo + '"]').parent().remove();
+	if((campo.indexOf('_socio') >= 0) && (dadosSocio !== null)){
+		if($('.erroPreRegistro[value="' + campo + '_' + dadosSocio.id_socio + '"]').length > 0)
+			$('.erroPreRegistro[value="' + campo + '_' + dadosSocio.id_socio + '"]').parent().remove();
+	}else{
+		// remove mensagem de validação do servidor
+		if(objeto.next().hasClass('invalid-feedback'))
+			objeto.removeClass('is-invalid').next().remove();
+		if($('.erroPreRegistro[value="' + campo + '"]').length > 0)
+			$('.erroPreRegistro[value="' + campo + '"]').parent().remove();
+	}
+
 	if(($('.erroPreRegistro').length == 0) && ($('#erroPreRegistro').length == 1))
 		$('#erroPreRegistro').remove();
 	if(campo == 'checkEndEmpresa')
@@ -1983,9 +1989,17 @@ $('#inserirRegistro input:checkbox').change(function(){
 // $('.nav-pills a').on('shown.bs.tab', function(){
 var teste;
 $('.erroPreRegistro').click(function(){
-	var campo = $(this).val();
+	var campo = $(this).val().indexOf('_socio_') >= 0 ? 'checkRT_socio' : $(this).val();
 	var hrefMenu = $('[name="' + campo + '"]').parents('.tab-pane').attr('id');
 	$('.menu-registro.nav-pills [href="#' + hrefMenu + '"]').tab('show');
+
+	if(campo == 'checkRT_socio'){
+		$('#mostrar_socios').click();
+		var id = $(this).val().replace(/\D/g, '');
+		$('#socio_' + id + ' .acoes_socio button.editar_socio').click();
+		campo = $(this).val().replace('_' + id, '');
+	}
+
 	teste = campo;
 	$('[name="' + teste + '"]').focus();
 });
