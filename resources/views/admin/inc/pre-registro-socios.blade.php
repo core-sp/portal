@@ -4,7 +4,7 @@
 
 <div class="card-body bg-light">
 
-    @if(!$resultado->pessoaJuridica->possuiSocio())
+    @if(!$resultado->pessoaJuridica->possuiSocio() && ($resultado->criado() || $resultado->isFinalizado()))
     <p><i>Ainda não possui sócio(s).</i></p>
 
     @else

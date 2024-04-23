@@ -4,7 +4,7 @@
 
 <div class="card-body bg-light">
 
-    @if(!$resultado->pessoaJuridica->possuiRT())
+    @if(!$resultado->pessoaJuridica->possuiRT() && ($resultado->criado() || $resultado->isFinalizado()))
     <p><i>Ainda não possui Responsável Técnico.</i></p>
 
     @else
