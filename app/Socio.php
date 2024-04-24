@@ -304,9 +304,13 @@ class Socio extends Model
         ];
 
         if($this->socioRT())
+        {
+            $rt['checkRT_socio'] = '';
             return $rt;
+        }
 
         $geral = [
+            'checkRT_socio' => '',
             'nome_socio_' . $this->id => 'required|min:5|max:191|regex:/^\D*$/',
             'cep_socio_' . $this->id => 'required|size:9|regex:/([0-9]{5})\-([0-9]{3})$/',
             'bairro_socio_' . $this->id => 'required|min:4|max:191',

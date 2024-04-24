@@ -180,13 +180,7 @@
             </div>
             <!-- socios -->
             <div id="parte_socios" class="tab-pane container fade"><br>
-                @if(!$resultado->userPodeEditar())
-                <fieldset disabled>
-                    @include('site.userExterno.inc.pre-registro-socios', ['nome_campos' => $codigos[4], 'classe' => $classes[6]])
-                </fieldset>
-                @else
-                    @include('site.userExterno.inc.pre-registro-socios', ['nome_campos' => $codigos[4], 'classe' => $classes[6]])
-                @endif
+                @include('site.userExterno.inc.pre-registro-socios', ['nome_campos' => $codigos[4], 'classe' => $classes[6]])
             </div>
             @endif
 

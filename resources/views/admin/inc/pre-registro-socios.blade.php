@@ -4,6 +4,8 @@
 
 <div class="card-body bg-light">
 
+    @include('admin.inc.pre-registro-btn-remover-just', ['aba' => $abas[4], 'valor_btn' => 'parte_socios'])
+    
     @if(!$resultado->pessoaJuridica->possuiSocio() && ($resultado->criado() || $resultado->isFinalizado()))
     <p><i>Ainda não possui sócio(s).</i></p>
 
@@ -14,8 +16,24 @@
     <hr>
 
     <p>
+        <i class="fas fa-trash-alt text-danger"></i>&nbsp;&nbsp;<span class="font-weight-bolder">ID(s) do(s) Sócio(s) removido(s) pelo solicitante na última atualização de status:</span>
+            <span>{{ array_key_exists('removidos_socio', $camposEditados) ? $camposEditados['removidos_socio'] : '-----' }}</span>
+    </p>
+
+    <hr>
+
+    <p id="checkRT_socio">
         {!! $resultado->pessoaJuridica->possuiRTSocio() ? '<i class="fas fa-check-circle text-success"></i>' : '<i class="fas fa-times text-danger"></i>' !!}
         &nbsp;<span class="font-weight-bolder">{{ $nome_campos['checkRT_socio'] }} - Responsável Técnico pertence ao quadro societário</span>
+        @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
+            'campo' => 'checkRT_socio',
+        ])
+        @endcomponent
+
+        @if(array_key_exists('checkRT_socio', $camposEditados))
+            <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <hr>
@@ -27,9 +45,6 @@
             'campo' => 'cpf_cnpj_socio',
         ])
         @endcomponent
-        @if(array_key_exists('cpf_cnpj_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -40,6 +55,9 @@
                 <span class="font-weight-bolder">Sócio <span class="text-primary">ID {{ $socio->id }}</span>&nbsp;&nbsp;-</span>
                 {!! $socio->socioRT() ? '&nbsp;&nbsp;<span class="badge badge-warning pt-1">RT</span>&nbsp;&nbsp;-' : '' !!}
                 &nbsp;&nbsp;{{ isset($socio->cpf_cnpj) ? formataCpfCnpj($socio->cpf_cnpj) : '------' }}
+                @if(array_key_exists('cpf_cnpj_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
+                @endif
             </span>
 
             @if(!$loop->last)
@@ -58,9 +76,6 @@
             'campo' => 'registro_socio',
         ])
         @endcomponent
-        @if(array_key_exists('registro_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -74,6 +89,9 @@
                 &nbsp;&nbsp;{{ isset($socio->registro) ? formataRegistro($socio->registro) : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @endif
+                @if(array_key_exists('registro_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -93,9 +111,6 @@
             'campo' => 'nome_socio',
         ])
         @endcomponent
-        @if(array_key_exists('nome_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -109,6 +124,9 @@
                 &nbsp;&nbsp;{{ isset($socio->nome) ? $socio->nome : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @endif
+                @if(array_key_exists('nome_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -128,9 +146,6 @@
             'campo' => 'nome_social_socio',
         ])
         @endcomponent
-        @if(array_key_exists('nome_social_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -144,6 +159,9 @@
                 &nbsp;&nbsp;{{ isset($socio->nome_social) ? $socio->nome_social : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @endif
+                @if(array_key_exists('nome_social_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -163,9 +181,6 @@
             'campo' => 'dt_nascimento_socio',
         ])
         @endcomponent
-        @if(array_key_exists('dt_nascimento_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -179,6 +194,9 @@
                 &nbsp;&nbsp;{{ isset($socio->dt_nascimento) ? onlyDate($socio->dt_nascimento) : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @endif
+                @if(array_key_exists('dt_nascimento_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -198,9 +216,6 @@
             'campo' => 'identidade_socio',
         ])
         @endcomponent
-        @if(array_key_exists('identidade_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -214,6 +229,9 @@
                 &nbsp;&nbsp;{{ isset($socio->identidade) ? $socio->identidade : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @endif
+                @if(array_key_exists('identidade_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -233,9 +251,6 @@
             'campo' => 'orgao_emissor_socio',
         ])
         @endcomponent
-        @if(array_key_exists('orgao_emissor_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -249,6 +264,9 @@
                 &nbsp;&nbsp;{{ isset($socio->orgao_emissor) ? $socio->orgao_emissor : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @endif
+                @if(array_key_exists('orgao_emissor_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -268,9 +286,6 @@
             'campo' => 'cep_socio',
         ])
         @endcomponent
-        @if(array_key_exists('cep_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -284,6 +299,9 @@
                 &nbsp;&nbsp;{{ isset($socio->cep) ? $socio->cep : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @endif
+                @if(array_key_exists('cep_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -303,9 +321,6 @@
             'campo' => 'bairro_socio',
         ])
         @endcomponent
-        @if(array_key_exists('bairro_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -319,6 +334,9 @@
                 &nbsp;&nbsp;{{ isset($socio->bairro) ? $socio->bairro : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @endif
+                @if(array_key_exists('bairro_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -338,9 +356,6 @@
             'campo' => 'logradouro_socio',
         ])
         @endcomponent
-        @if(array_key_exists('logradouro_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -354,6 +369,9 @@
                 &nbsp;&nbsp;{{ isset($socio->logradouro) ? $socio->logradouro : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @endif
+                @if(array_key_exists('logradouro_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -373,9 +391,6 @@
             'campo' => 'numero_socio',
         ])
         @endcomponent
-        @if(array_key_exists('numero_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -389,6 +404,9 @@
                 &nbsp;&nbsp;{{ isset($socio->numero) ? $socio->numero : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @endif
+                @if(array_key_exists('numero_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -408,9 +426,6 @@
             'campo' => 'complemento_socio',
         ])
         @endcomponent
-        @if(array_key_exists('complemento_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -424,6 +439,9 @@
                 &nbsp;&nbsp;{{ isset($socio->complemento) ? $socio->complemento : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @endif
+                @if(array_key_exists('complemento_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -443,9 +461,6 @@
             'campo' => 'cidade_socio',
         ])
         @endcomponent
-        @if(array_key_exists('cidade_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -459,6 +474,9 @@
                 &nbsp;&nbsp;{{ isset($socio->cidade) ? $socio->cidade : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @endif
+                @if(array_key_exists('cidade_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -478,9 +496,6 @@
             'campo' => 'uf_socio',
         ])
         @endcomponent
-        @if(array_key_exists('uf_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -494,6 +509,9 @@
                 &nbsp;&nbsp;{{ isset($socio->uf) ? $socio->uf : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @endif
+                @if(array_key_exists('uf_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -513,9 +531,6 @@
             'campo' => 'nome_mae_socio',
         ])
         @endcomponent
-        @if(array_key_exists('nome_mae_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -529,6 +544,9 @@
                 &nbsp;&nbsp;{{ isset($socio->nome_mae) ? $socio->nome_mae : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @endif
+                @if(array_key_exists('nome_mae_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -548,9 +566,6 @@
             'campo' => 'nome_pai_socio',
         ])
         @endcomponent
-        @if(array_key_exists('nome_pai_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -564,6 +579,9 @@
                 &nbsp;&nbsp;{{ isset($socio->nome_pai) ? $socio->nome_pai : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @endif
+                @if(array_key_exists('nome_pai_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -583,9 +601,6 @@
             'campo' => 'nacionalidade_socio',
         ])
         @endcomponent
-        @if(array_key_exists('nacionalidade_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -599,6 +614,9 @@
                 &nbsp;&nbsp;{{ isset($socio->nacionalidade) ? $socio->nacionalidade : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>Não precisa</i></span>
+                @endif
+                @if(array_key_exists('nacionalidade_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 
@@ -618,9 +636,6 @@
             'campo' => 'naturalidade_estado_socio',
         ])
         @endcomponent
-        @if(array_key_exists('naturalidade_estado_socio', $camposEditados))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
 
         @if($resultado->pessoaJuridica->possuiSocio())
         <br><br>
@@ -634,6 +649,9 @@
                 &nbsp;&nbsp;{{ isset($socio->naturalidade_estado) ? $socio->naturalidade_estado : '------' }}
                 @else
                 &nbsp;&nbsp;<span class="text-danger"><i>Não precisa</i></span>
+                @endif
+                @if(array_key_exists('naturalidade_estado_socio_' . $socio->id, $camposEditados))
+                <span class="badge badge-danger ml-2">Campo alterado</span>
                 @endif
             </span>
 

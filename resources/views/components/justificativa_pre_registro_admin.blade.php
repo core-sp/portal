@@ -14,7 +14,7 @@ $resultado = $preRegistro->getJustificativaPorCampo($campo);
         <i class="fas fa-{{ isset($resultado) ? 'edit' : 'user-edit' }}"></i>
     </button>
     @if(isset($resultado))
-    <span class="badge badge-warning ml-2">Justificado</span>
+    <span class="badge badge-warning just ml-2">Justificado</span>
     @endif
     <span class="valorJustificativaPR" style="display:none;">{{ isset($resultado) ? $resultado : '' }}</span>
 @endif

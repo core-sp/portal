@@ -3,6 +3,9 @@
 @endphp
 
 <div class="card-body bg-light">
+
+    @include('admin.inc.pre-registro-btn-remover-just', ['aba' => $abas[2], 'valor_btn' => 'parte_endereco'])
+
     <h5 class="font-weight-bolder mb-3">Endereço de correspondência</h5>
 
     <p id="cep">
@@ -100,10 +103,9 @@
     <br>
     <h5 class="font-weight-bolder mb-3">Endereço da empresa</h5>
 
-    @if(isset($resultado->pessoaJuridica) && $resultado->pessoaJuridica->mesmoEndereco())
-
     <p id="checkEndEmpresa">
-        <span class="font-weight-bolder">{{ $nome_campos['checkEndEmpresa'] }} - Mesmo endereço da correspondência </span>
+        {!! isset($resultado->pessoaJuridica) && $resultado->pessoaJuridica->mesmoEndereco() ? '<i class="fas fa-check-circle text-success"></i>' : '<i class="fas fa-times text-danger"></i>' !!}
+        &nbsp;<span class="font-weight-bolder">{{ $nome_campos['checkEndEmpresa'] }} - Mesmo endereço da correspondência </span>
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'checkEndEmpresa',
@@ -113,8 +115,6 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
-
-    @else
 
     <p id="cep_empresa">
         <span class="font-weight-bolder">{{ $nome_campos['cep_empresa'] }} - CEP: </span>
@@ -206,8 +206,6 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
-
-    @endif
 
 @endif
 </div>

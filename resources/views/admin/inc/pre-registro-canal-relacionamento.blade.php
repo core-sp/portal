@@ -4,6 +4,8 @@
 
 <div class="card-body bg-light">
 
+    @include('admin.inc.pre-registro-btn-remover-just', ['aba' => $abas[5], 'valor_btn' => 'parte_canal_relacionamento'])
+
     <p>
         <span class="font-weight-bolder">E-mail: </span>
         {{ $resultado->userExterno->email }}

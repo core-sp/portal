@@ -30,7 +30,26 @@ class PreRegistro extends Model
         if($this->correcaoEnviada())
         {
             $camposEspelho = isset($this->campos_espelho) ? $this->fromJson($this->campos_espelho) : array();
-            $dados = array_merge(array_diff_assoc($camposEspelho, $final), array_diff_assoc($final, $camposEspelho));
+            $dados = array_merge(array_diff_assoc($camposEspelho, $request), array_diff_assoc($request, $camposEspelho));
+
+            $socios = !$this->userExterno->isPessoaFisica() ? $this->pessoaJuridica->socios->pluck('id')->toArray() : array();
+
+            $removidos_socio = implode(', ', array_unique(array_keys(collect(array_filter($dados, function($k) use($socios) {
+                if(strpos($k, '_socio_') !== false)
+                    return !in_array(apenasNumeros($k), $socios);
+            }, ARRAY_FILTER_USE_KEY))->keyBy(function($i, $k) {
+                return apenasNumeros($k);
+            })->toArray())));
+
+            if(strlen($removidos_socio) > 1)
+                $dados['removidos_socio'] = $removidos_socio;
+
+            $dados = array_filter($dados, function($v, $k) use($socios) {
+                return strpos($k, '_socio_') !== false ? in_array(apenasNumeros($k), $socios) : true;
+            }, ARRAY_FILTER_USE_BOTH);
+
+            $socios = null;
+
             if(isset($dados['path']))
                 $dados['path'] = $final['path'];
             $this->update(['campos_editados' => $this->asJson($dados)]);
@@ -109,6 +128,10 @@ class PreRegistro extends Model
                     $texto[$valor] = "OK";
                 else
                     unset($texto[$valor]);
+                break;
+            case 'exclusao_massa':
+                foreach($valor as $v)
+                    unset($texto[$v]);
                 break;
             default:
                 if(isset($valor) && (strlen($valor) > 0))
@@ -540,7 +563,7 @@ class PreRegistro extends Model
         $request = $this->formatarCamposRequest($request);
         $idAnexos = isset($this->anexos) ? $this->anexos->pluck('id')->toArray() : array();
         $request['path'] = !empty($idAnexos) ? implode(',', $idAnexos) : '';
-        $final = $request;
+        $final['path'] = $request['path'];
 
         if(isset($this->campos_espelho))
         {

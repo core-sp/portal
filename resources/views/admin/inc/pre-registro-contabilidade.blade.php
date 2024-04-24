@@ -4,6 +4,8 @@
 
 <div class="card-body bg-light">
 
+    @include('admin.inc.pre-registro-btn-remover-just', ['aba' => $abas[0], 'valor_btn' => 'parte_contabilidade'])
+
     @if(!$resultado->possuiContabil() && ($resultado->criado() || $resultado->isFinalizado()))
     <p><i>Não possui Contabilidade.</i></p>
 

@@ -1312,6 +1312,10 @@ function putDadosPreRegistro(campo, valor, acao)
                 $('#submitNegarPR').submit();
             if(acao == 'justificar')
                 addJustificado(campo, valor);
+            if(acao == 'exclusao_massa')
+              valor.forEach(function(value, index, array){
+                addJustificado(value, '');
+              });
             else if(acao == 'editar'){
                 $("#modalLoadingBody").html('<i class="icon fa fa-check text-success"></i> Salvo');
                 $("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
@@ -1375,14 +1379,14 @@ function contJustificativaPR(obj)
 function addJustificado(campo, valor)
 {
     if(valor != ""){
-        if($('#' + campo + ' span.badge-warning').length == 0){
-            $('#' + campo).append('<span class="badge badge-warning ml-2">Justificado</span>');
-            $('#' + campo + ' button').removeClass('btn-outline-success').addClass('btn-outline-danger');
+        if($('#' + campo + ' .just').length == 0){
+            $('#' + campo + ' .justificativaPreRegistro').after('<span class="badge badge-warning just ml-2">Justificado</span>');
+            $('#' + campo + ' button.justificativaPreRegistro').removeClass('btn-outline-success').addClass('btn-outline-danger');
             $('#' + campo + ' button.justificativaPreRegistro').html('<i class="fas fa-edit"></i>');
         }
     }else{
-        $('#' + campo + ' span.badge-warning').remove();
-        $('#' + campo + ' button').removeClass('btn-outline-danger').addClass('btn-outline-success');
+        $('#' + campo + ' .just').remove();
+        $('#' + campo + ' button.justificativaPreRegistro').removeClass('btn-outline-danger').addClass('btn-outline-success');
         $('#' + campo + ' button.justificativaPreRegistro').html('<i class="fas fa-user-edit"></i>');
     }
 
@@ -1435,13 +1439,13 @@ function verificaJustificados()
     $('#accordionPreRegistro div.card-body').each(function() {
         var menu = $(this).parentsUntil('#accordionPreRegistro').find('.menuPR');
         if($(this).find('.valorJustificativaPR').text().length > 0){
-            if(menu.find('span.badge-warning').length == 0)
-                menu.append('<span class="badge badge-sm badge-warning ml-3">Justificado</span>');
+            if(menu.find('.justMenu').length == 0)
+                menu.append('<span class="badge badge-sm badge-warning justMenu ml-3">Justificado</span>');
         }else
-            menu.find('span.badge-warning').remove();
+            menu.find('.justMenu').remove();
     });
 
-    var justificado = $('.menuPR span.badge-warning').length;
+    var justificado = $('.menuPR .justMenu').length;
     var aprovado = confereAnexos();
 
     habilitarBotoesStatus(justificado);
@@ -1480,6 +1484,18 @@ $('#submitJustificativaPreRegistro').click(function() {
     var campo = this.value;
     var value = $('#modalJustificativaPreRegistro .modal-body textarea').val();
     putDadosPreRegistro(campo, value, 'justificar');
+});
+
+$('.remove_todas_justificativas').click(function() {
+  const campos_array = [];
+  $('#' + this.value + ' .justificativaPreRegistro').each(function(){
+    if($(this).html().trim() == '<i class="fas fa-edit"></i>'){
+      campos_array.push($(this).val());
+    }
+  });
+
+  if(campos_array.length > 0)
+    putDadosPreRegistro('exclusao_massa', campos_array, 'exclusao_massa');
 });
 
 $('.textoJustHist').click(function() {

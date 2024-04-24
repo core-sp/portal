@@ -4,6 +4,8 @@
 
 <div class="card-body bg-light">
 
+    @include('admin.inc.pre-registro-btn-remover-just', ['aba' => $abas[3], 'valor_btn' => 'parte_contato_rt'])
+
     @if(!$resultado->pessoaJuridica->possuiRT() && ($resultado->criado() || $resultado->isFinalizado()))
     <p><i>Ainda não possui Responsável Técnico.</i></p>
 

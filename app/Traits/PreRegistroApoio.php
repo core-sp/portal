@@ -87,6 +87,9 @@ trait PreRegistroApoio {
                 $temp = !$obj_existe ? $nome_classe::buscar($arrayCampos['cpf'], $gerenti) : $pj->responsavelTecnico;
                 return isset($temp) ? $temp->finalArray($arrayCampos, $pj) : false;
                 break;
+            case $this->relation_socio:
+                return true;
+                break;
         }
 
         throw new \Exception('Classe não está configurada para ser salva no array final', 500);
@@ -185,8 +188,8 @@ trait PreRegistroApoio {
 
             if($request['acao'] != 'editar')
             {
-                $campo = $request['acao'] == 'justificar' ? 'justificativa' : 'confere_anexos';
-                $valor = $request['acao'] == 'justificar' ? ['campo' => $request['campo'], 'valor' => $request['valor']] : $request['valor'];
+                $campo = ($request['acao'] == 'justificar') || ($request['acao'] == 'exclusao_massa') ? 'justificativa' : 'confere_anexos';
+                $valor = ($request['acao'] == 'justificar') || ($request['acao'] == 'exclusao_massa') ? ['campo' => $request['campo'], 'valor' => $request['valor']] : $request['valor'];
             }
             
             switch ($campo) {

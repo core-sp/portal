@@ -1630,6 +1630,15 @@ function atualizaOrdemSocios(){
 		});
 }
 
+function desabilitaBtnAcoesSocio(){
+	if($('#analiseCorrecao').length > 0){
+		if($('#acoes_socio .editar_socio').length > 0)
+			$('#acoes_socio .editar_socio').prop('disabled', true);
+		if($('#acoes_socio .excluir_socio').length > 0)
+			$('#acoes_socio .excluir_socio').prop('disabled', true);
+	}
+}
+
 function removeSocio(dados, id)
 {
 	if(dados == 'remover'){
@@ -1895,6 +1904,7 @@ var pre_registro_total_files = $('#totalFilesServer').length ? $('#totalFilesSer
 // ao carregar a pagina, verifica se possui o limite maximo de arquivos permitidos, caso sim, ele impede de adicionar mais
 $('form #inserirRegistro').ready(function(){
 	atualizaOrdemSocios();
+	desabilitaBtnAcoesSocio();
 	if($(".ArquivoBD_anexo").length == pre_registro_total_files)
 		$(".Arquivo_anexo").hide();
 }); 

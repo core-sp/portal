@@ -6,7 +6,7 @@
 
 <div id="acoes_socio">
 
-    <button type="button" id="criar_socio" class="btn btn-success btn-sm mr-4" {{ $resultado->pessoaJuridica->podeCriarSocio() ? '' : 'disabled' }}>
+    <button type="button" id="criar_socio" class="btn btn-success btn-sm mr-4" {{ $resultado->userPodeEditar() && $resultado->pessoaJuridica->podeCriarSocio() ? '' : 'disabled' }}>
         <i class="fas fa-plus"></i> Sócio
     </button>
 
@@ -17,7 +17,7 @@
                 class="{{ $classe }} form-check-input" 
                 name="checkRT_socio" 
                 value="{{ $resultado->pessoaJuridica->possuiRTSocio() ? 'on' : 'off' }}"
-                {{ $resultado->pessoaJuridica->possuiRT() ? '' : 'disabled' }}
+                {{ $resultado->userPodeEditar() && $resultado->pessoaJuridica->possuiRT() ? '' : 'disabled' }}
                 {{ $resultado->pessoaJuridica->possuiRTSocio() ? 'checked' : '' }}
             >
             <span class="bold">{{ $nome_campos['checkRT_socio'] }} - &nbsp;<span class="badge badge-warning pt-1">RT</span> Responsável Técnico pertence ao quadro societário</span>
@@ -45,6 +45,10 @@
 
     <button type="button" id="mostrar_socios" class="btn btn-outline-primary btn-sm mb-2">Voltar para os Sócios</button>
     <br>
+
+    @if(!$resultado->userPodeEditar())
+    <fieldset id="analiseCorrecao" disabled>
+    @endif
 
     <small class="text-muted text-left">
         <em>Após inserir um CPF / CNPJ válido, aguarde {{ $resultado->pessoaJuridica::TOTAL_HIST_DIAS_UPDATE_SOCIO * 24 }}h para trocar caso alcance o limite de <span id="limite-socios">{{ $resultado->pessoaJuridica::TOTAL_HIST_SOCIO }}</span> sócios.</em>
@@ -306,5 +310,9 @@
             </div>
         </div>
     </fieldset>
+
+    @if(!$resultado->userPodeEditar())
+    </fieldset>
+    @endif
 
 </div>

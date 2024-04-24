@@ -44,20 +44,25 @@ class PreRegistroAjaxAdminRequest extends FormRequest
             }else
                 $this->regraValor = ['in:' . implode(',', $tipos_anexos)];
         }
+
+        if($this->campo == 'exclusao_massa')
+            $this->regraValor = ['array'];
     }
 
     public function rules()
     {
         $todos = implode(',', array_values($this->service->getService('PreRegistro')->getNomesCampos()));
         
-        $todos .= ',registro,negado';
+        $todos .= ',registro,negado,registro_socio';
         if(request()->acao == 'editar')
             $todos = 'registro,registro_secundario';
         if(request()->acao == 'conferir')
             $todos = 'confere_anexos';
+        if(request()->acao == 'exclusao_massa')
+            $todos = 'exclusao_massa';
 
         return [
-            'acao' => 'required|in:justificar,editar,conferir',
+            'acao' => 'required|in:justificar,editar,conferir,exclusao_massa',
             'valor' => $this->regraValor,
             'campo' => 'required|in:'.$todos,
         ];
@@ -69,6 +74,7 @@ class PreRegistroAjaxAdminRequest extends FormRequest
             'max' => 'Limite de :max caracteres',
             'in' => 'Campo / ação não encontrado(a)',
             'required' => 'Falta dados para enviar a requisição',
+            'array' => 'Formato inválido',
         ];
     }
 }

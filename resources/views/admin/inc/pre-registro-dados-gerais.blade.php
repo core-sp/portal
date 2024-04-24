@@ -3,6 +3,9 @@
 @endphp
 
 <div class="card-body bg-light">
+
+    @include('admin.inc.pre-registro-btn-remover-just', ['aba' => $abas[1], 'valor_btn' => 'parte_dados_gerais'])
+
     <p id="tipo_{{ $resultado->userExterno->isPessoaFisica() ? 'cpf' : 'cnpj' }}">
         <span class="font-weight-bolder">{{ $resultado->userExterno->isPessoaFisica() ? 'CPF' : 'CNPJ' }}: </span>
         {{ formataCpfCnpj($resultado->userExterno->cpf_cnpj) }}

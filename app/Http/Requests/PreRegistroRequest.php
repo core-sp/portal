@@ -196,6 +196,7 @@ class PreRegistroRequest extends FormRequest
                     $this->msg_socios = array_merge($this->msg_socios, $socio->arrayValidacaoMsg());
                     $this->merge($socio->arrayValidacaoInputs());
                 }
+                $this->merge(['checkRT_socio' => !$preRegistro->pessoaJuridica->possuiRTSocio() ? 'off' : 'on']);
             }
             else{
                 $this->socios = ['cpf_cnpj_socio_' => 'required'];

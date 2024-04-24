@@ -4,6 +4,8 @@
 
 <div class="card-body bg-light">
 
+    @include('admin.inc.pre-registro-btn-remover-just', ['aba' => $abas[6], 'valor_btn' => 'parte_anexos'])
+
     <p class="font-weight-bolder mb-2 mt-1"><i class="fas fa-info-circle text-primary"></i> Exigências sobre os documentos obrigatórios: </p>
     @if(!$resultado->userExterno->isPessoaFisica())
         <p class="ml-3 mb-0 text-secondary"><i class="icon fa fa-check"></i> Comprovante de inscrição CNPJ</p>

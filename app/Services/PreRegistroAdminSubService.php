@@ -265,6 +265,9 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
 
         $preRegistro->salvarAjax($dados);
         $preRegistro->update(['idusuario' => $user->idusuario]);
+
+        $request['acao'] == 'exclusao_massa' ? 
+        event(new CrudEvent('pré-registro', 'fez a ação de "' . $request['acao'] . '" para o(s) campo(s) "' . implode(', ', $request['valor']) . '", removendo valor', $preRegistro->id)) : 
         event(new CrudEvent('pré-registro', 'fez a ação de "' . $request['acao'] . '" o campo "' . $request['campo'] . '", inserindo ou removendo valor', $preRegistro->id));
 
         return [

@@ -188,7 +188,9 @@
             <a class="card-link" data-toggle="collapse" href="#parte_socios">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
                     5. {{ $abas[4] }}
-                    @if(!empty(array_intersect_key($codigos[4], $resultado->getCamposEditados())))
+                    @if(!empty(array_filter($resultado->getCamposEditados(), function($key){
+                        return strpos($key, '_socio') !== false;
+                    }, ARRAY_FILTER_USE_KEY)))
                     <span class="badge badge-danger ml-2">Campos alterados</span>
                     @endif
                 </div>
