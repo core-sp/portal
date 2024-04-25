@@ -41,16 +41,21 @@
                                 @endif
 
                                 @if($preRegistro->isAprovado())
-                                    @if($preRegistro->temBoleto())
-                                    <a 
-                                        class="btn btn-success text-white mt-3" 
-                                        href="{{ route('externo.preregistro.anexo.download', $preRegistro->getBoleto()->id) }}"
-                                        download
-                                    >
-                                        Baixar boleto
-                                    </a>
+                                @php
+                                    $docs_atendimento = $preRegistro->getDocsAtendimento();
+                                @endphp
+                                    @if($docs_atendimento->isNotEmpty())
+                                        @foreach($docs_atendimento as $doc)
+                                        <a 
+                                            class="btn btn-success text-white mt-3" 
+                                            href="{{ route('externo.preregistro.anexo.download', $doc->id) }}"
+                                            download
+                                        >
+                                            Baixar {{ $doc->tipo }}
+                                        </a>
+                                        @endforeach
                                     @else
-                                    <p>Boleto ainda não está disponível.</p>
+                                    <p><i class="fas fa-exclamation-circle text-primary"></i>&nbsp;Documentos do atendimento ainda não estão disponíveis.</p>
                                     @endif
                                 @endif
                                 <hr />

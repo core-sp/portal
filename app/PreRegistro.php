@@ -369,14 +369,9 @@ class PreRegistro extends Model
         return !$semExplicacao ? $inicio . '<small> - '. $texto .'</small>' : $inicio;
     }
 
-    public function getBoleto()
+    public function getDocsAtendimento()
     {
-        return ($this->anexos->count() > 0) && $this->isAprovado() ? $this->anexos->where('nome_original', 'boleto_aprovado_' . $this->id)->first() : null;
-    }
-
-    public function temBoleto()
-    {
-        return null !== $this->getBoleto();
+        return $this->isAprovado() ? $this->anexos->whereNotNull('tipo')->where('pre_registro_id', $this->id) : collect();
     }
 
     public function getTipoTelefone()

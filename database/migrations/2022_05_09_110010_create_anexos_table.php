@@ -19,6 +19,7 @@ class CreateAnexosTable extends Migration
             $table->string('nome_original');
             $table->string('extensao');
             $table->string('tamanho_bytes');
+            $table->string('tipo')->nullable();
             $table->bigInteger('pre_registro_id')->unsigned()->nullable();
             $table->foreign('pre_registro_id')->references('id')->on('pre_registros');
             $table->timestamps();

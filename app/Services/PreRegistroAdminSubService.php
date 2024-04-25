@@ -217,7 +217,8 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
             'variaveis' => (object) $variaveis,
             'abas' => $this->getMenu(),
             'codigos' => $this->getCodigosCampos($resultado->userExterno->isPessoaFisica()),
-            'boleto' => $resultado->getBoleto(),
+            'docs_atendimento' => $resultado->getDocsAtendimento(),
+            'tipos_doc' => $this->tiposDocsAtendente(),
         ];
     }
 

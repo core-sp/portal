@@ -36,17 +36,22 @@
                          Visualizar
                     </a>
                     @if($solicitacao->isAprovado())
+                    @php
+                        $docs_atendimento = $solicitacao->getDocsAtendimento();
+                    @endphp
                     &nbsp; | &nbsp;
-                        @if($solicitacao->temBoleto())
-                        <a 
-                            class="btn btn-success btn-sm text-white" 
-                            href="{{ route('externo.preregistro.anexo.download', ['id' => $solicitacao->getBoleto()->id, 'preRegistro' => $solicitacao->id]) }}"
-                            download
-                        >
-                            Baixar boleto
-                        </a>
+                        @if($docs_atendimento->isNotEmpty())
+                            @foreach($docs_atendimento as $doc)
+                            <a 
+                                class="btn btn-success btn-sm text-white" 
+                                href="{{ route('externo.preregistro.anexo.download', ['id' => $doc->id, 'preRegistro' => $solicitacao->id]) }}"
+                                download
+                            >
+                                Baixar {{ $doc->tipo }}
+                            </a>
+                            @endforeach
                         @else
-                        <span><i>Boleto ainda não está disponível.</i></span>
+                        <span><i>Documentos do atendimento ainda não estão disponíveis.</i></span>
                         @endif
                     @endif
                 </p>

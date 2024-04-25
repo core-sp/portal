@@ -153,7 +153,7 @@ class Anexo extends Model
 
     public static function armazenarDoc($id, $file, $tipo_doc)
     {
-        $doc = self::where('nome_original', $tipo_doc . '_aprovado_' . $id)->first();
+        $doc = self::where('tipo', $tipo_doc)->where('pre_registro_id', $id)->first();
         if(isset($doc))
         {
             Storage::disk('local')->delete($doc->path);
@@ -165,9 +165,10 @@ class Anexo extends Model
 
         return [
             'path' => $anexo,
-            'nome_original' => $tipo_doc . '_aprovado_' . $id,
+            'nome_original' => $file->getClientOriginalName(),
             'tamanho_bytes' => Storage::size($anexo),
             'extensao' => $file->extension(),
+            'tipo' => $tipo_doc,
         ];
     }
 
@@ -228,10 +229,6 @@ class Anexo extends Model
 
     public function anexadoPeloAtendente()
     {
-        $nomes_doc = [
-            'boleto_aprovado_' . $this->pre_registro_id,
-        ];
-
-        return in_array($this->nome_original, $nomes_doc);
+        return isset($this->tipo) && in_array($this->tipo, self::tiposDocsAtendentePreRegistro());
     }
 }

@@ -19,12 +19,6 @@ class PreRegistroAdminRequest extends FormRequest
     {
         $this->msg = '';
         
-        if(\Route::is('preregistro.upload.doc'))
-        {
-            $this->merge(['tipo' => implode(',', $this->service->getService('PreRegistro')->admin()->tiposDocsAtendente())]);  
-            return;
-        }
-
         $preRegistro = $this->service->getService('PreRegistro')->admin()->view($this->preRegistro)['resultado'];
         $arrayStatus = [
             'aprovar' => $preRegistro::STATUS_APROVADO,
@@ -131,6 +125,8 @@ class PreRegistroAdminRequest extends FormRequest
             'uploaded' => 'Falhou o upload por erro no servidor',
             'file.max' => 'O arquivo deve ter um limite de até 2MB',
             'file.required' => 'Campo obrigatório',
+            'tipo.in' => 'Tipo de documento não aceito',
+            'tipo.required' => 'Campo do tipo de documento é obrigatório'
         ];
     }
 }

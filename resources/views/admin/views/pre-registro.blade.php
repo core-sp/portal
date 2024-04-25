@@ -63,59 +63,87 @@
     
     <hr />
 
-    <p class="font-weight-bolder">Documentos anexados pelo atendente após aprovação:</p>
+    <p class="font-weight-bolder">Documentos gerenciados pelo atendimento após aprovação:</p>
     @if($resultado->isAprovado())
         <p>
             <i class="fas fa-exclamation-circle text-primary"></i>
             &nbsp;<i>Após anexar, o documento ficará disponível para o solicitante realizar download na área restrita.</i>
         </p>
 
-    <form class="ml-1" action="{{ route('preregistro.upload.doc', $resultado->id) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        <div class="form-row">
-            <label>Anexar novo boleto:</label>
-            <div class="custom-file">
-                <input
-                    type="file"
-                    name="file"
-                    class="custom-file-input {{ $errors->has('file') ? 'is-invalid' : '' }}"
-                    id="doc_pre_registro"
-                    accept="application/pdf"
-                    role="button"
-                >
-                <label class="custom-file-label" for="doc_pre_registro">Selecionar arquivo...</label>
+    <fieldset class="border border-primary pb-2 pl-3 pr-3 mt-2">
+        <legend class="w-auto pr-2">Anexar Documentos</legend>
+
+        <form class="ml-1" action="{{ route('preregistro.upload.doc', $resultado->id) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+
+            <div class="form-group">
+                <div class="col">
+                    <label class="mr-2 mb-0">Tipo de documento a ser anexado:</label>
+                    @foreach($tipos_doc as $tipo)
+                    <div class="form-check-inline">
+                        <label class="form-check-label">
+                            <input type="radio" class="form-check-input" name="tipo" value="{{ $tipo }}">{{ ucfirst($tipo) }}
+                        </label>
+                    </div>
+                    @endforeach
+                </div>
             </div>
-        </div>
 
-        <div class="form-row mt-2">
-            <button type="submit" class="btn btn-sm btn-primary">Enviar</button>
-        </div>
-    </form>
+            <div class="form-group mt-2">
+                <div class="col">
+                    <label>Anexar novo documento <i>(irá substituir caso já exista)</i>:</label>
+                    <div class="custom-file">
+                        <input
+                            type="file"
+                            name="file"
+                            class="custom-file-input {{ $errors->has('file') ? 'is-invalid' : '' }}"
+                            id="doc_pre_registro"
+                            accept="application/pdf"
+                            role="button"
+                        >
+                        <label class="custom-file-label" for="doc_pre_registro">Selecionar arquivo...</label>
+                    </div>
+                </div>
+                <div class="col mt-2">
+                    <button type="submit" class="btn btn-sm btn-primary">Enviar</button>
+                </div>
+            </div>
+        </form>
 
-    @if(isset($boleto))
-    <div class="mt-3">
-    <span class="font-weight-bolder">Boleto:</span>
-    <p>
-        <i class="fas fa-paperclip"></i>
-        <a href="{{ route('preregistro.anexo.download', ['idPreRegistro' => $resultado->id, 'id' => $boleto->id]) }}" 
-            class="ml-2" 
-            target="_blank" 
-        >
-            <u>{{ $boleto->id }} - {{ $boleto->nome_original }}</u>
-        </a>
-        <a href="{{ route('preregistro.anexo.download', ['idPreRegistro' => $resultado->id, 'id' => $boleto->id]) }}" 
-            class="btn btn-sm btn-primary ml-2" 
-            download
-        >
-            <i class="fas fa-download"></i>
-        </a>
-        <br>
-        <span class="mt-2"><small><i>Última atualização:</i> {{ formataData($boleto->updated_at) }}</small></span>
-    </p>
-    </div>
-    @else
-        <p>Sem boleto anexado.</p>
-    @endif
+    </fieldset>
+
+    <fieldset class="border border-primary pb-2 pl-3 pr-3 mt-2">
+        <legend class="w-auto pr-2">Documentos Anexados</legend>
+
+        @if($docs_atendimento->isNotEmpty())
+            @foreach($docs_atendimento as $doc)
+            <div class="mt-2">
+                <p>
+                    <i class="fas fa-paperclip"></i>
+                    <span class="font-weight-bolder ml-1">{{ ucfirst($doc->tipo) }}: </span>
+                    <a href="{{ route('preregistro.anexo.download', ['idPreRegistro' => $resultado->id, 'id' => $doc->id]) }}" 
+                        class="ml-2" 
+                        target="_blank" 
+                    >
+                        <u>{{ $doc->id }} - {{ $doc->nome_original }}</u>
+                    </a>
+                    <a href="{{ route('preregistro.anexo.download', ['idPreRegistro' => $resultado->id, 'id' => $doc->id]) }}" 
+                        class="btn btn-sm btn-primary ml-2" 
+                        download
+                    >
+                        <i class="fas fa-download"></i>
+                    </a>
+                    <span class="ml-2"><small><i>Última atualização:</i> {{ formataData($doc->updated_at) }}</small></span>
+                </p>
+            </div>
+            {!! $loop->last ? '' : '<hr />' !!}
+
+            @endforeach
+        @else
+            <p>Sem documento anexado.</p>
+        @endif
+
+    </fieldset>
 
     @else
     <p><i>Pré-registro não está aprovado.</i></p>
