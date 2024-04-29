@@ -141,6 +141,8 @@ class Socio extends Model
             $existe = self::where('cpf_cnpj', $cpf_cnpj)->first();
             if(isset($existe) && isset($gerenti["registro"]) && (!isset($existe->registro) || ($existe->registro != $gerenti["registro"])))
                 $existe->update($gerenti);
+            if(isset($existe) && !isset($gerenti["registro"]) && isset($existe->registro))
+                $existe->update(['registro' => null]);
 
             if(!isset($existe))
                 $existe = isset($gerenti["registro"]) ? self::create($gerenti) : self::create(['cpf_cnpj' => $cpf_cnpj]);
