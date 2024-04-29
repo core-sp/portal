@@ -51,7 +51,17 @@ class PreRegistroCpf extends Model
 
     public function maisDe45Anos()
     {
-        return $this->dt_nascimento <= Carbon::today()->subYears(46)->format('Y-m-d');
+        return $this->dt_nascimento <= Carbon::today()->subYears(45)->addDay()->format('Y-m-d');
+    }
+
+    public function brasileira()
+    {
+        return $this->nacionalidade == 'BRASILEIRA';
+    }
+
+    public function reservista()
+    {
+        return ($this->sexo == 'M') && !$this->maisDe45Anos();
     }
 
     public function finalArray($arrayCampos)

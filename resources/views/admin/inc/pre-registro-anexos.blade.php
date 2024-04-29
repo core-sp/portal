@@ -77,7 +77,7 @@
                 value="Comprovante de inscrição CNPJ" 
                 class="confirmaAnexoPreRegistro"
                 {{ isset($resultado->getConfereAnexosArray()['Comprovante de inscrição CNPJ']) ? 'checked' : '' }}
-            /> Comprovante de inscrição CNPJ
+            /> Comprovante de inscrição CNPJ <span class="text-danger font-weight-bolder">*</span>
         </label>
     </div>
 
@@ -90,7 +90,7 @@
                 value="Contrato Social" 
                 class="confirmaAnexoPreRegistro"
                 {{ isset($resultado->getConfereAnexosArray()['Contrato Social']) ? 'checked' : '' }}
-            /> Contrato Social
+            /> Contrato Social <span class="text-danger font-weight-bolder">*</span>
         </label>
     </div>
 
@@ -103,14 +103,15 @@
                 value="Declaração Termo de indicação RT ou Procuração" 
                 class="confirmaAnexoPreRegistro"
                 {{ isset($resultado->getConfereAnexosArray()['Declaração Termo de indicação RT ou Procuração']) ? 'checked' : '' }}
-            /> Declaração Termo de indicação RT ou Procuração
+            /> Declaração Termo de indicação RT ou Procuração <span class="text-danger font-weight-bolder">*</span>
         </label>
     </div>
 
-    <p class="font-weight-bolder pl-3 mt-2 mb-1">Documentos de todos os sócios:</p>
+    <p class="font-weight-bolder pl-3 mt-2 mb-1">Documentos de todos os sócios, se possui pessoa física:</p>
 
     @endif
 
+    @if($resultado->userExterno->isPessoaFisica() || $resultado->pessoaJuridica->possuiSocioPF())
     <div class="form-check">
         <label for="comprovante_identidade" class="form-check-label">
             <input 
@@ -120,7 +121,7 @@
                 value="Comprovante de identidade" 
                 class="confirmaAnexoPreRegistro"
                 {{ isset($resultado->getConfereAnexosArray()['Comprovante de identidade']) ? 'checked' : '' }}
-            /> Comprovante de identidade
+            /> Comprovante de identidade <span class="text-danger font-weight-bolder">*</span>
         </label>
     </div>
 
@@ -133,7 +134,7 @@
                 value="CPF" 
                 class="confirmaAnexoPreRegistro"
                 {{ isset($resultado->getConfereAnexosArray()['CPF']) ? 'checked' : '' }}
-            /> CPF
+            /> CPF <span class="text-danger">*</span>
         </label>
     </div>
 
@@ -146,12 +147,12 @@
                 value="Comprovante de Residência" 
                 class="confirmaAnexoPreRegistro"
                 {{ isset($resultado->getConfereAnexosArray()['Comprovante de Residência']) ? 'checked' : '' }}
-            /> Comprovante de Residência
+            /> Comprovante de Residência <span class="text-danger font-weight-bolder">*</span>
         </label>
     </div>
 
-    @if((isset($resultado->pessoaFisica->nacionalidade) && ($resultado->pessoaFisica->nacionalidade == 'BRASILEIRA')) ||
-    !$resultado->userExterno->isPessoaFisica())
+    @if(($resultado->userExterno->isPessoaFisica() && $resultado->pessoaFisica->brasileira()) ||
+    (!$resultado->userExterno->isPessoaFisica() && $resultado->pessoaJuridica->possuiSocioBrasileiro()))
     <div class="form-check">
         <label for="cert_quitacao_eleitoral" class="form-check-label">
             <input 
@@ -161,13 +162,13 @@
                 value="Certidão de quitação eleitoral" 
                 class="confirmaAnexoPreRegistro"
                 {{ isset($resultado->getConfereAnexosArray()['Certidão de quitação eleitoral']) ? 'checked' : '' }}
-            /> Certidão de quitação eleitoral
+            /> Certidão de quitação eleitoral <span class="text-danger font-weight-bolder">*</span>
         </label>
     </div>
     @endif
 
-    @if((isset($resultado->pessoaFisica->sexo) && ($resultado->pessoaFisica->sexo == 'M') && !$resultado->pessoaFisica->maisDe45Anos()) ||
-    !$resultado->userExterno->isPessoaFisica())
+    @if(($resultado->userExterno->isPessoaFisica() && $resultado->pessoaFisica->reservista()) ||
+    (!$resultado->userExterno->isPessoaFisica() && $resultado->pessoaJuridica->possuiSocioReservista()))
     <div class="form-check">
         <label for="cert_reservista_dispensa" class="form-check-label">
             <input 
@@ -175,15 +176,20 @@
                 type="checkbox" 
                 name="confere_anexos[]"
                 value="Cerificado de reservista ou dispensa" 
-                class="confirmaAnexoPreRegistro"
+                class="confirmaAnexoPreRegistro opcional"
                 {{ isset($resultado->getConfereAnexosArray()['Cerificado de reservista ou dispensa']) ? 'checked' : '' }}
-            /> Cerificado de reservista ou dispensa
+            /> Cerificado de reservista ou dispensa {!! $resultado->userExterno->isPessoaFisica() ? '<span class="text-danger font-weight-bolder">*</span>' : '' !!}
         </label>
     </div>
     @endif
 
+    @else
+
+    {!! !$resultado->userExterno->isPessoaFisica() ? '<p class="ml-3"><i>Não possui pessoa física como sócio.</i></p>' : '' !!}
+    @endif
+
     <p class="text-muted mt-3">
-        <em>* Obs: somente para PJ não é obrigatório confirmar a "Certidão de quitação eleitoral" e "Cerificado de reservista ou dispensa" para aprovação</em>
+        <em><span class="text-danger font-weight-bolder">*</span> Anexos obrigatórios.</em>
     </p>
     {!! !$resultado->atendentePodeEditar() ? '</fieldset>' : '' !!}
     

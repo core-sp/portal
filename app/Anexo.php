@@ -203,12 +203,21 @@ class Anexo extends Model
         return $tipos;
     }
 
-    private function getAceitosPJ()
+    private function getAceitosPJ($sem_socio_pf = true, $brasileiro = false)
     {
         $tipos = self::getAceitosPreRegistro();
 
+        if($sem_socio_pf)
+        {
+            unset($tipos[0]);
+            unset($tipos[1]);
+            unset($tipos[2]);
+        }
+
+        if(!$brasileiro)
+            unset($tipos[3]);
+        
         // por não saber via sistema se os sócios são do sexo masculino ou não
-        unset($tipos[3]);
         unset($tipos[4]);
 
         return $tipos;
@@ -216,7 +225,8 @@ class Anexo extends Model
 
     public function getObrigatoriosPreRegistro()
     {
-        return $this->preRegistro->userExterno->isPessoaFisica() ? $this->getAceitosPF() : $this->getAceitosPJ();
+        return $this->preRegistro->userExterno->isPessoaFisica() ? $this->getAceitosPF() : 
+        $this->getAceitosPJ(!$this->preRegistro->pessoaJuridica->possuiSocioPF(), $this->preRegistro->pessoaJuridica->possuiSocioBrasileiro());
     }
 
     public function getOpcoesPreRegistro()

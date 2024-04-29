@@ -112,6 +112,28 @@ class PreRegistroCnpj extends Model
         return $this->possuiSocio() && $this->possuiRT() && $this->socios->where('cpf_cnpj', $this->responsavelTecnico->cpf)->where('pivot.rt', true)->isNotEmpty();
     }
 
+    public function possuiSocioPF()
+    {
+        if(!$this->possuiSocio())
+            return false;
+
+        $possuiPF = $this->socios->pluck('cpf_cnpj')->filter(function ($value, $key) {
+            return strlen($value) == 11;
+        })->isNotEmpty();
+
+        return $this->possuiRTSocio() || $possuiPF;
+    }
+
+    public function possuiSocioBrasileiro()
+    {
+        return $this->possuiSocioPF() && $this->socios->where('nacionalidade', 'BRASILEIRA')->isNotEmpty();
+    }
+
+    public function possuiSocioReservista()
+    {
+        return $this->possuiSocioPF() && $this->socios->where('dt_nascimento', '<=', now()->subYears(45)->addDay()->format('Y-m-d'))->isNotEmpty();
+    }
+
     public function getHistoricoCanEdit($classe = null)
     {
         $array = $this->getHistoricoArray($classe);

@@ -1395,29 +1395,14 @@ function addJustificado(campo, valor)
 
 function confereAnexos()
 {
-    // confere anexos: se pf, todos devem estar ok; senão apenas 2 podem faltar por não ser possível conferir via sistema
-    var aprovado = false;
-    var ok = $('.confirmaAnexoPreRegistro:checked').length;
-    var total = $('.confirmaAnexoPreRegistro').length;
+    var aprovado = $('.confirmaAnexoPreRegistro:checked').length == $('.confirmaAnexoPreRegistro').length;
 
-    if(ok == total)
-        aprovado = true;
-
-    if($('#tipo_cnpj').length){
-        var eleitoral = false; 
-        var reservista = false;
-        $('.confirmaAnexoPreRegistro:checked').each(function() {
-            if($(this).val() == 'Certidão de quitação eleitoral')
-                eleitoral = true;
-            if($(this).val() == 'Cerificado de reservista ou dispensa')
-                reservista = true;
-        });
-        if(ok == (total - 2))
-            if(!eleitoral && !reservista)
-                aprovado = true;
-        if(ok == (total - 1))
-            if(!eleitoral || !reservista)
-                aprovado = true;
+    if(!aprovado){
+      aprovado = true;
+      $('.confirmaAnexoPreRegistro:not(:checked)').each(function() {
+        if(!$(this).hasClass('opcional'))
+          aprovado = false;
+      });
     }
   
     return aprovado;
