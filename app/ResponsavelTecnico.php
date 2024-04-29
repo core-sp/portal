@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 
 class ResponsavelTecnico extends Model
 {
@@ -138,21 +139,28 @@ class ResponsavelTecnico extends Model
         return null;
     }
 
-    public function finalArray($arrayCampos, $pj)
+    public function arrayValidacaoInputs()
     {
-        $resultado = 'remover';
-
-        if(isset($arrayCampos['cpf']) && (strlen($arrayCampos['cpf']) == 11))
-        {
-            unset($arrayCampos['cpf']);
-            $resultado = $this->update($arrayCampos);
-        }
-
-        if(($resultado === 'remover') && $pj->possuiRTSocio())
-            $pj->socios()->detach($pj->socios->where('pivot.rt', true)->first()->pivot->socio_id);
-        $resultado = $pj->update(['responsavel_tecnico_id' => $resultado === 'remover' ? null : $this->id]);
-        $pj->preRegistro->touch();
-
-        return $resultado;
+        return collect(Arr::except($this->attributesToArray(), ['id', 'registro', 'created_at', 'updated_at', 'deleted_at']))->keyBy(function ($item, $key) {
+            return $key . '_rt';
+        })->toArray();
     }
+
+    // public function finalArray($arrayCampos, $pj)
+    // {
+    //     $resultado = 'remover';
+
+    //     if(isset($arrayCampos['cpf']) && (strlen($arrayCampos['cpf']) == 11))
+    //     {
+    //         unset($arrayCampos['cpf']);
+    //         $resultado = $this->update($arrayCampos);
+    //     }
+
+    //     if(($resultado === 'remover') && $pj->possuiRTSocio())
+    //         $pj->socios()->detach($pj->socios->where('pivot.rt', true)->first()->pivot->socio_id);
+    //     $resultado = $pj->update(['responsavel_tecnico_id' => $resultado === 'remover' ? null : $this->id]);
+    //     $pj->preRegistro->touch();
+
+    //     return $resultado;
+    // }
 }

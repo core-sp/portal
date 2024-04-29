@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 
 class PreRegistroCpf extends Model
 {
@@ -64,8 +65,13 @@ class PreRegistroCpf extends Model
         return ($this->sexo == 'M') && !$this->maisDe45Anos();
     }
 
-    public function finalArray($arrayCampos)
+    // public function finalArray($arrayCampos)
+    // {
+    //     return $this->update($arrayCampos);
+    // }
+
+    public function arrayValidacaoInputs()
     {
-        return $this->update($arrayCampos);
+        return Arr::except($this->attributesToArray(), ['id', 'pre_registro_id', 'created_at', 'updated_at', 'deleted_at']);
     }
 }

@@ -204,7 +204,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 'class' => 'alert-danger'
             ];
 
-        $status = $preRegistro->salvar($request, $gerentiRepository);
+        $status = $preRegistro->salvar(/*$request, $gerentiRepository*/);
         
         Mail::to($externo->email)->queue(new PreRegistroMail($preRegistro->fresh()));
         if(isset($preRegistro->contabil) && $preRegistro->contabil->possuiLogin())

@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 
 class PreRegistroCnpj extends Model
 {
@@ -197,15 +198,27 @@ class PreRegistroCnpj extends Model
         return $naoNulo && empty(array_diff_assoc($this->getEndereco(), $this->preRegistro->getEndereco()));
     }
 
-    public function finalArray($arrayCampos)
+    public function arrayValidacaoInputs()
     {
-        if(isset($arrayCampos['checkEndEmpresa']))
-        {
-            if($arrayCampos['checkEndEmpresa'] == 'on')
-                $arrayCampos = array_merge($arrayCampos, $this->preRegistro->getEndereco());
-            unset($arrayCampos['checkEndEmpresa']);
-        }
+        $all = collect(Arr::except($this->attributesToArray(), ['id', 'historico_rt', 'historico_socio', 'responsavel_tecnico_id', 'pre_registro_id', 'created_at', 
+        'updated_at', 'deleted_at']))->keyBy(function ($item, $key) {
+            return in_array($key, array_keys($this->getEndereco())) ? $key . '_empresa' : $key;
+        })->toArray();
 
-        return $this->update($arrayCampos);
+        $all['checkEndEmpresa'] = $this->mesmoEndereco() ? 'on' : 'off';
+
+        return $all;
     }
+
+    // public function finalArray($arrayCampos)
+    // {
+    //     if(isset($arrayCampos['checkEndEmpresa']))
+    //     {
+    //         if($arrayCampos['checkEndEmpresa'] == 'on')
+    //             $arrayCampos = array_merge($arrayCampos, $this->preRegistro->getEndereco());
+    //         unset($arrayCampos['checkEndEmpresa']);
+    //     }
+
+    //     return $this->update($arrayCampos);
+    // }
 }

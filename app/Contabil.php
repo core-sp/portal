@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Notifications\UserExternoResetPasswordNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Arr;
 
 class Contabil extends Authenticatable
 {
@@ -109,25 +110,25 @@ class Contabil extends Authenticatable
         return null;
     }
 
-    public function finalArray($arrayCampos, $pr)
-    {
-        $resultado = 'remover';
+    // public function finalArray($arrayCampos, $pr)
+    // {
+    //     $resultado = 'remover';
 
-        if(isset($arrayCampos['cnpj']) && (strlen($arrayCampos['cnpj']) == 14))
-        {
-            $resultado = '';
-            if(!$this->possuiLogin())
-            {
-                unset($arrayCampos['cnpj']);
-                $this->update($arrayCampos);
-            }
-        }
+    //     if(isset($arrayCampos['cnpj']) && (strlen($arrayCampos['cnpj']) == 14))
+    //     {
+    //         $resultado = '';
+    //         if(!$this->possuiLogin())
+    //         {
+    //             unset($arrayCampos['cnpj']);
+    //             $this->update($arrayCampos);
+    //         }
+    //     }
 
-        $resultado = $pr->update(['contabil_id' => $resultado === 'remover' ? null : $this->id]);
-        $pr->touch();
+    //     $resultado = $pr->update(['contabil_id' => $resultado === 'remover' ? null : $this->id]);
+    //     $pr->touch();
 
-        return $resultado;
-    }
+    //     return $resultado;
+    // }
 
     public function podeAtivar()
     {
@@ -148,5 +149,12 @@ class Contabil extends Authenticatable
     public function possuiLogin()
     {
         return isset($this->aceite) && isset($this->ativo);
+    }
+
+    public function arrayValidacaoInputs()
+    {
+        return collect(Arr::only($this->attributesToArray(), ['cnpj', 'nome', 'email', 'nome_contato', 'telefone']))->keyBy(function ($item, $key) {
+            return $key . '_contabil';
+        })->toArray();
     }
 }

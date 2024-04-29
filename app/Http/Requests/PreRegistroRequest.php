@@ -19,6 +19,13 @@ class PreRegistroRequest extends FormRequest
     private $socios;
     private $msg_socios;
 
+    private function upperImplode($array)
+    {
+        return implode(',', collect($array)->map(function($item) {
+            return mb_strtoupper($item, 'UTF-8');
+        })->toArray());
+    }
+
     private function getRules()
     {
         if(\Route::is('externo.contabil.inserir.preregistro'))
@@ -30,6 +37,13 @@ class PreRegistroRequest extends FormRequest
 
         $pessoa = null;
 
+        $segmentos = $this->upperImplode(segmentos());
+        $tipos_contatos = $this->upperImplode(tipos_contatos());
+        $opcoes_celular = $this->upperImplode(opcoes_celular());
+        $estados_civis = $this->upperImplode(estados_civis());
+        $nacionalidades = $this->upperImplode(nacionalidades());
+        $tipos_identidade = $this->upperImplode(tipos_identidade());
+
         $rules = [
             'path' => $this->regraPath,
             'cnpj_contabil' => ['nullable', new Cnpj, 'unique:users_externo,cpf_cnpj'],
@@ -37,7 +51,7 @@ class PreRegistroRequest extends FormRequest
             'email_contabil' => 'required_with:cnpj_contabil|nullable|email:rfc,filter|min:10|max:191',
             'nome_contato_contabil' => 'required_with:cnpj_contabil|nullable|min:5|max:191|regex:/^\D*$/',
             'telefone_contabil' => 'required_with:cnpj_contabil|nullable|min:14|max:17|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})$/',
-            'segmento' => 'nullable|in:'.implode(',', segmentos()),
+            'segmento' => 'nullable|in:'. $segmentos,
             'idregional' => 'required|exists:regionais,idregional',
             'cep' => 'required|size:9|regex:/([0-9]{5})\-([0-9]{3})$/',
             'bairro' => 'required|min:4|max:191',
@@ -46,13 +60,13 @@ class PreRegistroRequest extends FormRequest
             'complemento' => 'nullable|max:50',
             'cidade' => 'required|min:4|max:191|regex:/^\D*$/',
             'uf' => 'required|in:'.implode(',', array_keys(estados())),
-            'tipo_telefone' => 'required|in:'.implode(',', tipos_contatos()),
+            'tipo_telefone' => 'required|in:'. $tipos_contatos,
             'telefone' => 'required|min:14|max:17|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})$/',
-            'opcional_celular' => 'nullable|array|in:'.implode(',', opcoes_celular()),
+            'opcional_celular' => 'nullable|array|in:'. $opcoes_celular,
             'opcional_celular.*' => 'distinct',
-            'tipo_telefone_1' => 'required_with:telefone_1|nullable|in:'.implode(',', tipos_contatos()),
+            'tipo_telefone_1' => 'required_with:telefone_1|nullable|in:'. $tipos_contatos,
             'telefone_1' => 'required_with:tipo_telefone_1|nullable|min:14|max:17|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})$/',
-            'opcional_celular_1' => 'nullable|array|in:'.implode(',', opcoes_celular()),
+            'opcional_celular_1' => 'nullable|array|in:'. $opcoes_celular,
             'opcional_celular_1.*' => 'distinct',
             'pergunta' => 'required|min:2|max:191'
         ];
@@ -62,19 +76,19 @@ class PreRegistroRequest extends FormRequest
                 'nome_social' => 'nullable|min:5|max:191|regex:/^\D*$/',
                 'sexo' => 'required|in:'.implode(',', array_keys(generos())),
                 'dt_nascimento' => 'required|date_format:Y-m-d|before_or_equal:'.$this->regraDtNasc,
-                'estado_civil' => 'nullable|in:'.implode(',', estados_civis()),
-                'nacionalidade' => 'required|in:'.implode(',', nacionalidades()),
-                'naturalidade_cidade' => 'required_if:nacionalidade,Brasileira|nullable|string|min:4|max:191',
-                'naturalidade_estado' => 'required_if:nacionalidade,Brasileira|nullable|in:'.implode(',', array_keys(estados())),
+                'estado_civil' => 'nullable|in:'. $estados_civis,
+                'nacionalidade' => 'required|in:'. $nacionalidades,
+                'naturalidade_cidade' => 'required_if:nacionalidade,BRASILEIRA|nullable|string|min:4|max:191',
+                'naturalidade_estado' => 'required_if:nacionalidade,BRASILEIRA|nullable|in:'.implode(',', array_keys(estados())),
                 'nome_mae' => 'required|min:5|max:191|regex:/^\D*$/',
                 'nome_pai' => 'nullable|min:5|max:191|regex:/^\D*$/',
-                'tipo_identidade' => 'required|in:'.implode(',', tipos_identidade()),
+                'tipo_identidade' => 'required|in:'. $tipos_identidade,
                 'identidade' => 'required|min:4|max:30',
                 'orgao_emissor' => 'required|min:3|max:191',
                 'dt_expedicao' => 'required|date_format:Y-m-d|before_or_equal:today',
-                'titulo_eleitor' => 'required_if:nacionalidade,Brasileira|nullable|min:12|max:15',
-                'zona' => 'required_if:nacionalidade,Brasileira|max:6',
-                'secao' => 'required_if:nacionalidade,Brasileira|max:8',
+                'titulo_eleitor' => 'required_if:nacionalidade,BRASILEIRA|nullable|min:12|max:15',
+                'zona' => 'required_if:nacionalidade,BRASILEIRA|max:6',
+                'secao' => 'required_if:nacionalidade,BRASILEIRA|max:8',
                 'ra_reservista' => [
                     Rule::requiredIf(function () {
                         return ($this->sexo == 'M') && $this->regraReservistaPF;
@@ -101,30 +115,30 @@ class PreRegistroRequest extends FormRequest
                 'complemento_empresa' => 'nullable|max:50',
                 'cidade_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191|regex:/^\D*$/',
                 'uf_empresa' => 'required_if:checkEndEmpresa,off|nullable|in:'.implode(',', array_keys(estados())),
-                'nome_rt' => 'required|min:5|max:191|regex:/^\D*$/',
-                'nome_social_rt' => 'nullable|min:5|max:191|regex:/^\D*$/',
-                'sexo_rt' => 'required|in:'.implode(',', array_keys(generos())),
-                'dt_nascimento_rt' => 'required|date_format:Y-m-d|before_or_equal:'.$this->regraDtNasc,
                 'cpf_rt' => ['required', new Cpf],
-                'tipo_identidade_rt' => 'required|in:'.implode(',', tipos_identidade()),
-                'identidade_rt' => 'required|min:4|max:30',
-                'orgao_emissor_rt' => 'required|min:3|max:191',
-                'dt_expedicao_rt' => 'required|date_format:Y-m-d|before_or_equal:today',
-                'cep_rt' => 'required|size:9|regex:/([0-9]{5})\-([0-9]{3})$/',
-                'bairro_rt' => 'required|min:4|max:191',
-                'logradouro_rt' => 'required|min:4|max:191',
-                'numero_rt' => 'required|min:1|max:10',
+                'nome_rt' => 'required_with:cpf_rt|min:5|max:191|regex:/^\D*$/',
+                'nome_social_rt' => 'nullable|min:5|max:191|regex:/^\D*$/',
+                'sexo_rt' => 'required_with:cpf_rt|in:'.implode(',', array_keys(generos())),
+                'dt_nascimento_rt' => 'required_with:cpf_rt|date_format:Y-m-d|before_or_equal:'.$this->regraDtNasc,
+                'tipo_identidade_rt' => 'required_with:cpf_rt|in:'. $tipos_identidade,
+                'identidade_rt' => 'required_with:cpf_rt|min:4|max:30',
+                'orgao_emissor_rt' => 'required_with:cpf_rt|min:3|max:191',
+                'dt_expedicao_rt' => 'required_with:cpf_rt|date_format:Y-m-d|before_or_equal:today',
+                'cep_rt' => 'required_with:cpf_rt|size:9|regex:/([0-9]{5})\-([0-9]{3})$/',
+                'bairro_rt' => 'required_with:cpf_rt|min:4|max:191',
+                'logradouro_rt' => 'required_with:cpf_rt|min:4|max:191',
+                'numero_rt' => 'required_with:cpf_rt|min:1|max:10',
                 'complemento_rt' => 'nullable|max:50',
-                'cidade_rt' => 'required|min:4|max:191',
-                'uf_rt' => 'required|in:'.implode(',', array_keys(estados())),
-                'nome_mae_rt' => 'required|min:5|max:191|regex:/^\D*$/',
+                'cidade_rt' => 'required_with:cpf_rt|min:4|max:191',
+                'uf_rt' => 'required_with:cpf_rt|in:'.implode(',', array_keys(estados())),
+                'nome_mae_rt' => 'required_with:cpf_rt|min:5|max:191|regex:/^\D*$/',
                 'nome_pai_rt' => 'nullable|min:5|max:191|regex:/^\D*$/',
-                'titulo_eleitor_rt' => 'required|nullable|min:12|max:15',
-                'zona_rt' => 'required|max:6',
-                'secao_rt' => 'required|max:8',
+                'titulo_eleitor_rt' => 'required_with:cpf_rt|nullable|min:12|max:15',
+                'zona_rt' => 'required_with:cpf_rt|max:6',
+                'secao_rt' => 'required_with:cpf_rt|max:8',
                 'ra_reservista_rt' => [
                     Rule::requiredIf(function () {
-                        return ($this->sexo_rt == 'M') && $this->regraReservistaRT;
+                        return ($this->sexo_rt == 'M') && $this->regraReservistaRT && (strlen($this->cpf) == 11);
                     }),
                     'nullable',
                     'min:12',
@@ -155,12 +169,17 @@ class PreRegistroRequest extends FormRequest
 
         $preRegistro = $this->externo->load('preRegistro')->preRegistro;
 
+        // apaga todos os dados vindo do formulário
+        $pergunta = $this->pergunta;
+        $this->replace([]);
+        $this->merge(['pergunta' => $pergunta]);
+
         // Obrigatório salvar os anexos via rota ajax
         $anexosCount = isset($preRegistro) ? $preRegistro->anexos->count() : 0;
 
         $this->regraPath = '';
         $this->regraDtNasc = Carbon::today()->subYears(18)->format('Y-m-d');
-        $dataReservista = Carbon::today()->subYears(46)->format('Y-m-d');
+        $dataReservista = Carbon::today()->subYears(45)->addDay()->format('Y-m-d');
 
         if($anexosCount == 0)
         {
@@ -173,19 +192,32 @@ class PreRegistroRequest extends FormRequest
                 'path' => $anexosCount
             ]);
         
+        // substitui com os dados já salvos
+        $this->merge($preRegistro->arrayValidacaoInputs());
+
+        // substitui com os dados já salvos
+        if(isset($preRegistro->contabil_id))
+            $this->merge($preRegistro->contabil->arrayValidacaoInputs());
+        
         if(!$this->externo->isPessoaFisica())
         {
+            // substitui com os dados já salvos
+            $this->merge($preRegistro->pessoaJuridica->arrayValidacaoInputs());
+
+            if(isset($preRegistro->pessoaJuridica->responsavel_tecnico_id))
+                $this->merge($preRegistro->pessoaJuridica->responsavelTecnico->arrayValidacaoInputs());
+
             $this->regraReservistaRT = $this->filled('dt_nascimento_rt') && Carbon::hasFormat($this->dt_nascimento_rt, 'Y-m-d') && 
             ($this->dt_nascimento_rt > $dataReservista);
 
-            if(!isset(request()->checkEndEmpresa) || (isset(request()->checkEndEmpresa) && (request()->checkEndEmpresa != 'on')))
-                $this->merge([
-                    'checkEndEmpresa' => "off",
-                ]);
+            // if(!isset(request()->checkEndEmpresa) || (isset(request()->checkEndEmpresa) && (request()->checkEndEmpresa != 'on')))
+            //     $this->merge([
+            //         'checkEndEmpresa' => "off",
+            //     ]);
 
             $this->merge([
-                'cpf_rt' => apenasNumeros(request()->cpf_rt),
-                'identidade_rt' => mb_strtoupper(apenasNumerosLetras(request()->identidade_rt))
+                'cpf_rt' => apenasNumeros($this->cpf_rt),
+                'identidade_rt' => mb_strtoupper(apenasNumerosLetras($this->identidade_rt))
             ]);
 
             // confere os sócios
@@ -207,35 +239,38 @@ class PreRegistroRequest extends FormRequest
         
         if($this->externo->isPessoaFisica())
         {
-            $this->regraReservistaPF = $this->filled('nacionalidade') && ($this->nacionalidade == 'Brasileira') && 
+            // substitui com os dados já salvos
+            $this->merge($preRegistro->pessoaFisica->arrayValidacaoInputs());
+
+            $this->regraReservistaPF = $this->filled('nacionalidade') && ($this->nacionalidade == 'BRASILEIRA') && 
             $this->filled('dt_nascimento') && Carbon::hasFormat($this->dt_nascimento, 'Y-m-d') && ($this->dt_nascimento > $dataReservista);
 
-            if($this->filled('nacionalidade') && ($this->nacionalidade != "Brasileira"))
+            if($this->filled('nacionalidade') && ($this->nacionalidade != "BRASILEIRA"))
                 $this->merge([
                     'naturalidade_cidade' => null,
                     'naturalidade_estado' => null
                 ]);
             $this->merge([
-                'identidade' => mb_strtoupper(apenasNumerosLetras(request()->identidade))
+                'identidade' => mb_strtoupper(apenasNumerosLetras($this->identidade))
             ]);
         }
 
-        if(isset(request()->cnpj_contabil))
+        if(isset($this->cnpj_contabil))
             $this->merge([
-                'cnpj_contabil' => apenasNumeros(request()->cnpj_contabil),
+                'cnpj_contabil' => apenasNumeros($this->cnpj_contabil),
             ]);
 
-        if(auth()->guard('contabil')->check())
-        {
-            $contabil = auth()->guard('contabil')->user();
-            $this->merge([
-                'cnpj_contabil' => $contabil->cnpj,
-                'nome_contabil' => $contabil->nome,
-                'email_contabil' => $contabil->email,
-                'nome_contato_contabil' => $contabil->nome_contato,
-                'telefone_contabil' => $contabil->telefone,
-            ]);
-        }
+        // if(auth()->guard('contabil')->check())
+        // {
+        //     $contabil = auth()->guard('contabil')->user();
+        //     $this->merge([
+        //         'cnpj_contabil' => $contabil->cnpj,
+        //         'nome_contabil' => $contabil->nome,
+        //         'email_contabil' => $contabil->email,
+        //         'nome_contato_contabil' => $contabil->nome_contato,
+        //         'telefone_contabil' => $contabil->telefone,
+        //     ]);
+        // }
     }
 
     public function rules()
@@ -254,6 +289,7 @@ class PreRegistroRequest extends FormRequest
             'sometimes' => 'Campo obrigatório quando desabilitado' . $attr,
             'required' => 'Campo obrigatório' . $attr,
             'required_if' => 'Campo obrigatório' . $attr,
+            'required_with' => 'Campo obrigatório' . $attr,
             'mimetypes' => 'O arquivo não possue extensão permitida ou está com erro' . $attr,
             'file' => 'Deve ser um arquivo' . $attr,
             'size' => 'Deve ter :size caracteres' . $attr,

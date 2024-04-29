@@ -169,24 +169,24 @@ class PreRegistro extends Model
         return [$campo => $valor];
     }
 
-    private function finalArray($arrayCampos)
-    {
-        $arrayCampos['tipo_telefone'] = isset($arrayCampos['tipo_telefone_1']) ? 
-        $arrayCampos['tipo_telefone'] . ';' . $arrayCampos['tipo_telefone_1'] : $arrayCampos['tipo_telefone'] . ';';
+    // private function finalArray($arrayCampos)
+    // {
+    //     $arrayCampos['tipo_telefone'] = isset($arrayCampos['tipo_telefone_1']) ? 
+    //     $arrayCampos['tipo_telefone'] . ';' . $arrayCampos['tipo_telefone_1'] : $arrayCampos['tipo_telefone'] . ';';
 
-        $arrayCampos['telefone'] = isset($arrayCampos['telefone_1']) ? 
-        $arrayCampos['telefone'] . ';' . $arrayCampos['telefone_1'] : $arrayCampos['telefone'] . ';';
+    //     $arrayCampos['telefone'] = isset($arrayCampos['telefone_1']) ? 
+    //     $arrayCampos['telefone'] . ';' . $arrayCampos['telefone_1'] : $arrayCampos['telefone'] . ';';
 
-        if(isset($arrayCampos['opcional_celular']) || isset($arrayCampos['opcional_celular_1']))
-            $arrayCampos['opcional_celular'] = isset($arrayCampos['opcional_celular_1']) ? 
-            $arrayCampos['opcional_celular'] . ';' . $arrayCampos['opcional_celular_1'] : $arrayCampos['opcional_celular'] . ';';
+    //     if(isset($arrayCampos['opcional_celular']) || isset($arrayCampos['opcional_celular_1']))
+    //         $arrayCampos['opcional_celular'] = isset($arrayCampos['opcional_celular_1']) ? 
+    //         $arrayCampos['opcional_celular'] . ';' . $arrayCampos['opcional_celular_1'] : $arrayCampos['opcional_celular'] . ';';
 
-        unset($arrayCampos['tipo_telefone_1']);
-        unset($arrayCampos['telefone_1']);
-        unset($arrayCampos['opcional_celular_1']);
+    //     unset($arrayCampos['tipo_telefone_1']);
+    //     unset($arrayCampos['telefone_1']);
+    //     unset($arrayCampos['opcional_celular_1']);
 
-        return $this->update($arrayCampos);
-    }
+    //     return $this->update($arrayCampos);
+    // }
 
     private static function colorLabelStatusAdmin()
     {
@@ -614,19 +614,19 @@ class PreRegistro extends Model
         return $this->criarAjax($classe, $campo, $valor, $gerenti);
     }
 
-    public function salvar($request, $gerentiRepository)
+    public function salvar(/*$request, $gerentiRepository*/)
     {
         try{
-            $camposLimpos = $this->getCamposLimpos($request, $this->userExterno->getCamposPreRegistro());
-            unset($request);
+            // $camposLimpos = $this->getCamposLimpos($request, $this->userExterno->getCamposPreRegistro());
+            // unset($request);
 
-            foreach($camposLimpos as $classe => $arrayCampos){
-                $cpf_cnpj = isset($arrayCampos['cpf']) ? $arrayCampos['cpf'] : '';
-                $cpf_cnpj = isset($arrayCampos['cpf_cnpj']) ? $arrayCampos['cpf_cnpj'] : $cpf_cnpj;
-                $resultado = $this->salvarArray($classe, $arrayCampos, $this->getRegistradoGerenti($classe, $gerentiRepository, $cpf_cnpj));
-            }
+            // foreach($camposLimpos as $classe => $arrayCampos){
+            //     $cpf_cnpj = isset($arrayCampos['cpf']) ? $arrayCampos['cpf'] : '';
+            //     $cpf_cnpj = isset($arrayCampos['cpf_cnpj']) ? $arrayCampos['cpf_cnpj'] : $cpf_cnpj;
+            //     $resultado = $this->salvarArray($classe, $arrayCampos, $this->getRegistradoGerenti($classe, $gerentiRepository, $cpf_cnpj));
+            // }
 
-            unset($camposLimpos);
+            // unset($camposLimpos);
             $status = $this->criado() ? self::STATUS_ANALISE_INICIAL : self::STATUS_ANALISE_CORRECAO;
             $resultado = $this->update(['status' => $status]);
 
@@ -636,9 +636,25 @@ class PreRegistro extends Model
             $this->setHistoricoStatus();
             $resultado = $status;
         }catch(\Throwable $e){
-            throw new \Exception('Erro ao salvar dados finais do pré-registro com id ' . $this->id . ' na classe: ' . $classe .', com a seguinte mensagem: ' . $e->getMessage(), 500);
+            // throw new \Exception('Erro ao salvar dados finais do pré-registro com id ' . $this->id . ' na classe: ' . $classe .', com a seguinte mensagem: ' . $e->getMessage(), 500);
+            throw new \Exception('Erro ao salvar dados finais do pré-registro com id ' . $this->id .', com a seguinte mensagem: ' . $e->getMessage(), 500);
         }
 
         return $resultado;
+    }
+
+    public function arrayValidacaoInputs()
+    {
+        $all = Arr::only($this->attributesToArray(), ['segmento', 'cep', 'bairro', 'logradouro', 'numero', 'complemento', 'cidade', 'uf', 'telefone', 
+        'tipo_telefone', 'opcional_celular', 'idregional']);
+
+        $all['telefone'] = explode(';', $this->telefone)[0];
+        $all['telefone_1'] = explode(';', $this->telefone)[1];
+        $all['tipo_telefone'] = explode(';', $this->tipo_telefone)[0];
+        $all['tipo_telefone_1'] = explode(';', $this->tipo_telefone)[1];
+        $all['opcional_celular'] = array_filter(explode(',', explode(';', $this->opcional_celular)[0]));
+        $all['opcional_celular_1'] = array_filter(explode(',', explode(';', $this->opcional_celular)[1]));
+
+        return $all;
     }
 }
