@@ -503,17 +503,21 @@ class PreRegistro extends Model
     public function setHistoricoStatus()
     {
         $historico = isset($this->historico_status) ? $this->fromJson($this->historico_status) : array();
-        array_push($historico, $this->status . ';' . $this->updated_at);
+        $temp = $this->status . ';' . $this->updated_at;
+        array_push($historico, $temp);
         $this->update(['historico_status' => $this->asJson($historico)]);
+        return explode(';', $temp);
     }
 
     public function setHistoricoJustificativas()
     {
+        $data_update = $this->setHistoricoStatus()[1];
+
         if(strlen($this->justificativa) < 3)
             return null;
 
         $justificativas = isset($this->historico_justificativas) ? $this->fromJson($this->historico_justificativas) : array();
-        array_push($justificativas, $this->justificativa . ';' . $this->updated_at);
+        array_push($justificativas, $this->justificativa . ';' . $data_update);
         $this->update(['historico_justificativas' => $this->asJson($justificativas)]);
     }
 

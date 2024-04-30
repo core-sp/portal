@@ -285,7 +285,6 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
             throw new \Exception('Não permitido atualizar o status do pré-registro já finalizado (Aprovado ou Negado)', 401);
         
         $preRegistro->update(['idusuario' => $user->idusuario, 'status' => $status]);
-        $preRegistro->setHistoricoStatus();
         $preRegistro->setHistoricoJustificativas();
         $preRegistro = $preRegistro->fresh();
 
