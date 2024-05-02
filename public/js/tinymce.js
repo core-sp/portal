@@ -1,5 +1,5 @@
 // TinyMCE com File Manager
-var public_path = "{{ path('public') }}";  
+// var public_path = "{{-- path('public') --}}";  
 var css_galeria_popup = ['#tinyGaleria div.g-popup:not(:has([data-gallery]))', '#tinyGaleria :not(.g-popup, img)'];
 var editor_config = {
   license_key: 'gpl',
