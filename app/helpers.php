@@ -463,8 +463,13 @@ function secondLine($situacao, $vencimento = null, $link = null, $descricao = nu
         $str = '<strong class="text-success">PAGO</strong>';
     } elseif($situacao === 'Pago em Parcelamento') {
         $str = '<strong class="text-success">PAGO EM PARCELAMENTO</strong>';
-    } elseif($situacao === 'Proc. Adm.') {
-        $str = '<strong class="text-info">PROC. ADM.</strong>';
+    } elseif($situacao === 'Proc. Adm.'){
+        if($boleto !== null)
+            $str = '<strong class="text-info">PROC. ADM.</strong> ⋅ <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/' . $boleto . '" class="normal text-info" onclick="clickBoleto(\''. $descricao .'\')">BAIXAR BOLETO</a>';
+        elseif($link !== null)
+            $str = '<strong class="text-info">PROC. ADM.</strong> ⋅ <a href="' . $link . '" class="normal text-info" onclick="clickBoleto(\''. $descricao .'\')">BAIXAR BOLETO</a>';
+        else
+            $str = '<strong class="text-info">PROC. ADM.</strong>';
     } else {
         $str = '<strong class="text-info">INDEFINIDO</strong>';
     }
