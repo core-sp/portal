@@ -78,7 +78,11 @@ class CedulaService implements CedulaServiceInterface {
 
     private function validacaoFiltroAtivo($request)
     {
-        if(empty($request->all()))
+        $dados = array_filter($request->all(), function($v, $k) {
+            return in_array($k, ['status', 'datemin', 'datemax']);
+        }, ARRAY_FILTER_USE_BOTH);
+
+        if(empty($dados))
             return null;
 
         $datemin = $request->filled('datemin') ? Carbon::parse($request->datemin) : Carbon::today();
