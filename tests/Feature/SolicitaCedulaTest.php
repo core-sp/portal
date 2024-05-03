@@ -89,6 +89,56 @@ class SolicitaCedulaTest extends TestCase
         $this->get(route('solicita-cedula.filtro'))->assertOk();
     }
 
+    /** @test */
+    public function authorized_users_can_view_list_page_2_solicitacoes_cedulas()
+    {
+        $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
+        $rep = factory('App\Representante')->create();
+        $cedulas = factory('App\SolicitaCedula', 10)->create([
+            'idrepresentante' => $rep->id,
+        ]);
+
+        $cedula = factory('App\SolicitaCedula')->create([
+            'idrepresentante' => $rep->id,
+            'created_at' => now()->subDays(5),
+        ]);
+
+        $this->get(route('solicita-cedula.index'))
+        ->assertOk()
+        ->assertSeeText($cedulas->get(0)->representante->nome);
+
+        $this->get(route('solicita-cedula.index') . '?page=2')
+        ->assertOk()
+        ->assertSeeText($cedula->representante->nome);
+
+        $this->get(route('solicita-cedula.busca'))->assertOk();
+        $this->get(route('solicita-cedula.filtro'))->assertOk();
+    }
+
+    /** @test */
+    public function authorized_users_can_view_list_representante_deleted_solicitacoes_cedulas()
+    {
+        $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
+        $rep = factory('App\Representante')->create();
+
+        $cedula = factory('App\SolicitaCedula')->create([
+            'idrepresentante' => $rep->id,
+            'created_at' => now()->subDays(5),
+        ]);
+
+        $rep->delete();
+        
+        $this->get(route('solicita-cedula.index'))
+        ->assertOk()
+        ->assertSeeText($cedula->representante->nome);
+    }
+
     /** @test 
      * 
      * Usuário sem autorização não pode aprovar Solicitação de Cédula.
