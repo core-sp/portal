@@ -18,16 +18,16 @@ class PreRegistroAjaxAdminRequest extends FormRequest
     {
         $this->regraValor = ['max:500'];
 
-        if(in_array(request()->campo, ['confere_anexos[]']))
+        if(in_array($this->campo, ['confere_anexos[]']))
             $this->merge([
-                'campo' => str_replace('[]', '', request()->campo),
+                'campo' => str_replace('[]', '', $this->campo),
             ]);
 
-        if(in_array(request()->campo, ['registro', 'registro_secundario']) && (request()->acao == 'editar'))
+        if(in_array($this->campo, ['registro', 'registro_secundario']) && ($this->acao == 'editar'))
         {
             $this->regraValor = ['max:20'];
             $this->merge([
-                'valor' => apenasNumeros(request()->valor),
+                'valor' => apenasNumeros($this->valor),
             ]);
         }
 
@@ -54,11 +54,11 @@ class PreRegistroAjaxAdminRequest extends FormRequest
         $todos = implode(',', array_values($this->service->getService('PreRegistro')->getNomesCampos()));
         
         $todos .= ',registro,negado,registro_socio';
-        if(request()->acao == 'editar')
+        if($this->acao == 'editar')
             $todos = 'registro,registro_secundario';
-        if(request()->acao == 'conferir')
+        if($this->acao == 'conferir')
             $todos = 'confere_anexos';
-        if(request()->acao == 'exclusao_massa')
+        if($this->acao == 'exclusao_massa')
             $todos = 'exclusao_massa';
 
         return [
@@ -73,7 +73,7 @@ class PreRegistroAjaxAdminRequest extends FormRequest
         return [
             'max' => 'Limite de :max caracteres',
             'in' => 'Campo / ação não encontrado(a)',
-            'required' => 'Falta dados para enviar a requisição',
+            'required' => $this->acao == 'conferir' ? 'Não pode editar e/ou não possui anexos' : 'Falta dados para enviar a requisição',
             'array' => 'Formato inválido',
         ];
     }

@@ -25,12 +25,13 @@
     </p>
 
     <p id="registro">
-        <span class="font-weight-bolder">{{ $nome_campos['registro'] }} - Registro: </span>
+        <span class="font-weight-bolder">{{ $nome_campos['registro'] }} - Registro: <span class="font-weight-bolder text-danger">*</span></span>
         <input 
             type="text" 
             value="{{ isset($resultado->pessoaJuridica->responsavelTecnico->registro) ? formataRegistro($resultado->pessoaJuridica->responsavelTecnico->registro) : '' }}"
             name="registro"
             maxlength="20"
+            placeholder="Registro Obrigatório"
             {{ $resultado->atendentePodeEditar() ? '' : 'disabled' }}
         />
         @if($resultado->atendentePodeEditar())
