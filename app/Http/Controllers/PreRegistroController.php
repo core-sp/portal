@@ -66,8 +66,6 @@ class PreRegistroController extends Controller
 
     public function updateAjax(PreRegistroAjaxAdminRequest $request, $id)
     {
-        $this->authorize('updateOther', auth()->user());
-
         try{
             $user = auth()->user();
             $validatedData = $request->validated();
@@ -98,8 +96,6 @@ class PreRegistroController extends Controller
 
     public function updateStatus(PreRegistroAdminRequest $request, $id)
     {
-        $this->authorize('updateOther', auth()->user());
-
         try{
             $validated = $request->validated();
             $user = auth()->user();
@@ -116,8 +112,6 @@ class PreRegistroController extends Controller
 
     public function uploadDoc(PreRegistroAdminRequest $request, $preRegistro)
     {
-        $this->authorize('updateOther', auth()->user());
-
         try{
             $dados = $request->validated();
             $dados = $this->service->getService('PreRegistro')->admin()->uploadDoc($preRegistro, $dados['file'], $dados['tipo']);

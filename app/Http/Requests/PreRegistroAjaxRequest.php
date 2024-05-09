@@ -8,6 +8,7 @@ use App\Rules\CpfCnpj;
 use Carbon\Carbon;
 use App\Rules\Cnpj;
 use App\Rules\Cpf;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PreRegistroAjaxRequest extends FormRequest
 {
@@ -55,15 +56,15 @@ class PreRegistroAjaxRequest extends FormRequest
             'uf_rt' => implode(',', array_keys(estados())),
         ];
 
-        if(in_array(request()->campo, array_keys($arrayIn)) && isset(request()->valor))
-            $this->regraValor = 'in:' . mb_strtoupper($arrayIn[request()->campo], 'UTF-8');
+        if(in_array($this->campo, array_keys($arrayIn)) && isset($this->valor))
+            $this->regraValor = 'in:' . mb_strtoupper($arrayIn[$this->campo], 'UTF-8');
 
-        if(in_array(request()->campo, ['opcional_celular[]', 'opcional_celular_1[]']))
+        if(in_array($this->campo, ['opcional_celular[]', 'opcional_celular_1[]']))
             $this->merge([
-                'campo' => str_replace('[]', '', request()->campo),
+                'campo' => str_replace('[]', '', $this->campo),
             ]);
 
-        if((strpos(request()->campo, 'cpf') !== false) || (strpos(request()->campo, 'cnpj') !== false))
+        if((strpos($this->campo, 'cpf') !== false) || (strpos($this->campo, 'cnpj') !== false))
         {
             $this->merge(['valor' => apenasNumeros($this->valor)]);
             switch ($this->campo) {
@@ -78,6 +79,9 @@ class PreRegistroAjaxRequest extends FormRequest
                     $pr = auth()->guard('user_externo')->check() ? auth()->guard('user_externo')->user()->preRegistro : 
                     auth()->guard('contabil')->user()->preRegistros->find($this->preRegistro);
 
+                    if(!isset($pr))
+                        throw new ModelNotFoundException("No query results for model [App\PreRegistro] ");
+
                     $rt_cpf_socio = !$pr->userExterno->isPessoaFisica() && $pr->pessoaJuridica->possuiRT()? $pr->pessoaJuridica->responsavelTecnico->cpf : '';
 
                     $this->regraValor = ['nullable', new CpfCnpj, 'unique:contabeis,cnpj', 'not_in:' . $pr->userExterno->cpf_cnpj . ',' . $rt_cpf_socio];
@@ -89,7 +93,7 @@ class PreRegistroAjaxRequest extends FormRequest
             }
         }
 
-        if(request()->campo == 'path')
+        if($this->campo == 'path')
         {
             $total = 0;
             if(request()->hasFile('valor'))
@@ -106,21 +110,21 @@ class PreRegistroAjaxRequest extends FormRequest
             $this->merge(['total' => $total]);
         }
 
-        if(strpos(request()->campo, 'dt_nascimento') !== false)
-            if(isset(request()->valor))
+        if(strpos($this->campo, 'dt_nascimento') !== false)
+            if(isset($this->valor))
                 $this->regraValor = [
                     'date_format:Y-m-d',
                     'before_or_equal:' . Carbon::today()->subYears(18)->format('Y-m-d'),
                 ];
 
-        if((strpos(request()->campo, 'dt_expedicao') !== false) || (request()->campo == 'dt_inicio_atividade'))
-            if(isset(request()->valor))
+        if((strpos($this->campo, 'dt_expedicao') !== false) || ($this->campo == 'dt_inicio_atividade'))
+            if(isset($this->valor))
                 $this->regraValor = [
                     'date_format:Y-m-d',
                     'before_or_equal:today',
                 ];
         
-        if((request()->campo == 'idregional') && isset(request()->valor))
+        if(($this->campo == 'idregional') && isset($this->valor))
             $this->regraValor = [
                 'exists:regionais,idregional'
             ];
@@ -150,7 +154,7 @@ class PreRegistroAjaxRequest extends FormRequest
 
     public function rules()
     {
-        if(request()->campo == 'path')
+        if($this->campo == 'path')
             return [
                 'valor' => 'required|array|min:1|max:15',
                 'valor.*' => 'file|mimetypes:application/pdf,image/jpeg,image/png',
@@ -176,7 +180,7 @@ class PreRegistroAjaxRequest extends FormRequest
     public function messages()
     {
         return [
-            'max' => request()->campo != 'path' ? 'Limite de :max caracteres' : 'Existe mais de 15 arquivos',
+            'max' => $this->campo != 'path' ? 'Limite de :max caracteres' : 'Existe mais de 15 arquivos',
             'total.required' => 'A soma do tamanho dos arquivos ultrapassa 5 MB',
             'campo.in' => 'Campo não encontrado ou não permitido alterar',
             'campo.*.in' => 'Campo não encontrado ou não permitido alterar',
@@ -189,7 +193,7 @@ class PreRegistroAjaxRequest extends FormRequest
             'file' => 'Deve ser um arquivo',
             'uploaded' => 'Falhou o upload por erro no servidor',
             'date_format' => 'Deve ser tipo data',
-            'before_or_equal' => strpos(request()->campo, 'dt_nascimento') !== false ? 'Deve ter 18 anos completos ou mais' : 'Data deve ser igual ou anterior a hoje',
+            'before_or_equal' => strpos($this->campo, 'dt_nascimento') !== false ? 'Deve ter 18 anos completos ou mais' : 'Data deve ser igual ou anterior a hoje',
             'exists' => 'Esta regional não existe',
         ];
     }

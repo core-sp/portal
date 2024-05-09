@@ -4,6 +4,7 @@
 
 use App\PreRegistroCnpj;
 use App\ResponsavelTecnico;
+use App\Socio;
 use Faker\Generator as Faker;
 
 $factory->define(PreRegistroCnpj::class, function (Faker $faker) {
@@ -22,6 +23,7 @@ $factory->define(PreRegistroCnpj::class, function (Faker $faker) {
         'cidade' => 'SÃO PAULO',
         'uf' => 'SP',
         'historico_rt' => json_encode(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT),
+        'historico_socio' => json_encode(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT),
         'responsavel_tecnico_id' => ResponsavelTecnico::count() > 0 ? ResponsavelTecnico::count() : factory('App\ResponsavelTecnico'),
         'pre_registro_id' => factory('App\PreRegistro')->states('pj'),
     ];
@@ -164,4 +166,13 @@ $factory->afterCreatingState(PreRegistroCnpj::class, 'justificado', function ($p
 
 $factory->afterMaking(PreRegistroCnpj::class, function ($prCnpj, $faker) {
     $prCnpj->makeHidden(['pre_registro_id', 'historico_rt', 'responsavel_tecnico_id']);
+});
+
+$factory->afterCreating(PreRegistroCnpj::class, function ($prCnpj, $faker) {
+    factory('App\Anexo')->states('pre_registro')->create();
+    
+    $socio_pf = factory('App\Socio')->create();
+    $socio_pj = factory('App\Socio')->states('pj')->create();
+    $prCnpj->socios()->attach($socio_pf->id, ['rt' => false]);
+    $prCnpj->socios()->attach($socio_pj->id, ['rt' => false]);
 });

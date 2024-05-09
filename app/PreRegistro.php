@@ -652,12 +652,16 @@ class PreRegistro extends Model
         $all = Arr::only($this->attributesToArray(), ['segmento', 'cep', 'bairro', 'logradouro', 'numero', 'complemento', 'cidade', 'uf', 'telefone', 
         'tipo_telefone', 'opcional_celular', 'idregional']);
 
-        $all['telefone'] = explode(';', $this->telefone)[0];
-        $all['telefone_1'] = explode(';', $this->telefone)[1];
-        $all['tipo_telefone'] = explode(';', $this->tipo_telefone)[0];
-        $all['tipo_telefone_1'] = explode(';', $this->tipo_telefone)[1];
-        $all['opcional_celular'] = array_filter(explode(',', explode(';', $this->opcional_celular)[0]));
-        $all['opcional_celular_1'] = array_filter(explode(',', explode(';', $this->opcional_celular)[1]));
+        $tel = explode(';', $this->telefone);
+        $tipo = explode(';', $this->tipo_telefone);
+        $opcional = explode(';', $this->opcional_celular);
+
+        $all['telefone'] = isset($tel[0]) ? $tel[0] : null;
+        $all['telefone_1'] = isset($tel[1]) ? $tel[1] : null;
+        $all['tipo_telefone'] = isset($tipo[0]) ? $tipo[0] : null;
+        $all['tipo_telefone_1'] = isset($tipo[1]) ? $tipo[1] : null;
+        $all['opcional_celular'] = isset($opcional[0]) ? array_filter(explode(',', $opcional[0])) : [];
+        $all['opcional_celular_1'] = isset($opcional[1]) ? array_filter(explode(',', $opcional[1])) : [];
 
         return $all;
     }

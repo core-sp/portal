@@ -114,3 +114,7 @@ $factory->afterMakingState(PreRegistroCpf::class, 'request', function ($prCpf, $
 $factory->afterCreatingState(PreRegistroCpf::class, 'justificado', function ($prCpf, $faker) {
     factory('App\Anexo')->states('pre_registro')->create();
 });
+
+$factory->afterCreating(PreRegistroCpf::class, function ($prCpf, $faker) {
+    factory('App\Anexo')->states('pre_registro')->create();
+});

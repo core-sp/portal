@@ -14,6 +14,12 @@ class PreRegistroAjaxAdminRequest extends FormRequest
         $this->service = $service;
     }
 
+    public function authorize()
+    {
+        $user = auth()->user();
+        return $user->can('updateOther', $user);
+    }
+
     protected function prepareForValidation()
     {
         $this->regraValor = ['max:500'];

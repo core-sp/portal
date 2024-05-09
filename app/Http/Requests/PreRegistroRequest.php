@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use App\Rules\Cnpj;
 use App\Rules\Cpf;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PreRegistroRequest extends FormRequest
 {
@@ -21,9 +22,7 @@ class PreRegistroRequest extends FormRequest
 
     private function upperImplode($array)
     {
-        return implode(',', collect($array)->map(function($item) {
-            return mb_strtoupper($item, 'UTF-8');
-        })->toArray());
+        return mb_strtoupper(implode(',', $array), 'UTF-8');
     }
 
     private function getRules()
@@ -168,6 +167,8 @@ class PreRegistroRequest extends FormRequest
         $this->msg_socios = array();
 
         $preRegistro = $this->externo->load('preRegistro')->preRegistro;
+        if(!isset($preRegistro))
+            throw new ModelNotFoundException("No query results for model [App\PreRegistro] ");
 
         // apaga todos os dados vindo do formulário
         $pergunta = $this->pergunta;

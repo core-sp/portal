@@ -51,7 +51,7 @@ abstract class TestCase extends BaseTestCase
 
         $user = $user ?: factory('App\User')->create();
 
-        $this->actingAs($user);
+        $this->actingAs($user, 'web');
 
         return $user;
     }
@@ -68,7 +68,7 @@ abstract class TestCase extends BaseTestCase
             'email' => isset($email) ? $email : 'email_fake_admin@core-sp.org.br'
         ]);
 
-        $this->actingAs($user);
+        $this->actingAs($user, 'web');
 
         return $user;
     }

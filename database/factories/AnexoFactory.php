@@ -12,6 +12,7 @@ $factory->define(Anexo::class, function (Faker $faker) {
         'nome_original' => 'teste.jpg',
         'extensao' => 'jpg',
         'tamanho_bytes' => 28523,
+        'tipo' => null,
         'pre_registro_id' => null,
     ];
 });
