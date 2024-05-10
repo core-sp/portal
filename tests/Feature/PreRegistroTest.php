@@ -717,17 +717,16 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_update_table_pre_registros_by_ajax_with_input_type_text_more_191_chars()
     {
-        $faker = \Faker\Factory::create();
         $externo = $this->signInAsUserExterno();
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $preRegistro = [
-            'logradouro' => $faker->text(500),
-            'complemento' => $faker->text(500),
-            'bairro' => $faker->text(500),
-            'cidade' => $faker->text(500),
-            'telefone' => $faker->text(500),
-            'pergunta' => $faker->text(500),
+            'logradouro' => $this->faker()->text(500),
+            'complemento' => $this->faker()->text(500),
+            'bairro' => $this->faker()->text(500),
+            'cidade' => $this->faker()->text(500),
+            'telefone' => $this->faker()->text(500),
+            'pergunta' => $this->faker()->text(500),
         ];
 
         foreach($preRegistro as $key => $value)
@@ -2309,6 +2308,14 @@ class PreRegistroTest extends TestCase
                 'Dados Gerais&nbsp',
                 '<span class="badge badge-danger">',
                 '</a>',
+                '<a class="nav-link" data-toggle="pill" href="#parte_endereco">',
+                'Endereço&nbsp',
+                '<span class="badge badge-danger">',
+                '</a>',
+                '<a class="nav-link" data-toggle="pill" href="#parte_canal_relacionamento">',
+                'Canal de Relacionamento&nbsp',
+                '<span class="badge badge-danger">',
+                '</a>',
             ])
             ->assertSee('value="'. route('externo.preregistro.justificativa.view', ['preRegistro' => 1, 'campo' => $campo]) .'"');
     }
@@ -2377,6 +2384,14 @@ class PreRegistroTest extends TestCase
             ->assertSeeInOrder([
                 '<a class="nav-link" data-toggle="pill" href="#parte_dados_gerais">',
                 'Dados Gerais&nbsp',
+                '<span class="badge badge-danger">',
+                '</a>',
+                '<a class="nav-link" data-toggle="pill" href="#parte_endereco">',
+                'Endereço&nbsp',
+                '<span class="badge badge-danger">',
+                '</a>',
+                '<a class="nav-link" data-toggle="pill" href="#parte_canal_relacionamento">',
+                'Canal de Relacionamento&nbsp',
                 '<span class="badge badge-danger">',
                 '</a>',
             ])
@@ -4448,6 +4463,445 @@ class PreRegistroTest extends TestCase
 
     /** 
      * =======================================================================================================
+     * TESTES PRE-REGISTRO VIA AJAX - ADMIN
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function can_update_justificativa()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create([
+                'telefone' => '(11) 00000-0000;(12) 00000-111',
+                'tipo_telefone' => mb_strtoupper(tipos_contatos()[0].';' . tipos_contatos()[0], 'UTF-8'),
+                'opcional_celular' => mb_strtoupper(opcoes_celular()[1] . ';' . opcoes_celular()[2], 'UTF-8'),
+            ])
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->arrayValidacaoInputs());
+
+        $justificativas = array();
+        foreach($dados as $campo)
+        {
+            $texto = $this->faker()->text(500);
+            $justificativas[$campo] = $texto;
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $texto
+            ])->assertStatus(200);   
+            
+            $this->assertEquals(PreRegistro::first()->getJustificativaArray(), $justificativas);
+            $this->assertEquals(PreRegistro::first()->idusuario, $admin->idusuario);
+        }
+
+        $this->assertDatabaseHas('pre_registros', [
+            'justificativa' => json_encode($justificativas, JSON_FORCE_OBJECT),
+        ]);
+    }
+
+    /** @test */
+    public function can_update_justificativa_with_status_em_analise_or_analise_da_correcao()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create([
+                'telefone' => '(11) 00000-0000;(12) 00000-111',
+                'tipo_telefone' => mb_strtoupper(tipos_contatos()[0].';' . tipos_contatos()[0], 'UTF-8'),
+                'opcional_celular' => mb_strtoupper(opcoes_celular()[1] . ';' . opcoes_celular()[2], 'UTF-8'),
+            ])
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->arrayValidacaoInputs());
+
+        foreach(PreRegistro::getStatus() as $status)
+        {
+            $preRegistroCpf->preRegistro->update(['status' => $status]);
+            if(in_array($status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]))
+                foreach($dados as $campo)
+                    $this->post(route('preregistro.update.ajax', $preRegistroCpf->preRegistro->id), [
+                        'acao' => 'justificar',
+                        'campo' => $campo,
+                        'valor' => $this->faker()->text(500)
+                    ])->assertStatus(200);    
+        }
+    }
+
+    /** @test */
+    public function can_edit_justificativas()
+    {
+        $admin = $this->signInAsAdmin();
+        
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create([
+                'telefone' => '(11) 00000-0000;(12) 00000-111',
+                'tipo_telefone' => mb_strtoupper(tipos_contatos()[0].';' . tipos_contatos()[0], 'UTF-8'),
+                'opcional_celular' => mb_strtoupper(opcoes_celular()[1] . ';' . opcoes_celular()[2], 'UTF-8'),
+            ])
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->arrayValidacaoInputs());
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(500)
+            ])->assertStatus(200);   
+
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => ''
+            ])->assertStatus(200);    
+
+        $this->assertDatabaseHas('pre_registros', [
+            'justificativa' => null,
+            'idusuario' => $admin->idusuario
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_more_than_500_chars()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create([
+                'telefone' => '(11) 00000-0000;(12) 00000-111',
+                'tipo_telefone' => mb_strtoupper(tipos_contatos()[0].';' . tipos_contatos()[0], 'UTF-8'),
+                'opcional_celular' => mb_strtoupper(opcoes_celular()[1] . ';' . opcoes_celular()[2], 'UTF-8'),
+            ])
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->arrayValidacaoInputs());
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(500)
+            ])->assertStatus(200);   
+
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        foreach($dados as $campo)
+        {
+            $texto = $this->faker()->text(900);
+            $justificativas[$campo] = $texto;
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $texto
+            ])->assertSessionHasErrors('valor');   
+        }
+            
+        $this->assertDatabaseMissing('pre_registros', [
+            'justificativa' => json_encode($justificativas, JSON_FORCE_OBJECT)
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_with_wrong_inputs()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create([
+                'telefone' => '(11) 00000-0000;(12) 00000-111',
+                'tipo_telefone' => mb_strtoupper(tipos_contatos()[0].';' . tipos_contatos()[0], 'UTF-8'),
+                'opcional_celular' => mb_strtoupper(opcoes_celular()[1] . ';' . opcoes_celular()[2], 'UTF-8'),
+            ])
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->arrayValidacaoInputs());
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(500)
+            ])->assertStatus(200);   
+
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo . '_erro',
+                'valor' => $this->faker()->text(500)
+            ])->assertSessionHasErrors('campo');   
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_with_wrong_input_acao()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create([
+                'telefone' => '(11) 00000-0000;(12) 00000-111',
+                'tipo_telefone' => mb_strtoupper(tipos_contatos()[0].';' . tipos_contatos()[0], 'UTF-8'),
+                'opcional_celular' => mb_strtoupper(opcoes_celular()[1] . ';' . opcoes_celular()[2], 'UTF-8'),
+            ])
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->arrayValidacaoInputs());
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(500)
+            ])->assertStatus(200);   
+
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->preRegistro->id), [
+                'acao' => 'justificar_',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(500)
+            ])->assertSessionHasErrors('acao');   
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_with_status_different_em_analise_or_analise_da_correcao()
+    {
+        $this->withoutMiddleware(\Illuminate\Routing\Middleware\ThrottleRequests::class);
+
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create([
+                'telefone' => '(11) 00000-0000;(12) 00000-111',
+                'tipo_telefone' => mb_strtoupper(tipos_contatos()[0].';' . tipos_contatos()[0], 'UTF-8'),
+                'opcional_celular' => mb_strtoupper(opcoes_celular()[1] . ';' . opcoes_celular()[2], 'UTF-8'),
+            ])
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->arrayValidacaoInputs());
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(500)
+            ])->assertStatus(200);
+
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        foreach(PreRegistro::getStatus() as $status)
+        {
+            $preRegistroCpf->preRegistro->update(['status' => $status]);
+            if(!in_array($status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]))
+                foreach($dados as $campo)
+                    $this->post(route('preregistro.update.ajax', $preRegistroCpf->preRegistro->id), [
+                        'acao' => 'justificar',
+                        'campo' => $campo,
+                        'valor' => $this->faker()->text(500)
+                    ])->assertStatus(401);    
+        }
+    }
+
+    /** @test */
+    public function log_is_generated_when_update_justificativa()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create([
+                'telefone' => '(11) 00000-0000;(12) 00000-111',
+                'tipo_telefone' => mb_strtoupper(tipos_contatos()[0].';' . tipos_contatos()[0], 'UTF-8'),
+                'opcional_celular' => mb_strtoupper(opcoes_celular()[1] . ';' . opcoes_celular()[2], 'UTF-8'),
+            ])
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->arrayValidacaoInputs());
+
+        foreach($dados as $campo)
+        {
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(500)
+            ])->assertStatus(200);
+
+            $log = tailCustom(storage_path($this->pathLogInterno()));
+            $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+            $txt = $inicio . 'Usuário (usuário 1) fez a ação de "justificar" o campo "' . $campo . '", ';
+            $txt .= 'inserindo ou removendo valor *pré-registro* (id: '.$preRegistroCpf->preRegistro->id.')';
+            $this->assertStringContainsString($txt, $log);
+        }
+    }
+
+    /** @test */
+    public function can_remove_all_justificativas()
+    {
+        $admin = $this->signInAsAdmin();
+        
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create([
+                'telefone' => '(11) 00000-0000;(12) 00000-111',
+                'tipo_telefone' => mb_strtoupper(tipos_contatos()[0].';' . tipos_contatos()[0], 'UTF-8'),
+                'opcional_celular' => mb_strtoupper(opcoes_celular()[1] . ';' . opcoes_celular()[2], 'UTF-8'),
+            ])
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->arrayValidacaoInputs());
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(500)
+            ])->assertStatus(200);   
+
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+            'acao' => 'exclusao_massa',
+            'campo' => 'exclusao_massa',
+            'valor' => $dados
+        ])->assertStatus(200);    
+
+        $this->assertDatabaseHas('pre_registros', [
+            'justificativa' => null,
+            'idusuario' => $admin->idusuario
+        ]);
+    }
+
+    /** @test */
+    public function can_save_inputs()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_correcao')->create()
+        ]);
+        $campos = ['registro_secundario' => '000011234'];
+
+        foreach($campos as $campo => $valor)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'editar',
+                'campo' => $campo,
+                'valor' => $valor
+            ])->assertStatus(200);    
+
+        $this->assertDatabaseHas('pre_registros', $campos);
+    }
+
+    /** @test */
+    public function log_is_generated_when_save_inputs()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_correcao')->create()
+        ]);
+        $campos = ['registro_secundario' => '000011234'];
+
+        foreach($campos as $campo => $valor)
+        {
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'editar',
+                'campo' => $campo,
+                'valor' => $valor
+            ])->assertStatus(200);  
+
+            $log = tailCustom(storage_path($this->pathLogInterno()));
+            $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+            $txt = $inicio . 'Usuário (usuário 1) fez a ação de "editar" o campo "' . $campo . '", ';
+            $txt .= 'inserindo ou removendo valor *pré-registro* (id: '.$preRegistroCpf->preRegistro->id.')';
+            $this->assertStringContainsString($txt, $log);
+        }  
+
+        $this->assertDatabaseHas('pre_registros', $campos);
+    }
+
+    /** @test */
+    public function can_clean_inputs_saved_after_update()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_correcao')->create()
+        ]);
+        $campos = ['registro_secundario' => '000011234'];
+
+        foreach($campos as $campo => $valor)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'editar',
+                'campo' => $campo,
+                'valor' => $valor
+            ])->assertStatus(200);    
+
+        $this->assertDatabaseHas('pre_registros', $campos);
+
+        foreach($campos as $campo => $valor)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'editar',
+                'campo' => $campo,
+                'valor' => ''
+            ])->assertStatus(200);    
+
+        $this->assertDatabaseMissing('pre_registros', $campos);
+    }
+
+    /** @test */
+    public function cannot_save_input_registro_secundario_with_more_than_20_chars()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_correcao')->create()
+        ]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+            'acao' => 'editar',
+            'campo' => 'registro_secundario',
+            'valor' => '000011234541235987532'
+        ])->assertSessionHasErrors('valor');    
+    }
+
+    /** @test */
+    public function cannot_save_inputs_with_wrong_action()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_correcao')->create()
+        ]);
+        $campos = ['registro_secundario' => '000011234'];
+
+        foreach($campos as $campo => $valor)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'editar_',
+                'campo' => $campo,
+                'valor' => $valor
+            ])->assertSessionHasErrors('acao');    
+    }
+
+    /** @test */
+    public function cannot_save_inputs_with_wrong_field()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_correcao')->create()
+        ]);
+        $campos = ['registro_secundario' => '000011234'];
+
+        foreach($campos as $campo => $valor)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'editar',
+                'campo' => $campo . '-',
+                'valor' => $valor
+            ])->assertSessionHasErrors('campo');     
+    }
+
+    /** 
+     * =======================================================================================================
      * TESTES PRE-REGISTRO - ADMIN
      * =======================================================================================================
      */
@@ -4998,8 +5452,9 @@ class PreRegistroTest extends TestCase
     public function view_button_update_status_with_status_analise_inicial_or_analise_correcao()
     {
         $admin = $this->signInAsAdmin();
-        $preRegistroCpf = factory('App\PreRegistroCpf')->states('justificado')->create();
-        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
+        ]);
 
         $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
         ->assertSee('<i class="fas fa-check"></i> Aprovar')
@@ -5036,12 +5491,19 @@ class PreRegistroTest extends TestCase
     {
         $admin = $this->signInAsAdmin();
 
-        $preRegistroCpf = factory('App\PreRegistroCpf')->states('justificado')->create();
-
-        $preRegistroCpf->preRegistro->update([
-            'status' => PreRegistro::STATUS_NEGADO, 
-            'justificativa' => json_encode(['negado' => 'teste verificando'])
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
         ]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+            'acao' => 'justificar',
+            'campo' => 'negado',
+            'valor' => $this->faker()->text(500)
+        ])->assertStatus(200); 
+
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'negar'])
+        ->assertRedirect(route('preregistro.index'));
+        
         $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
         ->assertSee($preRegistroCpf->preRegistro->getJustificativaNegado());
     }
@@ -5108,8 +5570,19 @@ class PreRegistroTest extends TestCase
     {
         $admin = $this->signInAsAdmin();
 
-        $preRegistroCpf = factory('App\PreRegistroCpf')->states('justificado')->create();
-        $justificativas = $preRegistroCpf->preRegistro->getJustificativaArray();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
+        ]);
+
+        $keys = array_keys(PreRegistro::first()->arrayValidacaoInputs());
+        foreach($keys as $campo)
+            $this->post(route('preregistro.update.ajax', 1), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(100)
+            ])->assertStatus(200);
+
+        $justificativas = $preRegistroCpf->preRegistro->fresh()->getJustificativaArray();
 
         $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
         ->assertSeeText($justificativas['idregional'])
@@ -5123,8 +5596,7 @@ class PreRegistroTest extends TestCase
         ->assertSeeText($justificativas['uf'])
         ->assertSeeText($justificativas['telefone'])
         ->assertSeeText($justificativas['tipo_telefone'])
-        ->assertSeeText($justificativas['opcional_celular'])
-        ->assertSeeText($justificativas['path']);
+        ->assertSeeText($justificativas['opcional_celular']);
     }
 
     /** @test */
@@ -5190,5 +5662,58 @@ class PreRegistroTest extends TestCase
         foreach($keys as $campo)
             $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
             ->assertSee('value="'.route('externo.preregistro.justificativa.view', ['preRegistro' => 1, 'campo' => $campo, 'data_hora' => urlencode($data_hora)]).'"');
+    }
+
+    /** @test */
+    public function view_label_campo_alterado()
+    {
+        $this->filled_campos_editados_pre_registro_pf_when_form_is_submitted_when_status_aguardando_correcao();
+
+        $admin = $this->signIn(PreRegistro::first()->user);
+
+        $camposEditados = json_decode(PreRegistro::first()->campos_editados, true);
+
+        $this->get(route('preregistro.view', 1))
+        ->assertSeeInOrder([
+            '<a class="card-link" data-toggle="collapse" href="#parte_dados_gerais">',
+            '<div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">',
+            '2. Dados Gerais',
+            '<span class="badge badge-danger ml-2">Campos alterados</span>',
+            '<a class="card-link" data-toggle="collapse" href="#parte_endereco">',
+            '<div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">',
+            '3. Endereço',
+            '<span class="badge badge-danger ml-2">Campos alterados</span>',
+            '<a class="card-link" data-toggle="collapse" href="#parte_canal_relacionamento">',
+            '<div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">',
+            '6. Canal de Relacionamento',
+            '<span class="badge badge-danger ml-2">Campos alterados</span>',
+        ]);
+            
+        foreach($camposEditados as $key => $value)
+            $this->get(route('preregistro.view', 1))->assertSeeInOrder([
+                '<p id="'.$key.'">',
+                '<span class="badge badge-danger ml-2">Campo alterado</span>',
+                '</p>',
+            ]);
+    }
+
+    /** @test */
+    public function view_label_justificado()
+    {
+        $this->view_text_justificado();
+
+        $admin = $this->signIn(PreRegistro::first()->user);
+
+        $justificados = PreRegistro::first()->getJustificativaArray();
+            
+        foreach($justificados as $key => $value)
+            $this->get(route('preregistro.view', 1))->assertSeeInOrder([
+                '<p id="'.$key.'">',
+                'type="button" ',
+                'value="'.$key.'"',
+                '<i class="fas fa-edit"></i>',
+                '<span class="badge badge-warning just ml-2">Justificado</span>',
+                '</p>',
+            ]);
     }
 }

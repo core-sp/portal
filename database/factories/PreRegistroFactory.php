@@ -144,6 +144,23 @@ $factory->state(PreRegistro::class, 'campos_ajax', function (Faker $faker) {
     ];
 });
 
+$factory->state(PreRegistro::class, 'anexos_ok_pf', function (Faker $faker) {
+    $anexos = [
+        'Comprovante de identidade',
+        'CPF',
+        'Comprovante de Residência',
+        'Certidão de quitação eleitoral',
+        'Cerificado de reservista ou dispensa',
+        'Comprovante de inscrição CNPJ',
+        'Contrato Social',
+        'Declaração Termo de indicação RT ou Procuração'
+    ];
+
+    return [
+        'confere_anexos' => json_encode([$anexos[0] => "OK", $anexos[1] => "OK", $anexos[2] => "OK", $anexos[3] => "OK", $anexos[4] => "OK"]),
+    ];
+});
+
 $factory->afterMakingState(PreRegistro::class, 'campos_ajax', function ($pr, $faker) {
     $pr->makeHidden([
         'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos', 'historico_contabil',
@@ -156,4 +173,8 @@ $factory->afterCreatingState(PreRegistro::class, 'sendo_elaborado', function ($p
         'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos', 'historico_contabil',
         'historico_status', 'campos_espelho', 'campos_editados', 'historico_justificativas', 'created_at', 'updated_at', 'id'
     ]);
+});
+
+$factory->afterCreating(PreRegistro::class, function ($pr, $faker) {
+    factory('App\Anexo')->states('pre_registro')->create();
 });
