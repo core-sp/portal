@@ -6,8 +6,10 @@ use App\Contabil;
 use Faker\Generator as Faker;
 
 $factory->define(Contabil::class, function (Faker $faker) {
+    $faker->addProvider(new \Faker\Provider\pt_BR\Company($faker));
+
     return [
-        'cnpj' => '78087976000130',
+        'cnpj' => $faker->cnpj(false),
         'nome' => mb_strtoupper($faker->company, 'UTF-8'),
         'email' => $faker->email,
         'nome_contato' => mb_strtoupper($faker->name, 'UTF-8'),

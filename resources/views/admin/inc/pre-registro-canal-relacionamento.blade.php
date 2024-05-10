@@ -37,11 +37,10 @@
         @endif
     </p>
 
-    @if($resultado->tipoTelefoneCelular())
     <p id="opcional_celular">
         <span class="font-weight-bolder">{{ $nome_campos['opcional_celular'] }} <small class="font-weight-bolder">(opcional)</small> - Opções de comunicação 
             <small class="font-weight-bolder">({{ implode(', ', opcoes_celular()) }})</small>: </span>
-        {{ isset($resultado->getOpcionalCelular()[0]) ? implode(', ', $resultado->getOpcionalCelular()[0]) : '------' }}
+        {{ isset($resultado->getOpcionalCelular()[0]) && $resultado->tipoTelefoneCelular() ? implode(', ', $resultado->getOpcionalCelular()[0]) : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'opcional_celular',
@@ -51,7 +50,6 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
-    @endif
 
     <p id="tipo_telefone_1">
         <span class="font-weight-bolder">{{ $nome_campos['tipo_telefone_1'] }} 
@@ -81,11 +79,10 @@
         @endif
     </p>
 
-    @if($resultado->tipoTelefoneOpcionalCelular())
     <p id="opcional_celular_1">
         <span class="font-weight-bolder">{{ $nome_campos['opcional_celular_1'] }} <small class="font-weight-bolder">(opcional)</small> - Opções de comunicação 
             <small class="font-weight-bolder">({{ implode(', ', opcoes_celular()) }})</small>: </span>
-        {{ isset($resultado->getOpcionalCelular()[1]) ? implode(', ', $resultado->getOpcionalCelular()[1]) : '------' }}
+        {{ isset($resultado->getOpcionalCelular()[1]) && $resultado->tipoTelefoneOpcionalCelular() ? implode(', ', $resultado->getOpcionalCelular()[1]) : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'preRegistro' => $resultado,
             'campo' => 'opcional_celular_1',
@@ -95,6 +92,5 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
-    @endif
 
 </div>
