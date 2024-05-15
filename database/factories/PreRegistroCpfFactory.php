@@ -3,8 +3,6 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\PreRegistroCpf;
-use App\PreRegistro;
-use App\Contabil;
 use Faker\Generator as Faker;
 
 $factory->define(PreRegistroCpf::class, function (Faker $faker) {

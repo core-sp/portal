@@ -4,13 +4,10 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PreRegistroMail;
 use App\PreRegistro;
 use Carbon\Carbon;
-use Illuminate\Support\Arr;
 use App\Anexo;
 use Illuminate\Foundation\Testing\WithFaker;
 
