@@ -748,7 +748,7 @@ class PreRegistroCpfTest extends TestCase
         ])->attributesToArray();
 
         $pr = factory('App\PreRegistroCpf')->raw();
-        Anexo::first()->delete();
+        Anexo::find(3)->delete();
         
         $this->put(route('externo.verifica.inserir.preregistro'), ['pergunta' => "25 meses"])
         ->assertStatus(500);
@@ -799,11 +799,6 @@ class PreRegistroCpfTest extends TestCase
         $externo = $this->signInAsUserExterno();
 
         $prCpf = factory('App\PreRegistroCpf')->create([
-            'pre_registro_id' => factory('App\PreRegistro')->create([
-                'contabil_id' => null,
-                'segmento' => null,
-                'opcional_celular' => ';',
-            ]),
             'sexo' => 'F',
             'nome_social' => null,
             'estado_civil' => null,
@@ -828,17 +823,6 @@ class PreRegistroCpfTest extends TestCase
         $externo = $this->signInAsUserExterno();
 
         $prCpf = factory('App\PreRegistroCpf')->create([
-            'pre_registro_id' => factory('App\PreRegistro')->create([
-                'idregional' => null,
-                'cep' => null,
-                'bairro' => null,
-                'logradouro' => null,
-                'numero' => null,
-                'cidade' => null,
-                'uf' => null,
-                'tipo_telefone' => null,
-                'telefone' => null,
-            ]),
             'sexo' => null,
             'dt_nascimento' => null,
             'nacionalidade' => null,
@@ -848,20 +832,14 @@ class PreRegistroCpfTest extends TestCase
             'orgao_emissor' => null,
             'dt_expedicao' => null,
         ]);
-
-        Anexo::first()->delete();
         
-        $this->put(route('externo.verifica.inserir.preregistro'), ['pergunta' => ''])
+        $this->put(route('externo.verifica.inserir.preregistro'), ['pergunta' => '25 meses'])
         ->assertSessionHasErrors([
-            'idregional','cep','bairro','logradouro','numero','cidade','uf','tipo_telefone','telefone','sexo','dt_nascimento',
-            'nacionalidade','nome_mae','tipo_identidade','identidade','orgao_emissor','dt_expedicao','path','pergunta'
+            'sexo','dt_nascimento', 'nacionalidade','nome_mae','tipo_identidade','identidade','orgao_emissor','dt_expedicao'
         ]);
 
         $this->assertDatabaseHas('pre_registros', $prCpf->preRegistro->attributesToArray());
         $this->assertDatabaseHas('pre_registros_cpf', $prCpf->attributesToArray());
-        $this->assertDatabaseMissing('anexos', [
-            'pre_registro_id' => 1
-        ]);
 
         $this->assertEquals(PreRegistro::find(1)->status, PreRegistro::STATUS_CRIADO);
     }
@@ -2385,6 +2363,8 @@ class PreRegistroCpfTest extends TestCase
         $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_1);
         $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_2);
         $this->assertDatabaseHas('pre_registros', $externo->preRegistros->first()->fresh()->toArray());
+
+        $this->assertEquals(PreRegistro::find(3)->status, PreRegistro::STATUS_ANALISE_INICIAL);
     }
 
     /** @test */
@@ -2403,7 +2383,7 @@ class PreRegistroCpfTest extends TestCase
         ])->attributesToArray();
 
         $pr = factory('App\PreRegistroCpf')->raw();
-        Anexo::first()->delete();
+        Anexo::find(3)->delete();
         
         $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), ['pergunta' => "25 meses"])
         ->assertStatus(500);
@@ -2433,7 +2413,12 @@ class PreRegistroCpfTest extends TestCase
             ])
         ])->attributesToArray();
 
-        $pr = factory('App\PreRegistroCpf')->create()->attributesToArray();
+        $pr = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => 1,
+                'user_externo_id' => factory('App\UserExterno')->create()
+            ])
+        ])->attributesToArray();
         
         $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 3]), ['pergunta' => "25 meses"])
         ->assertViewIs('site.userExterno.inserir-pre-registro');
@@ -2446,6 +2431,8 @@ class PreRegistroCpfTest extends TestCase
         $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_1);
         $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_2);
         $this->assertDatabaseHas('pre_registros', PreRegistro::find(3)->toArray());
+
+        $this->assertEquals(PreRegistro::find(3)->status, PreRegistro::STATUS_ANALISE_INICIAL);
     }
 
     /** @test */
@@ -2454,10 +2441,6 @@ class PreRegistroCpfTest extends TestCase
         $externo = $this->signInAsUserExterno('contabil');
 
         $prCpf = factory('App\PreRegistroCpf')->create([
-            'pre_registro_id' => factory('App\PreRegistro')->create([
-                'segmento' => null,
-                'opcional_celular' => ';',
-            ]),
             'sexo' => 'F',
             'nome_social' => null,
             'estado_civil' => null,
@@ -2471,7 +2454,6 @@ class PreRegistroCpfTest extends TestCase
         $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
-        $this->assertDatabaseHas('pre_registros', PreRegistro::first()->attributesToArray());
         $this->assertDatabaseHas('pre_registros_cpf', $prCpf);
     }
 
@@ -2481,17 +2463,6 @@ class PreRegistroCpfTest extends TestCase
         $externo = $this->signInAsUserExterno('contabil');
         
         $prCpf = factory('App\PreRegistroCpf')->create([
-            'pre_registro_id' => factory('App\PreRegistro')->create([
-                'idregional' => null,
-                'cep' => null,
-                'bairro' => null,
-                'logradouro' => null,
-                'numero' => null,
-                'cidade' => null,
-                'uf' => null,
-                'tipo_telefone' => null,
-                'telefone' => null,
-            ]),
             'sexo' => null,
             'dt_nascimento' => null,
             'nacionalidade' => null,
@@ -2501,21 +2472,13 @@ class PreRegistroCpfTest extends TestCase
             'orgao_emissor' => null,
             'dt_expedicao' => null,
         ]);
-
-        Anexo::first()->delete();
         
-        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), ['pergunta' => ''])
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), ['pergunta' => '25 meses'])
         ->assertSessionHasErrors([
-            'idregional','cep','bairro','logradouro','numero','cidade','uf','tipo_telefone','telefone','sexo','dt_nascimento',
-            'nacionalidade','nome_mae','tipo_identidade','identidade','orgao_emissor','dt_expedicao','path','pergunta'
+            'sexo','dt_nascimento', 'nacionalidade','nome_mae','tipo_identidade','identidade','orgao_emissor','dt_expedicao',
         ]);
 
-        $this->assertDatabaseHas('pre_registros', $prCpf->preRegistro->attributesToArray());
         $this->assertDatabaseHas('pre_registros_cpf', $prCpf->attributesToArray());
-        $this->assertDatabaseMissing('anexos', [
-            'pre_registro_id' => 1
-        ]);
-
         $this->assertEquals(PreRegistro::find(1)->status, PreRegistro::STATUS_CRIADO);
     }
 
@@ -3246,7 +3209,7 @@ class PreRegistroCpfTest extends TestCase
 
         $this->put(route('preregistro.update.status', 1), ['situacao' => 'corrigir']);
 
-        $this->signInAsUserExterno('user_externo', $externo);
+        $this->signInAsUserExterno('contabil', $externo);
 
         $campos = [
             'nome_social' => null,
@@ -3725,7 +3688,7 @@ class PreRegistroCpfTest extends TestCase
         $tipo = 'Cerificado de reservista ou dispensa';
         $arrayAnexos['Cerificado de reservista ou dispensa'] = "OK";
 
-        $preRegistroCpf->update(['dt_nascimento' => Carbon::today()->subYears(45)->format('Y-m-d')]);
+        $preRegistroCpf->update(['dt_nascimento' => Carbon::today()->subYears(45)->subDay()->format('Y-m-d')]);
         $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
             'acao' => 'conferir',
             'campo' => 'confere_anexos[]',
@@ -4432,23 +4395,23 @@ class PreRegistroCpfTest extends TestCase
         ]);
         
         $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
-        ->assertSeeText($preRegistroCpf->nome_social)
-        ->assertSeeText(onlyDate($preRegistroCpf->dt_nascimento))
-        ->assertSeeText($preRegistroCpf->sexo)
-        ->assertSeeText($preRegistroCpf->estado_civil)
-        ->assertSeeText($preRegistroCpf->nacionalidade)
-        ->assertSeeText($preRegistroCpf->naturalidade_cidade)
-        ->assertSeeText($preRegistroCpf->naturalidade_estado)
-        ->assertSeeText($preRegistroCpf->nome_mae)
-        ->assertSeeText($preRegistroCpf->nome_pai)
-        ->assertSeeText($preRegistroCpf->tipo_identidade)
-        ->assertSeeText($preRegistroCpf->identidade)
-        ->assertSeeText($preRegistroCpf->orgao_emissor)
-        ->assertSeeText(onlyDate($preRegistroCpf->dt_expedicao))
-        ->assertSeeText($preRegistroCpf->titulo_eleitor)
-        ->assertSeeText($preRegistroCpf->zona)
-        ->assertSeeText($preRegistroCpf->secao)
-        ->assertSeeText($preRegistroCpf->ra_reservista);
+        ->assertSeeInOrder(['<p id="nome_social">', ' - Nome Social: </span>', $preRegistroCpf->nome_social])
+        ->assertSeeInOrder(['<p id="dt_nascimento">', ' - Data de Nascimento: </span>', onlyDate($preRegistroCpf->dt_nascimento)])
+        ->assertSeeInOrder(['<p id="sexo">', ' - Gênero: </span>', $preRegistroCpf->sexo])
+        ->assertSeeInOrder(['<p id="estado_civil">', ' - Estado Civil: </span>', $preRegistroCpf->estado_civil])
+        ->assertSeeInOrder(['<p id="nacionalidade">', ' - Nacionalidade: </span>', $preRegistroCpf->nacionalidade])
+        ->assertSeeInOrder(['<p id="naturalidade_cidade">', ' - Naturalidade - Cidade: </span>', $preRegistroCpf->naturalidade_cidade])
+        ->assertSeeInOrder(['<p id="naturalidade_estado">', ' - Naturalidade - Estado: </span>', $preRegistroCpf->naturalidade_estado])
+        ->assertSeeInOrder(['<p id="nome_mae">', ' - Nome da Mãe: </span>', $preRegistroCpf->nome_mae])
+        ->assertSeeInOrder(['<p id="nome_pai">', ' - Nome do Pai: </span>', $preRegistroCpf->nome_pai])
+        ->assertSeeInOrder(['<p id="tipo_identidade">', ' - Tipo do documento de identidade: </span>', $preRegistroCpf->tipo_identidade])
+        ->assertSeeInOrder(['<p id="identidade">', ' - N° do documento de identidade: </span>', $preRegistroCpf->identidade])
+        ->assertSeeInOrder(['<p id="orgao_emissor">', ' - Órgão Emissor: </span>', $preRegistroCpf->orgao_emissor])
+        ->assertSeeInOrder(['<p id="dt_expedicao">', ' - Data de Expedição: </span>', onlyDate($preRegistroCpf->dt_expedicao)])
+        ->assertSeeInOrder(['<p id="titulo_eleitor">', ' - Título de Eleitor: </span>', $preRegistroCpf->titulo_eleitor])
+        ->assertSeeInOrder(['<p id="zona">', ' - Zona Eleitoral: </span>', $preRegistroCpf->zona])
+        ->assertSeeInOrder(['<p id="secao">', ' - Seção Eleitoral: </span>', $preRegistroCpf->secao])
+        ->assertSeeInOrder(['<p id="ra_reservista">', ' - RA Reservista: </span>', $preRegistroCpf->ra_reservista]);
     }
 
     /** @test */

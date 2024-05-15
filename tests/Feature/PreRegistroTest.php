@@ -1077,21 +1077,23 @@ class PreRegistroTest extends TestCase
         $this->assertDatabaseHas('pre_registros', [
             'contabil_id' => null,
         ]);
+        $this->assertEquals(json_decode(PreRegistro::first()->historico_contabil, true)['tentativas'], 0);
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'contabil',
             'campo' => 'cnpj_contabil',
-            'valor' => '78087976000130'
+            'valor' => factory('App\Contabil')->raw()['cnpj']
         ])->assertOk();
 
         $this->assertDatabaseHas('pre_registros', [
             'contabil_id' => 1,
         ]);
+        $this->assertEquals(json_decode(PreRegistro::first()->historico_contabil, true)['tentativas'], 1);
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'contabil',
             'campo' => 'cnpj_contabil',
-            'valor' => '06985713000138'
+            'valor' => factory('App\Contabil')->raw()['cnpj']
         ])
         ->assertOk()
         ->assertJsonFragment(['update' => formataData(now()->addDay())]);
@@ -1099,6 +1101,7 @@ class PreRegistroTest extends TestCase
         $this->assertDatabaseMissing('pre_registros', [
             'contabil_id' => 2,
         ]);
+        $this->assertEquals(json_decode(PreRegistro::first()->historico_contabil, true)['tentativas'], 1);
     }
 
     /** @test */
@@ -1110,16 +1113,18 @@ class PreRegistroTest extends TestCase
         $this->assertDatabaseHas('pre_registros', [
             'contabil_id' => null,
         ]);
+        $this->assertEquals(json_decode(PreRegistro::first()->historico_contabil, true)['tentativas'], 0);
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'contabil',
             'campo' => 'cnpj_contabil',
-            'valor' => '78087976000130'
+            'valor' => factory('App\Contabil')->raw()['cnpj']
         ])->assertOk();
 
         $this->assertDatabaseHas('pre_registros', [
             'contabil_id' => '1',
         ]);
+        $this->assertEquals(json_decode(PreRegistro::first()->historico_contabil, true)['tentativas'], 1);
     }
 
     /** @test */
@@ -1131,12 +1136,13 @@ class PreRegistroTest extends TestCase
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'contabil',
             'campo' => 'cnpj_contabil',
-            'valor' => '78087976000130'
+            'valor' => factory('App\Contabil')->raw()['cnpj']
         ])->assertOk();
 
         $this->assertDatabaseHas('pre_registros', [
             'contabil_id' => 1,
         ]);
+        $this->assertEquals(json_decode(PreRegistro::first()->historico_contabil, true)['tentativas'], 1);
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'contabil',
@@ -1147,6 +1153,7 @@ class PreRegistroTest extends TestCase
         $this->assertDatabaseHas('pre_registros', [
             'contabil_id' => null,
         ]);
+        $this->assertEquals(json_decode(PreRegistro::first()->historico_contabil, true)['tentativas'], 1);
     }
 
     /** @test */
@@ -1159,6 +1166,7 @@ class PreRegistroTest extends TestCase
         $this->assertDatabaseHas('pre_registros', [
             'contabil_id' => null,
         ]);
+        $this->assertEquals(json_decode(PreRegistro::first()->historico_contabil, true)['tentativas'], 0);
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'contabil',
@@ -1169,6 +1177,7 @@ class PreRegistroTest extends TestCase
         $this->assertDatabaseMissing('pre_registros', [
             'contabil_id' => '1',
         ]);
+        $this->assertEquals(json_decode(PreRegistro::first()->historico_contabil, true)['tentativas'], 0);
     }
 
     /** @test */
@@ -1183,6 +1192,7 @@ class PreRegistroTest extends TestCase
         $this->assertDatabaseHas('pre_registros', [
             'contabil_id' => null,
         ]);
+        $this->assertEquals(json_decode(PreRegistro::first()->historico_contabil, true)['tentativas'], 0);
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'contabil',
@@ -1193,6 +1203,7 @@ class PreRegistroTest extends TestCase
         $this->assertDatabaseMissing('pre_registros', [
             'contabil_id' => '1',
         ]);
+        $this->assertEquals(json_decode(PreRegistro::first()->historico_contabil, true)['tentativas'], 0);
     }
 
     // Status do pré-registro
@@ -1425,6 +1436,102 @@ class PreRegistroTest extends TestCase
         
         $this->put(route('externo.verifica.inserir.preregistro'), ['pergunta' => "25 meses"])
         ->assertSessionHasErrors('cnpj_contabil');
+    }
+
+    /** @test */
+    public function can_submit_pre_registro_without_optional_inputs()
+    {
+        // PF
+        $externo = $this->signInAsUserExterno();
+
+        $prCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => null,
+                'segmento' => null,
+                'opcional_celular' => ';',
+            ])
+        ])->attributesToArray();
+
+        $this->put(route('externo.verifica.inserir.preregistro'), ['pergunta' => "25 meses"])
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
+
+        $this->assertDatabaseHas('pre_registros', PreRegistro::first()->attributesToArray());
+        $this->assertEquals(PreRegistro::find(1)->status, PreRegistro::STATUS_ANALISE_INICIAL);
+
+        // PJ
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+
+        $prCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => null,
+                'segmento' => null,
+                'opcional_celular' => ';',
+            ])
+        ])->attributesToArray();
+        
+        $this->put(route('externo.verifica.inserir.preregistro'), ['pergunta' => "25 meses"])
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
+        
+        $this->assertDatabaseHas('pre_registros', PreRegistro::find(2)->attributesToArray());
+        $this->assertEquals(PreRegistro::find(2)->status, PreRegistro::STATUS_ANALISE_INICIAL);
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_without_required_inputs()
+    {
+        // PF
+        $externo = $this->signInAsUserExterno();
+
+        $prCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'idregional' => null,
+                'cep' => null,
+                'bairro' => null,
+                'logradouro' => null,
+                'numero' => null,
+                'cidade' => null,
+                'uf' => null,
+                'tipo_telefone' => null,
+                'telefone' => null,
+            ])
+        ]);
+        
+        $this->put(route('externo.verifica.inserir.preregistro'), ['pergunta' => ''])
+        ->assertSessionHasErrors([
+            'idregional','cep','bairro','logradouro','numero','cidade','uf','tipo_telefone','telefone','pergunta'
+        ]);
+
+        $this->assertDatabaseHas('pre_registros', $prCpf->preRegistro->attributesToArray());
+        $this->assertEquals(PreRegistro::find(1)->status, PreRegistro::STATUS_CRIADO);
+
+        // PJ
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+
+        $prCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'idregional' => null,
+                'cep' => null,
+                'bairro' => null,
+                'logradouro' => null,
+                'numero' => null,
+                'cidade' => null,
+                'uf' => null,
+                'tipo_telefone' => null,
+                'telefone' => null,
+            ])
+        ]);
+        
+        $this->put(route('externo.verifica.inserir.preregistro'), ['pergunta' => ''])
+        ->assertSessionHasErrors([
+            'idregional','cep','bairro','logradouro','numero','cidade','uf','tipo_telefone','telefone','pergunta'
+        ]);
+
+        $this->assertDatabaseHas('pre_registros', $prCnpj->preRegistro->attributesToArray());
+        $this->assertEquals(PreRegistro::find(2)->status, PreRegistro::STATUS_CRIADO);
     }
 
     /** @test */
@@ -3436,6 +3543,106 @@ class PreRegistroTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 2]))
         ->assertSeeText('Foram encontrados ' . count($errors->messages()) . ' erros:')
         ->assertSeeInOrder($keys);
+    }
+
+    /** @test */
+    public function can_submit_pre_registro_without_optional_inputs_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+
+        $prCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'segmento' => null,
+                'opcional_celular' => ';',
+            ])
+        ])->attributesToArray();
+
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), ['pergunta' => "25 meses"])
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
+
+        $this->assertDatabaseHas('pre_registros', PreRegistro::first()->attributesToArray());
+        $this->assertEquals(PreRegistro::find(1)->status, PreRegistro::STATUS_ANALISE_INICIAL);
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+
+        $prCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj')->create([
+                'segmento' => null,
+                'opcional_celular' => ';',
+            ])
+        ])->attributesToArray();
+        
+        $externo->load('preRegistros');
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 2]), ['pergunta' => "25 meses"])
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 2]))->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 2]));
+        
+        $this->assertDatabaseHas('pre_registros', PreRegistro::find(2)->attributesToArray());
+        $this->assertEquals(PreRegistro::find(2)->status, PreRegistro::STATUS_ANALISE_INICIAL);
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_without_required_inputs_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        // PF
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+
+        $prCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'idregional' => null,
+                'cep' => null,
+                'bairro' => null,
+                'logradouro' => null,
+                'numero' => null,
+                'cidade' => null,
+                'uf' => null,
+                'tipo_telefone' => null,
+                'telefone' => null,
+            ])
+        ]);
+        
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), ['pergunta' => ''])
+        ->assertSessionHasErrors([
+            'idregional','cep','bairro','logradouro','numero','cidade','uf','tipo_telefone','telefone','pergunta'
+        ]);
+
+        $this->assertDatabaseHas('pre_registros', $prCpf->preRegistro->attributesToArray());
+        $this->assertEquals(PreRegistro::find(1)->status, PreRegistro::STATUS_CRIADO);
+
+        // PJ
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+
+        $prCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj')->create([
+                'idregional' => null,
+                'cep' => null,
+                'bairro' => null,
+                'logradouro' => null,
+                'numero' => null,
+                'cidade' => null,
+                'uf' => null,
+                'tipo_telefone' => null,
+                'telefone' => null,
+            ])
+        ]);
+        
+        $externo->load('preRegistros');
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 2]), ['pergunta' => ''])
+        ->assertSessionHasErrors([
+            'idregional','cep','bairro','logradouro','numero','cidade','uf','tipo_telefone','telefone','pergunta'
+        ]);
+
+        $this->assertDatabaseHas('pre_registros', $prCnpj->preRegistro->attributesToArray());
+        $this->assertEquals(PreRegistro::find(2)->status, PreRegistro::STATUS_CRIADO);
     }
 
     /** @test */
@@ -5548,21 +5755,21 @@ class PreRegistroTest extends TestCase
         $preRegistro = $preRegistroCpf->preRegistro;
         
         $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
-        ->assertSeeText(formataCpfCnpj($preRegistro->userExterno->cpf_cnpj))
-        ->assertSeeText($preRegistro->userExterno->nome)
-        ->assertSeeText($preRegistro->regional->regional)
-        ->assertSeeText($preRegistro->segmento)
-        ->assertSeeText($preRegistro->registro_secundario)
-        ->assertSeeText($preRegistro->cep)
-        ->assertSeeText($preRegistro->logradouro)
-        ->assertSeeText($preRegistro->numero)
-        ->assertSeeText($preRegistro->complemento)
-        ->assertSeeText($preRegistro->bairro)
-        ->assertSeeText($preRegistro->cidade)
-        ->assertSeeText($preRegistro->uf)
-        ->assertSeeText(explode(';', $preRegistro->telefone)[0])
-        ->assertSeeText(explode(';', $preRegistro->tipo_telefone)[0])
-        ->assertSeeText(implode(', ', $preRegistro->getOpcionalCelular()[0]));
+        ->assertSeeInOrder(['<p id="tipo_cpf">', '<span class="font-weight-bolder">CPF: </span>', formataCpfCnpj($preRegistro->userExterno->cpf_cnpj)])
+        ->assertSeeInOrder(['<p>', '<span class="font-weight-bolder">Nome Completo: </span>', $preRegistro->userExterno->nome])
+        ->assertSeeInOrder(['<p id="idregional">', ' - Região de Atuação: </span>', $preRegistro->regional->regional])
+        ->assertSeeInOrder(['<p id="segmento">', ' - Segmento: </span>', $preRegistro->segmento])
+        ->assertSeeInOrder(['<p id="registro_secundario">', '<span class="font-weight-bolder">Registro Secundário: </span>', $preRegistro->registro_secundario])
+        ->assertSeeInOrder(['<p id="cep">', ' - CEP: </span>', $preRegistro->cep])
+        ->assertSeeInOrder(['<p id="logradouro">', ' - Logradouro: </span>', $preRegistro->logradouro])
+        ->assertSeeInOrder(['<p id="numero">', ' - Número: </span>', $preRegistro->numero])
+        ->assertSeeInOrder(['<p id="complemento">', ' - Complemento: </span>', '-----'])
+        ->assertSeeInOrder(['<p id="bairro">', ' - Bairro: </span>', $preRegistro->bairro])
+        ->assertSeeInOrder(['<p id="cidade">', ' - Município: </span>', $preRegistro->cidade])
+        ->assertSeeInOrder(['<p id="uf">', ' - Estado: </span>', $preRegistro->uf])
+        ->assertSeeInOrder(['<p id="telefone">', ' - Nº de telefone: </span>', explode(';', $preRegistro->telefone)[0]])
+        ->assertSeeInOrder(['<p id="tipo_telefone">', ' - Tipo de telefone: </span>', explode(';', $preRegistro->tipo_telefone)[0]])
+        ->assertSeeInOrder(['<p id="opcional_celular">', '<small class="font-weight-bolder">(opcional)</small> - Opções de comunicação', implode(', ', $preRegistro->getOpcionalCelular()[0])]);
     }
 
     /** @test */

@@ -76,7 +76,7 @@ class PreRegistroAjaxRequest extends FormRequest
                     $this->msgUnique = 'O CNPJ fornecido já consta no Portal com outro tipo de conta';
                     break;
                 case 'cpf_cnpj_socio':
-                    $pr = auth()->guard('user_externo')->check() ? auth()->guard('user_externo')->user()->preRegistro : 
+                    $pr = auth()->guard('user_externo')->check() ? auth()->guard('user_externo')->user()->load('preRegistro')->preRegistro : 
                     auth()->guard('contabil')->user()->preRegistros->find($this->preRegistro);
 
                     if(!isset($pr))
@@ -193,7 +193,7 @@ class PreRegistroAjaxRequest extends FormRequest
             'file' => 'Deve ser um arquivo',
             'uploaded' => 'Falhou o upload por erro no servidor',
             'date_format' => 'Deve ser tipo data',
-            'before_or_equal' => strpos($this->campo, 'dt_nascimento') !== false ? 'Deve ter 18 anos completos ou mais' : 'Data deve ser igual ou anterior a hoje',
+            'before_or_equal' => !is_array($this->campo) && strpos($this->campo, 'dt_nascimento') !== false ? 'Deve ter 18 anos completos ou mais' : 'Data deve ser igual ou anterior a hoje',
             'exists' => 'Esta regional não existe',
         ];
     }

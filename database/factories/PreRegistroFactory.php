@@ -151,13 +151,27 @@ $factory->state(PreRegistro::class, 'anexos_ok_pf', function (Faker $faker) {
         'Comprovante de Residência',
         'Certidão de quitação eleitoral',
         'Cerificado de reservista ou dispensa',
+    ];
+
+    return [
+        'confere_anexos' => json_encode(array_fill_keys($anexos, "OK")),
+    ];
+});
+
+$factory->state(PreRegistro::class, 'anexos_ok_pj', function (Faker $faker) {
+    $anexos = [
+        'Comprovante de identidade',
+        'CPF',
+        'Comprovante de Residência',
+        'Certidão de quitação eleitoral',
+        'Cerificado de reservista ou dispensa',
         'Comprovante de inscrição CNPJ',
         'Contrato Social',
         'Declaração Termo de indicação RT ou Procuração'
     ];
 
     return [
-        'confere_anexos' => json_encode([$anexos[0] => "OK", $anexos[1] => "OK", $anexos[2] => "OK", $anexos[3] => "OK", $anexos[4] => "OK"]),
+        'confere_anexos' => json_encode(array_fill_keys($anexos, "OK")),
     ];
 });
 

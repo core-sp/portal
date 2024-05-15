@@ -180,7 +180,7 @@ class PreRegistroRequest extends FormRequest
 
         $this->regraPath = '';
         $this->regraDtNasc = Carbon::today()->subYears(18)->format('Y-m-d');
-        $dataReservista = Carbon::today()->subYears(45)->addDay()->format('Y-m-d');
+        $dataReservista = Carbon::today()->subYears(45)->format('Y-m-d');
 
         if($anexosCount == 0)
         {
@@ -209,7 +209,7 @@ class PreRegistroRequest extends FormRequest
                 $this->merge($preRegistro->pessoaJuridica->responsavelTecnico->arrayValidacaoInputs());
 
             $this->regraReservistaRT = $this->filled('dt_nascimento_rt') && Carbon::hasFormat($this->dt_nascimento_rt, 'Y-m-d') && 
-            ($this->dt_nascimento_rt > $dataReservista);
+            ($this->dt_nascimento_rt >= $dataReservista);
 
             // if(!isset(request()->checkEndEmpresa) || (isset(request()->checkEndEmpresa) && (request()->checkEndEmpresa != 'on')))
             //     $this->merge([
@@ -244,7 +244,7 @@ class PreRegistroRequest extends FormRequest
             $this->merge($preRegistro->pessoaFisica->arrayValidacaoInputs());
 
             $this->regraReservistaPF = $this->filled('nacionalidade') && ($this->nacionalidade == 'BRASILEIRA') && 
-            $this->filled('dt_nascimento') && Carbon::hasFormat($this->dt_nascimento, 'Y-m-d') && ($this->dt_nascimento > $dataReservista);
+            $this->filled('dt_nascimento') && Carbon::hasFormat($this->dt_nascimento, 'Y-m-d') && ($this->dt_nascimento >= $dataReservista);
 
             if($this->filled('nacionalidade') && ($this->nacionalidade != "BRASILEIRA"))
                 $this->merge([

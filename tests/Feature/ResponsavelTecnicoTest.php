@@ -3222,4 +3222,121 @@ class ResponsavelTecnicoTest extends TestCase
         ->assertSeeText($justificativas['cidade_rt'])
         ->assertSeeText($justificativas['uf_rt']);
     }
+
+    // /** @test */
+    // public function can_save_inputs()
+    // {
+    //     $admin = $this->signInAsAdmin();
+    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('justificado')->create();
+    //     $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+    //     $campos = ['registro' => '000011234'];
+
+    //     foreach($campos as $campo => $valor)
+    //         $this->post(route('preregistro.update.ajax', $preRegistroCnpj->pre_registro_id), [
+    //             'acao' => 'editar',
+    //             'campo' => $campo,
+    //             'valor' => $valor
+    //         ])->assertStatus(200);    
+
+    //     $this->assertDatabaseHas('responsaveis_tecnicos', $campos);
+    // }
+
+    // /** @test */
+    // public function log_is_generated_when_save_inputs()
+    // {
+    //     $admin = $this->signInAsAdmin();
+    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('justificado')->create();
+    //     $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+    //     $campos = ['registro' => '000011234'];
+
+    //     foreach($campos as $campo => $valor)
+    //     {
+    //         $this->post(route('preregistro.update.ajax', $preRegistroCnpj->pre_registro_id), [
+    //             'acao' => 'editar',
+    //             'campo' => $campo,
+    //             'valor' => $valor
+    //         ])->assertStatus(200);  
+
+    //         $log = tailCustom(storage_path($this->pathLogInterno()));
+    //         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+    //         $txt = $inicio . 'Usuário (usuário 1) fez a ação de "editar" o campo "' . $campo . '", ';
+    //         $txt .= 'inserindo ou removendo valor *pré-registro* (id: '.$preRegistroCnpj->preRegistro->id.')';
+    //         $this->assertStringContainsString($txt, $log);
+    //     }  
+
+    //     $this->assertDatabaseHas('responsaveis_tecnicos', $campos);
+    // }
+
+    // /** @test */
+    // public function can_clean_inputs_saved_after_update()
+    // {
+    //     $admin = $this->signInAsAdmin();
+    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('justificado')->create();
+    //     $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+    //     $campos = ['registro' => '000011234'];
+
+    //     foreach($campos as $campo => $valor)
+    //         $this->post(route('preregistro.update.ajax', $preRegistroCnpj->pre_registro_id), [
+    //             'acao' => 'editar',
+    //             'campo' => $campo,
+    //             'valor' => $valor
+    //         ])->assertStatus(200);    
+
+    //     $this->assertDatabaseHas('responsaveis_tecnicos', $campos);
+
+    //     foreach($campos as $campo => $valor)
+    //         $this->post(route('preregistro.update.ajax', $preRegistroCnpj->pre_registro_id), [
+    //             'acao' => 'editar',
+    //             'campo' => $campo,
+    //             'valor' => ''
+    //         ])->assertStatus(200);    
+
+    //     $this->assertDatabaseMissing('responsaveis_tecnicos', $campos);
+    // }
+
+    // /** @test */
+    // public function cannot_save_input_registro_with_more_than_20_chars()
+    // {
+    //     $admin = $this->signInAsAdmin();
+    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('justificado')->create();
+    //     $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+    //     $this->post(route('preregistro.update.ajax', $preRegistroCnpj->pre_registro_id), [
+    //         'acao' => 'editar',
+    //         'campo' => 'registro',
+    //         'valor' => '000011234541235987532'
+    //     ])->assertSessionHasErrors('valor');    
+    // }
+
+    // /** @test */
+    // public function cannot_save_inputs_with_wrong_action()
+    // {
+    //     $admin = $this->signInAsAdmin();
+    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('justificado')->create();
+    //     $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+    //     $campos = ['registro' => '000011234'];
+
+    //     foreach($campos as $campo => $valor)
+    //         $this->post(route('preregistro.update.ajax', $preRegistroCnpj->pre_registro_id), [
+    //             'acao' => 'editar_',
+    //             'campo' => $campo,
+    //             'valor' => $valor
+    //         ])->assertSessionHasErrors('acao');    
+    // }
+
+    // /** @test */
+    // public function cannot_save_inputs_with_wrong_field()
+    // {
+    //     $admin = $this->signInAsAdmin();
+    //     $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('justificado')->create();
+    //     $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+    //     $campos = ['registro' => '000011234'];
+
+    //     foreach($campos as $campo => $valor)
+    //         $this->post(route('preregistro.update.ajax', $preRegistroCnpj->pre_registro_id), [
+    //             'acao' => 'editar',
+    //             'campo' => $campo . '-',
+    //             'valor' => $valor
+    //         ])->assertSessionHasErrors('campo');     
+    // }
 }

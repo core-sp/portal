@@ -13,7 +13,7 @@ $factory->define(Socio::class, function (Faker $faker) {
         'registro' => null,
         'nome' => mb_strtoupper($faker->name, 'UTF-8'),
         'nome_social' => null,
-        'dt_nascimento' => '1970-02-20',
+        'dt_nascimento' => now()->subYears(40)->format('Y-m-d'),
         'identidade' => '221111113',
         'orgao_emissor' => 'SSP- SP',
         'cep' => '03021-050',

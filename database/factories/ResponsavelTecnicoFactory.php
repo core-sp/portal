@@ -6,8 +6,10 @@ use App\ResponsavelTecnico;
 use Faker\Generator as Faker;
 
 $factory->define(ResponsavelTecnico::class, function (Faker $faker) {
+    $faker->addProvider(new \Faker\Provider\pt_BR\Person($faker));
+
     return [
-        'cpf' => '47662011089',
+        'cpf' => $faker->cpf(false),
         'registro' => null,
         'nome' => mb_strtoupper($faker->name, 'UTF-8'),
         'nome_social' => null,

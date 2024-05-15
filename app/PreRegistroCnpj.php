@@ -36,15 +36,16 @@ class PreRegistroCnpj extends Model
 
     private function validarUpdateAjax($campo, $valor)
     {
-        if(($campo == 'checkEndEmpresa') && ($valor == 'on'))
-            return $this->preRegistro->getEndereco();
+        if($campo == 'checkEndEmpresa')
+            return $valor == 'on' ? $this->preRegistro->getEndereco() : null;
         return [$campo => $valor];
     }
 
     public function atualizarFinal($campo, $valor)
     {
         $valido = $this->validarUpdateAjax($campo, $valor);
-        $this->update($valido);
+        if(isset($valido))
+            $this->update($valido);
 
         return null;
     }
@@ -132,7 +133,7 @@ class PreRegistroCnpj extends Model
 
     public function possuiSocioReservista()
     {
-        return $this->possuiSocioPF() && $this->socios->where('dt_nascimento', '<=', now()->subYears(45)->addDay()->format('Y-m-d'))->isNotEmpty();
+        return $this->possuiSocioPF() && $this->socios->whereNotNull('dt_nascimento')->where('dt_nascimento', '>=', now()->subYears(45)->format('Y-m-d'))->isNotEmpty();
     }
 
     public function getHistoricoCanEdit($classe = null)
