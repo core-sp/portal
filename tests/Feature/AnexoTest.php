@@ -8,12 +8,11 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use App\PreRegistro;
 use App\Anexo;
-use Illuminate\Support\Str;
-use Illuminate\Support\Arr;
+use Illuminate\Foundation\Testing\WithFaker;
 
 class AnexoTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithFaker;
 
     /** 
      * =======================================================================================================
@@ -103,7 +102,8 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseHas('anexos', [
             'nome_original' => 'random.jpg',
-            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id
+            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id,
+            'tipo' => null,
         ]);
 
         $anexos = $externo->load('preRegistro')->preRegistro->anexos;
@@ -111,13 +111,11 @@ class AnexoTest extends TestCase
     }
 
     /** @test */
-    public function cannot_create_anexos_by_ajax_after_aprovado()
+    public function cannot_create_anexos_by_ajax_with_status_aprovado()
     {
         $externo = $this->signInAsUserExterno();
         factory('App\PreRegistroCpf')->create([
-            'pre_registro_id' => factory('App\PreRegistro')->create([
-                'status' => 'Aprovado'
-            ]),
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create(),
         ]);
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
         ->assertRedirect(route('externo.preregistro.view'));
@@ -132,6 +130,8 @@ class AnexoTest extends TestCase
             'nome_original' => 'random.jpg',
             'pre_registro_id' => 2
         ]);
+
+        Storage::disk('local')->assertMissing('userExterno/pre_registros/1/');
     }
 
     /** @test */
@@ -178,6 +178,8 @@ class AnexoTest extends TestCase
             UploadedFile::fake()->image('random.jpg')->size(10),
             UploadedFile::fake()->image('random.jpg')->size(10),
         ];
+
+        $this->assertEquals(count($anexos), 15);
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -187,7 +189,9 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseHas('anexos', [
             'nome_original' => Anexo::find(1)->nome_original,
-            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id
+            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id,
+            'extensao' => 'zip',
+            'tipo' => null,
         ]);
 
         Storage::disk('local')->assertExists(Anexo::find(1)->path);
@@ -219,6 +223,8 @@ class AnexoTest extends TestCase
             UploadedFile::fake()->image('random.jpg')->size(10),
         ];
         
+        $this->assertEquals(count($anexos) > 15, true);
+
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
             'campo' => 'path',
@@ -227,7 +233,9 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseMissing('anexos', [
             'id' => 1,
-            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id
+            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id,
+            'extensao' => 'zip',
+            'tipo' => null,
         ]);
     }
 
@@ -257,6 +265,8 @@ class AnexoTest extends TestCase
             UploadedFile::fake()->image('random15.jpg')->size(10),
         ];
 
+        $this->assertEquals(count($anexos), 15);
+
         for($cont = 1; $cont <= 10; $cont++)
         {
             $this->post(route('externo.inserir.preregistro.ajax'), [
@@ -267,7 +277,9 @@ class AnexoTest extends TestCase
 
             $this->assertDatabaseHas('anexos', [
                 'nome_original' => Anexo::find($cont)->nome_original,
-                'pre_registro_id' => $id
+                'pre_registro_id' => $id,
+                'extensao' => 'zip',
+                'tipo' => null,
             ]);
     
             Storage::disk('local')->assertExists(Anexo::find($cont)->path);
@@ -294,7 +306,9 @@ class AnexoTest extends TestCase
 
             $this->assertDatabaseHas('anexos', [
                 'nome_original' => Anexo::find($cont)->nome_original,
-                'pre_registro_id' => $id
+                'pre_registro_id' => $id,
+                'extensao' => 'jpeg',
+                'tipo' => null,
             ]);
     
             Storage::disk('local')->assertExists(Anexo::find($cont)->path);
@@ -329,7 +343,9 @@ class AnexoTest extends TestCase
 
             $this->assertDatabaseHas('anexos', [
                 'nome_original' => Anexo::find($cont)->nome_original,
-                'pre_registro_id' => $id
+                'pre_registro_id' => $id,
+                'extensao' => 'jpeg',
+                'tipo' => null,
             ]);
     
             Storage::disk('local')->assertExists(Anexo::find($cont)->path);
@@ -372,6 +388,8 @@ class AnexoTest extends TestCase
             UploadedFile::fake()->image('random15.jpg')->size(10),
         ];
 
+        $this->assertEquals(count($anexos), 15);
+
         for($cont = 1; $cont <= 15; $cont++)
         {
             $this->post(route('externo.inserir.preregistro.ajax'), [
@@ -382,7 +400,9 @@ class AnexoTest extends TestCase
 
             $this->assertDatabaseHas('anexos', [
                 'nome_original' => Anexo::find($cont)->nome_original,
-                'pre_registro_id' => $id
+                'pre_registro_id' => $id,
+                'extensao' => 'zip',
+                'tipo' => null,
             ]);
     
             Storage::disk('local')->assertExists(Anexo::find($cont)->path);
@@ -397,7 +417,6 @@ class AnexoTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-        $id = $externo->load('preRegistro')->preRegistro->id;
 
         $anexos = [
             UploadedFile::fake()->image('random1.jpg')->size(10),
@@ -418,6 +437,8 @@ class AnexoTest extends TestCase
             UploadedFile::fake()->image('random15.jpg')->size(10),
         ];
 
+        $this->assertEquals(count($anexos) > 15, true);
+
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
             'campo' => 'path',
@@ -426,7 +447,9 @@ class AnexoTest extends TestCase
 
         $this->assertDatabaseMissing('anexos', [
             'id' => 1,
-            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id
+            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id,
+            'extensao' => 'zip',
+            'tipo' => null,
         ]);
     }
 
@@ -448,7 +471,9 @@ class AnexoTest extends TestCase
 
             $this->assertDatabaseHas('anexos', [
                 'nome_original' => Anexo::find($cont)->nome_original,
-                'pre_registro_id' => $id
+                'pre_registro_id' => $id,
+                'extensao' => 'jpeg',
+                'tipo' => null,
             ]);
     
             Storage::disk('local')->assertExists(Anexo::find($cont)->path);
@@ -464,7 +489,9 @@ class AnexoTest extends TestCase
 
             $this->assertDatabaseHas('anexos', [
                 'nome_original' => Anexo::find($cont)->nome_original,
-                'pre_registro_id' => $id
+                'pre_registro_id' => $id,
+                'extensao' => 'jpeg',
+                'tipo' => null,
             ]);
     
             Storage::disk('local')->assertExists(Anexo::find($cont)->path);
@@ -495,7 +522,9 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseMissing('anexos', [
             'nome_original' => 'random.jpg',
-            'pre_registro_id' => $id
+            'pre_registro_id' => $id,
+            'extensao' => 'jpeg',
+            'tipo' => null,
         ]);
     }
 
@@ -515,7 +544,9 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseMissing('anexos', [
             'nome_original' => 'random.jpg',
-            'pre_registro_id' => $id
+            'pre_registro_id' => $id,
+            'extensao' => 'jpeg',
+            'tipo' => null,
         ]);
     }
 
@@ -535,7 +566,9 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseMissing('anexos', [
             'nome_original' => 'random.jpg',
-            'pre_registro_id' => $id
+            'pre_registro_id' => $id,
+            'extensao' => 'jpeg',
+            'tipo' => null,
         ]);
     }
 
@@ -555,7 +588,9 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseMissing('anexos', [
             'nome_original' => 'random.jpg',
-            'pre_registro_id' => $id
+            'pre_registro_id' => $id,
+            'extensao' => 'jpeg',
+            'tipo' => null,
         ]);
     }
 
@@ -575,7 +610,9 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseMissing('anexos', [
             'nome_original' => 'random.jpg',
-            'pre_registro_id' => $id
+            'pre_registro_id' => $id,
+            'extensao' => 'jpeg',
+            'tipo' => null,
         ]);
     }
 
@@ -598,7 +635,9 @@ class AnexoTest extends TestCase
 
             $this->assertDatabaseMissing('anexos', [
                 'pre_registro_id' => 1,
-                'nome_original' => 'random.' . $extensao
+                'nome_original' => 'random.' . $extensao,
+                'extensao' => $extensao,
+                'tipo' => null,
             ]);
         }
 
@@ -621,7 +660,9 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseMissing('anexos', [
             'nome_original' => 'random.pdf',
-            'pre_registro_id' => $id
+            'pre_registro_id' => $id,
+            'extensao' => 'pdf',
+            'tipo' => null,
         ]);
     }
 
@@ -642,6 +683,12 @@ class AnexoTest extends TestCase
                 UploadedFile::fake()->create('random2.pdf')->size(150),
             ]
         ])->assertSessionHasErrors('total');
+
+        $this->assertDatabaseMissing('anexos', [
+            'pre_registro_id' => $id,
+            'extensao' => 'zip',
+            'tipo' => null,
+        ]);
     }
 
     /** @test */
@@ -731,26 +778,20 @@ class AnexoTest extends TestCase
     }
 
     /** @test */
-    public function owner_can_download_boleto()
+    public function owner_cannot_view_doc_atendimento_without_file_when_approved()
     {
-        Storage::fake('local');
-
-        $user = $this->signInAsAdmin();
-
         $preRegistroCpf = factory('App\PreRegistroCpf')->create([
             'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
         ]);
 
-        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
-            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
-        ]);
-
         $externo = $this->signInAsUserExterno('user_externo', $preRegistroCpf->preRegistro->userExterno);
-        $this->get(route('externo.preregistro.anexo.download', Anexo::find(1)->id))->assertOk();
+
+        $this->get(route('externo.preregistro.view'))
+        ->assertSee('<p><i class="fas fa-exclamation-circle text-primary"></i>&nbsp;Documentos do atendimento ainda não estão disponíveis.</p>');
     }
 
     /** @test */
-    public function owner_cannot_delete_boleto()
+    public function owner_can_download_doc_atendimento()
     {
         Storage::fake('local');
 
@@ -761,15 +802,30 @@ class AnexoTest extends TestCase
         ]);
 
         $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
-            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
-        ]);
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300),
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
+        ])
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i> Boleto anexado com sucesso!');
+
+        $id = Anexo::where('tipo', Anexo::tiposDocsAtendentePreRegistro()[0])->where('pre_registro_id', 1)->first()->id;
 
         $externo = $this->signInAsUserExterno('user_externo', $preRegistroCpf->preRegistro->userExterno);
-        $this->delete(route('externo.preregistro.anexo.excluir', 1))->assertStatus(401);
+
+        $this->get(route('externo.preregistro.view'))
+        ->assertSeeInOrder([
+            '<a ',
+            'class="btn btn-success text-white mt-3" ',
+            'href="'. route('externo.preregistro.anexo.download', Anexo::find(2)->id) .'"',
+            'download',
+            'Baixar '. Anexo::find(2)->tipo,
+            '</a>',
+        ]);
+
+        $this->get(route('externo.preregistro.anexo.download', $id))->assertOk();
     }
 
     /** @test */
-    public function log_is_generated_when_download_boleto()
+    public function owner_cannot_delete_doc_atendimento()
     {
         Storage::fake('local');
 
@@ -780,15 +836,42 @@ class AnexoTest extends TestCase
         ]);
 
         $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
-            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
-        ]);
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300),
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
+        ])
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i> Boleto anexado com sucesso!');
+
+        $id = Anexo::where('tipo', Anexo::tiposDocsAtendentePreRegistro()[0])->where('pre_registro_id', 1)->first()->id;
 
         $externo = $this->signInAsUserExterno('user_externo', $preRegistroCpf->preRegistro->userExterno);
-        $this->get(route('externo.preregistro.anexo.download', Anexo::find(1)->id))->assertOk();
+        $this->delete(route('externo.preregistro.anexo.excluir', $id))->assertStatus(401);
+    }
+
+    /** @test */
+    public function log_is_generated_when_download_doc_atendimento()
+    {
+        Storage::fake('local');
+
+        $user = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300),
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
+        ])
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i> Boleto anexado com sucesso!');
+
+        $id = Anexo::where('tipo', Anexo::tiposDocsAtendentePreRegistro()[0])->where('pre_registro_id', 1)->first()->id;
+
+        $externo = $this->signInAsUserExterno('user_externo', $preRegistroCpf->preRegistro->userExterno);
+        $this->get(route('externo.preregistro.anexo.download', $id))->assertOk();
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
-        $txt = $inicio . 'Foi realizado o download do boleto com ID 1 do pré-registro com ID 1.';
+        $txt = $inicio . 'Foi realizado o download do '.Anexo::tiposDocsAtendentePreRegistro()[0].' com ID ' . $id . ' do pré-registro com ID 1.';
         $this->assertStringContainsString($txt, $log);
     }
 
@@ -870,7 +953,6 @@ class AnexoTest extends TestCase
         $preRegistroCpf = factory('App\PreRegistroCpf')->create([
             'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
         ]);
-        factory('App\Anexo')->states('pre_registro')->create();
 
         $this->get(route('externo.preregistro.anexo.download', 1))->assertStatus(401);
     }
@@ -880,28 +962,26 @@ class AnexoTest extends TestCase
     {
         Storage::fake('local');
         $externo = $this->signInAsUserExterno();
-        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
-            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()->id
-        ])->makeHidden(['pre_registro_id', 'created_at', 'updated_at', 'id']);
 
-        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-        Anexo::find(1)->delete();
+        $preRegistro = factory('App\PreRegistroCpf')->create()->preRegistro;
+           
+        $this->put(route('externo.verifica.inserir.preregistro'), ['pergunta' => "25 meses"])
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
+
+        PreRegistro::first()->update(['status' => PreRegistro::STATUS_CORRECAO]);
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
             'campo' => 'path',
-            'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
+            'valor' => [UploadedFile::fake()->create('random_2.pdf')->size(100)]
         ])->assertOk();
 
-        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertViewIs('site.userExterno.inserir-pre-registro');
+        $this->put(route('externo.verifica.inserir.preregistro'), ['pergunta' => "25 meses"])->assertViewIs('site.userExterno.inserir-pre-registro');
         $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
-        $pr = PreRegistro::first();
-        $dados = Arr::except($dados, ['final', 'created_at', 'updated_at', 'deleted_at', 'pergunta']);
-
-        $arrayFinal = array_diff(array_keys($dados), array_keys(json_decode($pr->campos_espelho, true)));
-        $this->assertEquals($arrayFinal, array());
-        $this->assertEquals(json_decode($pr->campos_editados, true)['path'], 2);
+        $this->assertEquals(json_decode(PreRegistro::first()->campos_editados, true)['path'], '2');
     }
 
     /** 
@@ -982,7 +1062,8 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseHas('anexos', [
             'nome_original' => 'random.jpg',
-            'pre_registro_id' => 1
+            'pre_registro_id' => 1,
+            'tipo' => null,
         ]);
 
         $anexos = $externo->load('preRegistros')->preRegistros->first()->anexos;
@@ -990,17 +1071,22 @@ class AnexoTest extends TestCase
     }
 
     /** @test */
-    public function cannot_create_anexos_by_ajax_after_aprovado_by_contabilidade()
+    public function cannot_create_anexos_by_ajax_with_status_aprovado_by_contabilidade()
     {
+        Storage::fake('local');
+
         $externo = $this->signInAsUserExterno('contabil');
         $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+
         factory('App\PreRegistroCpf')->create([
-            'pre_registro_id' => factory('App\PreRegistro')->create([
-                'status' => 'Aprovado'
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create([
+                'user_externo_id' => factory('App\UserExterno')->create($dados)
             ]),
         ]);
+
         $this->post(route('externo.contabil.inserir.preregistro'), $dados)
-        ->assertRedirect(route('externo.preregistro.view'));
+        ->assertRedirect(route('externo.preregistro.view'))
+        ->assertSessionHas('message', "Este CPF / CNPJ já possui uma solicitação aprovada.");
         
         $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
             'classe' => 'anexos',
@@ -1010,7 +1096,8 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseMissing('anexos', [
             'nome_original' => 'random.jpg',
-            'pre_registro_id' => 2
+            'pre_registro_id' => 2,
+            'tipo' => null,
         ]);
     }
 
@@ -1063,6 +1150,8 @@ class AnexoTest extends TestCase
             UploadedFile::fake()->image('random.jpg')->size(10),
             UploadedFile::fake()->image('random.jpg')->size(10),
         ];
+
+        $this->assertEquals(count($anexos), 15);
         
         $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
             'classe' => 'anexos',
@@ -1072,7 +1161,8 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseHas('anexos', [
             'nome_original' => Anexo::find(1)->nome_original,
-            'pre_registro_id' => $externo->preRegistros->first()->id
+            'pre_registro_id' => $externo->preRegistros->first()->id,
+            'tipo' => null,
         ]);
 
         Storage::disk('local')->assertExists(Anexo::find(1)->path);
@@ -1105,6 +1195,8 @@ class AnexoTest extends TestCase
             UploadedFile::fake()->image('random.jpg')->size(10),
             UploadedFile::fake()->image('random.jpg')->size(10),
         ];
+
+        $this->assertEquals(count($anexos) > 15, true);
         
         $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
             'classe' => 'anexos',
@@ -1114,7 +1206,8 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseMissing('anexos', [
             'id' => 1,
-            'pre_registro_id' => $externo->preRegistros->first()->id
+            'pre_registro_id' => $externo->preRegistros->first()->id,
+            'tipo' => null,
         ]);
     }
 
@@ -1146,6 +1239,8 @@ class AnexoTest extends TestCase
             UploadedFile::fake()->image('random15.jpg')->size(10),
         ];
 
+        $this->assertEquals(count($anexos), 15);
+
         for($cont = 1; $cont <= 10; $cont++)
         {
             $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
@@ -1156,7 +1251,8 @@ class AnexoTest extends TestCase
 
             $this->assertDatabaseHas('anexos', [
                 'nome_original' => Anexo::find($cont)->nome_original,
-                'pre_registro_id' => $id
+                'pre_registro_id' => $id,
+                'tipo' => null,
             ]);
 
             Storage::disk('local')->assertExists(Anexo::find($cont)->path);
@@ -1185,7 +1281,9 @@ class AnexoTest extends TestCase
 
             $this->assertDatabaseHas('anexos', [
                 'nome_original' => Anexo::find($cont)->nome_original,
-                'pre_registro_id' => $id
+                'pre_registro_id' => $id,
+                'extensao' => 'jpeg',
+                'tipo' => null,
             ]);
 
             Storage::disk('local')->assertExists(Anexo::find($cont)->path);
@@ -1267,6 +1365,8 @@ class AnexoTest extends TestCase
             UploadedFile::fake()->image('random15.jpg')->size(10),
         ];
 
+        $this->assertEquals(count($anexos), 15);
+
         for($cont = 1; $cont <= 15; $cont++)
         {
             $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
@@ -1277,7 +1377,9 @@ class AnexoTest extends TestCase
 
             $this->assertDatabaseHas('anexos', [
                 'nome_original' => Anexo::find($cont)->nome_original,
-                'pre_registro_id' => $id
+                'pre_registro_id' => $id,
+                'extensao' => 'zip',
+                'tipo' => null,
             ]);
 
             Storage::disk('local')->assertExists(Anexo::find($cont)->path);
@@ -1315,6 +1417,8 @@ class AnexoTest extends TestCase
             UploadedFile::fake()->image('random15.jpg')->size(10),
         ];
 
+        $this->assertEquals(count($anexos) > 15, true);
+
         $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
             'classe' => 'anexos',
             'campo' => 'path',
@@ -1323,7 +1427,9 @@ class AnexoTest extends TestCase
 
         $this->assertDatabaseMissing('anexos', [
             'id' => 1,
-            'pre_registro_id' => $id
+            'pre_registro_id' => $id,
+            'extensao' => 'zip',
+            'tipo' => null,
         ]);
     }
 
@@ -1347,7 +1453,9 @@ class AnexoTest extends TestCase
 
             $this->assertDatabaseHas('anexos', [
                 'nome_original' => Anexo::find($cont)->nome_original,
-                'pre_registro_id' => $id
+                'pre_registro_id' => $id,
+                'extensao' => 'jpeg',
+                'tipo' => null,
             ]);
 
             Storage::disk('local')->assertExists(Anexo::find($cont)->path);
@@ -1363,7 +1471,9 @@ class AnexoTest extends TestCase
 
             $this->assertDatabaseHas('anexos', [
                 'nome_original' => Anexo::find($cont)->nome_original,
-                'pre_registro_id' => $id
+                'pre_registro_id' => $id,
+                'extensao' => 'jpeg',
+                'tipo' => null,
             ]);
 
             Storage::disk('local')->assertExists(Anexo::find($cont)->path);
@@ -1396,7 +1506,9 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseMissing('anexos', [
             'nome_original' => 'random.jpg',
-            'pre_registro_id' => $id
+            'pre_registro_id' => $id,
+            'extensao' => 'jpeg',
+            'tipo' => null,
         ]);
     }
 
@@ -1418,7 +1530,9 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseMissing('anexos', [
             'nome_original' => 'random.jpg',
-            'pre_registro_id' => $id
+            'pre_registro_id' => $id,
+            'extensao' => 'jpeg',
+            'tipo' => null,
         ]);
     }
 
@@ -1440,7 +1554,9 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseMissing('anexos', [
             'nome_original' => 'random.jpg',
-            'pre_registro_id' => $id
+            'pre_registro_id' => $id,
+            'extensao' => 'jpeg',
+            'tipo' => null,
         ]);
     }
 
@@ -1462,7 +1578,9 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseMissing('anexos', [
             'nome_original' => 'random.jpg',
-            'pre_registro_id' => $id
+            'pre_registro_id' => $id,
+            'extensao' => 'jpeg',
+            'tipo' => null,
         ]);
     }
 
@@ -1484,7 +1602,9 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseMissing('anexos', [
             'nome_original' => 'random.jpg',
-            'pre_registro_id' => $id
+            'pre_registro_id' => $id,
+            'extensao' => 'jpeg',
+            'tipo' => null,
         ]);
     }
 
@@ -1509,7 +1629,9 @@ class AnexoTest extends TestCase
 
             $this->assertDatabaseMissing('anexos', [
                 'pre_registro_id' => 1,
-                'nome_original' => 'random.' . $extensao
+                'nome_original' => 'random.' . $extensao,
+                'extensao' => 'jpeg',
+                'tipo' => null,
             ]);
         }
 
@@ -1534,7 +1656,9 @@ class AnexoTest extends TestCase
         
         $this->assertDatabaseMissing('anexos', [
             'nome_original' => 'random.pdf',
-            'pre_registro_id' => $id
+            'pre_registro_id' => $id,
+            'extensao' => 'jpeg',
+            'tipo' => null,
         ]);
     }
 
@@ -1601,7 +1725,9 @@ class AnexoTest extends TestCase
 
         $this->assertDatabaseMissing('anexos', [
             'pre_registro_id' => 1,
-            'nome_original' => 'random.pdf'
+            'nome_original' => 'random.pdf',
+            'extensao' => 'pdf',
+            'tipo' => null,
         ]);
 
         Storage::disk('local')->assertMissing($caminho);
@@ -1655,26 +1781,20 @@ class AnexoTest extends TestCase
     }
 
     /** @test */
-    public function owner_can_download_boleto_by_contabilidade()
-    {
-        Storage::fake('local');
-
-        $user = $this->signInAsAdmin();
-
+    public function owner_cannot_view_doc_atendimento_without_file_when_approved_by_contabilidade()
+    {        
         $preRegistroCpf = factory('App\PreRegistroCpf')->create([
             'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
         ]);
 
-        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
-            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
-        ]);
-
         $externo = $this->signInAsUserExterno('contabil', $preRegistroCpf->preRegistro->contabil);
-        $this->get(route('externo.preregistro.anexo.download', ['id' => 1, 'preRegistro' => 1]))->assertOk();
+        
+        $this->get(route('externo.relacao.preregistros'))
+        ->assertSee('<span><i>Documentos do atendimento ainda não estão disponíveis.</i></span>');
     }
 
     /** @test */
-    public function owner_cannot_delete_boleto_by_contabilidade()
+    public function owner_can_download_doc_atendimento_by_contabilidade()
     {
         Storage::fake('local');
 
@@ -1685,15 +1805,31 @@ class AnexoTest extends TestCase
         ]);
 
         $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
-            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
-        ]);
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300),
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
+        ])
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i> Boleto anexado com sucesso!');
+
+        $id = Anexo::where('tipo', Anexo::tiposDocsAtendentePreRegistro()[0])->where('pre_registro_id', 1)->first()->id;
 
         $externo = $this->signInAsUserExterno('contabil', $preRegistroCpf->preRegistro->contabil);
-        $this->delete(route('externo.preregistro.anexo.excluir', ['id' => 1, 'preRegistro' => 1]))->assertStatus(401);
+
+        $this->get(route('externo.relacao.preregistros'))
+        ->assertSeeInOrder([
+            '&nbsp; | &nbsp;',
+            '<a ',
+            'class="btn btn-success btn-sm text-white" ',
+            'href="'. route('externo.preregistro.anexo.download', ['id' => 2, 'preRegistro' => 1]) .'"',
+            'download',
+            'Baixar '. Anexo::find(2)->tipo,
+            '</a>',
+        ]);
+
+        $this->get(route('externo.preregistro.anexo.download', ['id' => $id, 'preRegistro' => 1]))->assertOk();
     }
 
     /** @test */
-    public function log_is_generated_when_download_boleto_by_contabilidade()
+    public function owner_cannot_delete_doc_atendimento_by_contabilidade()
     {
         Storage::fake('local');
 
@@ -1704,15 +1840,42 @@ class AnexoTest extends TestCase
         ]);
 
         $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
-            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
-        ]);
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300),
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
+        ])
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i> Boleto anexado com sucesso!');
+
+        $id = Anexo::where('tipo', Anexo::tiposDocsAtendentePreRegistro()[0])->where('pre_registro_id', 1)->first()->id;
 
         $externo = $this->signInAsUserExterno('contabil', $preRegistroCpf->preRegistro->contabil);
-        $this->get(route('externo.preregistro.anexo.download', ['id' => 1, 'preRegistro' => 1]))->assertOk();
+        $this->delete(route('externo.preregistro.anexo.excluir', ['id' => $id, 'preRegistro' => 1]))->assertStatus(401);
+    }
+
+    /** @test */
+    public function log_is_generated_when_download_doc_atendimento_by_contabilidade()
+    {
+        Storage::fake('local');
+
+        $user = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300),
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
+        ])
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i> Boleto anexado com sucesso!');
+
+        $id = Anexo::where('tipo', Anexo::tiposDocsAtendentePreRegistro()[0])->where('pre_registro_id', 1)->first()->id;
+
+        $externo = $this->signInAsUserExterno('contabil', $preRegistroCpf->preRegistro->contabil);
+        $this->get(route('externo.preregistro.anexo.download', ['id' => $id, 'preRegistro' => 1]))->assertOk();
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
-        $txt = $inicio . 'Foi realizado o download do boleto com ID 1 do pré-registro com ID 1.';
+        $txt = $inicio . 'Foi realizado o download do '.Anexo::tiposDocsAtendentePreRegistro()[0].' com ID ' . $id . ' do pré-registro com ID 1.';
         $this->assertStringContainsString($txt, $log);
     }
 
@@ -1743,7 +1906,9 @@ class AnexoTest extends TestCase
         $this->assertDatabaseHas('anexos', [
             'path' => $anexo->path,
             'nome_original' => $anexo->nome_original,
-            'pre_registro_id' => $pr->id
+            'pre_registro_id' => $pr->id,
+            'extensao' => 'pdf',
+            'tipo' => null,
         ]);
 
         Storage::disk('local')->assertExists($anexo->path);
@@ -1811,12 +1976,16 @@ class AnexoTest extends TestCase
         Storage::fake('local');
 
         $externo = $this->signInAsUserExterno('contabil');
-        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
-            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()->id
-        ])->makeHidden(['pre_registro_id', 'created_at', 'updated_at', 'id']);
+        
+        $preRegistro = factory('App\PreRegistroCpf')->create()->preRegistro;
 
-        $dados = factory('App\PreRegistroCpf')->states('request')->make()->final;
-        Anexo::find(1)->delete();
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), ['pergunta' => "25 meses"])
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
+        ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
+
+        PreRegistro::first()->update(['status' => PreRegistro::STATUS_CORRECAO]);
 
         $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
             'classe' => 'anexos',
@@ -1824,18 +1993,13 @@ class AnexoTest extends TestCase
             'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
         ])->assertOk();
 
-        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), ['pergunta' => "25 meses"])
         ->assertViewIs('site.userExterno.inserir-pre-registro');
 
         $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
-        $pr = PreRegistro::first();
-        $dados = Arr::except($dados, ['final', 'created_at', 'updated_at', 'deleted_at', 'pergunta']);
-
-        $arrayFinal = array_diff(array_keys($dados), array_keys(json_decode($pr->campos_espelho, true)));
-        $this->assertEquals($arrayFinal, array());
-        $this->assertEquals(json_decode($pr->campos_editados, true)['path'], 2);
+        $this->assertEquals(json_decode(PreRegistro::first()->campos_editados, true)['path'], '2');
     }
 
     /** 
@@ -1845,24 +2009,175 @@ class AnexoTest extends TestCase
      */
 
     /** @test */
-    public function view_label_novo_anexo_when_user_change_files()
+    public function view_pre_registro_anexos()
     {
         $admin = $this->signInAsAdmin();
 
-        $preRegistroCpf = factory('App\PreRegistroCpf')->states('justificado')->create();
-        factory('App\Anexo', 2)->states('pre_registro')->create();
-
-        $preRegistroCpf->preRegistro->update([
-            'status' => PreRegistro::STATUS_ANALISE_CORRECAO,
-            'campos_editados' => json_encode(['path' => '2'], JSON_FORCE_OBJECT)
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
         ]);
+        
         $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
-        ->assertSeeText('Novos anexos')
-        ->assertSeeText('Novo anexo');
+        ->assertSeeInOrder([
+            '<span class="font-weight-bolder">ID: '. Anexo::first()->id .' </span>', 
+            '<p class="mb-0">', 
+            '<i class="fas fa-paperclip"></i>',
+            '<a href="'. route('preregistro.anexo.download', ['idPreRegistro' => 1, 'id' => 1]) .'"',
+            'class="ml-2" ',
+            'target="_blank" ',
+            '<u>'. Anexo::first()->nome_original .'</u>',
+            '</a>',
+            '<a href="'. route('preregistro.anexo.download', ['idPreRegistro' => 1, 'id' => 1]) .'"',
+            'class="btn btn-sm btn-primary ml-2"',
+            'download',
+            '<i class="fas fa-download"></i>',
+            '</a>'
+        ]);
     }
 
     /** @test */
-    public function can_upload_file_after_approved()
+    public function view_pre_registro_anexos_with_extension_zip()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
+        ]);
+        factory('App\Anexo')->states('pre_registro', 'zip')->create();
+        
+        $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
+        ->assertSeeInOrder([
+            '<span class="font-weight-bolder">ID: '. Anexo::find(2)->id .' </span>', 
+            '<p class="mb-0">', 
+            '<i class="fas fa-paperclip"></i> ' . Anexo::find(2)->nome_original,
+            '<a href="'. route('preregistro.anexo.download', ['idPreRegistro' => 1, 'id' => 2]) .'"',
+            'class="btn btn-sm btn-primary ml-2"',
+            'download',
+            '<i class="fas fa-download"></i>',
+            '</a>'
+        ]);
+    }
+
+    /** @test */
+    public function view_text_justificado_anexo()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
+        ]);
+
+        $this->post(route('preregistro.update.ajax', 1), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => $this->faker()->text(100)
+        ])->assertStatus(200);
+
+        $justificativas = $preRegistroCpf->preRegistro->fresh()->getJustificativaArray();
+
+        $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
+        ->assertSeeText($justificativas['path']);
+    }
+
+    /** @test */
+    public function view_justifications_text_anexos_by_url()
+    {
+        $externo = $this->signInAsUserExterno();
+
+        factory('App\PreRegistroCpf')->create();
+
+        $this->put(route('externo.verifica.inserir.preregistro', ['checkPreRegistro' => 'on']), ['pergunta' => "25 meses"])
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))
+        ->assertRedirect(route('externo.preregistro.view'));
+
+        $admin = $this->signIn(PreRegistro::first()->user);
+
+        $this->post(route('preregistro.update.ajax', 1), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => $this->faker()->text(100)
+        ])->assertStatus(200);
+
+        $this->put(route('preregistro.update.status', 1), ['situacao' => 'corrigir']);
+        $data_hora = now()->format('Y-m-d H:i:s');
+
+        $this->get(route('externo.preregistro.justificativa.view', ['preRegistro' => 1, 'campo' => 'path', 'data_hora' => urlencode($data_hora)]))
+        ->assertJsonFragment([
+            'justificativa' => PreRegistro::first()->getJustificativaPorCampoData('path', $data_hora),
+            'data_hora' => formataData($data_hora)
+        ]);
+    }
+
+    /** @test */
+    public function view_historico_justificativas_anexos()
+    {
+        $externo = $this->signInAsUserExterno();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create();
+
+        $this->put(route('externo.verifica.inserir.preregistro', ['checkPreRegistro' => 'on']), ['pergunta' => "25 meses"])
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))
+        ->assertRedirect(route('externo.preregistro.view'));
+
+        $admin = $this->signIn(PreRegistro::first()->user);
+
+        $this->post(route('preregistro.update.ajax', 1), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => $this->faker()->text(100)
+        ])->assertStatus(200);
+
+        $this->put(route('preregistro.update.status', 1), ['situacao' => 'corrigir']);
+        $data_hora = now()->format('Y-m-d H:i:s');
+
+        $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
+        ->assertSee('value="'.route('externo.preregistro.justificativa.view', ['preRegistro' => 1, 'campo' => 'path', 'data_hora' => urlencode($data_hora)]).'"');
+    }
+
+    /** @test */
+    public function view_label_novo_anexo()
+    {
+        $this->filled_campos_editados_anexos_when_form_is_submitted_when_status_aguardando_correcao();
+
+        $admin = $this->signIn(PreRegistro::first()->user);
+
+        $camposEditados = json_decode(PreRegistro::first()->campos_editados, true);
+
+        $this->get(route('preregistro.view', 1))
+        ->assertSeeInOrder([
+            '<a class="card-link" data-toggle="collapse" href="#parte_anexos">',
+            '<div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">',
+            '7. Anexos',
+            '<span class="badge badge-success ml-2">Novos anexos</span>',
+        ]);
+            
+        $this->get(route('preregistro.view', 1))
+        ->assertSee('<span class="badge badge-success ml-2">Novo anexo</span>');
+    }
+
+    /** @test */
+    public function view_label_justificado_anexos()
+    {
+        $this->view_text_justificado_anexo();
+
+        $admin = $this->signIn(PreRegistro::first()->user);
+            
+        $this->get(route('preregistro.view', 1))->assertSeeInOrder([
+            '<p id="path" class="mb-4">',
+            'type="button" ',
+            'value="path"',
+            '<i class="fas fa-edit"></i>',
+            '<span class="badge badge-warning just ml-2">Justificado</span>',
+            '</p>',
+        ]);
+    }
+
+    /** @test */
+    public function can_upload_doc_atendimento_after_approved()
     {
         Storage::fake();
 
@@ -1873,17 +2188,20 @@ class AnexoTest extends TestCase
         ]);
 
         $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
-            'file' => UploadedFile::fake()->create('random2.pdf')->size(100)
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300),
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
         ])
-        ->assertRedirect(route('preregistro.view', $preRegistroCpf->preRegistro->id));
+        ->assertSessionHas('message', '<i class="icon fa fa-check"></i> Boleto anexado com sucesso!');
+
+        $id = Anexo::where('tipo', Anexo::tiposDocsAtendentePreRegistro()[0])->where('pre_registro_id', 1)->first()->id;
 
         $this->assertDatabaseHas('anexos', [
-            'nome_original' => 'boleto_aprovado_' . $preRegistroCpf->preRegistro->id,
-            'pre_registro_id' => $preRegistroCpf->preRegistro->id
+            'pre_registro_id' => $preRegistroCpf->preRegistro->id,
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
         ]);
 
         $anexos = $preRegistroCpf->preRegistro->anexos;
-        Storage::disk('local')->assertExists($anexos->get(0)->path);
+        Storage::disk('local')->assertExists(Anexo::find($id)->path);
     }
 
     /** @test */
@@ -1898,7 +2216,8 @@ class AnexoTest extends TestCase
         ]);
 
         $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
-            'file' => null
+            'file' => null,
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
         ])
         ->assertSessionHasErrors([
             'file'
@@ -1917,7 +2236,8 @@ class AnexoTest extends TestCase
         ]);
 
         $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
-            'file' => UploadedFile::fake()->create('random2.pdf')->size(2049)
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(2049),
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
         ])
         ->assertSessionHasErrors([
             'file'
@@ -1936,7 +2256,8 @@ class AnexoTest extends TestCase
         ]);
 
         $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
-            'file' => UploadedFile::fake()->create('random2.png')->size(300)
+            'file' => UploadedFile::fake()->create('random2.png')->size(300),
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
         ])
         ->assertSessionHasErrors([
             'file'
@@ -1953,10 +2274,47 @@ class AnexoTest extends TestCase
         ]);
 
         $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
-            'file' => 'random2.pdf'
+            'file' => 'random2.pdf',
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
         ])
         ->assertSessionHasErrors([
             'file'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_upload_file_without_tipo_after_approved()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300),
+            'tipo' => '',
+        ])
+        ->assertSessionHasErrors([
+            'tipo'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_upload_file_wrong_tipo_after_approved()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300),
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0] . '_',
+        ])
+        ->assertSessionHasErrors([
+            'tipo'
         ]);
     }
 
@@ -1972,7 +2330,8 @@ class AnexoTest extends TestCase
         ]);
 
         $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
-            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300),
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
         ])
         ->assertSessionHas([
             'message' => '<i class="icon fas fa-times"></i> O pré-registro precisa estar aprovado para anexar documento.',
@@ -1981,7 +2340,7 @@ class AnexoTest extends TestCase
     }
 
     /** @test */
-    public function log_is_generated_when_anexo_doc_created()
+    public function log_is_generated_when_doc_atendimento_created()
     {
         Storage::fake('local');
         $user = $this->signInAsAdmin();
@@ -1991,7 +2350,8 @@ class AnexoTest extends TestCase
         ]);
 
         $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
-            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300),
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
         ]);
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
@@ -2001,7 +2361,7 @@ class AnexoTest extends TestCase
     }
 
     /** @test */
-    public function view_label_anexo_doc()
+    public function view_label_doc_atendimento()
     {
         Storage::fake('local');
         $user = $this->signInAsAdmin();
@@ -2011,16 +2371,23 @@ class AnexoTest extends TestCase
         ]);
 
         $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
-            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300),
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
         ]);
 
         $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
-        ->assertSee('<span class="font-weight-bolder">Boleto:</span>')
-        ->assertSee('<u>1 - boleto_aprovado_1</u>');
+        ->assertSeeInOrder([
+            '<legend class="w-auto pr-2">Documentos Anexados</legend>',
+            '<i class="fas fa-paperclip"></i>',
+            '<span class="font-weight-bolder ml-1">'. ucfirst(Anexo::find(2)->tipo) .': </span>',
+            '<u>'. Anexo::find(2)->id .' - '. Anexo::find(2)->nome_original .'</u>',
+            '<i class="fas fa-download"></i>',
+            '<span class="ml-2"><small><i>Última atualização:</i> '. formataData(Anexo::find(2)->updated_at) .'</small></span>',
+        ]);
     }
 
     /** @test */
-    public function log_is_not_generated_when_download_boleto()
+    public function log_is_not_generated_when_download_doc_atendimento()
     {
         Storage::fake('local');
 
@@ -2031,14 +2398,66 @@ class AnexoTest extends TestCase
         ]);
 
         $this->post(route('preregistro.upload.doc', $preRegistroCpf->preRegistro->id), [
-            'file' => UploadedFile::fake()->create('random2.pdf')->size(300)
+            'file' => UploadedFile::fake()->create('random2.pdf')->size(300),
+            'tipo' => Anexo::tiposDocsAtendentePreRegistro()[0],
         ]);
 
-        $this->get(route('preregistro.anexo.download', ['idPreRegistro' => 1, 'id' => 1]))->assertOk();
+        $this->get(route('preregistro.anexo.download', ['idPreRegistro' => 1, 'id' => 2]))->assertOk();
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
-        $txt = $inicio . 'Foi realizado o download do boleto com ID 1 do pré-registro com ID 1.';
+        $txt = $inicio . 'Foi realizado o download do boleto com ID 2 do pré-registro com ID 1.';
         $this->assertStringNotContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function view_form_doc_atendimento_with_status_approved()
+    {
+        Storage::fake('local');
+        $user = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
+        ->assertSeeInOrder([
+            '<p class="font-weight-bolder">Documentos gerenciados pelo atendimento após aprovação:</p>',
+            '<legend class="w-auto pr-2">Anexar Documentos</legend>',
+            '<form class="ml-1" action="'. route('preregistro.upload.doc', 1) .'" method="POST" enctype="multipart/form-data">',
+            '<label class="mr-2 mb-0">Tipo de documento a ser anexado:</label>',
+            '<input type="radio" class="form-check-input" name="tipo" value="'. Anexo::tiposDocsAtendentePreRegistro()[0] .'">'. ucfirst(Anexo::tiposDocsAtendentePreRegistro()[0]),
+            '<label>Anexar novo documento <i>(irá substituir caso já exista)</i>:</label>',
+            '<label class="custom-file-label" for="doc_pre_registro">Selecionar arquivo...</label>',
+            '<button type="submit" class="btn btn-sm btn-primary">Enviar</button>'
+        ]);
+    }
+
+    /** @test */
+    public function view_message_doc_atendimento_without_status_approved()
+    {
+        Storage::fake('local');
+        $user = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('sendo_elaborado')->create()->id
+        ]);
+
+        $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
+        ->assertSee('<p><i>Pré-registro não está aprovado.</i></p>');
+    }
+
+    /** @test */
+    public function view_message_doc_atendimento_with_status_approved_without_file()
+    {
+        Storage::fake('local');
+        $user = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()->id
+        ]);
+
+        $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
+        ->assertSee('<p>Sem documento anexado.</p>');
     }
 }

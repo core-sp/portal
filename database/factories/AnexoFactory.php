@@ -24,3 +24,16 @@ $factory->state(Anexo::class, 'pre_registro', function (Faker $faker) {
         'pre_registro_id' => $id
     ];
 });
+
+$factory->state(Anexo::class, 'zip', function (Faker $faker) {    
+    return [
+        'nome_original' => (string) \Str::uuid() . '.zip',
+        'extensao' => 'zip',
+    ];
+});
+
+$factory->afterCreatingState(Anexo::class, 'zip', function ($anexo, $faker) {
+    $posicao = strrpos($anexo->path, '/') + 1;
+    $path = substr_replace($anexo->path, $anexo->nome_original, $posicao, strlen($anexo->path));
+    $anexo->update(['path' => $path]);
+});
