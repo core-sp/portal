@@ -118,7 +118,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 'class' => 'alert-info'
             ];
         
-        $usuario = $service->getService('UserExterno')->cadastroPrevio($externo, $dados);
+        $usuario = $service->getService('UserExterno')->cadastroPrevio($externo, $usuario);
         return $this->criarPreRegistro($usuario, $externo, true);
     }
 

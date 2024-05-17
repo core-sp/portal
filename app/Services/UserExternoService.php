@@ -179,10 +179,15 @@ class UserExternoService implements UserExternoServiceInterface {
 
     public function cadastroPrevio($contabil, $dados_externo, $retorno_previo = false)
     {
-        $externo = new UserExterno;
-        $externo->cpf_cnpj = $dados_externo['cpf_cnpj'];
-        $externo->nome = $dados_externo['nome'];
-        $externo->email = $dados_externo['email'];
+        if($dados_externo instanceof UserExterno)
+            $externo = $dados_externo;
+        else
+        {
+            $externo = new UserExterno;
+            $externo->cpf_cnpj = $dados_externo['cpf_cnpj'];
+            $externo->nome = $dados_externo['nome'];
+            $externo->email = $dados_externo['email'];
+        }
 
         if($retorno_previo)
             return $externo;

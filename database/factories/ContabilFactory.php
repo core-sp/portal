@@ -10,9 +10,9 @@ $factory->define(Contabil::class, function (Faker $faker) {
 
     return [
         'cnpj' => $faker->cnpj(false),
-        'nome' => mb_strtoupper($faker->company, 'UTF-8'),
+        'nome' => str_replace("'", "", mb_strtoupper($faker->company, 'UTF-8')),
         'email' => $faker->email,
-        'nome_contato' => mb_strtoupper($faker->name, 'UTF-8'),
+        'nome_contato' => str_replace("'", "", mb_strtoupper($faker->name, 'UTF-8')),
         'telefone' => '(11) 12345-1234',
         'password' => bcrypt('Teste102030'), 
         'verify_token' => null, 
@@ -23,13 +23,16 @@ $factory->define(Contabil::class, function (Faker $faker) {
 
 $factory->state(Contabil::class, 'low', function (Faker $faker) {
     return [
-        'nome' => $faker->company,
-        'nome_contato' => $faker->name,
+        'nome' => str_replace("'", "", $faker->company),
+        'nome_contato' => str_replace("'", "", $faker->name),
     ];
 });
 
 $factory->state(Contabil::class, 'cadastro', function (Faker $faker) {
+    $faker->addProvider(new \Faker\Provider\pt_BR\Company($faker));
+
     return [
+        'cpf_cnpj' => $faker->cnpj(false),
         'tipo_conta' => 'contabil',
         'aceite' => 'on',
         'password' => 'Teste102030',

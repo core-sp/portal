@@ -984,6 +984,68 @@ class AnexoTest extends TestCase
         $this->assertEquals(json_decode(PreRegistro::first()->campos_editados, true)['path'], '2');
     }
 
+    /** @test */
+    public function view_justifications_anexos()
+    {
+        $externo = $this->signInAsUserExterno();
+
+        factory('App\PreRegistroCpf')->create();
+
+        $this->put(route('externo.verifica.inserir.preregistro'), ['pergunta' => "25 meses"])
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))
+        ->assertRedirect(route('externo.preregistro.view'));
+
+        $admin = $this->signIn(PreRegistro::first()->user);
+
+        $this->post(route('preregistro.update.ajax', 1), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => $this->faker()->text(100)
+        ])->assertStatus(200);
+
+        $this->put(route('preregistro.update.status', 1), ['situacao' => 'corrigir']);
+
+        $this->signInAsUserExterno('user_externo', $externo);
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
+        ->assertSeeInOrder([
+            '<a class="nav-link" data-toggle="pill" href="#parte_anexos">',
+            'Anexos&nbsp',
+            '<span class="badge badge-danger">',
+            '</a>',
+        ])
+        ->assertSee('value="'. route('externo.preregistro.justificativa.view', ['preRegistro' => 1, 'campo' => 'path']) .'"');
+    }
+
+    /** @test */
+    public function view_justifications_text_anexos()
+    {
+        $externo = $this->signInAsUserExterno();
+
+        factory('App\PreRegistroCpf')->create();
+
+        $this->put(route('externo.verifica.inserir.preregistro'), ['pergunta' => "25 meses"])
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro'))
+        ->assertRedirect(route('externo.preregistro.view'));
+
+        $admin = $this->signIn(PreRegistro::first()->user);
+
+        $this->post(route('preregistro.update.ajax', 1), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => $this->faker()->text(100)
+        ])->assertStatus(200);
+
+        $this->put(route('preregistro.update.status', 1), ['situacao' => 'corrigir']);
+
+        $this->get(route('externo.preregistro.justificativa.view', ['preRegistro' => 1, 'campo' => 'path']))
+        ->assertJsonFragment(['justificativa' => PreRegistro::first()->getJustificativaPorCampo('path')]);
+    }
+
     /** 
      * ==============================================================================================================
      * TESTES PRE-REGISTRO ANEXO - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
@@ -2000,6 +2062,68 @@ class AnexoTest extends TestCase
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
         $this->assertEquals(json_decode(PreRegistro::first()->campos_editados, true)['path'], '2');
+    }
+
+    /** @test */
+    public function view_justifications_anexos_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        factory('App\PreRegistroCpf')->create();
+
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), ['pergunta' => "25 meses"])
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
+        ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
+
+        $admin = $this->signIn(PreRegistro::first()->user);
+
+        $this->post(route('preregistro.update.ajax', 1), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => $this->faker()->text(100)
+        ])->assertStatus(200);
+
+        $this->put(route('preregistro.update.status', 1), ['situacao' => 'corrigir']);
+
+        $this->signInAsUserExterno('contabil', $externo);
+
+        $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))
+        ->assertSeeInOrder([
+            '<a class="nav-link" data-toggle="pill" href="#parte_anexos">',
+            'Anexos&nbsp',
+            '<span class="badge badge-danger">',
+            '</a>',
+        ])
+        ->assertSee('value="'. route('externo.preregistro.justificativa.view', ['preRegistro' => 1, 'campo' => 'path']) .'"');
+    }
+
+    /** @test */
+    public function view_justifications_text_anexos_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+
+        factory('App\PreRegistroCpf')->create();
+
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), ['pergunta' => "25 meses"])
+        ->assertViewIs('site.userExterno.inserir-pre-registro');
+
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
+        ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
+
+        $admin = $this->signIn(PreRegistro::first()->user);
+
+        $this->post(route('preregistro.update.ajax', 1), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => $this->faker()->text(100)
+        ])->assertStatus(200);
+
+        $this->put(route('preregistro.update.status', 1), ['situacao' => 'corrigir']);
+
+        $this->get(route('externo.preregistro.justificativa.view', ['preRegistro' => 1, 'campo' => 'path']))
+        ->assertJsonFragment(['justificativa' => PreRegistro::first()->getJustificativaPorCampo('path')]);
     }
 
     /** 
