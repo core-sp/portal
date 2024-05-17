@@ -8,7 +8,7 @@ $factory->define(UserExterno::class, function (Faker $faker) {
 
     return [
         'cpf_cnpj' => $faker->cpf(false), 
-        'nome' => mb_strtoupper($faker->name, 'UTF-8'),
+        'nome' => str_replace("'", "", mb_strtoupper($faker->name, 'UTF-8')),
         'email' => $faker->unique()->safeEmail,
         'password' => bcrypt('Teste102030'), 
         'verify_token' => null, 

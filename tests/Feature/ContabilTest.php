@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\PreRegistroMail;
 use App\PreRegistro;
 use App\Contabil;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Password;
 use Carbon\Carbon;
 use App\Mail\CadastroUserExternoMail;
@@ -388,6 +387,21 @@ class ContabilTest extends TestCase
     }
 
     /** @test */
+    public function cannot_register_if_exist_two_email_equals()
+    {
+        $pre = factory('App\Contabil')->create();
+        $dados = factory('App\Contabil')->states('cadastro')->raw([
+            'email' => $pre->email
+        ]);
+        $this->get(route('externo.cadastro'))->assertOk();
+
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertSessionHasErrors([
+            'email'
+        ]);
+    }
+
+    /** @test */
     public function register_new_contabil()
     {
         Mail::fake();
@@ -399,7 +413,9 @@ class ContabilTest extends TestCase
         ->assertViewIs('site.agradecimento')
         ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'contabil';
+        });
 
         $this->assertDatabaseHas('contabeis', [
             'cnpj' => $dados['cpf_cnpj'], 
@@ -407,7 +423,8 @@ class ContabilTest extends TestCase
         ]);
 
         // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
-        $this->get(route('externo.verifica-email', ['tipo' => 'contabil', 'token'=> Contabil::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'contabil', 'token'=> Contabil::first()->verify_token]))
+        ->assertRedirect(route('externo.login'));
         $this->assertDatabaseHas('contabeis', [
             'cnpj' => $dados['cpf_cnpj'], 
             'ativo' => 1
@@ -436,7 +453,10 @@ class ContabilTest extends TestCase
         ->assertViewIs('site.agradecimento')
         ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'contabil';
+        });
+
         $this->assertDatabaseHas('contabeis', [
             'cnpj' => $user_externo['cnpj'], 
             'ativo' => 0,
@@ -444,7 +464,48 @@ class ContabilTest extends TestCase
         ]);
 
         // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
-        $this->get(route('externo.verifica-email', ['tipo' => 'contabil', 'token'=> Contabil::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'contabil', 'token'=> Contabil::first()->verify_token]))
+        ->assertRedirect(route('externo.login'));
+        $this->assertDatabaseHas('contabeis', [
+            'cnpj' => $user_externo['cnpj'], 
+            'ativo' => 1
+        ]);
+    }
+
+    /** @test */
+    public function register_new_contabil_when_ativo_0_after_24h()
+    {
+        Mail::fake();
+
+        $user_externo = factory('App\Contabil')->create([
+            'ativo' => 0,
+        ]);
+        Contabil::first()->update(['updated_at' => Carbon::today()->subDay()]);
+
+        $dados = factory('App\Contabil')->states('cadastro')->raw([
+            'nome' => $user_externo['nome'],
+            'cpf_cnpj' => $user_externo['cnpj'],
+            'email' => $user_externo['email'],
+        ]);
+
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertViewIs('site.agradecimento')
+        ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
+
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'contabil';
+        });
+
+        $this->assertDatabaseHas('contabeis', [
+            'cnpj' => $user_externo['cnpj'], 
+            'ativo' => 0,
+            'deleted_at' => null
+        ]);
+
+        // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
+        $this->get(route('externo.verifica-email', ['tipo' => 'contabil', 'token'=> Contabil::first()->verify_token]))
+        ->assertRedirect(route('externo.login'));
         $this->assertDatabaseHas('contabeis', [
             'cnpj' => $user_externo['cnpj'], 
             'ativo' => 1
@@ -493,7 +554,9 @@ class ContabilTest extends TestCase
         ->assertViewIs('site.agradecimento')
         ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'contabil';
+        });
 
         $this->assertDatabaseHas('contabeis', [
             'cnpj' => $dados['cpf_cnpj'], 
@@ -526,7 +589,9 @@ class ContabilTest extends TestCase
         ->assertViewIs('site.agradecimento')
         ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'contabil';
+        });
 
         $this->assertDatabaseHas('contabeis', [
             'cnpj' => $dados['cpf_cnpj'], 
@@ -534,10 +599,8 @@ class ContabilTest extends TestCase
         ]);
         
         $this->get(route('externo.verifica-email', ['tipo' => 'contabil', 'token'=> Contabil::first()->verify_token . '5']))
-        ->assertStatus(302);
-
-        $this->get(route('externo.login'))
-        ->assertSeeText('Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Login Externo, caso contrário, por favor refazer cadastro no Login Externo.');
+        ->assertRedirect(route('externo.login'))
+        ->assertSessionHas('message', 'Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Login Externo, caso contrário, por favor refazer cadastro no Login Externo.');
         
         $this->assertDatabaseHas('contabeis', [
             'cnpj' => $dados['cpf_cnpj'], 
@@ -557,7 +620,9 @@ class ContabilTest extends TestCase
         ->assertViewIs('site.agradecimento')
         ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'contabil';
+        });
 
         $this->assertDatabaseHas('contabeis', [
             'cnpj' => $dados['cpf_cnpj'], 
@@ -585,7 +650,9 @@ class ContabilTest extends TestCase
         ->assertViewIs('site.agradecimento')
         ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'contabil';
+        });
 
         $this->assertDatabaseHas('contabeis', [
             'cnpj' => $dados['cpf_cnpj'], 
@@ -594,10 +661,8 @@ class ContabilTest extends TestCase
 
         Contabil::first()->update(['updated_at' => Carbon::today()->subDays(2)]);
         $this->get(route('externo.verifica-email', ['tipo' => 'contabil', 'token'=> Contabil::first()->verify_token]))
-        ->assertRedirect(route('externo.login'));
-
-        $this->get(route('externo.login'))
-        ->assertSeeText('Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Login Externo, caso contrário, por favor refazer cadastro no Login Externo.');
+        ->assertRedirect(route('externo.login'))
+        ->assertSessionHas('message', 'Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Login Externo, caso contrário, por favor refazer cadastro no Login Externo.');
         
         $this->assertDatabaseHas('contabeis', [
             'cnpj' => $dados['cpf_cnpj'], 
@@ -613,7 +678,9 @@ class ContabilTest extends TestCase
         ->assertViewIs('site.agradecimento')
         ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'contabil';
+        });
 
         $this->assertDatabaseHas('contabeis', [
             'cnpj' => $dados['cpf_cnpj'], 
@@ -622,7 +689,8 @@ class ContabilTest extends TestCase
         ]);
 
         // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
-        $this->get(route('externo.verifica-email', ['tipo' => 'contabil', 'token'=> Contabil::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'contabil', 'token'=> Contabil::first()->verify_token]))
+        ->assertRedirect(route('externo.login'));
         $this->assertDatabaseHas('contabeis', [
             'cnpj' => $dados['cpf_cnpj'], 
             'ativo' => 1
@@ -646,10 +714,8 @@ class ContabilTest extends TestCase
 
         $this->get(route('externo.cadastro'))->assertOk();
         $this->post(route('externo.cadastro.submit'), $dados)
-        ->assertRedirect(route('externo.cadastro'));
-
-        $this->get(route('externo.cadastro'))
-        ->assertSeeText('Esta conta já solicitou o cadastro. Verifique seu email para ativar. Caso não tenha mais acesso ao e-mail, aguarde 24h para se recadastrar');
+        ->assertRedirect(route('externo.cadastro'))
+        ->assertSessionHas('message', 'Esta conta já solicitou o cadastro. Verifique seu email para ativar. Caso não tenha mais acesso ao e-mail, aguarde 24h para se recadastrar');
 
         Mail::assertNotQueued(CadastroUserExternoMail::class);
 
@@ -685,7 +751,8 @@ class ContabilTest extends TestCase
         ->assertViewIs('site.agradecimento')
         ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
-        $this->get(route('externo.verifica-email', ['tipo' => 'contabil', 'token'=> Contabil::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'contabil', 'token'=> Contabil::first()->verify_token]))
+        ->assertRedirect(route('externo.login'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -1143,7 +1210,8 @@ class ContabilTest extends TestCase
         $this->post(route('externo.password.email'), [
             'tipo_conta' => 'contabil',
             'cpf_cnpj' => $user_externo['cnpj']
-        ]);
+        ])
+        ->assertSessionHas('status', "O link de reconfiguração de senha foi enviado ao email ". $user_externo['email'] ."<br>Esse link é válido por 60 minutos");
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -1286,10 +1354,8 @@ class ContabilTest extends TestCase
             'cpf_cnpj' => $user_externo->cnpj,
             'password' => 'Teste102030', 
             'password_confirmation' => 'Teste102030', 
-        ])->assertRedirect(route('externo.login'));
-
-        $this->get(route('externo.login'))
-        ->assertSee('Senha alterada com sucesso. Favor realizar o login novamente com as novas informações.');
+        ])->assertRedirect(route('externo.login'))
+        ->assertSessionHas('message', 'Senha alterada com sucesso. Favor realizar o login novamente com as novas informações.');
     }
 
     /** @test */
@@ -1310,7 +1376,8 @@ class ContabilTest extends TestCase
             'cpf_cnpj' => $user_externo->cnpj,
             'password' => 'Teste102030', 
             'password_confirmation' => 'Teste102030', 
-        ]);
+        ])
+        ->assertRedirect(route('externo.login'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -1434,6 +1501,22 @@ class ContabilTest extends TestCase
             'nome' => mb_strtoupper('Novo nome da Contabilidade', 'UTF-8'),
             'email' => 'teste@email.com.br'
         ]);
+    }
+
+    /** @test */
+    public function cannot_after_login_update_email_with_than_2_mails_equal()
+    {
+        $pre = factory('App\Contabil')->create([
+            'email' => 'teste@email.com.br'
+        ]);
+
+        $contabil = $this->signInAsUserExterno('contabil');
+
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'email' => $pre->email
+        ]))
+        ->assertSessionHasErrors(['email']);
     }
 
     /** @test */
@@ -1601,7 +1684,9 @@ class ContabilTest extends TestCase
         ->assertRedirect(route('externo.editar.view'))
         ->assertSessionHas('message', 'Dados alterados com sucesso.');
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'contabil';
+        });
     }
 
     /** @test */
@@ -1770,7 +1855,7 @@ class ContabilTest extends TestCase
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'contabil',
             'campo' => 'cnpj_contabil',
-            'valor' => '78087976000130'
+            'valor' => factory('App\Contabil')->raw()['cnpj']
         ])->assertStatus(200);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
@@ -2798,7 +2883,10 @@ class ContabilTest extends TestCase
         ->assertViewIs('site.agradecimento')
         ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'contabil';
+        });
+
         $this->assertDatabaseHas('contabeis', [
             'cnpj' => $dados['cpf_cnpj'], 
             'nome' => $dados['nome'],
@@ -2850,7 +2938,10 @@ class ContabilTest extends TestCase
         ->assertViewIs('site.agradecimento')
         ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
+            return $mail->tipo == 'contabil';
+        });
+
         $this->assertDatabaseHas('contabeis', [
             'cnpj' => $dados['cpf_cnpj'], 
             'nome' => $dados['nome'],

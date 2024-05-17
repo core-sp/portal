@@ -13,12 +13,15 @@ use Carbon\Carbon;
 
 class UserExternoTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithFaker;
 
-    /** @test 
-     * 
-     * Não pode criar um registro com formulário em branco.
-    */
+    /** 
+     * =======================================================================================================
+     * TESTES LOGIN USER EXTERNO
+     * =======================================================================================================
+     */
+
+    /** @test */
     public function cannot_register_without_mandatory_inputs()
     {
         $this->get(route('externo.cadastro'))->assertOk();
@@ -33,8 +36,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-    */
+    /** @test */
     public function cannot_register_without_tipo_conta_input()
     {
         $dados = factory('App\UserExterno')->states('cadastro')->raw([
@@ -51,8 +53,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-    */
+    /** @test */
     public function cannot_register_with_tipo_conta_input_invalid()
     {
         $dados = factory('App\UserExterno')->states('cadastro')->raw([
@@ -69,10 +70,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode criar um registro faltando cpf/cnpj.
-    */
+    /** @test */
     public function cannot_register_without_cpfcnpj_input()
     {
         $dados = factory('App\UserExterno')->states('cadastro')->raw([
@@ -89,10 +87,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode criar um registro faltando nome.
-    */
+    /** @test */
     public function cannot_register_without_nome_input()
     {
         $dados = factory('App\UserExterno')->states('cadastro')->raw([
@@ -109,10 +104,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode criar um registro faltando email.
-    */
+    /** @test */
     public function cannot_register_without_email_input()
     {
         $dados = factory('App\UserExterno')->states('cadastro')->raw([
@@ -129,10 +121,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode criar um registro faltando concordar com os termos.
-    */
+    /** @test */
     public function cannot_register_without_checkbox_input()
     {
         $dados = factory('App\UserExterno')->states('cadastro')->raw([
@@ -149,10 +138,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode criar um registro faltando com a senha sem os requisitos mínimos.
-    */
+    /** @test */
     public function cannot_register_with_password_wrong()
     {
         // Faltando letra maiuscula e mais um caracter
@@ -171,10 +157,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode criar um registro faltando com a senha e confirmação de senha diferentes.
-    */
+    /** @test */
     public function cannot_register_with_password_and_confirmation_differents()
     {
         $dados = factory('App\UserExterno')->states('cadastro')->raw([
@@ -192,10 +175,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode criar um registro faltando confirmação de senha.
-    */
+    /** @test */
     public function cannot_register_without_password_confirmation()
     {
         $dados = factory('App\UserExterno')->states('cadastro')->raw([
@@ -212,10 +192,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode criar um registro com padrão de email errado.
-    */
+    /** @test */
     public function cannot_register_with_email_wrong()
     {
         $dados = factory('App\UserExterno')->states('cadastro')->raw([
@@ -252,10 +229,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode criar um registro se o cpf/cnpj já existirem no banco dos Usuário Externo.
-    */
+    /** @test */
     public function cannot_register_if_exist_cpfcnpj_in_users_externo_table()
     {
         $pre = factory('App\UserExterno')->create();
@@ -362,9 +336,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-    */
+    /** @test */
     public function cannot_register_with_cpfcnpj_wrong()
     {
         $pre = factory('App\UserExterno')->create();
@@ -381,9 +353,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-    */
+    /** @test */
     public function cannot_register_if_exist_email_contabeis_table()
     {
         $pre = factory('App\Contabil')->create();
@@ -402,18 +372,14 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-    */
+    /** @test */
     public function cannot_register_if_exist_more_than_two_email_equals()
     {
         $pre = factory('App\UserExterno')->create();
         $pre2 = factory('App\UserExterno')->create([
-            'cpf_cnpj' => '89878398000177',
             'email' => $pre->email
         ]);
         $dados = factory('App\UserExterno')->states('cadastro')->raw([
-            'cpf_cnpj' => '09361260000167',
             'email' => $pre->email
         ]);
         $this->get(route('externo.cadastro'))->assertOk();
@@ -429,17 +395,16 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Pode se registrar com todas as informações certas.
-    */
+    /** @test */
     public function register_new_user_externo()
     {
         Mail::fake();
 
         $this->get(route('externo.cadastro'))->assertOk();
         $dados = factory('App\UserExterno')->states('cadastro')->raw();
-        $this->post(route('externo.cadastro.submit'), $dados);
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertViewIs('site.agradecimento')
+        ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
         Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
             return $mail->tipo == 'user-externo';
@@ -451,17 +416,15 @@ class UserExternoTest extends TestCase
         ]);
 
         // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
-        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token' => UserExterno::first()->verify_token]))
+        ->assertRedirect(route('externo.login'));
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $dados['cpf_cnpj'], 
             'ativo' => 1
         ]);
     }
 
-    /** @test 
-     * 
-     * Pode se registrar se deletado e ativo 0.
-    */
+    /** @test */
     public function register_new_user_externo_when_deleted_and_ativo_0_after_24h()
     {
         Mail::fake();
@@ -479,7 +442,9 @@ class UserExternoTest extends TestCase
         ]);
 
         $this->get(route('externo.cadastro'))->assertOk();
-        $this->post(route('externo.cadastro.submit'), $dados);
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertViewIs('site.agradecimento')
+        ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
         Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
             return $mail->tipo == 'user-externo';
@@ -492,17 +457,15 @@ class UserExternoTest extends TestCase
         ]);
 
         // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
-        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token' => UserExterno::first()->verify_token]))
+        ->assertRedirect(route('externo.login'));
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'], 
             'ativo' => 1
         ]);
     }
 
-    /** @test 
-     * 
-     * Pode se registrar se ativo 0.
-    */
+    /** @test */
     public function register_new_user_externo_when_ativo_0_after_24h()
     {
         Mail::fake();
@@ -519,7 +482,9 @@ class UserExternoTest extends TestCase
         ]);
 
         $this->get(route('externo.cadastro'))->assertOk();
-        $this->post(route('externo.cadastro.submit'), $dados);
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertViewIs('site.agradecimento')
+        ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
         Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
             return $mail->tipo == 'user-externo';
@@ -532,16 +497,15 @@ class UserExternoTest extends TestCase
         ]);
 
         // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
-        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token' => UserExterno::first()->verify_token]))
+        ->assertRedirect(route('externo.login'));
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'], 
             'ativo' => 1
         ]);
     }
 
-    /** @test 
-     * 
-    */
+    /** @test */
     public function cannot_register_new_user_externo_when_ativo_0_in_24h()
     {
         Mail::fake();
@@ -557,7 +521,8 @@ class UserExternoTest extends TestCase
         ]);
 
         $this->get(route('externo.cadastro'))->assertOk();
-        $this->post(route('externo.cadastro.submit'), $dados);
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertRedirect(route('externo.cadastro'));
 
         $this->get(route('externo.cadastro'))
         ->assertSeeText('Esta conta já solicitou o cadastro. Verifique seu email para ativar. Caso não tenha mais acesso ao e-mail, aguarde 24h para se recadastrar');
@@ -570,18 +535,17 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-    */
+    /** @test */
     public function cannot_to_active_register_after_24h()
     {
         Mail::fake();
 
-        $dados = factory('App\UserExterno')->states('cadastro')->raw([
-            'cpf_cnpj' => '36982299007',
-        ]);
+        $dados = factory('App\UserExterno')->states('cadastro')->raw();
 
         $this->get(route('externo.cadastro'))->assertOk();
-        $this->post(route('externo.cadastro.submit'), $dados);
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertViewIs('site.agradecimento')
+        ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
         Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
             return $mail->tipo == 'user-externo';
@@ -594,7 +558,7 @@ class UserExternoTest extends TestCase
 
         UserExterno::first()->update(['updated_at' => Carbon::today()->subDays(2)]);
         
-        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]))
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token' => UserExterno::first()->verify_token]))
         ->assertRedirect(route('externo.login'));
 
         $this->get(route('externo.login'))
@@ -606,134 +570,127 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-    */
+    /** @test */
     public function cannot_verify_mail_with_wrong_token()
     {
         Mail::fake();
 
-        $dados = factory('App\UserExterno')->states('cadastro')->raw([
-            'cpf_cnpj' => '36982299007',
-        ]);
+        $dados = factory('App\UserExterno')->states('cadastro')->raw();
 
         $this->get(route('externo.cadastro'))->assertOk();
-        $this->post(route('externo.cadastro.submit'), $dados);
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertViewIs('site.agradecimento')
+        ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
         Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
             return $mail->tipo == 'user-externo';
         });
 
         $this->assertDatabaseHas('users_externo', [
-            'cpf_cnpj' => '36982299007', 
+            'cpf_cnpj' => $dados['cpf_cnpj'], 
             'ativo' => 0
         ]);
         
-        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token . '5']))
-        ->assertStatus(302);
-
-        $this->get(route('externo.login'))
-        ->assertSeeText('Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Login Externo, caso contrário, por favor refazer cadastro no Login Externo.');
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token' => UserExterno::first()->verify_token . '5']))
+        ->assertRedirect(route('externo.login'))
+        ->assertSessionHas('message', 'Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Login Externo, caso contrário, por favor refazer cadastro no Login Externo.');
         
         $this->assertDatabaseHas('users_externo', [
-            'cpf_cnpj' => '36982299007', 
+            'cpf_cnpj' => $dados['cpf_cnpj'], 
             'ativo' => 0
         ]);
     }
 
-    /** @test 
-    */
+    /** @test */
     public function cannot_verify_mail_with_wrong_tipo()
     {
         Mail::fake();
 
-        $dados = factory('App\UserExterno')->states('cadastro')->raw([
-            'cpf_cnpj' => '36982299007',
-        ]);
+        $dados = factory('App\UserExterno')->states('cadastro')->raw();
 
         $this->get(route('externo.cadastro'))->assertOk();
-        $this->post(route('externo.cadastro.submit'), $dados);
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertViewIs('site.agradecimento')
+        ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
         Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
             return $mail->tipo == 'user-externo';
         });
 
         $this->assertDatabaseHas('users_externo', [
-            'cpf_cnpj' => '36982299007', 
+            'cpf_cnpj' => $dados['cpf_cnpj'], 
             'ativo' => 0
         ]);
         
-        $this->get(route('externo.verifica-email', ['tipo' => 'user-externos', 'token'=> UserExterno::first()->verify_token]))
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externos', 'token' => UserExterno::first()->verify_token]))
         ->assertNotFound();
         
         $this->assertDatabaseHas('users_externo', [
-            'cpf_cnpj' => '36982299007', 
+            'cpf_cnpj' => $dados['cpf_cnpj'], 
             'ativo' => 0
         ]);
     }
 
-    /** @test 
-     * 
-     * Pode se registrar se deletado e ativo 0.
-    */
+    /** @test */
     public function register_after_24h_and_verify_mail()
     {
         Mail::fake();
 
-        $dados = factory('App\UserExterno')->states('cadastro')->raw([
-            'cpf_cnpj' => '36982299007',
-        ]);
+        $dados = factory('App\UserExterno')->states('cadastro')->raw();
 
         $this->get(route('externo.cadastro'))->assertOk();
-        $this->post(route('externo.cadastro.submit'), $dados);
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertViewIs('site.agradecimento')
+        ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
         Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
             return $mail->tipo == 'user-externo';
         });
 
         $this->assertDatabaseHas('users_externo', [
-            'cpf_cnpj' => '36982299007', 
+            'cpf_cnpj' => $dados['cpf_cnpj'], 
             'ativo' => 0
         ]);
 
         UserExterno::first()->update(['updated_at' => Carbon::today()->subDays(2)]);
-        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]))
-        ->assertRedirect(route('externo.login'));
-
-        $this->get(route('externo.login'))
-        ->assertSeeText('Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Login Externo, caso contrário, por favor refazer cadastro no Login Externo.');
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token' => UserExterno::first()->verify_token]))
+        ->assertRedirect(route('externo.login'))
+        ->assertSessionHas('message', 'Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Login Externo, caso contrário, por favor refazer cadastro no Login Externo.');
         
         $this->assertDatabaseHas('users_externo', [
-            'cpf_cnpj' => '36982299007', 
+            'cpf_cnpj' => $dados['cpf_cnpj'], 
             'ativo' => 0
         ]);
 
         $dados = factory('App\UserExterno')->states('cadastro')->raw([
-            'cpf_cnpj' => '36982299007',
+            'cpf_cnpj' => $dados['cpf_cnpj'],
         ]);
 
         $this->get(route('externo.cadastro'))->assertOk();
-        $this->post(route('externo.cadastro.submit'), $dados);
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertViewIs('site.agradecimento')
+        ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
         Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
             return $mail->tipo == 'user-externo';
         });
 
         $this->assertDatabaseHas('users_externo', [
-            'cpf_cnpj' => '36982299007', 
+            'cpf_cnpj' => $dados['cpf_cnpj'], 
             'ativo' => 0,
             'deleted_at' => null
         ]);
 
         // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
-        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token' => UserExterno::first()->verify_token]))
+        ->assertRedirect(route('externo.login'));
         $this->assertDatabaseHas('users_externo', [
-            'cpf_cnpj' => '36982299007', 
+            'cpf_cnpj' => $dados['cpf_cnpj'], 
             'ativo' => 1
         ]);
     }
 
-    /** @test 
-    */
+    /** @test */
     public function cannot_register_new_user_externo_when_ativo_0_and_deleted_in_24h()
     {
         Mail::fake();
@@ -749,10 +706,9 @@ class UserExternoTest extends TestCase
         ]);
 
         $this->get(route('externo.cadastro'))->assertOk();
-        $this->post(route('externo.cadastro.submit'), $dados);
-
-        $this->get(route('externo.cadastro'))
-        ->assertSeeText('Esta conta já solicitou o cadastro. Verifique seu email para ativar. Caso não tenha mais acesso ao e-mail, aguarde 24h para se recadastrar');
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertRedirect(route('externo.cadastro'))
+        ->assertSessionHas('message', 'Esta conta já solicitou o cadastro. Verifique seu email para ativar. Caso não tenha mais acesso ao e-mail, aguarde 24h para se recadastrar');
 
         Mail::assertNotQueued(CadastroUserExternoMail::class);
 
@@ -762,18 +718,15 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Log externo ao se cadastrar.
-    */
+    /** @test */
     public function log_is_generated_when_new_user_externo()
     {
-        $dados = factory('App\UserExterno')->states('cadastro')->raw([
-            'cpf_cnpj' => '36982299007',
-        ]);
+        $dados = factory('App\UserExterno')->states('cadastro')->raw();
 
         $this->get(route('externo.cadastro'))->assertOk();
-        $this->post(route('externo.cadastro.submit'), $dados);
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertViewIs('site.agradecimento')
+        ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -781,20 +734,18 @@ class UserExternoTest extends TestCase
         $this->assertStringContainsString($txt, $log);
     }
 
-    /** @test 
-     * 
-     * Log externo ao verificar email.
-    */
+    /** @test */
     public function log_is_generated_when_verifica_email()
     {
-        $dados = factory('App\UserExterno')->states('cadastro')->raw([
-            'cpf_cnpj' => '36982299007',
-        ]);
+        $dados = factory('App\UserExterno')->states('cadastro')->raw();
 
         $this->get(route('externo.cadastro'))->assertOk();
-        $this->post(route('externo.cadastro.submit'), $dados);
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertViewIs('site.agradecimento')
+        ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
-        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token' => UserExterno::first()->verify_token]))
+        ->assertRedirect(route('externo.login'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -802,10 +753,7 @@ class UserExternoTest extends TestCase
         $this->assertStringContainsString($txt, $log);
     }
 
-    /** @test 
-     * 
-     * Usuário Externo  pode logar na área restrita do Portal.
-    */
+    /** @test */
     public function login_on_externo()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -819,10 +767,7 @@ class UserExternoTest extends TestCase
         ->assertRedirect(route('externo.dashboard'));
     }
 
-    /** @test 
-     * 
-     * Log externo ao logar.
-    */
+    /** @test */
     public function log_is_generated_when_logon()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -831,7 +776,8 @@ class UserExternoTest extends TestCase
             'cpf_cnpj' => $user_externo['cpf_cnpj'],
             'password' => 'Teste102030'
         ];
-        $this->post(route('externo.login.submit'), $dados);
+        $this->post(route('externo.login.submit'), $dados)
+        ->assertRedirect(route('externo.dashboard'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -839,10 +785,7 @@ class UserExternoTest extends TestCase
         $this->assertStringContainsString($txt, $log);
     }
 
-    /** @test 
-     * 
-     * Log externo ao logar.
-    */
+    /** @test */
     public function log_is_generated_when_logout()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -851,8 +794,9 @@ class UserExternoTest extends TestCase
             'cpf_cnpj' => $user_externo['cpf_cnpj'],
             'password' => 'Teste102030'
         ];
-        $this->post(route('externo.login.submit'), $dados);
-        $this->post(route('externo.logout'));
+        $this->post(route('externo.login.submit'), $dados)->assertRedirect(route('externo.dashboard'));
+        $this->post(route('externo.logout'))
+        ->assertRedirect(route('site.home'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -860,13 +804,11 @@ class UserExternoTest extends TestCase
         $this->assertStringContainsString($txt, $log);
     }
 
-    /** @test 
-     * 
-     * Log externo ao logar.
-    */
+    /** @test */
     public function log_is_generated_when_logout_without_session()
     {
-        $this->post(route('externo.logout'));
+        $this->post(route('externo.logout'))
+        ->assertRedirect(route('site.home'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -874,10 +816,7 @@ class UserExternoTest extends TestCase
         $this->assertStringContainsString($txt, $log);
     }
 
-    /** @test 
-     * 
-     * Log externo ao não conseguir logar com cpf/cnpj válido, mas não existe no banco.
-    */
+    /** @test */
     public function log_is_generated_when_failed_logon()
     {
         factory('App\UserExterno')->create();
@@ -886,7 +825,11 @@ class UserExternoTest extends TestCase
             'cpf_cnpj' => '72027756000135',
             'password' => 'Teste102030'
         ];
-        $this->post(route('externo.login.submit'), $dados);
+
+        $this->get(route('externo.login'))->assertOk();
+
+        $this->post(route('externo.login.submit'), $dados)
+        ->assertRedirect(route('externo.login'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -894,10 +837,7 @@ class UserExternoTest extends TestCase
         $this->assertStringContainsString($txt, $log);
     }
 
-    /** @test 
-     * 
-     * Log externo ao não conseguir logar com senha errada.
-    */
+    /** @test */
     public function log_is_generated_when_failed_logon_with_password_wrong()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -906,7 +846,11 @@ class UserExternoTest extends TestCase
             'cpf_cnpj' => $user_externo->cpf_cnpj,
             'password' => 'Teste10203040'
         ];
-        $this->post(route('externo.login.submit'), $dados);
+
+        $this->get(route('externo.login'))->assertOk();
+
+        $this->post(route('externo.login.submit'), $dados)
+        ->assertRedirect(route('externo.login'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -914,10 +858,7 @@ class UserExternoTest extends TestCase
         $this->assertStringContainsString($txt, $log);
     }
 
-    /** @test 
-     * 
-     * Usuário Externo  não pode logar se não está cadastrado.
-    */
+    /** @test */
     public function cannot_login_on_externo_without_registration()
     {
         $user_externo = factory('App\UserExterno')->raw();
@@ -933,10 +874,7 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.login'))->assertSeeText('CPF/CNPJ não encontrado.');
     }
 
-    /** @test 
-     * 
-     * Usuário Externo  não pode logar se não está ativo.
-    */
+    /** @test */
     public function cannot_login_on_externo_with_ativo_0()
     {
         $user_externo = factory('App\UserExterno')->create([
@@ -952,10 +890,7 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.login'))->assertSeeText('Por favor, acesse o email informado no momento do cadastro para verificar sua conta.');
     }
 
-    /** @test 
-     * 
-     * Usuário Externo  não pode logar se não está ativo.
-    */
+    /** @test */
     public function cannot_login_on_externo_when_deleted()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -971,8 +906,7 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.login'))->assertSeeText('CPF/CNPJ não encontrado.');
     }
 
-    /** @test 
-    */
+    /** @test */
     public function cannot_login_on_externo_with_tipo_wrong()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -988,10 +922,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Usuário Externo  não pode logar se senha está errada.
-    */
+    /** @test */
     public function cannot_login_on_externo_with_password_wrong()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -1006,8 +937,7 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.login'))->assertSeeText('Login inválido');
     }
 
-    /** @test 
-    */
+    /** @test */
     public function actived_user_await_login_after_3x()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -1038,8 +968,7 @@ class UserExternoTest extends TestCase
         ->assertSeeText('Login inválido devido à quantidade de tentativas. Tente novamente em');
     }
 
-    /** @test 
-    */
+    /** @test */
     public function log_is_generated_when_lockout_logon_with_cpf_cnpj_not_created()
     {
         $externo = factory('App\UserExterno')->create();
@@ -1048,8 +977,10 @@ class UserExternoTest extends TestCase
             'cpf_cnpj' => '72027756000135',
             'password' => 'Teste102030'
         ];
-        for($i = 0; $i < 4; $i++)
-            $this->post(route('externo.login.submit'), $dados);
+        for($i = 0; $i < 4; $i++){
+            $this->get(route('externo.login'))->assertOk();
+            $this->post(route('externo.login.submit'), $dados)->assertRedirect(route('externo.login'));
+        }
             
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -1058,8 +989,7 @@ class UserExternoTest extends TestCase
         $this->assertStringContainsString($txt, $log);
     }
 
-    /** @test 
-    */
+    /** @test */
     public function log_is_generated_when_lockout_logon_with_cpf_cnpj_not_actived()
     {
         $externo = factory('App\UserExterno')->create([
@@ -1080,8 +1010,7 @@ class UserExternoTest extends TestCase
         $this->assertStringContainsString($txt, $log);
     }
 
-    /** @test 
-    */
+    /** @test */
     public function log_is_generated_when_lockout_logon()
     {
         $externo = factory('App\UserExterno')->create();
@@ -1090,8 +1019,10 @@ class UserExternoTest extends TestCase
             'cpf_cnpj' => $externo->cpf_cnpj,
             'password' => 'Teste1020'
         ];
-        for($i = 0; $i < 4; $i++)
-            $this->post(route('externo.login.submit'), $dados);
+        for($i = 0; $i < 4; $i++){
+            $this->get(route('externo.login'))->assertOk();
+            $this->post(route('externo.login.submit'), $dados)->assertRedirect(route('externo.login'));
+        }
             
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -1100,8 +1031,7 @@ class UserExternoTest extends TestCase
         $this->assertStringContainsString($txt, $log);
     }
 
-    /** @test 
-    */
+    /** @test */
     public function not_actived_user_await_login_after_3x()
     {
         $user_externo = factory('App\UserExterno')->create([
@@ -1134,8 +1064,7 @@ class UserExternoTest extends TestCase
         ->assertSeeText('Login inválido devido à quantidade de tentativas. Tente novamente em');
     }
 
-    /** @test 
-    */
+    /** @test */
     public function not_registered_user_await_login_after_3x()
     {
         $user_externo = factory('App\UserExterno')->make();
@@ -1166,10 +1095,7 @@ class UserExternoTest extends TestCase
         ->assertSeeText('Login inválido devido à quantidade de tentativas. Tente novamente em');
     }
 
-    /** @test 
-     * 
-     * Usuário Externo  não pode resetar senha sem cadastro.
-    */
+    /** @test */
     public function cannot_send_mail_reset_password_for_user_externo_not_created()
     {
         Mail::fake();
@@ -1186,10 +1112,7 @@ class UserExternoTest extends TestCase
         Mail::assertNothingSent();
     }
 
-    /** @test 
-     * 
-     * Usuário Externo  não pode resetar senha com cadastro sem ativar.
-    */
+    /** @test */
     public function cannot_send_mail_reset_password_for_user_externo_not_actived()
     {
         Mail::fake();
@@ -1208,8 +1131,7 @@ class UserExternoTest extends TestCase
         Mail::assertNothingSent();
     }
 
-    /** @test 
-    */
+    /** @test */
     public function cannot_send_mail_reset_password_for_user_externo_tipo_invalid()
     {
         Mail::fake();
@@ -1226,10 +1148,7 @@ class UserExternoTest extends TestCase
         Mail::assertNothingSent();
     }
 
-    /** @test 
-     * 
-     * Usuário Externo  pode resetar senha.
-    */
+    /** @test */
     public function send_mail_reset_password_for_user_externo()
     {
         Mail::fake();
@@ -1239,24 +1158,18 @@ class UserExternoTest extends TestCase
         $this->post(route('externo.password.email'), [
             'tipo_conta' => 'user_externo',
             'cpf_cnpj' => $user_externo['cpf_cnpj']
-        ])->assertStatus(302);
-        $this->get(route('externo.password.request'))
-        ->assertSee('O link de reconfiguração de senha foi enviado ao email ' .$user_externo['email']);
+        ])
+        ->assertSessionHas('status', "O link de reconfiguração de senha foi enviado ao email ". $user_externo['email'] ."<br>Esse link é válido por 60 minutos");
         
         Mail::hasSent($user_externo, ResetPassword::class);
     }
 
-    /** @test 
-     * 
-     * Não pode enviar email para resetar senha se o cpf / cnpj não foi encontrado.
-    */
+    /** @test */
     public function cannot_send_mail_reset_password_when_not_find_cpfcnpj()
     {
         Mail::fake();
 
-        factory('App\UserExterno')->create([
-            'cpf_cnpj' => '43795442818'
-        ]);
+        factory('App\UserExterno')->create();
         $user_externo = factory('App\UserExterno')->raw();
         $this->get(route('externo.password.request'))->assertOk();
         $this->post(route('externo.password.email'), [
@@ -1269,10 +1182,7 @@ class UserExternoTest extends TestCase
         Mail::assertNothingSent();
     }
 
-    /** @test 
-     * 
-     * Não pode enviar email para resetar senha se o cpf / cnpj está errado.
-    */
+    /** @test */
     public function cannot_send_mail_reset_password_with_cpfcnpj_wrong()
     {
         $user_externo = factory('App\UserExterno')->create([
@@ -1287,10 +1197,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Log externo ao alterar a senha em 'Esqueci a senha'.
-    */
+    /** @test */
     public function log_is_generated_when_send_mail_reset_password()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -1298,7 +1205,8 @@ class UserExternoTest extends TestCase
         $this->post(route('externo.password.email'), [
             'tipo_conta' => 'user_externo',
             'cpf_cnpj' => $user_externo['cpf_cnpj']
-        ]);
+        ])
+        ->assertSessionHas('status', "O link de reconfiguração de senha foi enviado ao email ". $user_externo['email'] ."<br>Esse link é válido por 60 minutos");
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -1306,10 +1214,7 @@ class UserExternoTest extends TestCase
         $this->assertStringContainsString($txt, $log);
     }
 
-    /** @test 
-     * 
-     * Não pode resetar senha se o cpf / cnpj está errado.
-    */
+    /** @test */
     public function cannot_reset_password_with_cpfcnpj_wrong_after_verificar_email()
     {
         $user_externo = factory('App\UserExterno')->create([
@@ -1328,10 +1233,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode resetar senha se a senha está errada.
-    */
+    /** @test */
     public function cannot_reset_password_with_password_wrong_after_verificar_email()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -1348,10 +1250,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode resetar senha se a confirmação de senha está errada.
-    */
+    /** @test */
     public function cannot_reset_password_with_password_confirmation_wrong_after_verificar_email()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -1368,10 +1267,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode resetar senha se a senha e confirmação de senha estão diferentes.
-    */
+    /** @test */
     public function cannot_reset_password_with_password_and_confirmation_differents_after_verificar_email()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -1388,10 +1284,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode resetar senha se os campos obrigatórios estão faltando.
-    */
+    /** @test */
     public function cannot_reset_password_without_mandatory_inputs_after_verificar_email()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -1411,9 +1304,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-    */
+    /** @test */
     public function cannot_reset_password_with_wrong_token()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -1430,9 +1321,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-    */
+    /** @test */
     public function cannot_reset_password_with_wrong_tipo()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -1449,10 +1338,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Pode resetar senha com tudo certo.
-    */
+    /** @test */
     public function reset_password_after_verificar_email()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -1465,16 +1351,11 @@ class UserExternoTest extends TestCase
             'cpf_cnpj' => $user_externo->cpf_cnpj,
             'password' => 'Teste102030', 
             'password_confirmation' => 'Teste102030', 
-        ])->assertRedirect(route('externo.login'));
-
-        $this->get(route('externo.login'))
-        ->assertSee('Senha alterada com sucesso. Favor realizar o login novamente com as novas informações.');
+        ])->assertRedirect(route('externo.login'))
+        ->assertSessionHas('message', 'Senha alterada com sucesso. Favor realizar o login novamente com as novas informações.');
     }
 
-    /** @test 
-     * 
-     * Log externo ao alterar a senha em 'Esqueci a senha'.
-    */
+    /** @test */
     public function log_is_generated_when_reset_password()
     {
         $user_externo = factory('App\UserExterno')->create();
@@ -1492,7 +1373,8 @@ class UserExternoTest extends TestCase
             'cpf_cnpj' => $user_externo->cpf_cnpj,
             'password' => 'Teste102030', 
             'password_confirmation' => 'Teste102030', 
-        ]);
+        ])
+        ->assertRedirect(route('externo.login'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -1508,7 +1390,11 @@ class UserExternoTest extends TestCase
 
         $this->get(route('externo.login'))->assertOk();
 
-        $this->post(route('externo.login.submit'), ['cpf_cnpj' => $user_externo['cpf_cnpj'], 'password' => 'teste1020', 'email_system' => '1'])
+        $this->post(route('externo.login.submit'), [
+            'cpf_cnpj' => $user_externo['cpf_cnpj'], 
+            'password' => 'teste1020', 
+            'email_system' => '1'
+        ])
         ->assertRedirect(route('externo.login'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
@@ -1530,20 +1416,23 @@ class UserExternoTest extends TestCase
 
         for($i = 0; $i < 4; $i++)
         {
-            $this->get(route('externo.login'));
+            $this->get(route('externo.login'))->assertOk();
             $this->assertEquals($csrf, request()->session()->get('_token'));
             $this->post(route('externo.login.submit'), [
                 'tipo_conta' => 'user_externo',
                 'cpf_cnpj' => $user_externo['cpf_cnpj'], 
                 'password' => 'teste1020'
-            ]);
+            ])
+            ->assertRedirect(route('externo.login'));
             $this->assertEquals($csrf, request()->session()->get('_token'));
         }
 
         $this->post('admin/login', [
             'login' => $user->username, 
             'password' => 'TestePorta1'
-        ]);
+        ])
+        ->assertRedirect(route('externo.login'));
+
         $this->assertEquals($csrf, request()->session()->get('_token'));
         $this->get('admin/login')
         ->assertSee('Login inválido devido à quantidade de tentativas.');
@@ -1592,10 +1481,7 @@ class UserExternoTest extends TestCase
         ->assertOk();
     }
 
-    /** @test 
-     * 
-     * Pode editar os dados cadastrais.
-    */
+    /** @test */
     public function can_after_login_update_nome_and_email()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1604,9 +1490,9 @@ class UserExternoTest extends TestCase
         $this->put(route('externo.editar', [
             'nome' => 'Novo nome do Usuário Externo',
             'email' => 'teste@email.com.br'
-        ]));
-        $this->get(route('externo.editar.view'))
-        ->assertSee('Dados alterados com sucesso.');
+        ]))
+        ->assertRedirect(route('externo.editar.view'))
+        ->assertSessionHas('message', 'Dados alterados com sucesso.');
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'],
             'nome' => mb_strtoupper('Novo nome do Usuário Externo', 'UTF-8'),
@@ -1614,16 +1500,13 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-    */
+    /** @test */
     public function cannot_after_login_update_email_with_more_than_2_mails_equal()
     {
         factory('App\UserExterno')->create([
-            'cpf_cnpj' => '89878398000177',
             'email' => 'teste@email.com.br'
         ]);
         factory('App\UserExterno')->create([
-            'cpf_cnpj' => '98040120063',
             'email' => 'teste@email.com.br'
         ]);
 
@@ -1632,9 +1515,8 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.editar.view'))->assertOk();
         $this->put(route('externo.editar', [
             'email' => 'teste@email.com.br'
-        ]));
-        $this->get(route('externo.editar.view'))
-        ->assertSee('Este email já alcançou o limite de cadastro, por favor insira outro.');
+        ]))
+        ->assertSessionHas('message', 'Este email já alcançou o limite de cadastro, por favor insira outro.');
 
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'],
@@ -1642,10 +1524,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Log externo ao alterar os dados cadastrais.
-    */
+    /** @test */
     public function log_is_generated_when_update_data()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1654,7 +1533,8 @@ class UserExternoTest extends TestCase
         $this->put(route('externo.editar', [
             'nome' => 'Novo nome do Usuário Externo',
             'email' => 'teste@email.com.br'
-        ]));
+        ]))
+        ->assertRedirect(route('externo.editar.view'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -1663,10 +1543,7 @@ class UserExternoTest extends TestCase
         $this->assertStringContainsString($txt, $log);
     }
 
-    /** @test 
-     * 
-     * Pode editar o nome.
-    */
+    /** @test */
     public function can_after_login_update_nome()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1675,7 +1552,10 @@ class UserExternoTest extends TestCase
         $this->put(route('externo.editar', [
             'nome' => 'Novo nome do Usuário Externo',
             'email' => $user_externo['email']
-        ]));
+        ]))
+        ->assertRedirect(route('externo.editar.view'))
+        ->assertSessionHas('message', 'Dados alterados com sucesso.');
+
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'],
             'nome' => mb_strtoupper('Novo nome do Usuário Externo', 'UTF-8'),
@@ -1683,10 +1563,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Pode editar o email.
-    */
+    /** @test */
     public function can_after_login_update_email()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1695,7 +1572,10 @@ class UserExternoTest extends TestCase
         $this->put(route('externo.editar', [
             'nome' => $user_externo['nome'],
             'email' => 'teste@teste.com.br'
-        ]));
+        ]))
+        ->assertRedirect(route('externo.editar.view'))
+        ->assertSessionHas('message', 'Dados alterados com sucesso.');
+
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'],
             'nome' => $user_externo['nome'],
@@ -1703,10 +1583,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Carrega os dados cadastrais.
-    */
+    /** @test */
     public function fill_data_with_nome_cpfcnpj_email()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1717,10 +1594,7 @@ class UserExternoTest extends TestCase
         ->assertSee($user_externo['email']);
     }
 
-    /** @test 
-     * 
-     * Não pode editar os dados cadastrais sem os inputs obrigatórios.
-    */
+    /** @test */
     public function cannot_after_login_update_nome_and_email_without_mandatory_inputs()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1740,10 +1614,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode editar o nome vazio.
-    */
+    /** @test */
     public function cannot_after_login_update_nome_empty()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1761,10 +1632,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode editar o email vazio.
-    */
+    /** @test */
     public function cannot_after_login_update_email_empty()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1782,10 +1650,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode editar o email errado.
-    */
+    /** @test */
     public function cannot_after_login_update_email_wrong()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1803,10 +1668,7 @@ class UserExternoTest extends TestCase
         ]);
     }
     
-    /** @test 
-     * 
-     * Pode editar a senha depois de logar.
-    */
+    /** @test */
     public function can_after_login_update_password()
     {
         Mail::fake();
@@ -1823,9 +1685,9 @@ class UserExternoTest extends TestCase
             'password_atual' => 'Teste102030',
             'password' => 'Teste10203040',
             'password_confirmation' => 'Teste10203040'
-        ]));
-        $this->get(route('externo.editar.view'))
-        ->assertSee('Dados alterados com sucesso.');
+        ]))
+        ->assertRedirect(route('externo.editar.view'))
+        ->assertSessionHas('message', 'Dados alterados com sucesso.');
 
         Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
             return $mail->tipo == 'user-externo';
@@ -1841,7 +1703,9 @@ class UserExternoTest extends TestCase
             'password_atual' => 'Teste102030',
             'password' => 'TestePortal123@#$%&',
             'password_confirmation' => 'TestePortal123@#$%&', 
-        ]));
+        ]))
+        ->assertRedirect(route('externo.editar.view'))
+        ->assertSessionHas('message', 'Dados alterados com sucesso.');
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
@@ -1849,10 +1713,7 @@ class UserExternoTest extends TestCase
         $this->assertStringContainsString($texto, $log);
     }
 
-    /** @test 
-     * 
-     * Não pode editar a senha se a atual foi digitada errada.
-    */
+    /** @test */
     public function cannot_after_login_update_password_with_password_atual_wrong()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1863,15 +1724,12 @@ class UserExternoTest extends TestCase
             'password_atual' => 'Teste10203040',
             'password' => 'Teste10203040',
             'password_confirmation' => 'Teste10203040'
-        ]));
-        $this->get(route('externo.editar.senha.view'))
-        ->assertSee('A senha atual digitada está incorreta!');
+        ]))
+        ->assertRedirect(route('externo.editar.senha.view'))
+        ->assertSessionHas('message', 'A senha atual digitada está incorreta!');
     }
 
-    /** @test 
-     * 
-     * Não pode editar a senha se está errada.
-    */
+    /** @test */
     public function cannot_after_login_update_password_wrong()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1887,10 +1745,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode editar a senha se a confirmação de senha está errada.
-    */
+    /** @test */
     public function cannot_after_login_update_password_confirmation_wrong()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1907,10 +1762,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode editar a senha se a senha e confirmação de senha estão diferentes.
-    */
+    /** @test */
     public function cannot_after_login_update_password_and_confirmation_differents()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1927,10 +1779,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode editar a senha se a senha está vazia.
-    */
+    /** @test */
     public function cannot_after_login_update_password_empty()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1946,10 +1795,7 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    /** @test 
-     * 
-     * Não pode editar a senha se a confirmação está vazia.
-    */
+    /** @test */
     public function cannot_after_login_update_confirmation_empty()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1971,10 +1817,7 @@ class UserExternoTest extends TestCase
      * =======================================================================================================
      */
 
-    /** @test 
-     * 
-     * Pode acessar todas as abas na área restrita do Portal.
-    */
+    /** @test */
     public function after_login_can_access_tabs_on_restrict()
     {
         $user_externo = $this->signInAsUserExterno();
@@ -1985,10 +1828,7 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.preregistro.view'))->assertOk();
     }
 
-    /** @test 
-     * 
-     * Abas da área restrita não são acessíveis sem o login.
-    */
+    /** @test */
     public function cannot_access_tabs_on_restrict_area_without_login()
     {
         $this->get(route('externo.dashboard'))->assertRedirect(route('externo.login'));
@@ -2012,7 +1852,7 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.relacao.preregistros'))->assertRedirect(route('externo.login'));
 
         $this->post(route('externo.contabil.inserir.preregistro'), [
-            'cpf_cnpj' => '49931920000112', 
+            'cpf_cnpj' => factory('App\Contabil')->raw()['cnpj'], 
             'email' => 'teste@teste.com', 
             'nome' => 'Teste Nome'
         ])->assertRedirect(route('externo.login'));
@@ -2026,23 +1866,19 @@ class UserExternoTest extends TestCase
         $externo = $this->signInAsUserExterno();
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
         
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on', 'preRegistro' => 1]))
-        ->assertRedirect(route('externo.dashboard'));
+        $this->get(route('externo.inserir.preregistro.view', ['preRegistro' => 1]))
+        ->assertRedirect(route('externo.preregistro.view'));
 
-        $pr = factory('App\PreRegistroCpf')->states('request')->make();
-        $dados = $pr->final;
-        $pr = $pr->makeHidden(['final'])->attributesToArray();
+        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), ['pergunta' => '25 meses'])
+        ->assertNotFound();
 
-        $this->put(route('externo.verifica.inserir.preregistro', ['preRegistro' => 1]), $dados)
-        ->assertRedirect(route('externo.dashboard'));
-
-        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]), $dados)
+        $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.dashboard'));
 
         $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
-            'classe' => 'contabil',
-            'campo' => 'cnpj_contabil',
-            'valor' => '78087976000130'
+            'classe' => 'preRegistro',
+            'campo' => 'segmento',
+            'valor' => 'Brindes'
         ])->assertRedirect(route('externo.dashboard'));
 
         $this->get(route('externo.preregistro.anexo.download', ['id' => 1, 'preRegistro' => 1]))
@@ -2059,7 +1895,8 @@ class UserExternoTest extends TestCase
 
         $externo = $this->signInAsUserExterno('contabil');
         $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
-        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados)
+        ->assertRedirect(route('externo.inserir.preregistro.view', 1));
 
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $dados['cpf_cnpj'], 
@@ -2069,8 +1906,12 @@ class UserExternoTest extends TestCase
             'aceite' => 0
         ]);
 
-        $dados = factory('App\UserExterno')->states('cadastro')->raw();
-        $this->post(route('externo.cadastro.submit'), $dados);
+        $dados = factory('App\UserExterno')->states('cadastro')->raw([
+            'cpf_cnpj' => $dados['cpf_cnpj']
+        ]);
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertViewIs('site.agradecimento')
+        ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
         Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
             return $mail->tipo == 'user-externo';
@@ -2084,7 +1925,8 @@ class UserExternoTest extends TestCase
             'aceite' => 1
         ]);
 
-        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token' => UserExterno::first()->verify_token]))
+        ->assertRedirect(route('externo.login'));
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $dados['cpf_cnpj'], 
             'nome' => $dados['nome'],
@@ -2101,8 +1943,8 @@ class UserExternoTest extends TestCase
 
         $externo = $this->signInAsUserExterno('contabil');
         $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
-        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
-
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados)
+        ->assertRedirect(route('externo.inserir.preregistro.view', 1));
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $dados['cpf_cnpj'], 
             'nome' => $dados['nome'],
@@ -2113,8 +1955,12 @@ class UserExternoTest extends TestCase
 
         UserExterno::first()->update(['updated_at' => Carbon::today()->subDays(2)]);
 
-        $dados = factory('App\UserExterno')->states('cadastro')->raw();
-        $this->post(route('externo.cadastro.submit'), $dados);
+        $dados = factory('App\UserExterno')->states('cadastro')->raw([
+            'cpf_cnpj' => $dados['cpf_cnpj']
+        ]);
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertViewIs('site.agradecimento')
+        ->assertViewHas('agradece', "Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>");
 
         Mail::assertQueued(CadastroUserExternoMail::class, function ($mail) {
             return $mail->tipo == 'user-externo';
@@ -2127,7 +1973,8 @@ class UserExternoTest extends TestCase
             'deleted_at' => null
         ]);
 
-        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token'=> UserExterno::first()->verify_token]));
+        $this->get(route('externo.verifica-email', ['tipo' => 'user-externo', 'token' => UserExterno::first()->verify_token]))
+        ->assertRedirect(route('externo.login'));
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $dados['cpf_cnpj'], 
             'ativo' => 1,

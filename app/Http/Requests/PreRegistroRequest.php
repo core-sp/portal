@@ -158,8 +158,14 @@ class PreRegistroRequest extends FormRequest
             ]);
             return;
         }
+
+        $user_contabil_check = auth()->guard('contabil')->check();
+
+        if(\Route::is('externo.verifica.inserir.preregistro') && 
+        (isset($this->preRegistro) && !$user_contabil_check) || (!isset($this->preRegistro) && $user_contabil_check))
+            throw new ModelNotFoundException(isset($this->preRegistro) ? "Página não encontrada para usuário externo comum." : "Página não encontrada para contabilidade.", 401);
         
-        $this->externo = auth()->guard('contabil')->check() ? 
+        $this->externo = $user_contabil_check ? 
         auth()->guard('contabil')->user()->preRegistros->find($this->preRegistro)->userExterno : 
         auth()->guard('user_externo')->user();
 
@@ -261,7 +267,7 @@ class PreRegistroRequest extends FormRequest
                 'cnpj_contabil' => apenasNumeros($this->cnpj_contabil),
             ]);
 
-        // if(auth()->guard('contabil')->check())
+        // if($user_contabil_check)
         // {
         //     $contabil = auth()->guard('contabil')->user();
         //     $this->merge([
