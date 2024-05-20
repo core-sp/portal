@@ -5054,19 +5054,23 @@ class PreRegistroCnpjTest extends TestCase
         ]);
         
         $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
-        ->assertSeeInOrder(['<p id="razao_social">', ' - Razão Social: </span>', $preRegistroCnpj->razao_social])
-        ->assertSeeInOrder(['<p id="nire">', ' - NIRE: </span>', $preRegistroCnpj->nire])
-        ->assertSeeInOrder(['<p id="tipo_empresa">', ' - Tipo da Empresa: </span>', $preRegistroCnpj->tipo_empresa])
-        ->assertSeeInOrder(['<p id="dt_inicio_atividade">', ' - Data início da atividade: </span>', onlyDate($preRegistroCnpj->dt_inicio_atividade)])
-        ->assertSeeInOrder(['<p id="capital_social">', ' - Capital Social: R$ </span>', $preRegistroCnpj->capital_social])
-        ->assertSeeInOrder(['<p id="cep_empresa">', ' - CEP: </span>', $preRegistroCnpj->cep])
-        ->assertSeeInOrder(['<p id="logradouro_empresa">', ' - Logradouro: </span>', $preRegistroCnpj->logradouro])
-        ->assertSeeInOrder(['<p id="numero_empresa">', ' - Número: </span>', $preRegistroCnpj->numero])
-        ->assertSeeInOrder(['<p id="complemento_empresa">', ' - Complemento: </span>', '------'])
-        ->assertSeeInOrder(['<p id="bairro_empresa">', ' - Bairro: </span>', $preRegistroCnpj->bairro])
-        ->assertSeeInOrder(['<p id="cidade_empresa">', ' - Município: </span>', $preRegistroCnpj->cidade])
-        ->assertSeeInOrder(['<p id="uf_empresa">', ' - Estado: </span>', $preRegistroCnpj->uf])
-        ->assertSeeInOrder(['<p id="checkEndEmpresa">', '<i class="fas fa-times text-danger"></i>', ' - Mesmo endereço da correspondência </span>']);
+        ->assertSeeInOrder([
+            '<p id="tipo_cnpj">', '<span class="font-weight-bolder">CNPJ: </span>', formataCpfCnpj($preRegistroCnpj->preRegistro->userExterno->cpf_cnpj),
+            '<p id="razao_social">', ' - Razão Social: </span>', $preRegistroCnpj->razao_social,
+            '<p id="nome_fantasia">', ' - Nome Fantasia: </span>', $preRegistroCnpj->nome_fantasia,
+            '<p id="capital_social">', ' - Capital Social: R$ </span>', $preRegistroCnpj->capital_social,
+            '<p id="nire">', ' - NIRE: </span>', $preRegistroCnpj->nire,
+            '<p id="tipo_empresa">', ' - Tipo da Empresa: </span>', $preRegistroCnpj->tipo_empresa,
+            '<p id="dt_inicio_atividade">', ' - Data início da atividade: </span>', onlyDate($preRegistroCnpj->dt_inicio_atividade),
+            '<p id="checkEndEmpresa">', '<i class="fas fa-times text-danger"></i>', ' - Mesmo endereço da correspondência </span>',
+            '<p id="cep_empresa">', ' - CEP: </span>', $preRegistroCnpj->cep,
+            '<p id="bairro_empresa">', ' - Bairro: </span>', $preRegistroCnpj->bairro,
+            '<p id="logradouro_empresa">', ' - Logradouro: </span>', $preRegistroCnpj->logradouro,
+            '<p id="numero_empresa">', ' - Número: </span>', $preRegistroCnpj->numero,
+            '<p id="complemento_empresa">', ' - Complemento: </span>', '------',
+            '<p id="cidade_empresa">', ' - Município: </span>', $preRegistroCnpj->cidade,
+            '<p id="uf_empresa">', ' - Estado: </span>', $preRegistroCnpj->uf,
+        ]);
     }
 
     /** @test */

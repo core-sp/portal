@@ -4395,23 +4395,27 @@ class PreRegistroCpfTest extends TestCase
         ]);
         
         $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
-        ->assertSeeInOrder(['<p id="nome_social">', ' - Nome Social: </span>', $preRegistroCpf->nome_social])
-        ->assertSeeInOrder(['<p id="dt_nascimento">', ' - Data de Nascimento: </span>', onlyDate($preRegistroCpf->dt_nascimento)])
-        ->assertSeeInOrder(['<p id="sexo">', ' - Gênero: </span>', $preRegistroCpf->sexo])
-        ->assertSeeInOrder(['<p id="estado_civil">', ' - Estado Civil: </span>', $preRegistroCpf->estado_civil])
-        ->assertSeeInOrder(['<p id="nacionalidade">', ' - Nacionalidade: </span>', $preRegistroCpf->nacionalidade])
-        ->assertSeeInOrder(['<p id="naturalidade_cidade">', ' - Naturalidade - Cidade: </span>', $preRegistroCpf->naturalidade_cidade])
-        ->assertSeeInOrder(['<p id="naturalidade_estado">', ' - Naturalidade - Estado: </span>', $preRegistroCpf->naturalidade_estado])
-        ->assertSeeInOrder(['<p id="nome_mae">', ' - Nome da Mãe: </span>', $preRegistroCpf->nome_mae])
-        ->assertSeeInOrder(['<p id="nome_pai">', ' - Nome do Pai: </span>', $preRegistroCpf->nome_pai])
-        ->assertSeeInOrder(['<p id="tipo_identidade">', ' - Tipo do documento de identidade: </span>', $preRegistroCpf->tipo_identidade])
-        ->assertSeeInOrder(['<p id="identidade">', ' - N° do documento de identidade: </span>', $preRegistroCpf->identidade])
-        ->assertSeeInOrder(['<p id="orgao_emissor">', ' - Órgão Emissor: </span>', $preRegistroCpf->orgao_emissor])
-        ->assertSeeInOrder(['<p id="dt_expedicao">', ' - Data de Expedição: </span>', onlyDate($preRegistroCpf->dt_expedicao)])
-        ->assertSeeInOrder(['<p id="titulo_eleitor">', ' - Título de Eleitor: </span>', $preRegistroCpf->titulo_eleitor])
-        ->assertSeeInOrder(['<p id="zona">', ' - Zona Eleitoral: </span>', $preRegistroCpf->zona])
-        ->assertSeeInOrder(['<p id="secao">', ' - Seção Eleitoral: </span>', $preRegistroCpf->secao])
-        ->assertSeeInOrder(['<p id="ra_reservista">', ' - RA Reservista: </span>', $preRegistroCpf->ra_reservista]);
+        ->assertSeeInOrder([
+            '<p id="tipo_cpf">', '<span class="font-weight-bolder">CPF: </span>', formataCpfCnpj($preRegistroCpf->preRegistro->userExterno->cpf_cnpj),
+            '<p>', '<span class="font-weight-bolder">Nome Completo: </span>', $preRegistroCpf->preRegistro->userExterno->nome,
+            '<p id="nome_social">', ' - Nome Social: </span>', $preRegistroCpf->nome_social,
+            '<p id="sexo">', ' - Gênero: </span>', $preRegistroCpf->sexo,
+            '<p id="dt_nascimento">', ' - Data de Nascimento: </span>', onlyDate($preRegistroCpf->dt_nascimento),
+            '<p id="estado_civil">', ' - Estado Civil: </span>', $preRegistroCpf->estado_civil,
+            '<p id="nacionalidade">', ' - Nacionalidade: </span>', $preRegistroCpf->nacionalidade,
+            '<p id="naturalidade_cidade">', ' - Naturalidade - Cidade: </span>', $preRegistroCpf->naturalidade_cidade,
+            '<p id="naturalidade_estado">', ' - Naturalidade - Estado: </span>', $preRegistroCpf->naturalidade_estado,
+            '<p id="nome_mae">', ' - Nome da Mãe: </span>', $preRegistroCpf->nome_mae,
+            '<p id="nome_pai">', ' - Nome do Pai: </span>', $preRegistroCpf->nome_pai,
+            '<p id="tipo_identidade">', ' - Tipo do documento de identidade: </span>', $preRegistroCpf->tipo_identidade,
+            '<p id="identidade">', ' - N° do documento de identidade: </span>', $preRegistroCpf->identidade,
+            '<p id="orgao_emissor">', ' - Órgão Emissor: </span>', $preRegistroCpf->orgao_emissor,
+            '<p id="dt_expedicao">', ' - Data de Expedição: </span>', onlyDate($preRegistroCpf->dt_expedicao),
+            '<p id="titulo_eleitor">', ' - Título de Eleitor: </span>', $preRegistroCpf->titulo_eleitor,
+            '<p id="zona">', ' - Zona Eleitoral: </span>', $preRegistroCpf->zona,
+            '<p id="secao">', ' - Seção Eleitoral: </span>', $preRegistroCpf->secao,
+            '<p id="ra_reservista">', ' - RA Reservista: </span>', $preRegistroCpf->ra_reservista,
+        ]);
     }
 
     /** @test */

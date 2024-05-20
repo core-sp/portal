@@ -5755,21 +5755,24 @@ class PreRegistroTest extends TestCase
         $preRegistro = $preRegistroCpf->preRegistro;
         
         $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
-        ->assertSeeInOrder(['<p id="tipo_cpf">', '<span class="font-weight-bolder">CPF: </span>', formataCpfCnpj($preRegistro->userExterno->cpf_cnpj)])
-        ->assertSeeInOrder(['<p>', '<span class="font-weight-bolder">Nome Completo: </span>', $preRegistro->userExterno->nome])
-        ->assertSeeInOrder(['<p id="idregional">', ' - Região de Atuação: </span>', $preRegistro->regional->regional])
-        ->assertSeeInOrder(['<p id="segmento">', ' - Segmento: </span>', $preRegistro->segmento])
-        ->assertSeeInOrder(['<p id="registro_secundario">', '<span class="font-weight-bolder">Registro Secundário: </span>', $preRegistro->registro_secundario])
-        ->assertSeeInOrder(['<p id="cep">', ' - CEP: </span>', $preRegistro->cep])
-        ->assertSeeInOrder(['<p id="logradouro">', ' - Logradouro: </span>', $preRegistro->logradouro])
-        ->assertSeeInOrder(['<p id="numero">', ' - Número: </span>', $preRegistro->numero])
-        ->assertSeeInOrder(['<p id="complemento">', ' - Complemento: </span>', '-----'])
-        ->assertSeeInOrder(['<p id="bairro">', ' - Bairro: </span>', $preRegistro->bairro])
-        ->assertSeeInOrder(['<p id="cidade">', ' - Município: </span>', $preRegistro->cidade])
-        ->assertSeeInOrder(['<p id="uf">', ' - Estado: </span>', $preRegistro->uf])
-        ->assertSeeInOrder(['<p id="telefone">', ' - Nº de telefone: </span>', explode(';', $preRegistro->telefone)[0]])
-        ->assertSeeInOrder(['<p id="tipo_telefone">', ' - Tipo de telefone: </span>', explode(';', $preRegistro->tipo_telefone)[0]])
-        ->assertSeeInOrder(['<p id="opcional_celular">', '<small class="font-weight-bolder">(opcional)</small> - Opções de comunicação', implode(', ', $preRegistro->getOpcionalCelular()[0])]);
+        ->assertSeeInOrder([
+            '<p id="segmento">', ' - Segmento: </span>', $preRegistro->segmento,
+            '<p id="idregional">', ' - Região de Atuação: </span>', $preRegistro->regional->regional,
+            '<p id="registro_secundario">', '<span class="font-weight-bolder">Registro Secundário: </span>', $preRegistro->registro_secundario,
+            '<p id="cep">', ' - CEP: </span>', $preRegistro->cep,
+            '<p id="bairro">', ' - Bairro: </span>', $preRegistro->bairro,
+            '<p id="logradouro">', ' - Logradouro: </span>', $preRegistro->logradouro,
+            '<p id="numero">', ' - Número: </span>', $preRegistro->numero,
+            '<p id="complemento">', ' - Complemento: </span>', '-----',
+            '<p id="cidade">', ' - Município: </span>', $preRegistro->cidade,
+            '<p id="uf">', ' - Estado: </span>', $preRegistro->uf,
+            '<p id="tipo_telefone">', ' - Tipo de telefone: </span>', explode(';', $preRegistro->tipo_telefone)[0],
+            '<p id="telefone">', ' - Nº de telefone: </span>', explode(';', $preRegistro->telefone)[0],
+            '<p id="opcional_celular">', '<small class="font-weight-bolder">(opcional)</small> - Opções de comunicação', implode(', ', $preRegistro->getOpcionalCelular()[0]),
+            '<p id="tipo_telefone_1">', '<small class="font-weight-bolder">(opcional)</small> - Tipo de telefone: </span>', '-----',
+            '<p id="telefone_1">', '<small class="font-weight-bolder">(opcional)</small> - Nº de telefone: </span>', '-----',
+            '<p id="opcional_celular_1">', '<small class="font-weight-bolder">(opcional)</small> - Opções de comunicação ', '------',
+        ]);
     }
 
     /** @test */

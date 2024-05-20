@@ -2128,7 +2128,251 @@ class AnexoTest extends TestCase
 
     /** 
      * =======================================================================================================
-     * TESTES PRE-REGISTRO - ADMIN
+     * TESTES PRE-REGISTRO ANEXO VIA AJAX - ADMIN
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function can_update_justificativa()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
+        ]);
+
+        $justificativas = array();
+        
+        $texto = $this->faker()->text(500);
+        $justificativas['path'] = $texto;
+        $this->post(route('preregistro.update.ajax', $preRegistroCpf->preRegistro->id), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => $texto
+        ])->assertStatus(200);   
+            
+        $this->assertEquals(PreRegistro::first()->getJustificativaArray(), $justificativas);
+        $this->assertEquals(PreRegistro::first()->idusuario, $admin->idusuario);
+
+        $this->assertDatabaseHas('pre_registros', [
+            'justificativa' => json_encode($justificativas, JSON_FORCE_OBJECT)
+        ]);
+    }
+
+    /** @test */
+    public function can_update_justificativa_with_status_em_analise_or_analise_da_correcao()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        foreach(PreRegistro::getStatus() as $status)
+        {
+            $preRegistroCnpj->preRegistro->update(['status' => $status]);
+            if(in_array($status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]))
+                $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+                    'acao' => 'justificar',
+                    'campo' => 'path',
+                    'valor' => $this->faker()->text(500)
+                ])->assertStatus(200);    
+        }
+    }
+
+    /** @test */
+    public function can_edit_justificativas()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCnpj->pre_registro_id), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => ''
+        ])->assertStatus(200);    
+
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCnpj->pre_registro_id), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => ''
+        ])->assertStatus(200);
+
+        $this->assertDatabaseHas('pre_registros', [
+            'justificativa' => null,
+            'idusuario' => $admin->idusuario
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_more_than_500_chars()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => $this->faker()->text(500)
+        ])->assertStatus(200);
+
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        $texto = $this->faker()->text(900);
+        $justificativas['path'] = $texto;
+        $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => $texto
+        ])->assertSessionHasErrors('valor');   
+
+        $this->assertDatabaseMissing('pre_registros', [
+            'justificativa' => json_encode($justificativas, JSON_FORCE_OBJECT)
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_with_wrong_inputs()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => $this->faker()->text(500)
+        ])->assertStatus(200);
+
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+            'acao' => 'justificar',
+            'campo' => 'path_erro',
+            'valor' => $this->faker()->text(500)
+        ])->assertSessionHasErrors('campo');
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_with_wrong_input_acao()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => $this->faker()->text(500)
+        ])->assertStatus(200);
+
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+            'acao' => 'justificar_',
+            'campo' => 'path',
+            'valor' => $this->faker()->text(500)
+        ])->assertSessionHasErrors('acao'); 
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_with_status_different_em_analise_or_analise_da_correcao()
+    {
+        $this->withoutMiddleware(\Illuminate\Routing\Middleware\ThrottleRequests::class);
+
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => $this->faker()->text(500)
+        ])->assertStatus(200);
+
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        foreach(PreRegistro::getStatus() as $status)
+        {
+            $preRegistroCnpj->preRegistro->update(['status' => $status]);
+            if(!in_array($status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]))
+                $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+                    'acao' => 'justificar',
+                    'campo' => 'path',
+                    'valor' => $this->faker()->text(500)
+                ])->assertStatus(401);
+                
+        }
+    }
+
+    /** @test */
+    public function log_is_generated_when_update_justificativa()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => $this->faker()->text(500)
+        ])->assertOk(); 
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Usuário (usuário 1) fez a ação de "justificar" o campo "path", ';
+        $txt .= 'inserindo ou removendo valor *pré-registro* (id: '.$preRegistroCnpj->preRegistro->id.')';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function can_remove_all_justificativas()
+    {
+        $admin = $this->signInAsAdmin();
+        
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+            'acao' => 'justificar',
+            'campo' => 'path',
+            'valor' => $this->faker()->text(500)
+        ])->assertStatus(200);   
+
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCnpj->pre_registro_id), [
+            'acao' => 'exclusao_massa',
+            'campo' => 'exclusao_massa',
+            'valor' => ['path']
+        ])->assertStatus(200);    
+
+        $this->assertDatabaseHas('pre_registros', [
+            'justificativa' => null,
+            'idusuario' => $admin->idusuario
+        ]);
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES PRE-REGISTRO ANEXO - ADMIN
      * =======================================================================================================
      */
 

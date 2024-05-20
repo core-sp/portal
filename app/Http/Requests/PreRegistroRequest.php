@@ -137,7 +137,7 @@ class PreRegistroRequest extends FormRequest
                 'secao_rt' => 'required_with:cpf_rt|max:8',
                 'ra_reservista_rt' => [
                     Rule::requiredIf(function () {
-                        return ($this->sexo_rt == 'M') && $this->regraReservistaRT && (strlen($this->cpf) == 11);
+                        return ($this->sexo_rt == 'M') && $this->regraReservistaRT && (strlen($this->cpf_rt) == 11);
                     }),
                     'nullable',
                     'min:12',

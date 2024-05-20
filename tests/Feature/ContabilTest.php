@@ -3583,6 +3583,287 @@ class ContabilTest extends TestCase
 
     /** 
      * =======================================================================================================
+     * TESTES PRÉ-REGISTRO CONTÁBIL VIA AJAX - ADMIN
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function can_update_justificativa()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->contabil->arrayValidacaoInputs());
+
+        $justificativas = array();
+        foreach($dados as $campo)
+        {
+            $texto = $this->faker()->text(500);
+            $justificativas[$campo] = $texto;
+            $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $texto
+            ])->assertStatus(200);   
+            
+            $this->assertEquals(PreRegistro::first()->getJustificativaArray(), $justificativas);
+            $this->assertEquals(PreRegistro::first()->idusuario, $admin->idusuario);
+        }
+
+        $this->assertDatabaseHas('pre_registros', [
+            'justificativa' => json_encode($justificativas, JSON_FORCE_OBJECT)
+        ]);
+    }
+
+    /** @test */
+    public function can_update_justificativa_with_status_em_analise_or_analise_da_correcao()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->contabil->arrayValidacaoInputs());
+
+        foreach(PreRegistro::getStatus() as $status)
+        {
+            $preRegistroCnpj->preRegistro->update(['status' => $status]);
+            if(in_array($status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]))
+                foreach($dados as $campo)
+                    $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+                        'acao' => 'justificar',
+                        'campo' => $campo,
+                        'valor' => $this->faker()->text(500)
+                    ])->assertStatus(200);    
+        }
+    }
+
+    /** @test */
+    public function can_edit_justificativas()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->contabil->arrayValidacaoInputs());
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCnpj->pre_registro_id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => ''
+            ])->assertStatus(200);    
+
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCnpj->pre_registro_id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => ''
+            ])->assertStatus(200);
+
+        $this->assertDatabaseHas('pre_registros', [
+            'justificativa' => null,
+            'idusuario' => $admin->idusuario
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_more_than_500_chars()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->contabil->arrayValidacaoInputs());
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(500)
+            ])->assertStatus(200);
+
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        foreach($dados as $campo)
+        {
+            $texto = $this->faker()->text(900);
+            $justificativas[$campo] = $texto;
+            $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $texto
+            ])->assertSessionHasErrors('valor');   
+        }
+
+        $this->assertDatabaseMissing('pre_registros', [
+            'justificativa' => json_encode($justificativas, JSON_FORCE_OBJECT)
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_with_wrong_inputs()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->contabil->arrayValidacaoInputs());
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(500)
+            ])->assertStatus(200);
+
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo . '_erro',
+                'valor' => $this->faker()->text(500)
+            ])->assertSessionHasErrors('campo');
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_with_wrong_input_acao()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->contabil->arrayValidacaoInputs());
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(500)
+            ])->assertStatus(200);
+
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+                'acao' => 'justificar_',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(500)
+            ])->assertSessionHasErrors('acao'); 
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_with_status_different_em_analise_or_analise_da_correcao()
+    {
+        $this->withoutMiddleware(\Illuminate\Routing\Middleware\ThrottleRequests::class);
+
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->contabil->arrayValidacaoInputs());
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(500)
+            ])->assertStatus(200);
+
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        foreach(PreRegistro::getStatus() as $status)
+        {
+            $preRegistroCnpj->preRegistro->update(['status' => $status]);
+            if(!in_array($status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]))
+                foreach($dados as $campo)
+                    $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+                        'acao' => 'justificar',
+                        'campo' => $campo,
+                        'valor' => $this->faker()->text(500)
+                    ])->assertStatus(401);
+                
+        }
+    }
+
+    /** @test */
+    public function log_is_generated_when_update_justificativa()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->contabil->arrayValidacaoInputs());
+
+        foreach($dados as $campo)
+        {
+            $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(500)
+            ])->assertOk(); 
+
+            $log = tailCustom(storage_path($this->pathLogInterno()));
+            $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+            $txt = $inicio . 'Usuário (usuário 1) fez a ação de "justificar" o campo "' . $campo . '", ';
+            $txt .= 'inserindo ou removendo valor *pré-registro* (id: '.$preRegistroCnpj->preRegistro->id.')';
+            $this->assertStringContainsString($txt, $log);
+        }
+    }
+
+    /** @test */
+    public function can_remove_all_justificativas()
+    {
+        $admin = $this->signInAsAdmin();
+        
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('pj', 'analise_inicial')->create()
+        ]);
+
+        $dados = array_keys(PreRegistro::first()->contabil->arrayValidacaoInputs());
+
+        foreach($dados as $campo)
+            $this->post(route('preregistro.update.ajax', $preRegistroCnpj->preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => $this->faker()->text(500)
+            ])->assertStatus(200);   
+
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCnpj->pre_registro_id), [
+            'acao' => 'exclusao_massa',
+            'campo' => 'exclusao_massa',
+            'valor' => $dados
+        ])->assertStatus(200);    
+
+        $this->assertDatabaseHas('pre_registros', [
+            'justificativa' => null,
+            'idusuario' => $admin->idusuario
+        ]);
+    }
+
+    /** 
+     * =======================================================================================================
      * TESTES PRÉ-REGISTRO CONTÁBIL - ADMIN
      * =======================================================================================================
      */
@@ -3597,11 +3878,13 @@ class ContabilTest extends TestCase
         ])->preRegistro->contabil;
         
         $this->get(route('preregistro.view', 1))
-        ->assertSeeInOrder(['<p id="cnpj_contabil">', ' - CNPJ: </span>', formataCpfCnpj($contabil->cnpj)])
-        ->assertSeeInOrder(['<p id="nome_contabil">', ' - Nome da contabilidade: </span>', $contabil->nome])
-        ->assertSeeInOrder(['<p id="email_contabil">', ' - E-mail da contabilidade: </span>', $contabil->email])
-        ->assertSeeInOrder(['<p id="nome_contato_contabil">', ' - Nome de contato da contabilidade: </span>', $contabil->nome_contato])
-        ->assertSeeInOrder(['<p id="telefone_contabil">', ' - Telefone da contabilidade: </span>', $contabil->telefone]);
+        ->assertSeeInOrder([
+            '<p id="cnpj_contabil">', ' - CNPJ: </span>', formataCpfCnpj($contabil->cnpj),
+            '<p id="nome_contabil">', ' - Nome da contabilidade: </span>', $contabil->nome,
+            '<p id="email_contabil">', ' - E-mail da contabilidade: </span>', $contabil->email,
+            '<p id="nome_contato_contabil">', ' - Nome de contato da contabilidade: </span>', $contabil->nome_contato,
+            '<p id="telefone_contabil">', ' - Telefone da contabilidade: </span>', $contabil->telefone,
+        ]);
     }
 
     /** @test */
