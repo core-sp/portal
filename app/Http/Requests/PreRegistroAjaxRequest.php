@@ -47,13 +47,16 @@ class PreRegistroAjaxRequest extends FormRequest
             'sexo' => implode(',', array_keys(generos())),
             'estado_civil' => implode(',', estados_civis()),
             'nacionalidade' => implode(',', nacionalidades()),
+            'nacionalidade_socio' => implode(',', nacionalidades()),
             'naturalidade_estado' => implode(',', array_keys(estados())),
+            'naturalidade_estado_socio' => implode(',', array_keys(estados())),
             'tipo_identidade' => implode(',', tipos_identidade()),
             'tipo_empresa' => implode(',', tipos_empresa()),
             'uf_empresa' => implode(',', array_keys(estados())),
             'sexo_rt' => implode(',', array_keys(generos())),
             'tipo_identidade_rt' => implode(',', tipos_identidade()),
             'uf_rt' => implode(',', array_keys(estados())),
+            'uf_socio' => implode(',', array_keys(estados())),
         ];
 
         if(in_array($this->campo, array_keys($arrayIn)) && isset($this->valor))
@@ -63,6 +66,9 @@ class PreRegistroAjaxRequest extends FormRequest
             $this->merge([
                 'campo' => str_replace('[]', '', $this->campo),
             ]);
+
+        if(in_array($this->campo, ['cep', 'cep_empresa', 'cep_rt', 'cep_socio']) && isset($this->valor))
+            $this->regraValor = ['size:9', 'regex:/([0-9]{5})\-([0-9]{3})$/'];
 
         if((strpos($this->campo, 'cpf') !== false) || (strpos($this->campo, 'cnpj') !== false))
         {
@@ -85,7 +91,7 @@ class PreRegistroAjaxRequest extends FormRequest
                     $rt_cpf_socio = !$pr->userExterno->isPessoaFisica() && $pr->pessoaJuridica->possuiRT()? $pr->pessoaJuridica->responsavelTecnico->cpf : '';
 
                     $this->regraValor = ['nullable', new CpfCnpj, 'unique:contabeis,cnpj', 'not_in:' . $pr->userExterno->cpf_cnpj . ',' . $rt_cpf_socio];
-                    $this->msgUnique = 'O CNPJ fornecido já consta no Portal como Contabilidade, não pode ser sócio';
+                    $this->msgUnique = 'O CNPJ fornecido já consta no Portal com outro tipo de conta, não pode ser sócio';
                     $this->msgNotIn = $rt_cpf_socio == $this->valor ? 'Para incluir o CPF do RT, deve confirmar no item 5.1' : 'O CNPJ do usuário externo deste pré-registro não pode ser sócio';
                     break;
                 default:
@@ -188,6 +194,9 @@ class PreRegistroAjaxRequest extends FormRequest
             'valor.not_in' => $this->msgNotIn,
             'valor.unique' => $this->msgUnique,
             'valor.array' => 'Formato da requisição do upload do anexo está errado',
+            'valor.size' => 'Valor deve ter :size caracteres',
+            'valor.regex' => 'Valor não corresponde ao padrão',
+            'classe.in' => 'Classe não encontrada ou não permitido alterar',
             'required' => 'Falta dados para enviar a requisição',
             'mimetypes' => 'O arquivo não possui extensão permitida ou está com erro',
             'file' => 'Deve ser um arquivo',

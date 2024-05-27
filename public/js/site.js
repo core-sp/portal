@@ -2001,22 +2001,24 @@ var teste;
 $('.erroPreRegistro').click(function(){
 	var campo = $(this).val().indexOf('_socio_') >= 0 ? 'checkRT_socio' : $(this).val();
 	var hrefMenu = $('[name="' + campo + '"]').parents('.tab-pane').attr('id');
-	$('.menu-registro.nav-pills [href="#' + hrefMenu + '"]').tab('show');
+	var id_socio = null;
 
 	if(campo == 'checkRT_socio'){
 		$('#mostrar_socios').click();
-		var id = $(this).val().replace(/\D/g, '');
-		$('#socio_' + id + ' .acoes_socio button.editar_socio').click();
-		campo = $(this).val().replace('_' + id, '');
+		id_socio = $(this).val().replace(/\D/g, '');
+		if($(this).val().replace('_' + id_socio, '') != 'cpf_cnpj_socio')
+			$('#socio_' + id_socio + ' .acoes_socio button.editar_socio').click();
+		campo = $(this).val().replace('_' + id_socio, '');
 	}
 
-	teste = campo;
-	$('[name="' + teste + '"]').focus();
+	teste = campo == 'cpf_cnpj_socio' ? 'button[data-target="#socio_' + id_socio + '"]' : '[name="' + campo + '"]';
+	$('.menu-registro.nav-pills [href="#' + hrefMenu + '"]').hasClass('active') ? 
+	$(teste).focus() : $('.menu-registro.nav-pills [href="#' + hrefMenu + '"]').tab('show');
 });
 
 $('.menu-registro.nav-pills a').on('shown.bs.tab', function(){
     if($('.erroPreRegistro').length > 0)
-		$('[name="' + teste + '"]').focus();
+		$(teste).focus();
 });
 // --------------------------------------------------------------------------------------
 

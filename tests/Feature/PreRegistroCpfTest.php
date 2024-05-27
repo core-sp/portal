@@ -1659,9 +1659,9 @@ class PreRegistroCpfTest extends TestCase
     }
 
     /** 
-     * ===============================================================================================================
-     * TESTES PRE-REGISTRO-CPF - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
-     * ===============================================================================================================
+     * ===================================================================================================================
+     * TESTES PRE-REGISTRO-CPF VIA AJAX - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
+     * ===================================================================================================================
      */
 
     /** @test */
@@ -2246,6 +2246,12 @@ class PreRegistroCpfTest extends TestCase
                 ])->assertStatus(200);
         }
     }
+
+    /** 
+     * =====================================================================================================================
+     * TESTES PRE-REGISTRO-CPF VIA SUBMIT - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
+     * =====================================================================================================================
+     */
 
     /** @test */
     public function can_submit_pre_registro_cpf_by_contabilidade()

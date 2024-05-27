@@ -41,14 +41,15 @@ class Contabil extends Authenticatable
 
     protected static function criarFinal($campo, $valor, $pr)
     {
-        $valido = $campo == 'cnpj' ? self::buscar($valor, $pr->getHistoricoCanEdit()) : null;
-        if(isset($valido))
-        {
-            if($valido == 'notUpdate')
-                $valido = ['update' => $pr->getNextUpdateHistorico()];
-            else
-                $pr->update(['contabil_id' => $valido->id, 'historico_contabil' => $pr->setHistorico()]);
-        }
+        if($campo != 'cnpj')
+            throw new \Exception('Não pode relacionar contábil sem CNPJ no pré-registro de ID ' . $pr->id . '.', 400);
+
+        $valido = self::buscar($valor, $pr->getHistoricoCanEdit());
+
+        if($valido == 'notUpdate')
+            $valido = ['update' => $pr->getNextUpdateHistorico()];
+        else
+            $pr->update(['contabil_id' => $valido->id, 'historico_contabil' => $pr->setHistorico()]);
 
         return $valido;
     }
@@ -107,7 +108,7 @@ class Contabil extends Authenticatable
             return isset($existe) ? $existe->makeHidden(['verify_token']) : self::create(['cnpj' => $cnpj]);
         }
 
-        return null;
+        throw new \Exception('Não pode buscar contábil sem CNPJ.', 400);
     }
 
     // public function finalArray($arrayCampos, $pr)

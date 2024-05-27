@@ -33,20 +33,21 @@ class ResponsavelTecnico extends Model
 
     protected static function criarFinal($campo, $valor, $gerenti, $pr)
     {
-        $valido = $campo == 'cpf' ? self::buscar($valor, $gerenti, $pr->pessoaJuridica->getHistoricoCanEdit()) : null;
-        if(isset($valido))
-        {
-            if($valido == 'notUpdate')
-                $valido = ['update' => $pr->pessoaJuridica->getNextUpdateHistorico()];
-            else{
-                $pr->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id, 'historico_rt' => $pr->pessoaJuridica->setHistorico()]);
-                $socio = $pr->pessoaJuridica->socios->where('cpf_cnpj', $valor)->first();
-                if(isset($socio) && !$socio->pivot->rt){
-                    $socio->pivot->update(['rt' => true]);
-                    $valido['tab'] = $pr->pessoaJuridica->socioRT->first()->tabHTML();
-                    $valido['id_socio'] = $socio->id;
-                    $valido['rt'] = true;
-                }
+        if($campo != 'cpf')
+            throw new \Exception('Não pode relacionar responsável técnico sem CPF no pré-registro de ID ' . $pr->id . '.', 400);
+
+        $valido = self::buscar($valor, $gerenti, $pr->pessoaJuridica->getHistoricoCanEdit());
+
+        if($valido == 'notUpdate')
+            $valido = ['update' => $pr->pessoaJuridica->getNextUpdateHistorico()];
+        else{
+            $pr->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id, 'historico_rt' => $pr->pessoaJuridica->setHistorico()]);
+            $socio = $pr->pessoaJuridica->socios->where('cpf_cnpj', $valor)->first();
+            if(isset($socio) && !$socio->pivot->rt){
+                $socio->pivot->update(['rt' => true]);
+                $valido['tab'] = $pr->pessoaJuridica->socioRT->first()->tabHTML();
+                $valido['id_socio'] = $socio->id;
+                $valido['rt'] = true;
             }
         }
 
@@ -136,7 +137,7 @@ class ResponsavelTecnico extends Model
             return $existe;
         }
 
-        return null;
+        throw new \Exception('Não pode buscar responsável técnico sem CPF.', 400);
     }
 
     public function arrayValidacaoInputs()

@@ -423,6 +423,23 @@ class PreRegistroCnpjTest extends TestCase
     }
 
     /** @test */
+    public function cannot_update_table_pre_registro_cnpj_by_ajax_with_cep_wrong()
+    {
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaJuridica',
+            'campo' => 'cep_empresa',
+            'valor' => '123456789'
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'cep' => null
+        ]);
+    }
+
+    /** @test */
     public function cannot_update_table_pre_registro_cnpj_by_ajax_with_dt_inicio_atividade_after_today()
     {
         $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
@@ -1853,9 +1870,9 @@ class PreRegistroCnpjTest extends TestCase
     }
 
     /** 
-     * ===============================================================================================================
-     * TESTES PRE-REGISTRO-CNPJ - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
-     * ===============================================================================================================
+     * ====================================================================================================================
+     * TESTES PRE-REGISTRO-CNPJ VIA AJAX - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
+     * ====================================================================================================================
      */
 
     /** @test */
@@ -2225,6 +2242,24 @@ class PreRegistroCnpjTest extends TestCase
             ])->assertSessionHasErrors('valor');
         
         $this->assertDatabaseMissing('pre_registros_cnpj', $this->remove_empresa($preRegistroCnpj)->toArray());
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registro_cnpj_by_ajax_with_cep_wrong_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'pessoaJuridica',
+            'campo' => 'cep_empresa',
+            'valor' => '123456789'
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'cep' => null
+        ]);
     }
 
     /** @test */
@@ -2672,6 +2707,12 @@ class PreRegistroCnpjTest extends TestCase
                 ])->assertStatus(200);
         }
     }
+
+    /** 
+     * ======================================================================================================================
+     * TESTES PRE-REGISTRO-CNPJ VIA SUBMIT - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
+     * ======================================================================================================================
+     */
 
     /** @test */
     public function can_submit_pre_registro_cnpj_by_contabilidade()

@@ -741,6 +741,23 @@ class PreRegistroTest extends TestCase
     }
 
     /** @test */
+    public function cannot_update_table_pre_registros_by_ajax_with_cep_wrong()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'cep',
+            'valor' => '12-3456789'
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseHas('pre_registros', [
+            'cep' => null
+        ]);
+    }
+
+    /** @test */
     public function cannot_update_table_pre_registros_by_ajax_with_idregional_wrong()
     {
         $externo = $this->signInAsUserExterno();
@@ -2539,7 +2556,7 @@ class PreRegistroTest extends TestCase
 
     /** 
      * ===============================================================================================================
-     * TESTES PRE-REGISTRO - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
+     * TESTES PRE-REGISTRO VIA AJAX - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
      * ===============================================================================================================
      */
 
@@ -3099,6 +3116,24 @@ class PreRegistroTest extends TestCase
     }
 
     /** @test */
+    public function cannot_update_table_pre_registros_by_ajax_with_cep_wrong_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'preRegistro',
+            'campo' => 'cep',
+            'valor' => '12-3456789'
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseHas('pre_registros', [
+            'cep' => null
+        ]);
+    }
+
+    /** @test */
     public function cannot_update_table_pre_registros_by_ajax_with_idregional_wrong_by_contabilidade()
     {
         $externo = $this->signInAsUserExterno('contabil');
@@ -3456,6 +3491,12 @@ class PreRegistroTest extends TestCase
                 ])->assertStatus(200);
         }
     }
+
+    /** 
+     * =================================================================================================================
+     * TESTES PRE-REGISTRO VIA SUBMIT - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
+     * =================================================================================================================
+     */
 
     /** @test */
     public function view_message_errors_when_submit_by_contabilidade()

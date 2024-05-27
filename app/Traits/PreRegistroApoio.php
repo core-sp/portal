@@ -26,7 +26,7 @@ trait PreRegistroApoio {
                 return $classe::criarFinal($campo, $valor, $gerenti, $this);
                 break;
             case $this->relation_socio:
-                return !is_array($campo) || ($campo[0] > 0) ? null : $classe::criarFinal($campo[1], $valor, $gerenti, $this);
+                return $classe::criarFinal($campo[1], $valor, $gerenti, $this);
                 break;
             case $this->relation_contabil:
             case $this->relation_anexos:
@@ -296,11 +296,11 @@ trait PreRegistroApoio {
         $gerenti['cpf'] = $cpf_cnpj;
     }
 
-    private function getSocioGerenti($ass_id, $gerentiRepository, $cpf_cnpj, &$gerenti, $tipo_pessoa)
+    private function getSocioGerenti($ass_id, $gerentiRepository, $cpf_cnpj, &$gerenti, $tipo)
     {
         $gerenti['cpf_cnpj'] = $cpf_cnpj;
 
-        if($tipo_pessoa == "J")
+        if($tipo == 'PJ')
             return;
 
         $resultadosGerenti = utf8_converter($gerentiRepository->gerentiDadosGeraisPF($ass_id));
@@ -329,7 +329,7 @@ trait PreRegistroApoio {
 
         $resultadosGerenti = $gerentiRepository->gerentiBusca("", null, $cpf_cnpj);
         $ass_id = null;
-        $tipo_pessoa = null;
+        $tipo = null;
         $gerenti = array();
 
         // Para testar: em caso de relation_rt, colocar 5 em "ASS_TP_ASSOC" em gerentiBusca() em GerentiRepositoryMock
@@ -338,24 +338,24 @@ trait PreRegistroApoio {
             $naoCancelado = $resultado['CANCELADO'] == "F";
             $ativo = $resultado['ASS_ATIVO'] == "T";
             $tipo = $this->getTipoPessoaByCodigo($resultado["ASS_TP_ASSOC"]);
-            $tipo_pessoa = $resultado['ASS_TP_PESSOA'];
 
             if($naoCancelado && $ativo && ((($relacao == $this->relation_rt) && ($tipo == 'RT')) || (($relacao == $this->relation_socio) && ($tipo != 'Indefinida'))))
             {
-                $ass_id = $resultado["ASS_ID"];
-                $gerenti['nome'] = mb_strtoupper($resultado["ASS_NOME"], 'UTF-8');
-                $gerenti['registro'] = apenasNumeros($resultado["ASS_REGISTRO"]);
                 if(
-                    (($relacao == $this->relation_socio) && ($resultado['ASS_TP_PESSOA'] != "J") && (strlen($cpf_cnpj) == 11)) || 
-                    (($relacao == $this->relation_socio) && ($resultado['ASS_TP_PESSOA'] == "J") && (strlen($cpf_cnpj) == 14))
-                )
+                    (($tipo != 'PJ') && (strlen($cpf_cnpj) == 11)) || 
+                    (($relacao == $this->relation_socio) && ($tipo == 'PJ') && (strlen($cpf_cnpj) == 14))
+                ){
+                    $ass_id = $resultado["ASS_ID"];
+                    $gerenti['nome'] = mb_strtoupper($resultado["ASS_NOME"], 'UTF-8');
+                    $gerenti['registro'] = apenasNumeros($resultado["ASS_REGISTRO"]);
                     break;
+                }
             }
         }
 
         if(isset($ass_id))
             $relacao == $this->relation_rt ? $this->getRTGerenti($ass_id, $gerentiRepository, $cpf_cnpj, $gerenti) : 
-            $this->getSocioGerenti($ass_id, $gerentiRepository, $cpf_cnpj, $gerenti, $tipo_pessoa);
+            $this->getSocioGerenti($ass_id, $gerentiRepository, $cpf_cnpj, $gerenti, $tipo);
 
         return $gerenti;
     }

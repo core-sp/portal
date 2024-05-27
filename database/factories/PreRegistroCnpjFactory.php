@@ -54,6 +54,10 @@ $factory->state(PreRegistroCnpj::class, 'make_endereco', function (Faker $faker)
     ];
 });
 
+$factory->state(PreRegistroCnpj::class, 'rt_socio', function (Faker $faker) {
+    return [];
+});
+
 $factory->afterMakingState(PreRegistroCnpj::class, 'make_endereco', function ($prCnpj, $faker) {
     $prCnpj->makeHidden(['pre_registro_id', 'historico_rt', 'historico_socio', 'responsavel_tecnico_id', 'pre_registro']);
     $prCnpj->makeHidden(array_keys($prCnpj->getEndereco()));
@@ -68,4 +72,9 @@ $factory->afterCreating(PreRegistroCnpj::class, function ($prCnpj, $faker) {
     $socio_pj = factory('App\Socio')->states('pj')->create();
     $prCnpj->socios()->attach($socio_pf->id, ['rt' => false]);
     $prCnpj->socios()->attach($socio_pj->id, ['rt' => false]);
+});
+
+$factory->afterCreatingState(PreRegistroCnpj::class, 'rt_socio', function ($prCnpj, $faker) {    
+    $socio_pf = factory('App\Socio')->states('rt')->create();
+    $prCnpj->socios()->attach($socio_pf->id, ['rt' => true]);
 });

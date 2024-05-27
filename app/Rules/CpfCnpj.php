@@ -6,6 +6,8 @@ use Illuminate\Contracts\Validation\Rule;
 
 class CpfCnpj implements Rule
 {
+    private $attribute;
+
     public function __construct()
     {
         //
@@ -13,6 +15,8 @@ class CpfCnpj implements Rule
 
     public function passes($attribute, $value)
     {
+        $this->attribute = $attribute;
+
         $value = apenasNumeros($value);
         
         if(strlen($value) === 11) {
@@ -77,6 +81,6 @@ class CpfCnpj implements Rule
 
     public function message()
     {
-        return 'CPF/CNPJ inválido!';
+        return strpos($this->attribute, '_socio_') !== false ? 'CPF/CNPJ inválido em "CPF / CNPJ do Sócio com ID ' . str_replace('cpf_cnpj_socio_', '', $this->attribute) . '"' : 'CPF/CNPJ inválido!';
     }
 }

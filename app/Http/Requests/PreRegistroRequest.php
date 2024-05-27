@@ -131,7 +131,7 @@ class PreRegistroRequest extends FormRequest
                 'cidade_rt' => 'required_with:cpf_rt|min:4|max:191',
                 'uf_rt' => 'required_with:cpf_rt|in:'.implode(',', array_keys(estados())),
                 'nome_mae_rt' => 'required_with:cpf_rt|min:5|max:191|regex:/^\D*$/',
-                'nome_pai_rt' => 'nullable|min:5|max:191|regex:/^\D*$/',
+                'nome_pai_rt' => 'required_if:checkRT_socio,on|nullable|min:5|max:191|regex:/^\D*$/',
                 'titulo_eleitor_rt' => 'required_with:cpf_rt|nullable|min:12|max:15',
                 'zona_rt' => 'required_with:cpf_rt|max:6',
                 'secao_rt' => 'required_with:cpf_rt|max:8',
@@ -321,6 +321,11 @@ class PreRegistroRequest extends FormRequest
             'cpf_cnpj.unique' => 'Não pode solicitar pré-registro com o CNPJ fornecido devido constar no Portal como Contabilidade',
             'cnpj_contabil.unique' => 'O CNPJ fornecido já consta no Portal com outro tipo de conta',
             'email.unique' => 'E-mail já existe como Contabilidade',
+            'not_in' => 'Valor não é aceito',
+            'unique' => 'O valor já existe e não pode ser usado',
+            'different' => 'O valor deve ser diferente do CPF do Responsável Técnico',
+            'before_or_equal' => 'Deve ter 18 anos completos ou mais',
+            'nome_pai_rt.required_if' => 'Por ser Sócio e Responsável Técnico o campo' . $attr . ' é obrigatório',
         ];
     }
 

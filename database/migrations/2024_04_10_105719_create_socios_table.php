@@ -29,7 +29,7 @@ class CreateSociosTable extends Migration
             $table->string('bairro')->nullable();
             $table->string('cidade')->nullable();
             $table->char('uf', 2)->nullable();
-            $table->string('nacionalidade')->default('BRASILEIRA')->nullable();
+            $table->string('nacionalidade')->nullable();
             $table->string('naturalidade_estado')->nullable();
             $table->string('nome_mae')->nullable();
             $table->string('nome_pai')->nullable();

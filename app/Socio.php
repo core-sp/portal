@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
+use App\Rules\CpfCnpj;
 
 class Socio extends Model
 {
@@ -52,8 +53,15 @@ class Socio extends Model
     private function updateAjax($campo, $valor)
     {
         $dados_pf = ['nome_social', 'dt_nascimento', 'identidade', 'orgao_emissor', 'nacionalidade', 'naturalidade_estado', 'nome_mae', 'nome_pai'];
+        $dados_rt = ['nacionalidade', 'naturalidade_estado'];
 
-        if(($campo != 'cpf_cnpj') || (!$this->socioPF() && !in_array($campo, $dados_pf)))
+        if($this->socioRT() && !in_array($campo, $dados_rt))
+            throw new \Exception('Não pode atualizar o sócio PF / RT com este campo "'. $campo .'".', 400);
+
+        if(!$this->socioPF() && in_array($campo, $dados_pf))
+            throw new \Exception('Não pode atualizar o sócio PJ com este campo "'. $campo .'".', 400);
+
+        if($campo != 'cpf_cnpj')
             $this->update([$campo => $valor]);
     }
 
@@ -77,18 +85,19 @@ class Socio extends Model
         
         $dadosRT = self::confereRTSocio($campo, $valor, $pr->pessoaJuridica);
 
-        $valido = $campo == 'cpf_cnpj' ? self::buscar($valor, $gerenti, $pr->pessoaJuridica->getHistoricoCanEdit(self::class)) : null;
-        if(isset($valido))
-        {
-            if($valido == 'notUpdate')
-                $valido = ['update' => $pr->pessoaJuridica->getNextUpdateHistorico(self::class)];
-            elseif($pr->pessoaJuridica->socios->where('id', $valido->id)->first() !== null)
-                return ['existente' => 'O sócio com o CPF / CNPJ <strong>' . formataCpfCnpj($valido->cpf_cnpj) . '</strong> já está relacionado!'];
-            else{
-                $pr->pessoaJuridica->socios()->attach($valido->id, ['rt' => is_array($dadosRT)]);
-                $pr->pessoaJuridica->update(['historico_socio' => $pr->pessoaJuridica->setHistorico(self::class)]);
-                $valido = $pr->pessoaJuridica->fresh()->socios->find($valido->id);
-            }
+        if($campo != 'cpf_cnpj')
+            throw new \Exception('Não pode relacionar sócio sem CPF / CNPJ no pré-registro de ID ' . $pr->id . '.', 400);
+
+        $valido = self::buscar($valor, $gerenti, $pr->pessoaJuridica->getHistoricoCanEdit(self::class));
+
+        if($valido == 'notUpdate')
+            $valido = ['update' => $pr->pessoaJuridica->getNextUpdateHistorico(self::class)];
+        elseif($pr->pessoaJuridica->socios->where('id', $valido->id)->first() !== null)
+            return ['existente' => 'O sócio com o CPF / CNPJ <strong>' . formataCpfCnpj($valido->cpf_cnpj) . '</strong> já está relacionado!'];
+        else{
+            $pr->pessoaJuridica->socios()->attach($valido->id, ['rt' => is_array($dadosRT)]);
+            $pr->pessoaJuridica->update(['historico_socio' => $pr->pessoaJuridica->setHistorico(self::class)]);
+            $valido = $pr->pessoaJuridica->fresh()->socios->find($valido->id);
         }
 
         return isset($valido) && (gettype($valido) == "object") && (get_class($valido) == self::class) ? 
@@ -150,7 +159,7 @@ class Socio extends Model
             return $existe;
         }
 
-        return null;
+        throw new \Exception('Não pode buscar sócio sem CPF / CNPJ.', 400);
     }
 
     private function tabHTMLpf($inicio, $final)
@@ -298,7 +307,7 @@ class Socio extends Model
     public function arrayValidacao()
     {
         $rt = [
-            'nacionalidade_socio_' . $this->id => 'required|in:'.implode(',',
+            'nacionalidade_socio_' . $this->id => 'required_with:cpf_cnpj_socio_' . $this->id.'|in:'.implode(',',
                 collect(nacionalidades())->map(function ($item, $key) {
                     return mb_strtoupper($item, 'UTF-8');
                 })->toArray()),
@@ -311,25 +320,28 @@ class Socio extends Model
             return $rt;
         }
 
+        $user_externo_cpf_cnpj = $this->pessoasJuridicas->find($this->pivot->pre_registro_cnpj_id)->preRegistro->userExterno->cpf_cnpj;
+
         $geral = [
             'checkRT_socio' => '',
-            'nome_socio_' . $this->id => 'required|min:5|max:191|regex:/^\D*$/',
-            'cep_socio_' . $this->id => 'required|size:9|regex:/([0-9]{5})\-([0-9]{3})$/',
-            'bairro_socio_' . $this->id => 'required|min:4|max:191',
-            'logradouro_socio_' . $this->id => 'required|min:4|max:191',
-            'numero_socio_' . $this->id => 'required|min:1|max:10',
+            'cpf_cnpj_socio_' . $this->id => ['required', new CpfCnpj, 'unique:contabeis,cnpj', 'not_in:' . $user_externo_cpf_cnpj, 'different:cpf_rt'],
+            'nome_socio_' . $this->id => 'required_with:cpf_cnpj_socio_' . $this->id.'|min:5|max:191|regex:/^\D*$/',
+            'cep_socio_' . $this->id => 'required_with:cpf_cnpj_socio_' . $this->id.'|size:9|regex:/([0-9]{5})\-([0-9]{3})$/',
+            'bairro_socio_' . $this->id => 'required_with:cpf_cnpj_socio_' . $this->id.'|min:4|max:191',
+            'logradouro_socio_' . $this->id => 'required_with:cpf_cnpj_socio_' . $this->id.'|min:4|max:191',
+            'numero_socio_' . $this->id => 'required_with:cpf_cnpj_socio_' . $this->id.'|min:1|max:10',
             'complemento_socio_' . $this->id => 'nullable|max:50',
-            'cidade_socio_' . $this->id => 'required|min:4|max:191',
-            'uf_socio_' . $this->id => 'required|in:'.implode(',', array_keys(estados())),
+            'cidade_socio_' . $this->id => 'required_with:cpf_cnpj_socio_' . $this->id.'|min:4|max:191',
+            'uf_socio_' . $this->id => 'required_with:cpf_cnpj_socio_' . $this->id.'|in:'.implode(',', array_keys(estados())),
         ];
 
         return $this->socioPF() ? array_merge([
             'nome_social_socio_' . $this->id => 'nullable|min:5|max:191|regex:/^\D*$/',
-            'dt_nascimento_socio_' . $this->id => 'required|date_format:Y-m-d|before_or_equal:'.now()->subYears(18)->format('Y-m-d'),
-            'identidade_socio_' . $this->id => 'required|min:4|max:30',
-            'orgao_emissor_socio_' . $this->id => 'required|min:3|max:191',
-            'nome_mae_socio_' . $this->id => 'required|min:5|max:191|regex:/^\D*$/',
-            'nome_pai_socio_' . $this->id => 'required|min:5|max:191|regex:/^\D*$/',
+            'dt_nascimento_socio_' . $this->id => 'required_with:cpf_cnpj_socio_' . $this->id.'|date_format:Y-m-d|before_or_equal:'.now()->subYears(18)->format('Y-m-d'),
+            'identidade_socio_' . $this->id => 'required_with:cpf_cnpj_socio_' . $this->id.'|min:4|max:30',
+            'orgao_emissor_socio_' . $this->id => 'required_with:cpf_cnpj_socio_' . $this->id.'|min:3|max:191',
+            'nome_mae_socio_' . $this->id => 'required_with:cpf_cnpj_socio_' . $this->id.'|min:5|max:191|regex:/^\D*$/',
+            'nome_pai_socio_' . $this->id => 'required_with:cpf_cnpj_socio_' . $this->id.'|min:5|max:191|regex:/^\D*$/',
         ], $rt, $geral) : $geral;
     }
 
@@ -340,7 +352,7 @@ class Socio extends Model
         if($this->socioRT())
             return $rt;
 
-        $geral = $this->arrayInputs(['nome', 'cep', 'bairro', 'logradouro', 'numero', 'complemento', 'cidade', 'uf']);
+        $geral = $this->arrayInputs(['cpf_cnpj', 'nome', 'cep', 'bairro', 'logradouro', 'numero', 'complemento', 'cidade', 'uf']);
 
         return !$this->socioPF() ? $geral : 
         array_merge($this->arrayInputs(['nome_social', 'dt_nascimento', 'identidade', 'orgao_emissor', 'nome_mae', 'nome_pai']), $rt, $geral);
@@ -357,6 +369,7 @@ class Socio extends Model
             return $rt;
 
         $geral = [
+            'cpf_cnpj_socio_' . $this->id => '"CPF / CNPJ do Sócio com ID ' . $this->id . '"',
             'nome_socio_' . $this->id => '"Nome do Sócio com ID ' . $this->id . '"',
             'cep_socio_' . $this->id => '"Cep do Sócio com ID ' . $this->id . '"',
             'bairro_socio_' . $this->id => '"Bairro do Sócio com ID ' . $this->id . '"',

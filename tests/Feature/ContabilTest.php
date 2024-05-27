@@ -4,8 +4,6 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PreRegistroMail;
 use App\PreRegistro;
@@ -1836,7 +1834,7 @@ class ContabilTest extends TestCase
 
     /** 
      * =======================================================================================================
-     * TESTES PRE-REGISTRO CONTABIL - LOGIN COMO USUARIO EXTERNO COMUM
+     * TESTES PRE-REGISTRO CONTABIL VIA AJAX - LOGIN COMO USUARIO EXTERNO COMUM
      * =======================================================================================================
      */
 
@@ -1866,7 +1864,7 @@ class ContabilTest extends TestCase
 
     /** 
      * =======================================================================================================
-     * TESTES PRE-REGISTRO CONTABIL VIA AJAX - CLIENT
+     * TESTES PRE-REGISTRO CONTABIL VIA AJAX - CLIENT - LOGIN COMO USUARIO EXTERNO COMUM
      * =======================================================================================================
      */
 
@@ -2223,7 +2221,7 @@ class ContabilTest extends TestCase
                 'classe' => 'contabil',
                 'campo' => $key.'_contabil',
                 'valor' => $value
-            ])->assertOk();
+            ])->assertStatus(500);
         
         $this->assertDatabaseMissing('contabeis', $contabil);
         $this->assertDatabaseHas('pre_registros', [
@@ -2266,7 +2264,7 @@ class ContabilTest extends TestCase
             'classe' => 'contabil',
             'campo' => 'nome_contabil',
             'valor' => 'Novo Teste'
-        ])->assertOk();
+        ])->assertStatus(500);
 
         $this->assertDatabaseHas('contabeis', $contabil);
         $this->assertDatabaseHas('pre_registros', [
@@ -2307,12 +2305,18 @@ class ContabilTest extends TestCase
             'contabil_id' => $contabil['id']
         ]);
 
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'contabil',
+            'campo' => 'cnpj_contabil',
+            'valor' => ''
+        ])->assertOk();
+
         foreach($contabil as $key => $value)
-            !in_array($key, ['id']) ? $this->post(route('externo.inserir.preregistro.ajax'), [
+            !in_array($key, ['id', 'cnpj']) ? $this->post(route('externo.inserir.preregistro.ajax'), [
                 'classe' => 'contabil',
                 'campo' => $key . '_contabil',
                 'valor' => ''
-            ])->assertOk() : null;
+            ])->assertStatus(500) : null;
 
         $this->assertDatabaseHas('contabeis', $contabil);
         $this->assertDatabaseHas('pre_registros', [
@@ -2355,7 +2359,7 @@ class ContabilTest extends TestCase
             'contabil_id' => $contabil->id
         ]);
 
-        $contabilAjax = $contabil->makeHidden(['id'])->toArray();
+        $contabilAjax = $contabil->makeHidden(['id', 'cnpj'])->toArray();
         foreach([PreRegistro::STATUS_CORRECAO, PreRegistro::STATUS_CRIADO] as $status)
         {
             $preRegistro->update(['status' => $status]);
@@ -2370,7 +2374,7 @@ class ContabilTest extends TestCase
 
     /** 
      * =======================================================================================================
-     * TESTES PRE-REGISTRO CONTABIL VIA SUBMIT - CLIENT
+     * TESTES PRE-REGISTRO CONTABIL VIA SUBMIT - CLIENT - LOGIN COMO USUARIO EXTERNO COMUM
      * =======================================================================================================
      */
     
@@ -2782,9 +2786,9 @@ class ContabilTest extends TestCase
     }
 
     /** 
-     * ===============================================================================================================
-     * TESTES PRE-REGISTRO CONTABIL - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
-     * ===============================================================================================================
+     * =================================================================================================================================
+     * TESTES PRE-REGISTRO CONTABIL VIA AJAX E SUBMIT - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
+     * =================================================================================================================================
      */
 
      /** @test */

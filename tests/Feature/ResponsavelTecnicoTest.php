@@ -317,11 +317,45 @@ class ResponsavelTecnicoTest extends TestCase
     }
 
     /** @test */
+    public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_cep_wrong()
+    {
+        $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf']
+        ])->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cep_rt',
+            'valor' => '123-456789'
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseMissing('responsaveis_tecnicos', [
+            'cep' => '123-456789'
+        ]);
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'responsavel_tecnico_id' => 1
+        ]);
+    }
+
+    /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_under_18_years_old()
     {
         $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf']
+        ])->assertOk();
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'pessoaJuridica.responsavelTecnico',
@@ -334,7 +368,7 @@ class ResponsavelTecnicoTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('pre_registros_cnpj', [
-            'responsavel_tecnico_id' => null
+            'responsavel_tecnico_id' => 1
         ]);
     }
 
@@ -347,6 +381,12 @@ class ResponsavelTecnicoTest extends TestCase
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf']
+        ])->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
             'campo' => 'dt_expedicao_rt',
             'valor' => Carbon::today()->addDay()->format('Y-m-d')
         ])->assertSessionHasErrors('valor');
@@ -356,7 +396,7 @@ class ResponsavelTecnicoTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('pre_registros_cnpj', [
-            'responsavel_tecnico_id' => null
+            'responsavel_tecnico_id' => 1
         ]);
     }
 
@@ -366,6 +406,12 @@ class ResponsavelTecnicoTest extends TestCase
         $externo = $this->signInAsUserExterno('user_externo', factory('App\UserExterno')->states('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf']
+        ])->assertOk();
 
         $datas = [
             'dt_nascimento' => null, 
@@ -379,9 +425,9 @@ class ResponsavelTecnicoTest extends TestCase
                 'valor' => 'texto'
             ])->assertSessionHasErrors('valor');
 
-        $this->assertDatabaseMissing('responsaveis_tecnicos', $datas);
+        $this->assertDatabaseHas('responsaveis_tecnicos', $datas);
         $this->assertDatabaseHas('pre_registros_cnpj', [
-            'responsavel_tecnico_id' => null
+            'responsavel_tecnico_id' => 1
         ]);
     }
 
@@ -394,13 +440,19 @@ class ResponsavelTecnicoTest extends TestCase
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf']
+        ])->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
             'campo' => 'sexo_rt',
             'valor' => 'P'
         ])->assertSessionHasErrors('valor');
 
         $this->assertDatabaseMissing('responsaveis_tecnicos', ['sexo' => 'P']);
         $this->assertDatabaseHas('pre_registros_cnpj', [
-            'responsavel_tecnico_id' => null
+            'responsavel_tecnico_id' => 1
         ]);
     }
 
@@ -413,13 +465,19 @@ class ResponsavelTecnicoTest extends TestCase
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf']
+        ])->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
             'campo' => 'tipo_identidade_rt',
             'valor' => 'Teste'
         ])->assertSessionHasErrors('valor');
 
         $this->assertDatabaseMissing('responsaveis_tecnicos', ['tipo_identidade_rt' => 'Teste']);
         $this->assertDatabaseHas('pre_registros_cnpj', [
-            'responsavel_tecnico_id' => null
+            'responsavel_tecnico_id' => 1
         ]);
     }
 
@@ -432,13 +490,19 @@ class ResponsavelTecnicoTest extends TestCase
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf']
+        ])->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
             'campo' => 'uf_rt',
             'valor' => 'TT'
         ])->assertSessionHasErrors('valor');
 
         $this->assertDatabaseMissing('responsaveis_tecnicos', ['uf_rt' => 'TT']);
         $this->assertDatabaseHas('pre_registros_cnpj', [
-            'responsavel_tecnico_id' => null
+            'responsavel_tecnico_id' => 1
         ]);
     }
 
@@ -458,7 +522,7 @@ class ResponsavelTecnicoTest extends TestCase
                     'classe' => 'pessoaJuridica.responsavelTecnico',
                     'campo' => $key . '_rt',
                     'valor' => $value
-                ])->assertOk();
+                ])->assertStatus(500);
         }
         
         $this->assertDatabaseMissing('responsaveis_tecnicos', $rt);
@@ -504,7 +568,7 @@ class ResponsavelTecnicoTest extends TestCase
             'classe' => 'pessoaJuridica.responsavelTecnico',
             'campo' => 'nome_rt',
             'valor' => 'Novo Teste'
-        ])->assertOk();
+        ])->assertStatus(500);
 
         $this->assertDatabaseHas('responsaveis_tecnicos', $rt);
         $this->assertDatabaseMissing('responsaveis_tecnicos', ['nome' => 'Novo Teste']);
@@ -687,7 +751,7 @@ class ResponsavelTecnicoTest extends TestCase
         
         $preRegistro = factory('App\PreRegistroCnpj')->create();
 
-        $rtAjax = $preRegistro->responsavelTecnico->arrayValidacaoInputs();
+        $rtAjax = Arr::except($preRegistro->responsavelTecnico->arrayValidacaoInputs(), ['cpf_rt']);
         foreach([PreRegistro::STATUS_CORRECAO, PreRegistro::STATUS_CRIADO] as $status)
         {
             $preRegistro->preRegistro->update(['status' => $status]);
@@ -1487,7 +1551,7 @@ class ResponsavelTecnicoTest extends TestCase
         
         $rt = factory('App\PreRegistroCnpj')->create([
             'responsavel_tecnico_id' => factory('App\ResponsavelTecnico')->create([
-                'logradouro' => $this->faker()->text(500),
+                'logradouro' => null,
             ])
         ]);
         
@@ -1867,9 +1931,9 @@ class ResponsavelTecnicoTest extends TestCase
     }
 
     /** 
-     * ==========================================================================================================================
-     * TESTES PRE-REGISTRO RESPONSAVEL TECNICO - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
-     * ==========================================================================================================================
+     * ===================================================================================================================================
+     * TESTES PRE-REGISTRO RESPONSAVEL TECNICO VIA AJAX - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
+     * ===================================================================================================================================
      */
 
     /** @test */
@@ -2145,11 +2209,45 @@ class ResponsavelTecnicoTest extends TestCase
     }
 
     /** @test */
+    public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_cep_wrong_by_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno('contabil');
+        $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
+        $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf']
+        ])->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cep_rt',
+            'valor' => '123-456789'
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseMissing('responsaveis_tecnicos', [
+            'cep' => '123-456789'
+        ]);
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'responsavel_tecnico_id' => 1
+        ]);
+    }
+
+    /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_under_18_years_old_by_contabilidade()
     {
         $externo = $this->signInAsUserExterno('contabil');
         $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
         $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf']
+        ])->assertOk();
 
         $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
             'classe' => 'pessoaJuridica.responsavelTecnico',
@@ -2162,7 +2260,7 @@ class ResponsavelTecnicoTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('pre_registros_cnpj', [
-            'responsavel_tecnico_id' => null
+            'responsavel_tecnico_id' => 1
         ]);
     }
 
@@ -2175,6 +2273,12 @@ class ResponsavelTecnicoTest extends TestCase
 
         $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
             'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf']
+        ])->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
             'campo' => 'dt_expedicao_rt',
             'valor' => Carbon::today()->addDay()->format('Y-m-d')
         ])->assertSessionHasErrors('valor');
@@ -2184,7 +2288,7 @@ class ResponsavelTecnicoTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('pre_registros_cnpj', [
-            'responsavel_tecnico_id' => null
+            'responsavel_tecnico_id' => 1
         ]);
     }
 
@@ -2194,6 +2298,12 @@ class ResponsavelTecnicoTest extends TestCase
         $externo = $this->signInAsUserExterno('contabil');
         $dados = factory('App\UserExterno')->states('pj', 'cadastro_by_contabil')->make()->toArray();
         $this->post(route('externo.contabil.inserir.preregistro'), $dados);
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf']
+        ])->assertOk();
 
         $datas = [
             'dt_nascimento' => null, 
@@ -2207,9 +2317,9 @@ class ResponsavelTecnicoTest extends TestCase
                 'valor' => 'texto'
             ])->assertSessionHasErrors('valor');
 
-        $this->assertDatabaseMissing('responsaveis_tecnicos', $datas);
+        $this->assertDatabaseHas('responsaveis_tecnicos', $datas);
         $this->assertDatabaseHas('pre_registros_cnpj', [
-            'responsavel_tecnico_id' => null
+            'responsavel_tecnico_id' => 1
         ]);
     }
 
@@ -2222,13 +2332,19 @@ class ResponsavelTecnicoTest extends TestCase
 
         $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
             'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf']
+        ])->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
             'campo' => 'sexo_rt',
             'valor' => 'P'
         ])->assertSessionHasErrors('valor');
 
         $this->assertDatabaseMissing('responsaveis_tecnicos', ['sexo' => 'P']);
         $this->assertDatabaseHas('pre_registros_cnpj', [
-            'responsavel_tecnico_id' => null
+            'responsavel_tecnico_id' => 1
         ]);
     }
 
@@ -2241,13 +2357,19 @@ class ResponsavelTecnicoTest extends TestCase
 
         $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
             'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf']
+        ])->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
             'campo' => 'tipo_identidade_rt',
             'valor' => 'Teste'
         ])->assertSessionHasErrors('valor');
 
-        $this->assertDatabaseMissing('responsaveis_tecnicos', ['tipo_identidade_rt' => 'Teste']);
+        $this->assertDatabaseMissing('responsaveis_tecnicos', ['tipo_identidade' => 'Teste']);
         $this->assertDatabaseHas('pre_registros_cnpj', [
-            'responsavel_tecnico_id' => null
+            'responsavel_tecnico_id' => 1
         ]);
     }
 
@@ -2260,13 +2382,19 @@ class ResponsavelTecnicoTest extends TestCase
 
         $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
             'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf']
+        ])->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
             'campo' => 'uf_rt',
             'valor' => 'TT'
         ])->assertSessionHasErrors('valor');
 
-        $this->assertDatabaseMissing('responsaveis_tecnicos', ['uf_rt' => 'TT']);
+        $this->assertDatabaseMissing('responsaveis_tecnicos', ['uf' => 'TT']);
         $this->assertDatabaseHas('pre_registros_cnpj', [
-            'responsavel_tecnico_id' => null
+            'responsavel_tecnico_id' => 1
         ]);
     }
 
@@ -2286,7 +2414,7 @@ class ResponsavelTecnicoTest extends TestCase
                     'classe' => 'pessoaJuridica.responsavelTecnico',
                     'campo' => $key . '_rt',
                     'valor' => $value
-                ])->assertOk();
+                ])->assertStatus(500);
         
         $this->assertDatabaseMissing('responsaveis_tecnicos', $rt);
         $this->assertDatabaseHas('pre_registros_cnpj', [
@@ -2331,7 +2459,7 @@ class ResponsavelTecnicoTest extends TestCase
             'classe' => 'pessoaJuridica.responsavelTecnico',
             'campo' => 'nome_rt',
             'valor' => 'Novo Teste'
-        ])->assertOk();
+        ])->assertStatus(500);
 
         $this->assertDatabaseHas('responsaveis_tecnicos', $rt);
         $this->assertDatabaseHas('pre_registros_cnpj', [
@@ -2517,7 +2645,7 @@ class ResponsavelTecnicoTest extends TestCase
         
         $preRegistro = factory('App\PreRegistroCnpj')->create();
 
-        $rtAjax = $preRegistro->responsavelTecnico->arrayValidacaoInputs();
+        $rtAjax = Arr::except($preRegistro->responsavelTecnico->arrayValidacaoInputs(), ['cpf_rt']);
         foreach([PreRegistro::STATUS_CORRECAO, PreRegistro::STATUS_CRIADO] as $status)
         {
             $preRegistro->preRegistro->update(['status' => $status]);
@@ -2529,6 +2657,12 @@ class ResponsavelTecnicoTest extends TestCase
                 ])->assertStatus(200);
         }
     }
+
+    /** 
+     * =====================================================================================================================================
+     * TESTES PRE-REGISTRO RESPONSÁVEL TÉCNICO VIA SUBMIT - LOGIN CONTABILIDADE RESPONSÁVEL PELO GERENCIAMENTO PARA O USUARIO EXTERNO COMUM
+     * =====================================================================================================================================
+     */
 
     /** @test */
     public function can_submit_rt_if_rt_exists_in_database_by_contabilidade()
@@ -3314,7 +3448,7 @@ class ResponsavelTecnicoTest extends TestCase
         
         $rt = factory('App\PreRegistroCnpj')->create([
             'responsavel_tecnico_id' => factory('App\ResponsavelTecnico')->create([
-                'logradouro' => $this->faker()->text(500),
+                'logradouro' => null,
             ])
         ]);
         
@@ -3701,7 +3835,7 @@ class ResponsavelTecnicoTest extends TestCase
 
     /** 
      * =======================================================================================================
-     * TESTES PRE-REGISTRO-CNPJ VIA AJAX - ADMIN
+     * TESTES PRE-REGISTRO RESPONSÁVEL TÉCNICO VIA AJAX - ADMIN
      * =======================================================================================================
      */
 
