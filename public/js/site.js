@@ -1438,6 +1438,8 @@ function putDadosPreRegistro(objeto)
 				preencheRT(response['resultado']);
 			if(campo == 'cnpj_contabil')
 				preencheContabil(response['resultado']);
+			else if(campo.includes('_contabil'))
+				preencheCanalContabil(campo);
 			if(campo == 'path')
 				preencheFile(response['resultado']);
 			if(classe == 'Arquivo-Excluir')
@@ -1547,6 +1549,7 @@ function preencheContabil(dados)
 			$('#inserirRegistro [name$="_contabil"]').each(function(){
 				$(this).val('');
 			});
+			preencheCanalContabil();
 			$('#campos_contabil').prop("disabled", true);
 		}else{
 			var desabilita = (dados.aceite != null) && (dados.ativo != null);
@@ -1556,7 +1559,39 @@ function preencheContabil(dados)
 				if(name != 'cnpj')
 					$(this).val(dados[name]);
 			});
+			preencheCanalContabil('cnpj_contabil', dados);
 		}
+	}
+}
+
+function preencheCanalContabil(campo = null, dados = null)
+{
+	if($('#inserirRegistro input[name="cnpj_contabil"]').val() == ""){
+		$('#inserirRegistro #contato-contabil-canal :input').each(function(){
+			$(this).val('');
+		});
+		$('#inserirRegistro #contato-contabil-canal').hide();
+		return;
+	}
+
+	if(campo == 'cnpj_contabil'){
+		$('#inserirRegistro #contato-contabil-canal :input').each(function(){
+			var name_id = $(this).attr('id').slice(0, $(this).attr('id').indexOf('-contabil-canal'));
+			$(this).val(dados[name_id]);
+		});
+		$('#inserirRegistro #contato-contabil-canal').show();
+		return;
+	}
+
+	if((campo != null) && (campo != 'cnpj_contabil')){
+		$('#inserirRegistro #contato-contabil-canal :input').each(function(){
+			var name_id = $(this).attr('id').slice(0, $(this).attr('id').indexOf('-contabil-canal'));
+			if(campo == (name_id + '_contabil'))
+				campo == 'email_contabil' ? 
+				$(this).val($('#inserirRegistro input[name="' + campo + '"]').val()) : 
+				$(this).val($('#inserirRegistro input[name="' + campo + '"]').val().toUpperCase());
+		});
+		return;
 	}
 }
 
@@ -2106,6 +2141,10 @@ $('#acoes_socio').on('click', '.excluir_socio', function() {
 
 $('#nacionalidade_socio').change(function(){
 	desabilitaNatSocio();
+});
+
+$('#link-tab-contabil').click(function(){
+	$('.menu-registro.nav-pills a[href="#parte_contabilidade"]').tab('show');
 });
 
 //	--------------------------------------------------------------------------------------------------------

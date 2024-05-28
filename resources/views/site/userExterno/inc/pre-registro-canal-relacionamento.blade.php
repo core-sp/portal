@@ -4,10 +4,9 @@
 ])
 @endcomponent
 
-@if(isset($resultado->contabil_id))
-<fieldset class="border rounded border-secondary p-2 mb-3">
+<fieldset id="contato-contabil-canal" class="border rounded border-secondary p-2 mb-3" style="{{ isset($resultado->contabil_id) ? '' : 'display: none' }}">
     <legend class="w-auto">
-        <small>&nbsp;Contato da Contabilidade&nbsp;</small>
+        <button class="btn btn-link btn-lg m-0 pl-1 pr-1" type="button" id="link-tab-contabil">Contato da Contabilidade</button>
     </legend>
 
     <div class="form-row mb-2">
@@ -18,6 +17,7 @@
                 class="form-control"
                 value="{{ isset($resultado->contabil->email) ? $resultado->contabil->email : '' }}"
                 placeholder="Obrigatório inserir um e-mail"
+                id="email-contabil-canal"
                 readonly
                 disabled
             />
@@ -30,6 +30,7 @@
                 class="form-control telefone2Input"
                 value="{{ isset($resultado->contabil->telefone) ? $resultado->contabil->telefone : '' }}"
                 placeholder="Obrigatório inserir um telefone"
+                id="telefone-contabil-canal"
                 readonly
                 disabled
             />
@@ -43,14 +44,13 @@
                 class="form-control"
                 value="{{ isset($resultado->contabil->nome_contato) ? $resultado->contabil->nome_contato : '' }}"
                 placeholder="Obrigatório inserir um nome de contato"
+                id="nome_contato-contabil-canal"
                 readonly
                 disabled
             />
         </div>
     </div>
 </fieldset>
-
-@endif
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
