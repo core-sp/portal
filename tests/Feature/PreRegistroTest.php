@@ -5215,7 +5215,7 @@ class PreRegistroTest extends TestCase
         ->assertSee('data-content="<strong>Solicitante está aguardando o atendente analisar os dados</strong>')
         ->assertSee('data-content="<strong>Atendente está aguardando o solicitante corrigir os dados</strong>')
         ->assertSee('data-content="<strong>Solicitante está aguardando o atendente analisar os dados após correção</strong>')
-        ->assertSee('data-content="<strong>Atendente aprovou a solicitação e pode realizar o anexo do boleto</strong>')
+        ->assertSee('data-content="<strong>Atendente aprovou a solicitação e pode anexar os documentos para o solicitante</strong>')
         ->assertSee('data-content="<strong>Atendente negou a solicitação</strong>');
     }
 

@@ -242,7 +242,7 @@ class PreRegistro extends Model
         $legenda .= $inicio . self::colorLabelStatusAdmin()[self::STATUS_ANALISE_INICIAL] . $meio . '"<strong>Solicitante está aguardando o atendente analisar os dados</strong>">' . self::STATUS_ANALISE_INICIAL . '</button>';
         $legenda .= $inicio . self::colorLabelStatusAdmin()[self::STATUS_CORRECAO] . $meio . '"<strong>Atendente está aguardando o solicitante corrigir os dados</strong>">' . self::STATUS_CORRECAO . '</button>';
         $legenda .= $inicio . self::colorLabelStatusAdmin()[self::STATUS_ANALISE_CORRECAO] . $meio . '"<strong>Solicitante está aguardando o atendente analisar os dados após correção</strong>">' . self::STATUS_ANALISE_CORRECAO . '</button>';
-        $legenda .= $inicio . self::colorLabelStatusAdmin()[self::STATUS_APROVADO] . $meio . '"<strong>Atendente aprovou a solicitação e pode realizar o anexo do boleto</strong>">' . self::STATUS_APROVADO . '</button>';
+        $legenda .= $inicio . self::colorLabelStatusAdmin()[self::STATUS_APROVADO] . $meio . '"<strong>Atendente aprovou a solicitação e pode anexar os documentos para o solicitante</strong>">' . self::STATUS_APROVADO . '</button>';
         $legenda .= $inicio . self::colorLabelStatusAdmin()[self::STATUS_NEGADO] . $meio . '"<strong>Atendente negou a solicitação</strong>">' . self::STATUS_NEGADO . '</button>';
         $legenda .= '</p><hr/>';
 
@@ -287,6 +287,11 @@ class PreRegistro extends Model
     public function possuiContabil()
     {
         return isset($this->contabil_id);
+    }
+
+    public function gerenciadoPorContabil()
+    {
+        return $this->possuiContabil() && $this->contabil->possuiLoginAtivo();
     }
 
     public function excluirAnexos()

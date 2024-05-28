@@ -28,7 +28,8 @@
                 <p class="pb-0" data-clarity-mask="True">ID: <strong>{{ $solicitacao->id }}</strong></p>
                 <p class="pb-0">
                     <span class="text-nowrap" data-clarity-mask="True">CPF / CNPJ: <strong>{{ formataCpfCnpj($solicitacao->userExterno->cpf_cnpj) }}</strong>&nbsp;&nbsp; | &nbsp;</span>
-                    <span class="text-nowrap" data-clarity-mask="True">Nome: <strong>{{ $solicitacao->userExterno->nome }}</strong></span>
+                    <span class="text-nowrap" data-clarity-mask="True">Nome: <strong>{{ $solicitacao->userExterno->nome }}</strong>&nbsp;&nbsp; | &nbsp;</span>
+                    <span class="text-nowrap" data-clarity-mask="True"><strong>Conta ativa: &nbsp;{!! $solicitacao->userExterno->possuiLoginAtivo() ? '<i class="fas fa-user-check text-success"></i>' : '<i class="fas fa-user-times text-danger"></i>' !!}</strong></span>
                 </p>
                 
                 <p class="pb-0">Status: {!! $solicitacao->getLabelStatusUser(true) !!}&nbsp;&nbsp; | &nbsp;

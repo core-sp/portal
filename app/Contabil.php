@@ -152,6 +152,11 @@ class Contabil extends Authenticatable
         return isset($this->aceite) && isset($this->ativo);
     }
 
+    public function possuiLoginAtivo()
+    {
+        return $this->possuiLogin() && ($this->ativo == 1);
+    }
+
     public function arrayValidacaoInputs()
     {
         return collect(Arr::only($this->attributesToArray(), ['cnpj', 'nome', 'email', 'nome_contato', 'telefone']))->keyBy(function ($item, $key) {

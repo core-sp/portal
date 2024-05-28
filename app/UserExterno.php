@@ -74,6 +74,11 @@ class UserExterno extends Authenticatable
         return $this->aceite == 1;
     }
 
+    public function possuiLoginAtivo()
+    {
+        return $this->possuiLogin() && ($this->ativo == 1);
+    }
+
     // public function getCamposPreRegistro()
     // {
     //     return collect($this->camposPjOuPf($this->isPessoaFisica()));

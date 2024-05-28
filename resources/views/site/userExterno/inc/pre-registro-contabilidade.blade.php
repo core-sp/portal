@@ -9,7 +9,7 @@
         <span class="font-weight-bolder">Observações:</span>
         <br>
         {!! auth()->guard('contabil')->check() ? 
-            'Para alterar os dados abaixo, vá na aba "Alterar dados" do menu da esquerda.' : 
+            'Para alterar os dados abaixo, vá na aba "Alterar dados do cadastro" do menu da esquerda.' : 
             'Se registro realizado por Escritório de Contabilidade, inserir os dados solicitados abaixo, caso contrário, avançar esta etapa sem o preenchimento. <br>
             <span class="text-danger font-weight-bolder">*</span> Campos obrigatórios caso preencha CNPJ da contabilidade <br>
             Caso a contabilidade possua login no Portal, somente ela poderá alterar os dados.'

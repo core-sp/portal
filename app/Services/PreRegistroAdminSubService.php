@@ -39,6 +39,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
             'CPF / CNPJ',
             'Nome',
             'Regional',
+            'Contábil gerencia?',
             'Atualizado em:',
             'Status',
             'Ações'
@@ -55,12 +56,14 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
             if($resultado->isAprovado())
                 $acoes .= '<small class="d-block"><i class="fas fa-paperclip">&nbsp;</i><b><i>Pode anexar documentos</i></b></small>';
             $textoUser = '<span class="rounded p-1 bg' . $resultado->getLabelStatus() . ' font-weight-bolder font-italic">' . $resultado->status . '</span>';
+            $ativo = $resultado->userExterno->possuiLoginAtivo() ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times"></i>';
             $conteudo = [
                 'corDaLinha' => '<tr class="table' . $resultado->getLabelStatus() . '">',
                 $resultado->id,
-                formataCpfCnpj($resultado->userExterno->cpf_cnpj),
+                formataCpfCnpj($resultado->userExterno->cpf_cnpj) . '<small class="d-block font-weight-bolder font-italic">Conta ativa:&nbsp;&nbsp;' . $ativo . '</small>',
                 $resultado->userExterno->nome,
                 isset($resultado->idregional) ? $resultado->regional->regional : 'Sem regional no momento',
+                $resultado->gerenciadoPorContabil() ? '<i>Sim</i>' : '<i>Não</i>',
                 formataData($resultado->updated_at),
                 isset($resultado->idusuario) ? $textoUser . '<small class="d-block">Atualizado por: <strong>'.$resultado->user->nome.'</strong></small>' : $textoUser,
                 $acoes
@@ -145,13 +148,13 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
             $atendente = $dados['atendente'];
 
             return PreRegistro::with(['userExterno' => function ($query) {
-                $query->select('id', 'cpf_cnpj', 'nome');
+                $query->select('id', 'cpf_cnpj', 'nome', 'aceite', 'ativo');
             }, 'regional' => function ($query2) {
                 $query2->select('idregional', 'regional');
             }, 'user' => function ($query3) {
                 $query3->select('idusuario', 'nome');
             }])
-            ->select('id', 'updated_at', 'status', 'user_externo_id', 'idregional', 'idusuario')
+            ->select('id', 'updated_at', 'status', 'user_externo_id', 'contabil_id', 'idregional', 'idusuario')
             ->when($regional != 'Todas', function ($query) use ($regional) {
                 $query->where('idregional', $regional);
             })

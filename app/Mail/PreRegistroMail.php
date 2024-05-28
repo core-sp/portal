@@ -26,7 +26,7 @@ class PreRegistroMail extends Mailable
         $this->body .= "<br><br>";
         $this->body .= "Para remover a permissão da contabilidade, basta apagar o seu CNPJ da solicitação.";
         $this->body .= "<br><br>";
-        $this->body .= "Os anexos só serão excluídos por você ou pela contabilidade.";
+        $this->body .= "Os anexos só serão excluídos por você ou pela contabilidade. Ou serão excluídos automaticamente após ser encerrada pelo atendente a solicitação ou após muito tempo inativo.";
     }
 
     private function analiseInicial()
