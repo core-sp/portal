@@ -1536,4 +1536,8 @@ $('#doc_pre_registro').on('change',function(e){
   $(this).next('.custom-file-label').html(fileName);
 });
 
+$('.link-tab-rt').click(function(){
+	$("#accordionPreRegistro #parte_contato_rt.collapse").collapse('show');
+});
+
 // Fim da Funcionalidade Pre-Registro

@@ -88,7 +88,11 @@
                 @if(!$socio->socioRT())
                 &nbsp;&nbsp;{{ isset($socio->registro) ? formataRegistro($socio->registro) : '------' }}
                 @else
-                &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @component('components.texto_rt_pj_socios_pre_registro_admin', [
+                    'abas' => $abas,
+                    'socio' => $socio,
+                ])
+                @endcomponent
                 @endif
                 @if(array_key_exists('registro_socio_' . $socio->id, $camposEditados))
                 <span class="badge badge-danger ml-2">Campo alterado</span>
@@ -123,7 +127,11 @@
                 @if(!$socio->socioRT())
                 &nbsp;&nbsp;{{ isset($socio->nome) ? $socio->nome : '------' }}
                 @else
-                &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @component('components.texto_rt_pj_socios_pre_registro_admin', [
+                    'abas' => $abas,
+                    'socio' => $socio,
+                ])
+                @endcomponent
                 @endif
                 @if(array_key_exists('nome_socio_' . $socio->id, $camposEditados))
                 <span class="badge badge-danger ml-2">Campo alterado</span>
@@ -158,7 +166,11 @@
                 @if($socio->socioPF() && !$socio->socioRT())
                 &nbsp;&nbsp;{{ isset($socio->nome_social) ? $socio->nome_social : '------' }}
                 @else
-                &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @component('components.texto_rt_pj_socios_pre_registro_admin', [
+                    'abas' => $abas,
+                    'socio' => $socio,
+                ])
+                @endcomponent
                 @endif
                 @if(array_key_exists('nome_social_socio_' . $socio->id, $camposEditados))
                 <span class="badge badge-danger ml-2">Campo alterado</span>
@@ -193,7 +205,11 @@
                 @if($socio->socioPF() && !$socio->socioRT())
                 &nbsp;&nbsp;{{ isset($socio->dt_nascimento) ? onlyDate($socio->dt_nascimento) : '------' }}
                 @else
-                &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @component('components.texto_rt_pj_socios_pre_registro_admin', [
+                    'abas' => $abas,
+                    'socio' => $socio,
+                ])
+                @endcomponent
                 @endif
                 @if(array_key_exists('dt_nascimento_socio_' . $socio->id, $camposEditados))
                 <span class="badge badge-danger ml-2">Campo alterado</span>
@@ -228,7 +244,11 @@
                 @if($socio->socioPF() && !$socio->socioRT())
                 &nbsp;&nbsp;{{ isset($socio->identidade) ? $socio->identidade : '------' }}
                 @else
-                &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @component('components.texto_rt_pj_socios_pre_registro_admin', [
+                    'abas' => $abas,
+                    'socio' => $socio,
+                ])
+                @endcomponent
                 @endif
                 @if(array_key_exists('identidade_socio_' . $socio->id, $camposEditados))
                 <span class="badge badge-danger ml-2">Campo alterado</span>
@@ -263,7 +283,11 @@
                 @if($socio->socioPF() && !$socio->socioRT())
                 &nbsp;&nbsp;{{ isset($socio->orgao_emissor) ? $socio->orgao_emissor : '------' }}
                 @else
-                &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @component('components.texto_rt_pj_socios_pre_registro_admin', [
+                    'abas' => $abas,
+                    'socio' => $socio,
+                ])
+                @endcomponent
                 @endif
                 @if(array_key_exists('orgao_emissor_socio_' . $socio->id, $camposEditados))
                 <span class="badge badge-danger ml-2">Campo alterado</span>
@@ -298,7 +322,11 @@
                 @if(!$socio->socioRT())
                 &nbsp;&nbsp;{{ isset($socio->cep) ? $socio->cep : '------' }}
                 @else
-                &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @component('components.texto_rt_pj_socios_pre_registro_admin', [
+                    'abas' => $abas,
+                    'socio' => $socio,
+                ])
+                @endcomponent
                 @endif
                 @if(array_key_exists('cep_socio_' . $socio->id, $camposEditados))
                 <span class="badge badge-danger ml-2">Campo alterado</span>
@@ -333,7 +361,11 @@
                 @if(!$socio->socioRT())
                 &nbsp;&nbsp;{{ isset($socio->bairro) ? $socio->bairro : '------' }}
                 @else
-                &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @component('components.texto_rt_pj_socios_pre_registro_admin', [
+                    'abas' => $abas,
+                    'socio' => $socio,
+                ])
+                @endcomponent
                 @endif
                 @if(array_key_exists('bairro_socio_' . $socio->id, $camposEditados))
                 <span class="badge badge-danger ml-2">Campo alterado</span>
@@ -368,7 +400,11 @@
                 @if(!$socio->socioRT())
                 &nbsp;&nbsp;{{ isset($socio->logradouro) ? $socio->logradouro : '------' }}
                 @else
-                &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @component('components.texto_rt_pj_socios_pre_registro_admin', [
+                    'abas' => $abas,
+                    'socio' => $socio,
+                ])
+                @endcomponent
                 @endif
                 @if(array_key_exists('logradouro_socio_' . $socio->id, $camposEditados))
                 <span class="badge badge-danger ml-2">Campo alterado</span>
@@ -403,7 +439,11 @@
                 @if(!$socio->socioRT())
                 &nbsp;&nbsp;{{ isset($socio->numero) ? $socio->numero : '------' }}
                 @else
-                &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @component('components.texto_rt_pj_socios_pre_registro_admin', [
+                    'abas' => $abas,
+                    'socio' => $socio,
+                ])
+                @endcomponent
                 @endif
                 @if(array_key_exists('numero_socio_' . $socio->id, $camposEditados))
                 <span class="badge badge-danger ml-2">Campo alterado</span>
@@ -438,7 +478,11 @@
                 @if(!$socio->socioRT())
                 &nbsp;&nbsp;{{ isset($socio->complemento) ? $socio->complemento : '------' }}
                 @else
-                &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @component('components.texto_rt_pj_socios_pre_registro_admin', [
+                    'abas' => $abas,
+                    'socio' => $socio,
+                ])
+                @endcomponent
                 @endif
                 @if(array_key_exists('complemento_socio_' . $socio->id, $camposEditados))
                 <span class="badge badge-danger ml-2">Campo alterado</span>
@@ -473,7 +517,11 @@
                 @if(!$socio->socioRT())
                 &nbsp;&nbsp;{{ isset($socio->cidade) ? $socio->cidade : '------' }}
                 @else
-                &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @component('components.texto_rt_pj_socios_pre_registro_admin', [
+                    'abas' => $abas,
+                    'socio' => $socio,
+                ])
+                @endcomponent
                 @endif
                 @if(array_key_exists('cidade_socio_' . $socio->id, $camposEditados))
                 <span class="badge badge-danger ml-2">Campo alterado</span>
@@ -508,7 +556,11 @@
                 @if(!$socio->socioRT())
                 &nbsp;&nbsp;{{ isset($socio->uf) ? $socio->uf : '------' }}
                 @else
-                &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @component('components.texto_rt_pj_socios_pre_registro_admin', [
+                    'abas' => $abas,
+                    'socio' => $socio,
+                ])
+                @endcomponent
                 @endif
                 @if(array_key_exists('uf_socio_' . $socio->id, $camposEditados))
                 <span class="badge badge-danger ml-2">Campo alterado</span>
@@ -543,7 +595,11 @@
                 @if($socio->socioPF() && !$socio->socioRT())
                 &nbsp;&nbsp;{{ isset($socio->nome_mae) ? $socio->nome_mae : '------' }}
                 @else
-                &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @component('components.texto_rt_pj_socios_pre_registro_admin', [
+                    'abas' => $abas,
+                    'socio' => $socio,
+                ])
+                @endcomponent
                 @endif
                 @if(array_key_exists('nome_mae_socio_' . $socio->id, $camposEditados))
                 <span class="badge badge-danger ml-2">Campo alterado</span>
@@ -578,7 +634,11 @@
                 @if($socio->socioPF() && !$socio->socioRT())
                 &nbsp;&nbsp;{{ isset($socio->nome_pai) ? $socio->nome_pai : '------' }}
                 @else
-                &nbsp;&nbsp;<span class="text-danger"><i>{{ $socio->socioRT() ? 'Aba "' . $abas[3] . '"' : 'Não precisa' }}</i></span>
+                @component('components.texto_rt_pj_socios_pre_registro_admin', [
+                    'abas' => $abas,
+                    'socio' => $socio,
+                ])
+                @endcomponent
                 @endif
                 @if(array_key_exists('nome_pai_socio_' . $socio->id, $camposEditados))
                 <span class="badge badge-danger ml-2">Campo alterado</span>
