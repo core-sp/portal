@@ -10,12 +10,20 @@
     <div class="alert alert-light pl-0 pb-0">
     @foreach($errors->messages() as $key => $message)
         @php
+            if(strpos($key, '_socio') !== false){
+                $id_socio = preg_replace('/\D/', '', $key);
+                $n_socio = preg_replace('/\_\d/', '', $key);
+                $n_socio = textoTerminaCom($n_socio, '_socio') ? $n_socio : substr_replace($n_socio, '', strrpos($n_socio, '_'), strlen($n_socio));
+            }
             if(in_array($key, ['opcional_celular', 'opcional_celular_1']))
                 $key .= '[]';
+            $input = isset($n_socio) ? $n_socio : $key;
         @endphp
         <span>
             <button class="btn btn-sm btn-link erroPreRegistro" value="{{ $key }}">
-                <i class="fas fa-exclamation-triangle text-danger"></i>  {{ $message[0] }}
+                <i class="fas fa-exclamation-triangle text-danger"></i>&nbsp;&nbsp;
+                <strong>{{ implode(',', array_filter(data_get($codigos, '*.' . $input))) }}</strong>
+                {!! isset($id_socio) && (strlen($id_socio) > 0) ? ' <i>(ID <strong>' . $id_socio . '</strong>)</i>' : '' !!} - {{ $message[0] }}
             </button>
             <br>
         </span>

@@ -2,6 +2,7 @@
 
 use App\Permissao;
 use App\Representante;
+use Illuminate\Support\Str;
 
 function montaTabela($headers, $contents, $classes = null)
 {
@@ -998,4 +999,9 @@ function getGuardExterno($auth)
     if($auth->guard('contabil')->check())
         return 'contabil';
     return null;
+}
+
+function textoTerminaCom($texto, $string)
+{
+    return Str::endsWith($texto, $string);
 }
