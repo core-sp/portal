@@ -131,7 +131,7 @@ class AnexoTest extends TestCase
             'pre_registro_id' => 2
         ]);
 
-        Storage::disk('local')->assertMissing('userExterno/pre_registros/1/');
+        Storage::disk('local')->assertMissing('userExterno/pre_registros/2');
     }
 
     /** @test */
