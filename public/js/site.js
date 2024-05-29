@@ -2143,6 +2143,10 @@ $('#acoes_socio').on('click', '.excluir_socio', function() {
 	modalExcluirPR(null, texto, "Sócio", "o sócio");
 });
 
+$('#acoes_socio').on('click', '#link-tab-rt', function(){
+	$('.menu-registro.nav-pills a[href="#parte_contato_rt"]').tab('show');
+});
+
 $('#nacionalidade_socio').change(function(){
 	desabilitaNatSocio();
 });

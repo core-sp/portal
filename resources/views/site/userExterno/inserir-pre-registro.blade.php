@@ -194,13 +194,7 @@
 
             <!-- Tab 4 PF e Tab 5 PJ -->
             <div id="parte_canal_relacionamento" class="tab-pane container fade"><br>
-                @if(!$resultado->userPodeEditar())
-                <fieldset disabled>
-                    @include('site.userExterno.inc.pre-registro-canal-relacionamento', ['nome_campos' => $codigos[5], 'classe' => $classes[4]])
-                </fieldset>
-                @else
-                    @include('site.userExterno.inc.pre-registro-canal-relacionamento', ['nome_campos' => $codigos[5], 'classe' => $classes[4]])
-                @endif
+                @include('site.userExterno.inc.pre-registro-canal-relacionamento', ['nome_campos' => $codigos[5], 'classe' => $classes[4]])
             </div>
 
             <!-- Tab 5 PF e Tab 6 PJ -->

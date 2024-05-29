@@ -1486,7 +1486,7 @@ class SocioTest extends TestCase
         $this->assertStringContainsString('<div id="socio_'. $socio->id .'_box">', 
         $response->getOriginalContent()['resultado']['tab']);
 
-        $this->assertStringContainsString('<p class="text-danger mb-2"><strong><i>Dados do Responsável Técnico na aba "Contato / RT", em "Sócios" somente dados complementares.</i></strong></p>', 
+        $this->assertStringContainsString('<p class="text-danger mb-2"><strong><i>Dados do Responsável Técnico na <button class="btn btn-link font-italic m-0 p-0" type="button" id="link-tab-rt">aba "Contato / RT"</button>, em "Sócios" somente dados complementares.</i></strong></p>', 
         $response->getOriginalContent()['resultado']['tab']);
 
         $this->assertStringContainsString('<span class="label_naturalidade_estado bold">Naturalidade:</span> <span class="naturalidade_estado_socio editar_dado">'. $socio->naturalidade_estado .'</span></span>', 
@@ -4281,7 +4281,7 @@ class SocioTest extends TestCase
         $this->assertStringContainsString('<div id="socio_'. $socio->id .'_box">', 
         $response->getOriginalContent()['resultado']['tab']);
 
-        $this->assertStringContainsString('<p class="text-danger mb-2"><strong><i>Dados do Responsável Técnico na aba "Contato / RT", em "Sócios" somente dados complementares.</i></strong></p>', 
+        $this->assertStringContainsString('<p class="text-danger mb-2"><strong><i>Dados do Responsável Técnico na <button class="btn btn-link font-italic m-0 p-0" type="button" id="link-tab-rt">aba "Contato / RT"</button>, em "Sócios" somente dados complementares.</i></strong></p>', 
         $response->getOriginalContent()['resultado']['tab']);
 
         $this->assertStringContainsString('<span class="label_naturalidade_estado bold">Naturalidade:</span> <span class="naturalidade_estado_socio editar_dado">'. $socio->naturalidade_estado .'</span></span>', 

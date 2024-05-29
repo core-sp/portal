@@ -215,6 +215,7 @@ class Socio extends Model
         $inicio = '<span class="p-1 mr-2 mb-2">';
         $final = '</span>';
         $cpf_cnpj_txt = $this->socioPF() ? 'CPF' : 'CNPJ';
+        $btn_rt = '<button class="btn btn-link font-italic m-0 p-0" type="button" id="link-tab-rt">aba "Contato / RT"</button>';
         
         $texto = '<div id="socio_' . $this->id .'_box">';
         $texto .= '<button type="button" class="btn btn-primary btn-sm btn-block mt-3" data-toggle="collapse" data-target="#socio_'. $this->id .'">';
@@ -225,7 +226,7 @@ class Socio extends Model
         $texto .= '<div id="socio_'.$this->id . '" class="collapse border border-top-0 border-secondary p-2 dados_socio">';
 
         if($this->socioRT())
-            $texto .= '<p class="text-danger mb-2"><strong><i>Dados do Responsável Técnico na aba "Contato / RT", em "Sócios" somente dados complementares.</i></strong></p>';
+            $texto .= '<p class="text-danger mb-2"><strong><i>Dados do Responsável Técnico na ' . $btn_rt . ', em "Sócios" somente dados complementares.</i></strong></p>';
 
         // ID
         $texto .= $inicio;

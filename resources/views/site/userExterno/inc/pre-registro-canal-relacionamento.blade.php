@@ -52,6 +52,10 @@
     </div>
 </fieldset>
 
+@if(!$resultado->userPodeEditar())
+<fieldset disabled>
+@endif
+
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
         <label for="email_pre">E-mail <span class="text-danger">*</span></label>
@@ -218,3 +222,7 @@
         </div>
     </div>
 </fieldset>
+
+@if(!$resultado->userPodeEditar())
+</fieldset>
+@endif
