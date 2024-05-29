@@ -359,7 +359,7 @@ class PreRegistro extends Model
                 break;
             case self::STATUS_APROVADO:
                 $cor = 'success';
-                $texto = 'O formulário foi aprovado pelo atendente e estará disponível o boleto para pagamento';
+                $texto = 'O formulário foi aprovado pelo atendente e estará disponível os documentos para finalizar';
                 break;
             case self::STATUS_NEGADO:
                 $cor = 'danger';
