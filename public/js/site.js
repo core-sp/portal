@@ -1431,6 +1431,8 @@ function putDadosPreRegistro(objeto)
 		cache: false,
 		timeout: 60000,
 		success: function(response) {
+			if(campo == undefined)
+				campo = '';
 			$("#modalLoadingPreRegistro").modal('hide');
 			if(arrayEndereco.indexOf(campo) != -1)
 				confereEnderecoEmpresa(response['resultado']);
