@@ -231,8 +231,7 @@ class UserExternoSiteController extends Controller
             abort(404, 'Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.');
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
-            abort(500, 'Erro ao salvar os dados da solicitação de registro via ajax');
+            in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : abort(500, $e->getMessage());
         }
         
         return response()->json($dados);

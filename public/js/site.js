@@ -1280,12 +1280,13 @@ async function getEndereco(id)
 // ----------------------------------------------------------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------------------------------------------------------
+// Funcionalidade Solicitação de Registro (Pré-registro)
+
 // Campo file dinâmico
 
 // Confere se o ultimo input file está vazio 
 function arquivoVazio(nome){
-	if($(nome + " .custom-file-input:last").val().length == 0)
-		return true;
+	return $(nome + " .custom-file-input:last").val().length == 0;
 }
 
 function addArquivo(nome){
@@ -1293,7 +1294,7 @@ function addArquivo(nome){
 		return false;
 		
 	var total = $(".Arquivo_" + nome).length + $(".ArquivoBD_" + nome).length;
-	var total_files = 1 ;
+	var total_files = 1;
 
 	if(($(".ArquivoBD_" + nome).length < total_files) && ($(".Arquivo_" + nome).css("display") == "none")){ //quando usa o hide
 		$(".Arquivo_" + nome).show();
@@ -1355,64 +1356,92 @@ function appendArquivoBD(finalLink, nome, valor, id, totalFiles)
 	cloneBD.find(".Arquivo-Download").attr("href", link + 'download/' + id);
 	cloneBD.find(".modalExcluir").val(id);
 
-	if((total == 1) && (cloneBD.css("display") == "none"))
-		cloneBD.show();
-	else
-		$(".ArquivoBD_" + nome + ':last').after(cloneBD);
-
+	(total == 1) && (cloneBD.css("display") == "none") ? cloneBD.show() : $(".ArquivoBD_" + nome + ':last').after(cloneBD);
 	limparFile(nome, totalFiles);
 }
 // ----------------------------------------------------------------------------------------------------------------------------
 
 //	--------------------------------------------------------------------------------------------------------
-// Funcionalidade Solicitação de Registro (Pré-registro)
 
-function putDadosPreRegistro(objeto)
-{
+const putDadosPR = new Object();
+
+function popObjetoPutDados(objeto){
 	var classesObjeto = objeto.attr("class");
-	var classe = classesObjeto.split(' ')[0];
-	var campo = objeto.attr("name");
-	var valor = campo == 'path' ? objeto[0].files : objeto.val();
-	var cT = campo == 'path' ? false : 'application/x-www-form-urlencoded';
-	var pD = campo == 'path' ? false : true;
-	var frmData = new FormData();
-	var dados = null;
-	var arrayEndereco = ['cep', 'logradouro', 'numero', 'complemento', 'cidade', 'uf'];
 	var contabil_editar_id = $('#contabil_editar_pr').length > 0 ? $('#contabil_editar_pr').val() : null;
 	var link_post = '';
 	var link_delete = '';
+	var frmData = new FormData();
 
-	if(campo == 'path'){
-		for(var i = 0; i < valor.length; i++)
-			frmData.append("valor[]", valor[i]);
-		frmData.append('campo', campo);
-		frmData.append('classe', classe);
+	putDadosPR.classe = classesObjeto.split(' ')[0];
+	putDadosPR.campo = objeto.attr("name");
+	putDadosPR.valor = putDadosPR.campo == 'path' ? objeto[0].files : objeto.val();
+	putDadosPR.cT = putDadosPR.campo == 'path' ? false : 'application/x-www-form-urlencoded';
+	putDadosPR.pD = putDadosPR.campo != 'path';
+	putDadosPR.dados = null;
+	
+	if(putDadosPR.campo == 'path'){
+		for(var i = 0; i < putDadosPR.valor.length; i++)
+			frmData.append("valor[]", putDadosPR.valor[i]);
+		frmData.append('campo', putDadosPR.campo);
+		frmData.append('classe', putDadosPR.classe);
 	}
 
-	if((campo == "") || (classe == ""))
+	if((putDadosPR.campo == "") || (putDadosPR.classe == ""))
 		return;
 
-	if(classe == 'Socio-Excluir'){
-		classe = 'pessoaJuridica.socios';
-		campo = 'cpf_cnpj_socio';
+	if(putDadosPR.classe == 'Socio-Excluir'){
+		putDadosPR.classe = 'pessoaJuridica.socios';
+		putDadosPR.campo = 'cpf_cnpj_socio';
 	}
 
-	if(classe == 'Arquivo-Excluir')
-		dados = {
+	if(putDadosPR.classe == 'Arquivo-Excluir')
+		putDadosPR.dados = {
 			'_method': 'delete',
-			'id': valor
+			'id': putDadosPR.valor
 		};
 	else
-		dados = {
-			'id_socio': classe == 'pessoaJuridica.socios' ? $('#form_socio [name="id_socio"]').val() : null,
-			'classe': classe,
-			'campo': campo,
-			'valor': valor
+		putDadosPR.dados = {
+			'id_socio': putDadosPR.classe == 'pessoaJuridica.socios' ? $('#form_socio [name="id_socio"]').val() : null,
+			'classe': putDadosPR.classe,
+			'campo': putDadosPR.campo,
+			'valor': putDadosPR.valor
 		};
 
 	link_post = contabil_editar_id != null ? '/externo/inserir-registro-ajax/' + contabil_editar_id : '/externo/inserir-registro-ajax';
-	link_delete = (contabil_editar_id != null) && (classe == 'Arquivo-Excluir') ? 
-	'/externo/pre-registro-anexo/excluir/' + dados.id + '/' + contabil_editar_id : '/externo/pre-registro-anexo/excluir/' + dados.id;
+	link_delete = (contabil_editar_id != null) && (putDadosPR.classe == 'Arquivo-Excluir') ? 
+	'/externo/pre-registro-anexo/excluir/' + putDadosPR.dados.id + '/' + contabil_editar_id : '/externo/pre-registro-anexo/excluir/' + putDadosPR.dados.id;
+
+	putDadosPR.data = putDadosPR.campo == 'path' ? frmData : putDadosPR.dados;
+	putDadosPR.url = putDadosPR.classe == 'Arquivo-Excluir' ? link_delete : link_post;
+}
+
+function acoesAposSucesso(response){
+	if(putDadosPR.campo == undefined)
+		putDadosPR.campo = '';
+
+	$("#modalLoadingPreRegistro").modal('hide');
+
+	if(['cep', 'logradouro', 'numero', 'complemento', 'cidade', 'uf'].indexOf(putDadosPR.campo) != -1)
+		confereEnderecoEmpresa(response['resultado']);
+	if(putDadosPR.campo == 'cpf_rt')
+		preencheRT(response['resultado']);
+	if(putDadosPR.campo == 'cnpj_contabil')
+		preencheContabil(response['resultado']);
+	else if(putDadosPR.campo.includes('_contabil'))
+		preencheCanalContabil(putDadosPR.campo);
+	if(putDadosPR.campo == 'path')
+		preencheFile(response['resultado']);
+	if(putDadosPR.classe == 'Arquivo-Excluir')
+		removeFile(response['resultado']);
+	if(putDadosPR.classe == 'pessoaJuridica.socios'){
+		removeSocio(response['resultado'], $('#form_socio [name="id_socio"]').val());
+		preencheSocio(response['resultado'], putDadosPR.campo, putDadosPR.valor);
+	}
+}
+
+function putDadosPreRegistro(objeto)
+{
+	popObjetoPutDados(objeto);
 
 	$("#modalLoadingBody").html('<i class="spinner-border text-info"></i> Salvando');
 	$('#modalLoadingPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
@@ -1423,40 +1452,22 @@ function putDadosPreRegistro(objeto)
 		headers: {
 			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 		},
-		data: campo == 'path' ? frmData : dados,
+		data: putDadosPR.data,
 		dataType: 'json',
-		url: classe == 'Arquivo-Excluir' ? link_delete : link_post,
-		processData: pD,
-        contentType: cT,
+		url: putDadosPR.url,
+		processData: putDadosPR.pD,
+        contentType: putDadosPR.cT,
 		cache: false,
 		timeout: 60000,
 		success: function(response) {
-			if(campo == undefined)
-				campo = '';
-			$("#modalLoadingPreRegistro").modal('hide');
-			if(arrayEndereco.indexOf(campo) != -1)
-				confereEnderecoEmpresa(response['resultado']);
-			if(campo == 'cpf_rt')
-				preencheRT(response['resultado']);
-			if(campo == 'cnpj_contabil')
-				preencheContabil(response['resultado']);
-			else if(campo.includes('_contabil'))
-				preencheCanalContabil(campo);
-			if(campo == 'path')
-				preencheFile(response['resultado']);
-			if(classe == 'Arquivo-Excluir')
-				removeFile(response['resultado']);
-			if(classe == 'pessoaJuridica.socios'){
-				removeSocio(response['resultado'], $('#form_socio [name="id_socio"]').val());
-				preencheSocio(response['resultado'], campo, valor);
-			}
-			removerMsgErroServer(objeto, campo, campo.indexOf('_socio') >= 0 ? dados : null);
+			acoesAposSucesso(response);
+			removerMsgErroServer(objeto);
 			$('#atualizacaoPreRegistro').text(response['dt_atualizado']);
-			valorPreRegistro = valor;
+			valorPreRegistro = putDadosPR.valor;
 			// confereObrigatorios();
 		},
 		error: function(request, status, error) {
-			if(campo == 'cpf_cnpj_socio')
+			if(putDadosPR.campo == 'cpf_cnpj_socio')
 				$('#mostrar_socios').click();
 
 			var errorFunction = getErrorMsg(request);
@@ -1471,26 +1482,27 @@ function putDadosPreRegistro(objeto)
 	});
 }
 
-function removerMsgErroServer(objeto, campo, dadosSocio = null)
+function removerMsgErroServer(objeto)
 {
 	var endEmpresa = '.erroPreRegistro[value="cep_empresa"], .erroPreRegistro[value="bairro_empresa"], ';
 	endEmpresa += '.erroPreRegistro[value="logradouro_empresa"], .erroPreRegistro[value="numero_empresa"], ';
 	endEmpresa += '.erroPreRegistro[value="complemento_empresa"], .erroPreRegistro[value="cidade_empresa"], .erroPreRegistro[value="uf_empresa"]';
+	var dadosSocio = putDadosPR.campo.indexOf('_socio') >= 0 ? putDadosPR.dados : null;
 
-	if((campo.indexOf('_socio') >= 0) && (dadosSocio !== null)){
-		if($('.erroPreRegistro[value="' + campo + '_' + dadosSocio.id_socio + '"]').length > 0)
-			$('.erroPreRegistro[value="' + campo + '_' + dadosSocio.id_socio + '"]').parent().remove();
+	if((putDadosPR.campo.indexOf('_socio') >= 0) && (dadosSocio !== null)){
+		if($('.erroPreRegistro[value="' + putDadosPR.campo + '_' + dadosSocio.id_socio + '"]').length > 0)
+			$('.erroPreRegistro[value="' + putDadosPR.campo + '_' + dadosSocio.id_socio + '"]').parent().remove();
 	}else{
 		// remove mensagem de validação do servidor
 		if(objeto.next().hasClass('invalid-feedback'))
 			objeto.removeClass('is-invalid').next().remove();
-		if($('.erroPreRegistro[value="' + campo + '"]').length > 0)
-			$('.erroPreRegistro[value="' + campo + '"]').parent().remove();
+		if($('.erroPreRegistro[value="' + putDadosPR.campo + '"]').length > 0)
+			$('.erroPreRegistro[value="' + putDadosPR.campo + '"]').parent().remove();
 	}
 
 	if(($('.erroPreRegistro').length == 0) && ($('#erroPreRegistro').length == 1))
 		$('#erroPreRegistro').remove();
-	if(campo == 'checkEndEmpresa')
+	if(putDadosPR.campo == 'checkEndEmpresa')
 		$(endEmpresa).parent().remove();
 }
 
@@ -1508,7 +1520,7 @@ function getErrorMsg(request)
 		}
 		time = 3000;
 	}
-	if(request.status == 401){
+	if((request.status == 401) || (request.status == 500)){
 		errorMessage = request.responseJSON.message;
 		time = 3000;
 	}
@@ -1528,13 +1540,10 @@ function confereEnderecoEmpresa(boolMesmoEndereco)
 {
 	if(boolMesmoEndereco === null)
 		return;
-	if(boolMesmoEndereco){
-		$('#checkEndEmpresa').prop('checked', true);
-		$("#habilitarEndEmpresa").prop('disabled', true).hide();
-	}else{
-		$('#checkEndEmpresa').prop('checked', false);
-		$("#habilitarEndEmpresa").prop('disabled', false).show();
-	}
+
+	$('#checkEndEmpresa').prop('checked', boolMesmoEndereco);
+	$("#habilitarEndEmpresa").prop('disabled', boolMesmoEndereco);
+	boolMesmoEndereco ? $("#habilitarEndEmpresa").hide() : $("#habilitarEndEmpresa").show();
 }
 
 function preencheContabil(dados)
@@ -1545,6 +1554,8 @@ function preencheContabil(dados)
 		$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
 		setTimeout(function() {
 			$("#modalLoadingPreRegistro").modal('hide');
+			$('#inserirRegistro input[name="cnpj_contabil"]').val('');
+			valorPreRegistro = null;
 		}, 2500);
 	}else{
 		if($('#inserirRegistro input[name="cnpj_contabil"]').val() == ""){
@@ -1607,6 +1618,8 @@ function preencheRT(dados)
 		$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
 		setTimeout(function() {
 			$("#modalLoadingPreRegistro").modal('hide');
+			$('#inserirRegistro input[name="cpf_rt"]').val('');
+			valorPreRegistro = null;
 		}, 2500);
 	}else{
 		if(sem_cpf){
@@ -1765,20 +1778,17 @@ function avancarVoltarDisabled(ativado, ordemMenu)
 
 function avancarVoltarPreRegistro(tipo, ativado, ordemMenu)
 {	
-	if(tipo == 'voltarPreRegistro')
-		if(ativado != 0){
-			var novoAtivado = ativado - 1;
-			$('.menu-registro.nav-pills li:eq(' + novoAtivado + ') a').tab('show').focus();
-			return novoAtivado;
-		}
-	if(tipo == 'avancarPreRegistro')
-		if(ativado != (ordemMenu.length - 1)){
-			var novoAtivado = ativado + 1;
-			$('.menu-registro.nav-pills li:eq(' + novoAtivado + ') a').tab('show').focus();
-			return novoAtivado;
-		}
+	var novoAtivado = ativado;
+
+	if((tipo == 'voltarPreRegistro') && (ativado != 0))
+		novoAtivado = ativado - 1;
+	else if((tipo == 'avancarPreRegistro') && (ativado != (ordemMenu.length - 1)))
+		novoAtivado = ativado + 1;
 	
-	return ativado;
+	if(novoAtivado != ativado)
+		$('.menu-registro.nav-pills li:eq(' + novoAtivado + ') a').tab('show').focus();
+
+	return novoAtivado;
 }
 
 // function confereObrigatorios()
@@ -1800,17 +1810,10 @@ function avancarVoltarPreRegistro(tipo, ativado, ordemMenu)
 function disabledOptionsSelect(name, valor)
 {
 	if(name == 'nacionalidade')
-		valor != 'Brasileira' ? 
-		$('#inserirRegistro input[name="naturalidade_cidade"], #inserirRegistro select[name="naturalidade_estado"]').prop("disabled", true) : 
-		$('#inserirRegistro input[name="naturalidade_cidade"], #inserirRegistro select[name="naturalidade_estado"]').prop("disabled", false);
+		$('#inserirRegistro input[name="naturalidade_cidade"], #inserirRegistro select[name="naturalidade_estado"]').prop("disabled", (valor != 'Brasileira'));
 
-	if(name == 'tipo_telefone')
-		valor != 'Celular' ? $('#inserirRegistro #opcoesCelular').prop("disabled", true) : 
-		$('#inserirRegistro #opcoesCelular').prop("disabled", false);
-
-	if(name == 'tipo_telefone_1')
-		valor != 'Celular' ? $('#inserirRegistro #opcoesCelular_1').prop("disabled", true) : 
-		$('#inserirRegistro #opcoesCelular_1').prop("disabled", false);
+	if((name == 'tipo_telefone') || (name == 'tipo_telefone_1'))
+		$('#inserirRegistro #opcoesCelular' + name.replace('tipo_telefone', '')).prop("disabled", (valor != 'Celular'));
 }
 
 function desabilitaNatSocio(){
@@ -1899,11 +1902,8 @@ $('#voltarPreRegistro, #avancarPreRegistro, .menu-registro .nav-link').click(fun
 	$('.menu-registro .nav-link').each(function(){
 		ordemMenu.push($(this).text().trim());
 	});
-	var ativoAntes = 0;
-	if($(this).hasClass('nav-link'))
-		ativoAntes = ordemMenu.indexOf($(this).text().trim());
-	else
-		ativoAntes = ordemMenu.indexOf($('.menu-registro .active').text().trim());
+
+	var ativoAntes = $(this).hasClass('nav-link') ? ordemMenu.indexOf($(this).text().trim()) : ordemMenu.indexOf($('.menu-registro .active').text().trim());
 	var ativoDepois = avancarVoltarPreRegistro(this.id, ativoAntes, ordemMenu);
 	avancarVoltarDisabled(ativoDepois, ordemMenu);
 	
@@ -1926,7 +1926,7 @@ $("#checkRT_socio").change(function(){
 
 $('#inserirRegistro .modalExcluir').click(function(){
 	var id = $(this).val();
-	var texto = $(this).parent().parent().find("input").val();
+	var texto = $(this).parents("[class^='ArquivoBD_']").find('input').val();
 	modalExcluirPR(id, texto, "Arquivo", "o anexo");
 });
 
@@ -1936,7 +1936,7 @@ $('#modalExcluir #excluir-geral').click(function(e){
 });
 
 // gerencia os arquivos, cria os inputs, remove os inputs, controla as quantidades de inputs e files vindo do bd
-var pre_registro_total_files = $('#totalFilesServer').length ? $('#totalFilesServer').val() : 0;
+const pre_registro_total_files = $('#totalFilesServer').length ? $('#totalFilesServer').val() : 0;
 
 // ao carregar a pagina, verifica se possui o limite maximo de arquivos permitidos, caso sim, ele impede de adicionar mais
 $('form #inserirRegistro').ready(function(){
@@ -1961,8 +1961,8 @@ $("#inserirRegistro .files").on("change", function() {
 	$(this).parent().remove("div .invalid-feedback");
 
 	// procedimento para recuperar a classe e adicionar o final do nome para o método de add input
-	var nomeClasse = $(this).parent().parent().parent().parent().attr('class');
-	var nome = nomeClasse.slice(nomeClasse.indexOf('_') + 1);
+	var nomeClasse = $(this).parents("[class^='Arquivo_']").attr('class');
+	var nome = nomeClasse.replace('Arquivo_', '');
 	addArquivo(nome);
 });
 
