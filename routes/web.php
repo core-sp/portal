@@ -442,6 +442,19 @@ Route::middleware(['block_ip'])->group(function () {
     Route::get('/carta-de-servicos-ao-usuario/buscar', 'GerarTextoController@buscar')->name('carta-servicos-buscar');
     Route::get('/carta-de-servicos-ao-usuario/{id?}', 'GerarTextoController@show')->name('carta-servicos');
 
+    // TESTE APIS GERENTI ====================================================================================================
+    Route::prefix('teste-apis-gerenti')->group(function(){
+      Route::get('/', 'SiteController@testeApis');
+      Route::post('/api-simulador', 'SiteController@testeApis')->name('api-simulador');
+      Route::get('/api-tipos-contatos', 'SiteController@testeApis')->name('api-tipos-contatos');
+      Route::get('/api-contatos', 'SiteController@testeApis')->name('api-contatos');
+      Route::get('/api-enderecos', 'SiteController@testeApis')->name('api-enderecos');
+      Route::get('/api-extrato', 'SiteController@testeApis')->name('api-extrato');
+      Route::get('/api-segmentos', 'SiteController@testeApis')->name('api-segmentos');
+      Route::get('/api-dados-representante', 'SiteController@testeApis')->name('api-dados-representante');
+    });
+    // =======================================================================================================================
+
     // Páginas (deve ser inserido no final do arquivo de rotas)
     Route::get('{slug}', 'PaginaController@show')->name('paginas.site');
   });

@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Repositories\CompromissoRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 use App\Contracts\MediadorServiceInterface;
+use App\Repositories\GerentiApiRepository;
+use Carbon\Carbon;
 
 class SiteController extends Controller
 {
@@ -109,5 +111,51 @@ class SiteController extends Controller
         $resultados = $this->compromissoRepository->getByData(date('Y-m-d', strtotime($data)));
 
         return view('site.agenda-institucional', compact('resultados', 'data'));
+    }
+
+    public function testeApis(GerentiApiRepository $apiGerenti, Request $request)
+    {
+        $dados = [];
+        $message = '';
+
+        if(\Route::is('api-simulador')){
+            $tipoAssociado = (int) $request->tipoAssociado;
+            $dataInicio = Carbon::create($request->dataInicio)->toISOString();
+            $capitalSocial = $tipoAssociado == 1 ? (float) str_replace(',', '.', str_replace('.', '', $request->capitalSocial)) : 0;
+            $message = 'API - Simulador';
+            $dados = $apiGerenti->gerentiSimulador($tipoAssociado, $dataInicio, $capitalSocial);
+        }
+
+        if(\Route::is('api-tipos-contatos')){
+            $message = 'API - Tipos Contatos';
+            $dados = $apiGerenti->gerentiTiposContatos();
+        }
+
+        if(\Route::is('api-contatos')){
+            $message = 'API - Contatos Representante';
+            $dados = $apiGerenti->gerentiGetContatos((int) $request->ass_id, $request->tipo);
+        }
+
+        if(\Route::is('api-enderecos')){
+            $message = 'API - Endereços Representante';
+            $dados = $apiGerenti->gerentiGetEnderecos((int) $request->ass_id);
+        }
+
+        if(\Route::is('api-extrato')){
+            $message = 'API - Extrato Representante';
+            $dados = ['data' => $apiGerenti->gerentiGetExtrato((int) $request->ass_id)];
+        }
+
+        if(\Route::is('api-segmentos')){
+            $message = 'API - Segmentos';
+            $dados = $apiGerenti->gerentiSegmentos();
+        }
+
+        if(\Route::is('api-dados-representante')){
+            $message = 'API - Dados do Representante';
+            $dados = $apiGerenti->gerentiDadosRepresentante((int) $request->ass_id);
+        }
+
+        return view('site.teste-apis-gerenti', compact('dados', 'message'));
     }
 }

@@ -72,4 +72,124 @@ class GerentiApiRepository
 
         return json_decode($response->getBody()->getContents(), true);
     }
+
+    // API do GERENTI usada para serviço de Simulador
+    public function gerentiSimulador($tipoAssociado = 1, $dataInicio = null, $capitalSocial = 0)
+    {
+        $this->generateToken();
+
+        $client = new Client();
+
+        $response =  $client->request('POST', env('GERENTI_API_BASE_URL') . '/api/v1/simulacao', [
+            'json' => [
+                'tipoAssociado' => $tipoAssociado,
+                'dataInicio' => !isset($dataInicio) ? now()->toISOString() : $dataInicio,
+                'capitalSocial' => $capitalSocial,
+            ],
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->bearerToken
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    // API do GERENTI usada para serviço de Tipos de Contatos
+    public function gerentiTiposContatos()
+    {
+        $this->generateToken();
+
+        $client = new Client();
+
+        $response =  $client->request('GET', env('GERENTI_API_BASE_URL') . '/api/v1/representantes/tiposdecontato', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->bearerToken
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    // API do GERENTI usada para serviço de Contatos do Representante
+    public function gerentiGetContatos($ass_id, $tipo = null)
+    {
+        $this->generateToken();
+
+        $client = new Client();
+
+        $response =  $client->request('GET', env('GERENTI_API_BASE_URL') . '/api/v1/representantes/' . $ass_id . '/contatos', [
+            'json' => [
+                'tipo' => $tipo,
+            ],
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->bearerToken
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    // API do GERENTI usada para serviço de Endereços do Representante
+    public function gerentiGetEnderecos($ass_id)
+    {
+        $this->generateToken();
+
+        $client = new Client();
+
+        $response =  $client->request('GET', env('GERENTI_API_BASE_URL') . '/api/v1/representantes/' . $ass_id . '/enderecos', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->bearerToken
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    // API do GERENTI usada para serviço de Extratos do Representante
+    public function gerentiGetExtrato($ass_id)
+    {
+        $this->generateToken();
+
+        $client = new Client();
+
+        $response =  $client->request('GET', env('GERENTI_API_BASE_URL') . '/api/v1/representantes/' . $ass_id . '/extrato', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->bearerToken
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    // API do GERENTI usada para serviço de Segmentos
+    public function gerentiSegmentos()
+    {
+        $this->generateToken();
+
+        $client = new Client();
+
+        $response =  $client->request('GET', env('GERENTI_API_BASE_URL') . '/api/v1/representantes/segmentos', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->bearerToken
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    // API do GERENTI usada para serviço de Dados do Representante
+    public function gerentiDadosRepresentante($ass_id)
+    {
+        $this->generateToken();
+
+        $client = new Client();
+
+        $response =  $client->request('GET', env('GERENTI_API_BASE_URL') . '/api/v1/representantes/' . $ass_id . '/dados', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->bearerToken
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
 }
