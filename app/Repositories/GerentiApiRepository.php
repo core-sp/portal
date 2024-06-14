@@ -116,11 +116,9 @@ class GerentiApiRepository
         $this->generateToken();
 
         $client = new Client();
+        $query = isset($tipo) ? '?tipo=' . $tipo : '';
 
-        $response =  $client->request('GET', env('GERENTI_API_BASE_URL') . '/api/v1/representantes/' . $ass_id . '/contatos', [
-            'json' => [
-                'tipo' => $tipo,
-            ],
+        $response =  $client->request('GET', env('GERENTI_API_BASE_URL') . '/api/v1/representantes/' . $ass_id . '/contatos' . $query, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->bearerToken
             ]
@@ -185,6 +183,43 @@ class GerentiApiRepository
         $client = new Client();
 
         $response =  $client->request('GET', env('GERENTI_API_BASE_URL') . '/api/v1/representantes/' . $ass_id . '/dados', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->bearerToken
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    // API do GERENTI usada para serviço de Representante Registrado
+    public function gerentiRepresentanteRegistrado($registro, $cpf_cnpj, $email)
+    {
+        $this->generateToken();
+
+        $client = new Client();
+
+        $response =  $client->request('POST', env('GERENTI_API_BASE_URL') . '/api/v1/representantes/registrar', [
+            'json' => [
+                'registro' => apenasNumeros($registro),
+                'cpf_cnpj' => apenasNumeros($cpf_cnpj),
+                'email' => $email,
+            ],
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->bearerToken
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    // API do GERENTI usada para serviço de Validar Representante
+    public function gerentiValidarRepresentante($ass_id)
+    {
+        $this->generateToken();
+
+        $client = new Client();
+
+        $response =  $client->request('GET', env('GERENTI_API_BASE_URL') . '/api/v1/representantes/' . $ass_id . '/validar', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->bearerToken
             ]

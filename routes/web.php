@@ -452,6 +452,8 @@ Route::middleware(['block_ip'])->group(function () {
       Route::get('/api-extrato', 'SiteController@testeApis')->name('api-extrato');
       Route::get('/api-segmentos', 'SiteController@testeApis')->name('api-segmentos');
       Route::get('/api-dados-representante', 'SiteController@testeApis')->name('api-dados-representante');
+      Route::post('/api-representante-registrado', 'SiteController@testeApis')->name('api-representante-registrado');
+      Route::get('/api-validar-representante', 'SiteController@testeApis')->name('api-validar-representante');
     });
     // =======================================================================================================================
 

@@ -156,6 +156,16 @@ class SiteController extends Controller
             $dados = $apiGerenti->gerentiDadosRepresentante((int) $request->ass_id);
         }
 
+        if(\Route::is('api-representante-registrado')){
+            $message = 'API - Representante Registrado';
+            $dados = $apiGerenti->gerentiRepresentanteRegistrado($request->registro, $request->cpf_cnpj, $request->email);
+        }
+
+        if(\Route::is('api-validar-representante')){
+            $message = 'API - Validar Representante';
+            $dados = $apiGerenti->gerentiValidarRepresentante((int) $request->ass_id);
+        }
+
         return view('site.teste-apis-gerenti', compact('dados', 'message'));
     }
 }

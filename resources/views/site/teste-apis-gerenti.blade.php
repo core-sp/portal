@@ -22,6 +22,36 @@
 
 <section id="pagina-busca">
   <div class="container">
+    <p class="bold text-danger mb-2">!!!!!!!!! Resultado no final da página !!!!!!!!!!!!!!!</p>
+
+    <!-- REPRESENTANTE REGISTRADO -->
+    <div class="row">
+      <div class="col">
+
+        <h3 class="text-success">REPRESENTANTE REGISTRADO (retorna ass_id usado na maioria dos endpoints)</h3>
+        <form method="post" action="{{ route('api-representante-registrado') }}" class="w-100 simulador">
+          @csrf
+          <div class="form-row">
+            <div class="col-sm mb-2-576">
+              <label for="registro">REGISTRO do Representante</label>
+              <input type="text" name="registro" class="form-control" />
+            </div>
+            <div class="col-sm mb-2-576">
+              <label for="cpf_cnpj">CPF / CNPJ do Representante</label>
+              <input type="text" name="cpf_cnpj" class="form-control" />
+            </div>
+            <div class="col-sm mb-2-576">
+              <label for="email">E-MAIL do Representante</label>
+              <input type="text" name="email" class="form-control" />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm mt-2">Recuperar ass_id</button>
+        </form>
+      </div>
+    </div>
+    <!-- ===================================================================================================== -->
+
+    <hr>
 
     <!-- SIMULADOR -->
     <div class="row">
@@ -160,6 +190,26 @@
 
     <hr>
 
+    <!-- VALIDAR REPRESENTANTE -->
+    <div class="row">
+      <div class="col">
+
+        <h3 class="text-success">VALIDAR REPRESENTANTE (se representante pode utilizar os serviços)</h3>
+        <form method="get" action="{{ route('api-validar-representante') }}" class="w-100 simulador">
+          <div class="form-row">
+            <div class="col-sm mb-2-576">
+              <label for="ass_id">ASS ID do Representante</label>
+              <input type="text" name="ass_id" class="form-control" />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm mt-2">Recuperar validação</button>
+        </form>
+      </div>
+    </div>
+    <!-- ===================================================================================================== -->
+
+    <hr>
+
     <!-- DADOS DO REPRESENTANTE -->
     <div class="row">
       <div class="col">
@@ -178,10 +228,16 @@
     </div>
     <!-- ===================================================================================================== -->
 
+    <hr>
+
+    <!-- RESULTADO =========================================================================================== -->
+
     @if(isset($dados) && count($dados) > 0)
     <div class="row">
       <div class="col">
         <h4 class="mt-2 mb-2 text-danger">RESULTADO - {{ isset($dados['message']) && (strlen($dados['message']) > 0) ? $dados['message'] : $message }}</h4>
+
+        <h5 class="mb-2">Chave: Success - {{ isset($dados['success']) && $dados['success'] ? 'true' : 'não tem a chave ou retorno false' }}</h5>
         
         @if(isset($dados['data']))
 
@@ -189,8 +245,14 @@
             <h5>Chave: {{ $key }}</h5>
             @if(!is_array($dado) && ($dado != strip_tags($dado)))
               <p>{!! $dado !!}</p>
+            @elseif(is_array($dado))
+              <p>
+                <pre>{{ json_encode($dado, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) }}</pre>
+              </p>
+            @elseif(is_bool($dado))
+              <p>{{ $dado ? 'true' : 'false' }}</p>
             @else
-              <p>{{ is_array($dado) ? json_encode($dado, JSON_UNESCAPED_UNICODE) : $dado }}</p>
+              <p>{{ $dado }}</p>
             @endif
             <br>
           @endforeach
