@@ -7,6 +7,7 @@ use App\GerarTexto;
 use App\Events\CrudEvent;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Arr;
 
 class GerarTextoService implements GerarTextoServiceInterface {
 
@@ -21,6 +22,11 @@ class GerarTextoService implements GerarTextoServiceInterface {
             'pluraliza' => 'texto',
             'form' => 'texto'
         ];
+    }
+
+    public function limiteCriarTextos()
+    {
+        return GerarTexto::TOTAL_N_VEZES;
     }
 
     public function view($tipo_doc, $id = null)
@@ -40,13 +46,24 @@ class GerarTextoService implements GerarTextoServiceInterface {
             'resultado' => $resultado,
             'variaveis' => (object) $this->variaveis,
             'orientacao_sumario' => GerarTexto::orientacaoSumario()[$tipo_doc],
+            'limite_criar_textos' => GerarTexto::TOTAL_N_VEZES,
         ];
     }
 
-    public function criar($tipo_doc)
+    public function criar($tipo_doc, $n_vezes = null)
     {
-        $texto = GerarTexto::criar($tipo_doc);
-        event(new CrudEvent('novo texto do documento '.$tipo_doc, 'criou', $texto->id));
+        $n_vezes = isset($n_vezes) ? (int) $n_vezes : $n_vezes;
+        $texto = GerarTexto::criar($tipo_doc, $n_vezes);
+
+        if(isset($n_vezes) && ($n_vezes > 1)){
+            $ids = implode(', ', array_keys(Arr::except($texto, ['texto_tipo'])));
+            event(new CrudEvent('novos textos do documento '.$tipo_doc, 'criou', $ids));
+            $texto = (object) $texto;
+            $texto->novo_texto = ['novos_textos' => explode(', ', $ids)];
+        }else{
+            event(new CrudEvent('novo texto do documento '.$tipo_doc, 'criou', $texto->id));
+            $texto->novo_texto = ['novo_texto' => $texto->id];
+        }
 
         return $texto;
     }
@@ -110,6 +127,7 @@ class GerarTextoService implements GerarTextoServiceInterface {
                     array_push($ok, $id_temp);
                 }
             }
+            GerarTexto::reordenarPorTipo($tipo_doc);
         }else
             throw new \Exception('Deve existir no mínimo um texto.', 400);
         

@@ -3,11 +3,18 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Contracts\MediadorServiceInterface;
 
 class GerarTextoRequest extends FormRequest
 {
     private $niveis;
     private $comNumero;
+    private $service;
+
+    public function __construct(MediadorServiceInterface $service)
+    {
+        $this->service = $service->getService('GerarTexto');
+    }
 
     public function authorize()
     {
@@ -20,6 +27,9 @@ class GerarTextoRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+        if(\Route::is('textos.create'))
+            return;
+
         if(\Route::is('textos.delete'))
         {
             $this->merge(['excluir_ids' => explode(',', $this->excluir_ids)]);
@@ -64,6 +74,11 @@ class GerarTextoRequest extends FormRequest
             return [
                 'excluir_ids' => 'required',
             ];
+
+        if(\Route::is('textos.create'))
+            return [
+                'n_vezes' => 'nullable|integer|min:2|max:' . $this->service->limiteCriarTextos(),
+            ];
     }
 
     public function messages()
@@ -74,6 +89,9 @@ class GerarTextoRequest extends FormRequest
             'max' => 'O campo :attribute excedeu o limite de :max caracteres',
             'in' => 'O campo :attribute possui valor inválido',
             'boolean' => 'O campo :attribute possui valor inválido',
+            'n_vezes.min' => 'Para criar vários textos o valor deve ser maior ou igual a :min',
+            'n_vezes.max' => 'Para criar vários textos o valor deve ser menor ou igual a :max',
+            'n_vezes.integer' => 'Para criar vários textos o valor deve ser um número inteiro',
         ];
     }
 }

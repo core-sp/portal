@@ -9,6 +9,7 @@ class GerarTexto extends Model
     protected $table = 'gerar_textos';
     protected $guarded = [];
 
+    const TOTAL_N_VEZES = 10;
     const SEPARADOR = '.';
     const TIPO_TITULO = 'Título';
     const TIPO_SUBTITULO = 'Subtítulo';
@@ -40,13 +41,34 @@ class GerarTexto extends Model
         ];
     }
 
-    public static function criar($tipo_doc)
+    public static function reordenarPorTipo($tipo_doc)
+    {
+        self::where('tipo_doc', $tipo_doc)->orderBy('ordem')->get()->each(function ($item, $key) {
+            $item->update(['ordem' => $key + 1]);
+        });
+    }
+
+    public static function criar($tipo_doc, $n_vezes = null)
     {
         $total = self::where('tipo_doc', $tipo_doc)->max('ordem') + 1;
         $publicada = $total > 1 ? self::select('publicar')->where('tipo_doc', $tipo_doc)->first()->publicar : false;
+        $n_vezes = isset($n_vezes) && ($n_vezes > 1) && ($n_vezes <= self::TOTAL_N_VEZES) ? ($total - 1) + $n_vezes : null;
+        $titulo = mb_strtoupper('Título do texto...', 'UTF-8');
 
-        return self::create([
-            'texto_tipo' => mb_strtoupper('Título do texto...', 'UTF-8'),
+        if(isset($n_vezes))
+        {
+            for($i=$total; $i <= $n_vezes; $i++)
+                $final[self::create([
+                    'texto_tipo' => $titulo,
+                    'ordem' => $i,
+                    'tipo_doc' => $tipo_doc,
+                    'publicar' => $publicada,
+                ])->id] = null;
+            $final['texto_tipo'] = $titulo;
+        }
+
+        return isset($n_vezes) ? $final : self::create([
+            'texto_tipo' => $titulo,
             'ordem' => $total,
             'tipo_doc' => $tipo_doc,
             'publicar' => $publicada,

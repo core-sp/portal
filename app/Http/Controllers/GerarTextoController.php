@@ -16,12 +16,12 @@ class GerarTextoController extends Controller
         $this->service = $service;
     }
     
-    public function create($tipo_doc)
+    public function create(GerarTextoRequest $request, $tipo_doc)
     {
         $this->authorize('gerarTextoUpdate', auth()->user());
 
         try{
-            $texto = $this->service->getService('GerarTexto')->criar($tipo_doc);
+            $texto = $this->service->getService('GerarTexto')->criar($tipo_doc, $request->n_vezes);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao criar o texto do documento ".$tipo_doc.".");
@@ -30,7 +30,7 @@ class GerarTextoController extends Controller
         return redirect()->route('textos.view', $tipo_doc)
             ->with('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "'.$texto->texto_tipo.'" foi criado com sucesso e inserido no final do sumário!')
             ->with('class', 'alert-success')
-            ->with('novo_texto', $texto->id);
+            ->with($texto->novo_texto);
     }
 
     public function updateCampos($tipo_doc, $id, GerarTextoRequest $request)

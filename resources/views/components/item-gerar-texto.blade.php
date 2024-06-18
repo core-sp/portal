@@ -11,7 +11,8 @@
         <input type="checkbox" class="form-check-input mt-2" name="excluir_ids" value="{{ $texto->id }}">
         <button type="button" class="btn btn-link btn-sm pl-0 abrir" value="{{ $texto->id }}">
         @if($texto->tipoTitulo())
-            {!! session()->exists('novo_texto') && ($texto->id == session()->get('novo_texto')) ? '<span class="badge badge-warning">Novo</span>&nbsp;&nbsp;' : '' !!}
+            {!! (session()->exists('novo_texto') && ($texto->id == session()->get('novo_texto'))) || (session()->exists('novos_textos') && in_array($texto->id, session()->get('novos_textos'))) ? 
+                '<span class="badge badge-warning">Novo</span>&nbsp;&nbsp;' : '' !!}
             <span class="indice-texto">{{ $texto->tituloFormatado() }}</span>
         @else
             <strong><span class="indice-texto">{{ $texto->subtituloFormatado() }}</span></strong>

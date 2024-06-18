@@ -22,6 +22,22 @@
         <p class="text-muted"><em>* Sumário após última atualização da índice.</em></p>
         <h4><strong>Sumário:</strong></h4>
 
+        <em>Opção de criar vários textos de uma vez <i>(até <span id="lim-max-criar">{{ $limite_criar_textos }}</span>)</i></em>
+        <div class="input-group col-2 mb-4 pl-0">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Criar</span>
+            </div>
+            <input type="text" name="n_vezes" class="form-control {{ $errors->has('n_vezes') ? 'is-invalid' : '' }}" placeholder="Ex: 2">
+            <div class="input-group-append">
+                <button class="btn btn-success criarTexto" type="button">textos</button>
+            </div>
+            @if($errors->has('n_vezes'))
+            <div class="invalid-feedback">
+                {{ $errors->first('n_vezes') }}
+            </div>
+            @endif
+        </div>
+
         @if(isset($can_update) && $can_update)
         <div class="row mt-3">
             <div class="col">

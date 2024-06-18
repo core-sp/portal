@@ -81,6 +81,90 @@ class GerarTextoTest extends TestCase
     }
 
     /** @test */
+    public function textos_by_input_can_be_created_by_an_user()
+    {
+        $user = $this->signInAsAdmin();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {
+            $this->get(route('textos.view', $tipo))->assertOk();
+            $this->post(route('textos.create', $tipo), ['n_vezes' => 5])
+            ->assertRedirect(route('textos.view', $tipo))
+            ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "'.GerarTexto::where('tipo_doc', $tipo)->first()->texto_tipo.'" foi criado com sucesso e inserido no final do sumário!');
+    
+            $ids = GerarTexto::select('id')->where('tipo_doc', $tipo)->get()->pluck('id')->all();
+
+            $this->get(route('textos.view', $tipo))
+            ->assertSeeInOrder([
+                '<button type="button" class="btn btn-link btn-sm pl-0 abrir" value="' . $ids[0] . '">',
+                '<button type="button" class="btn btn-link btn-sm pl-0 abrir" value="' . $ids[1] . '">',
+                '<button type="button" class="btn btn-link btn-sm pl-0 abrir" value="' . $ids[2] . '">',
+                '<button type="button" class="btn btn-link btn-sm pl-0 abrir" value="' . $ids[3] . '">',
+                '<button type="button" class="btn btn-link btn-sm pl-0 abrir" value="' . $ids[4] . '">',
+            ]);
+
+            $this->assertDatabaseHas('gerar_textos', ['id' => $ids[0], 'id' => $ids[1], 'id' => $ids[2], 'id' => $ids[3], 'id' => $ids[4]]);
+        }
+    }
+
+    /** @test */
+    public function textos_by_input_cannot_be_created_with_input_less_than_2()
+    {
+        $user = $this->signInAsAdmin();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {
+            $this->get(route('textos.view', $tipo))->assertOk();
+            $this->post(route('textos.create', $tipo), ['n_vezes' => 0])
+            ->assertSessionHasErrors([
+                'n_vezes'
+            ]);
+
+            $this->get(route('textos.view', $tipo))->assertOk();
+            $this->post(route('textos.create', $tipo), ['n_vezes' => 1])
+            ->assertSessionHasErrors([
+                'n_vezes'
+            ]);
+    
+            $this->assertDatabaseMissing('gerar_textos', ['id' => 1]);
+        }
+    }
+
+    /** @test */
+    public function textos_by_input_cannot_be_created_with_input_greater_than_10()
+    {
+        $user = $this->signInAsAdmin();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {
+            $this->get(route('textos.view', $tipo))->assertOk();
+            $this->post(route('textos.create', $tipo), ['n_vezes' => 11])
+            ->assertSessionHasErrors([
+                'n_vezes'
+            ]);
+    
+            $this->assertDatabaseMissing('gerar_textos', ['id' => 1]);
+        }
+    }
+
+    /** @test */
+    public function textos_by_input_cannot_be_created_with_input_without_number()
+    {
+        $user = $this->signInAsAdmin();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {
+            $this->get(route('textos.view', $tipo))->assertOk();
+            $this->post(route('textos.create', $tipo), ['n_vezes' => 'a'])
+            ->assertSessionHasErrors([
+                'n_vezes'
+            ]);
+    
+            $this->assertDatabaseMissing('gerar_textos', ['id' => 1]);
+        }
+    }
+
+    /** @test */
     public function texto_cannot_be_created_with_tipo_invalid()
     {
         $user = $this->signInAsAdmin();
@@ -130,6 +214,23 @@ class GerarTextoTest extends TestCase
             $log = tailCustom(storage_path($this->pathLogInterno()));
             $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
             $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') criou *novo texto do documento '.$tipo.'* (id: '. ++$key .')';
+            $this->assertStringContainsString($txt, $log);
+        }
+    }
+
+    /** @test */
+    public function log_is_generated_when_textos_are_created()
+    {
+        $user = $this->signInAsAdmin();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $key => $tipo)
+        {
+            $this->post(route('textos.create', $tipo), ['n_vezes' => 3]);
+            $ids = implode(', ', GerarTexto::select('id')->where('tipo_doc', $tipo)->get()->pluck('id')->all());
+
+            $log = tailCustom(storage_path($this->pathLogInterno()));
+            $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+            $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') criou *novos textos do documento '.$tipo.'* (id: '. $ids .')';
             $this->assertStringContainsString($txt, $log);
         }
     }
@@ -508,6 +609,24 @@ class GerarTextoTest extends TestCase
     
             $this->assertDatabaseMissing('gerar_textos', $textos->get(0)->toArray());
             $this->assertDatabaseMissing('gerar_textos', $textos->get(1)->toArray());
+        }
+    }
+
+    /** @test */
+    public function reorder_after_deleted()
+    {
+        $user = $this->signInAsAdmin();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {
+            $textos = factory('App\GerarTexto', 5)->states($tipo)->create();
+
+            $id = $textos->get(2)->id;
+            $this->get(route('textos.view', $tipo))->assertOk();
+            $this->delete(route('textos.delete', $tipo), ['excluir_ids' => $id])
+            ->assertJson([$id]);
+    
+            $this->assertEquals(['1','2','3','4'], GerarTexto::select('ordem')->where('tipo_doc', $tipo)->orderBy('ordem')->get()->pluck('ordem')->all());
         }
     }
 

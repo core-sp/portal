@@ -1202,7 +1202,14 @@ function selecionarTodos(inverso){
 $(".criarTexto").click(function(){
 	var token = $('meta[name="csrf-token"]').attr('content');
 	var link = '/admin/textos/' + $('#tipo_doc').val();
-	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
+  var n_vezes = $(this).parents('.input-group').find('input');
+
+  if((n_vezes.length > 0) && (n_vezes.val().trim() === ''))
+    return;
+
+  n_vezes = n_vezes.length > 0 ? '<input type="hidden" name="n_vezes" value="' + n_vezes.val() + '">' : null;
+  
+	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '">' + n_vezes + '</form>');
 	$('body').append(form);
 	$(form).submit();
 });
