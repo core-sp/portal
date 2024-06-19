@@ -443,17 +443,19 @@ Route::middleware(['block_ip'])->group(function () {
     Route::get('/carta-de-servicos-ao-usuario/{id?}', 'GerarTextoController@show')->name('carta-servicos');
 
     // TESTE APIS GERENTI ====================================================================================================
-    Route::prefix('teste-apis-gerenti')->group(function(){
-      Route::get('/', 'SiteController@testeApis');
-      Route::post('/api-simulador', 'SiteController@testeApis')->name('api-simulador');
-      Route::get('/api-tipos-contatos', 'SiteController@testeApis')->name('api-tipos-contatos');
-      Route::get('/api-contatos', 'SiteController@testeApis')->name('api-contatos');
-      Route::get('/api-enderecos', 'SiteController@testeApis')->name('api-enderecos');
-      Route::get('/api-extrato', 'SiteController@testeApis')->name('api-extrato');
-      Route::get('/api-segmentos', 'SiteController@testeApis')->name('api-segmentos');
-      Route::get('/api-dados-representante', 'SiteController@testeApis')->name('api-dados-representante');
-      Route::post('/api-representante-registrado', 'SiteController@testeApis')->name('api-representante-registrado');
-      Route::get('/api-validar-representante', 'SiteController@testeApis')->name('api-validar-representante');
+    Route::middleware(['auth'])->group(function () {
+      Route::prefix('teste-apis-gerenti')->group(function(){
+        Route::get('/', 'SiteController@testeApis')->name('api-view');
+        Route::post('/api-simulador', 'SiteController@testeApis')->name('api-simulador');
+        Route::get('/api-tipos-contatos', 'SiteController@testeApis')->name('api-tipos-contatos');
+        Route::get('/api-contatos', 'SiteController@testeApis')->name('api-contatos');
+        Route::get('/api-enderecos', 'SiteController@testeApis')->name('api-enderecos');
+        Route::get('/api-extrato', 'SiteController@testeApis')->name('api-extrato');
+        Route::get('/api-segmentos', 'SiteController@testeApis')->name('api-segmentos');
+        Route::get('/api-dados-representante', 'SiteController@testeApis')->name('api-dados-representante');
+        Route::post('/api-representante-registrado', 'SiteController@testeApis')->name('api-representante-registrado');
+        Route::get('/api-validar-representante', 'SiteController@testeApis')->name('api-validar-representante');
+      });
     });
     // =======================================================================================================================
 

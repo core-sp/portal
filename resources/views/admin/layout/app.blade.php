@@ -39,6 +39,9 @@
                 <a href="/horizon" class="nav-link" target="_blank">Horizon</a>
               </li>
               @endif
+              <li class="nav-item d-none d-sm-inline-block">
+                <a href="{{ route('api-view') }}" class="nav-link" target="_self">Teste API Gerenti</a>
+              </li>
             </ul>
 
             <ul class="navbar-nav ml-auto">
