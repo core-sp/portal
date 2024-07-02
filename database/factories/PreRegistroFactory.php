@@ -54,6 +54,12 @@ $factory->state(PreRegistro::class, 'pj', function (Faker $faker) {
     ];
 });
 
+$factory->state(PreRegistro::class, 'bloqueado_contabil', function (Faker $faker) {
+    return [
+        'historico_contabil' => json_encode(['tentativas' => 1, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT),
+    ];
+});
+
 $factory->state(PreRegistro::class, 'sendo_elaborado', function (Faker $faker) {
     return [
         'idusuario' => null,

@@ -136,6 +136,33 @@ class PreRegistroCnpj extends Model
         return $this->possuiSocioPF() && $this->socios->whereNotNull('dt_nascimento')->where('dt_nascimento', '>=', now()->subYears(45)->format('Y-m-d'))->isNotEmpty();
     }
 
+    public function removerRTSocio()
+    {
+        if($this->possuiRTSocio())
+            $this->socios()->detach($this->socios->where('pivot.rt', true)->first()->pivot->socio_id);
+    }
+
+    public function relacionarRT($id)
+    {
+        return $this->update(['responsavel_tecnico_id' => $id, 'historico_rt' => $this->setHistorico()]);
+    }
+
+    public function relacionarRTSocio($cpf_cnpj)
+    {
+        $socio = $this->socios->where('cpf_cnpj', $cpf_cnpj)->first();
+        if(isset($socio) && !$socio->pivot->rt)
+        {
+            $socio->pivot->update(['rt' => true]);
+            return [
+                'tab' => $this->socioRT->first()->tabHTML(),
+                'id_socio' => $socio->id,
+                'rt' => true,
+            ];
+        }
+
+        return [];
+    }
+
     public function getHistoricoCanEdit($classe = null)
     {
         $array = $this->getHistoricoArray($classe);

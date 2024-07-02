@@ -21,14 +21,11 @@ class Contabil extends Authenticatable
     protected $guarded = [];
     protected $hidden = ['password', 'remember_token'];
 
-    private function validarUpdateAjax($campo, $valor, $canEdit = null)
+    private function validarUpdateAjax($campo)
     {
+        // Não atualiza CNPJ de Contabil já criado
         if($campo == 'cnpj')
-        {
-            if(isset($valor) && (strlen($valor) == 14)) 
-                return self::buscar($valor, $canEdit);
             return 'remover';
-        }
 
         return null;
     }
@@ -56,15 +53,9 @@ class Contabil extends Authenticatable
 
     public function atualizarFinal($campo, $valor, $pr)
     {
-        $valido = $this->validarUpdateAjax($campo, $valor, $pr->getHistoricoCanEdit());
-        if(isset($valido))
-        {
-            if($valido == 'notUpdate')
-                $valido = ['update' => $pr->getNextUpdateHistorico()];
-            else
-                $valido == 'remover' ? $pr->update(['contabil_id' => null]) : 
-                $pr->update(['contabil_id' => $valido->id, 'historico_contabil' => $pr->setHistorico()]);
-        }
+        $valido = $this->validarUpdateAjax($campo);
+        if(isset($valido) && ($valido == 'remover'))
+            $pr->update(['contabil_id' => null]);
         else
         {
             $this->updateAjax($campo, $valor);

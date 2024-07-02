@@ -58,6 +58,12 @@ $factory->state(PreRegistroCnpj::class, 'rt_socio', function (Faker $faker) {
     return [];
 });
 
+$factory->state(PreRegistroCnpj::class, 'bloqueado_rt', function (Faker $faker) {
+    return [
+        'historico_rt' => json_encode(['tentativas' => 1, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT),
+    ];
+});
+
 $factory->afterMakingState(PreRegistroCnpj::class, 'make_endereco', function ($prCnpj, $faker) {
     $prCnpj->makeHidden(['pre_registro_id', 'historico_rt', 'historico_socio', 'responsavel_tecnico_id', 'pre_registro']);
     $prCnpj->makeHidden(array_keys($prCnpj->getEndereco()));

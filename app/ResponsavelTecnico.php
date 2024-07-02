@@ -13,14 +13,11 @@ class ResponsavelTecnico extends Model
     protected $table = 'responsaveis_tecnicos';
     protected $guarded = [];
 
-    private function validarUpdateAjax($campo, $valor, $gerenti, $canEdit = null)
+    private function validarUpdateAjax($campo)
     {
+        // Não atualiza CPF de RT já criado
         if($campo == 'cpf')
-        {
-            if(isset($valor) && (strlen($valor) == 11)) 
-                return self::buscar($valor, $gerenti, $canEdit);
             return 'remover';
-        }
 
         return null;
     }
@@ -41,32 +38,20 @@ class ResponsavelTecnico extends Model
         if($valido == 'notUpdate')
             $valido = ['update' => $pr->pessoaJuridica->getNextUpdateHistorico()];
         else{
-            $pr->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id, 'historico_rt' => $pr->pessoaJuridica->setHistorico()]);
-            $socio = $pr->pessoaJuridica->socios->where('cpf_cnpj', $valor)->first();
-            if(isset($socio) && !$socio->pivot->rt){
-                $socio->pivot->update(['rt' => true]);
-                $valido['tab'] = $pr->pessoaJuridica->socioRT->first()->tabHTML();
-                $valido['id_socio'] = $socio->id;
-                $valido['rt'] = true;
-            }
+            $pr->pessoaJuridica->relacionarRT($valido->id);
+            $valido->fill($pr->pessoaJuridica->relacionarRTSocio($valor));
         }
 
         return $valido;
     }
 
-    public function atualizarFinal($campo, $valor, $gerenti, $pj)
+    public function atualizarFinal($campo, $valor, $pj)
     {
-        $valido = $this->validarUpdateAjax($campo, $valor, $gerenti, $pj->getHistoricoCanEdit());
-        if(isset($valido))
+        $valido = $this->validarUpdateAjax($campo);
+        if(isset($valido) && ($valido == 'remover'))
         {
-            if($valido == 'notUpdate')
-                $valido = ['update' => $pj->getNextUpdateHistorico()];
-            else
-                if($valido == 'remover'){
-                    $pj->possuiRTSocio() ? $pj->socios()->detach($pj->socios->where('pivot.rt', true)->first()->pivot->socio_id) : null;
-                    $pj->update(['responsavel_tecnico_id' => null]);
-                }else
-                    $pj->update(['responsavel_tecnico_id' => $valido->id, 'historico_rt' => $pj->setHistorico()]);
+            $pj->removerRTSocio();
+            $pj->update(['responsavel_tecnico_id' => null]);
         }
         else
         {

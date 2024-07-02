@@ -1847,7 +1847,7 @@ class ResponsavelTecnicoTest extends TestCase
         ];
 
         foreach($campos as $key => $value)
-            $this->post(route('externo.inserir.preregistro.ajax'), [
+            $key == 'cpf_rt' ? null : $this->post(route('externo.inserir.preregistro.ajax'), [
                 'classe' => 'pessoaJuridica.responsavelTecnico',
                 'campo' => $key,
                 'valor' => $value
@@ -1856,6 +1856,7 @@ class ResponsavelTecnicoTest extends TestCase
         $this->put(route('externo.verifica.inserir.preregistro'), ['pergunta' => "25 meses"])->assertViewIs('site.userExterno.inserir-pre-registro');
         $this->put(route('externo.inserir.preregistro'))->assertRedirect(route('externo.preregistro.view'));
 
+        unset($campos['cpf_rt']);
         $arrayFinal = array_diff(array_keys(PreRegistro::first()->getCamposEditados()), array_keys($campos));
         $this->assertEquals($arrayFinal, array());
         $arrayFinal = array_diff(array_keys($campos), array_keys(PreRegistro::first()->getCamposEditados()));
@@ -3747,7 +3748,7 @@ class ResponsavelTecnicoTest extends TestCase
         ];
 
         foreach($campos as $key => $value)
-            $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
+            $key == 'cpf_rt' ? null : $this->post(route('externo.inserir.preregistro.ajax', ['preRegistro' => 1]), [
                 'classe' => 'pessoaJuridica.responsavelTecnico',
                 'campo' => $key,
                 'valor' => $value
@@ -3759,6 +3760,7 @@ class ResponsavelTecnicoTest extends TestCase
         $this->put(route('externo.inserir.preregistro', ['preRegistro' => 1]))
         ->assertRedirect(route('externo.preregistro.view', ['preRegistro' => 1]));
 
+        unset($campos['cpf_rt']);
         $arrayFinal = array_diff(array_keys(PreRegistro::first()->getCamposEditados()), array_keys($campos));
         $this->assertEquals($arrayFinal, array());
         $arrayFinal = array_diff(array_keys($campos), array_keys(PreRegistro::first()->getCamposEditados()));

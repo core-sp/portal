@@ -52,7 +52,7 @@ trait PreRegistroApoio {
                 break;
             case $this->relation_rt:
                 $pj = $this->loadMissing($classe)->pessoaJuridica;
-                return $pj->responsavelTecnico->atualizarFinal($campo, $valor, $gerenti, $pj);
+                return $pj->responsavelTecnico->atualizarFinal($campo, $valor, $pj);
                 break;
             case $this->relation_socio:
                 $pj = $this->loadMissing($classe)->pessoaJuridica;
