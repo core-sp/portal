@@ -9,12 +9,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Notifications\UserExternoResetPasswordNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
-use App\Traits\PreRegistroApoio;
+use App\Traits\Gerenti;
 
 class UserExterno extends Authenticatable
 {
     // use Notifiable;
-    use SoftDeletes, PreRegistroApoio;
+    use SoftDeletes, Gerenti;
 
     protected $guard = 'user_externo';
     protected $table = 'users_externo';

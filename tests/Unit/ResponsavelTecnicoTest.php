@@ -57,30 +57,6 @@ class ResponsavelTecnicoTest extends TestCase
     }
 
     /** @test */
-    public function dados_rt_socio()
-    {
-        $dados = factory('App\PreRegistroCnpj')->states('rt_socio')->create();
-        
-        $this->assertEquals([
-            'registro',
-            'nome',
-            'nome_social',
-            'dt_nascimento',
-            'cep',
-            'logradouro',
-            'numero',
-            'complemento',
-            'bairro',
-            'cidade',
-            'uf',
-            'nome_mae',
-            'nome_pai',
-            'identidade',
-            'orgao_emissor',
-        ], array_keys($dados->responsavelTecnico->dadosRTSocio()->toArray()));
-    }
-
-    /** @test */
     public function array_validacao_inputs_do_pre_registro()
     {
         $rt = factory('App\ResponsavelTecnico')->create();
@@ -144,7 +120,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $nao_existe = factory('App\ResponsavelTecnico')->raw();
 
-        // Contabil não existe, então cria, sem gerenti e com verificação se pode editar
+        // RT não existe, então cria, sem gerenti e com verificação se pode editar
         $this->assertEquals(ResponsavelTecnico::class, get_class(ResponsavelTecnico::buscar($nao_existe['cpf'], null, true)));
         $this->assertEquals('notUpdate', ResponsavelTecnico::buscar($nao_existe['cpf'], null, false));
         $this->assertEquals(8, ResponsavelTecnico::count());

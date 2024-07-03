@@ -58,9 +58,19 @@ $factory->state(PreRegistroCnpj::class, 'rt_socio', function (Faker $faker) {
     return [];
 });
 
+$factory->state(PreRegistroCnpj::class, 'com_limite_socios', function (Faker $faker) {
+    return [];
+});
+
 $factory->state(PreRegistroCnpj::class, 'bloqueado_rt', function (Faker $faker) {
     return [
         'historico_rt' => json_encode(['tentativas' => 1, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT),
+    ];
+});
+
+$factory->state(PreRegistroCnpj::class, 'bloqueado_socio', function (Faker $faker) {
+    return [
+        'historico_socio' => json_encode(['tentativas' => PreRegistroCnpj::TOTAL_HIST_SOCIO, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT),
     ];
 });
 
@@ -83,4 +93,10 @@ $factory->afterCreating(PreRegistroCnpj::class, function ($prCnpj, $faker) {
 $factory->afterCreatingState(PreRegistroCnpj::class, 'rt_socio', function ($prCnpj, $faker) {    
     $socio_pf = factory('App\Socio')->states('rt')->create();
     $prCnpj->socios()->attach($socio_pf->id, ['rt' => true]);
+});
+
+$factory->afterCreatingState(PreRegistroCnpj::class, 'com_limite_socios', function ($prCnpj, $faker) {    
+    $socios_pf = factory('App\Socio', 4)->create();
+    $socios_pj = factory('App\Socio', 4)->states('pj')->create();
+    $prCnpj->socios()->attach(array_merge($socios_pf->pluck('id')->all(), $socios_pj->pluck('id')->all()));
 });

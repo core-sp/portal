@@ -136,31 +136,59 @@ class PreRegistroCnpj extends Model
         return $this->possuiSocioPF() && $this->socios->whereNotNull('dt_nascimento')->where('dt_nascimento', '>=', now()->subYears(45)->format('Y-m-d'))->isNotEmpty();
     }
 
-    public function removerRTSocio()
+    public function removerRT()
     {
         if($this->possuiRTSocio())
             $this->socios()->detach($this->socios->where('pivot.rt', true)->first()->pivot->socio_id);
+
+        return $this->update(['responsavel_tecnico_id' => null]);
     }
 
     public function relacionarRT($id)
     {
-        return $this->update(['responsavel_tecnico_id' => $id, 'historico_rt' => $this->setHistorico()]);
+        $this->update(['responsavel_tecnico_id' => $id, 'historico_rt' => $this->setHistorico()]);
+
+        return $this->relacionarRTSocio();
     }
 
-    public function relacionarRTSocio($cpf_cnpj)
+    // Confere se existe como sócio e relaciona
+    private function relacionarRTSocio()
     {
-        $socio = $this->socios->where('cpf_cnpj', $cpf_cnpj)->first();
+        $socio = $this->socios->where('cpf_cnpj', $this->responsavelTecnico->cpf)->first();
         if(isset($socio) && !$socio->pivot->rt)
         {
             $socio->pivot->update(['rt' => true]);
-            return [
-                'tab' => $this->socioRT->first()->tabHTML(),
+            $this->responsavelTecnico->fill([
+                'tab' => $socio->fresh()->tabHTML(),
                 'id_socio' => $socio->id,
                 'rt' => true,
-            ];
+            ]);
         }
 
-        return [];
+        return $this->responsavelTecnico;
+    }
+
+    // Relaciona e verifica se é RT também
+    public function relacionarSocio($socio)
+    {
+        $rt = isset($this->responsavel_tecnico_id) && ($socio->cpf_cnpj == $this->responsavelTecnico->cpf);
+
+        $this->socios()->attach($socio->id, ['rt' => $rt]);
+        $this->update(['historico_socio' => $this->setHistorico(get_class($socio))]);
+
+        // Trazer a relação com a tabela pivot
+        $socio = $this->fresh()->socios->find($socio->id);
+        $socio->fill([
+            'tab' => $socio->tabHTML(), 
+            'rt' => $rt
+        ]);
+
+        return $socio;
+    }
+
+    public function socioEstaRelacionado($id)
+    {
+        return $this->socios->where('id', $id)->first() !== null;
     }
 
     public function getHistoricoCanEdit($classe = null)

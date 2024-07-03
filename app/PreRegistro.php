@@ -615,10 +615,10 @@ class PreRegistro extends Model
         $valor = $request['valor'];
 
         if((($classe == $this->getNomeClasses()[6]) && is_array($campo)) || (($classe != $this->getNomeClasses()[0]) && ($classe != $this->getNomeClasses()[4])))
-            return (is_array($campo) && ($campo[0] == 0)) || !$this->has($classe)->where('id', $this->id)->exists() ? $this->criarAjax($classe, $campo, $valor, $gerenti) : $this->atualizarAjax($classe, $campo, $valor, $gerenti);
+            return (is_array($campo) && ($campo[0] == 0)) || !$this->has($classe)->where('id', $this->id)->exists() ? $this->criarAjax($classe, $campo, $valor, $gerenti) : $this->atualizarAjax($classe, $campo, $valor);
 
         if($classe == $this->getNomeClasses()[4])
-            return $this->atualizarAjax($classe, $campo, $valor, $gerenti);
+            return $this->atualizarAjax($classe, $campo, $valor);
 
         return $this->criarAjax($classe, $campo, $valor, $gerenti);
     }

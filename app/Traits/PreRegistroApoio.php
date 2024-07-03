@@ -37,7 +37,7 @@ trait PreRegistroApoio {
         }
     }
 
-    private function atualizarAjax($classe, $campo, $valor, $gerenti)
+    private function atualizarAjax($classe, $campo, $valor)
     {
         switch ($classe) {
             case $this->relation_pre_registro:
@@ -59,7 +59,7 @@ trait PreRegistroApoio {
                 $socio = $pj->socios->where('id', $campo[0])->first();
                 if(!isset($socio))
                     throw new \Exception('Não há sócio com a ID '. $campo[0] . ' relacionado com o pré-registro de ID ' . $this->id . '.', 404);
-                return $socio->atualizarFinal($campo[1], $valor, $gerenti, $pj);
+                return $socio->atualizarFinal($campo[1], $valor, $pj);
                 break;
             default:
                 return null;

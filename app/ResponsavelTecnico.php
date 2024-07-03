@@ -36,23 +36,16 @@ class ResponsavelTecnico extends Model
         $valido = self::buscar($valor, $gerenti, $pr->pessoaJuridica->getHistoricoCanEdit());
 
         if($valido == 'notUpdate')
-            $valido = ['update' => $pr->pessoaJuridica->getNextUpdateHistorico()];
-        else{
-            $pr->pessoaJuridica->relacionarRT($valido->id);
-            $valido->fill($pr->pessoaJuridica->relacionarRTSocio($valor));
-        }
+            return ['update' => $pr->pessoaJuridica->getNextUpdateHistorico()];
 
-        return $valido;
+        return $pr->pessoaJuridica->relacionarRT($valido->id);
     }
 
     public function atualizarFinal($campo, $valor, $pj)
     {
         $valido = $this->validarUpdateAjax($campo);
         if(isset($valido) && ($valido == 'remover'))
-        {
-            $pj->removerRTSocio();
-            $pj->update(['responsavel_tecnico_id' => null]);
-        }
+            $pj->removerRT();
         else
         {
             $this->updateAjax($campo, $valor);
@@ -91,16 +84,18 @@ class ResponsavelTecnico extends Model
         ];
     }
 
+    private function atualizarComGerenti($gerenti)
+    {
+        if(isset($gerenti["registro"]) && (!isset($this->registro) || ($this->registro != $gerenti["registro"])))
+            $this->update($gerenti);
+
+        if(!isset($gerenti["registro"]) && isset($this->registro))
+            $this->update(['registro' => null]);
+    }
+
     public function pessoasJuridicas()
     {
         return $this->hasMany('App\PreRegistroCnpj')->withTrashed();
-    }
-
-    public function dadosRTSocio()
-    {
-        return $this->makeHidden([
-            'cpf', 'sexo', 'tipo_identidade', 'dt_expedicao', 'titulo_eleitor', 'zona', 'secao', 'ra_reservista', 'id', 'created_at', 'updated_at', 'deleted_at'
-        ]);
     }
 
     public static function buscar($cpf, $gerenti, $canEdit = null)
@@ -111,15 +106,12 @@ class ResponsavelTecnico extends Model
                 return 'notUpdate';
 
             $existe = self::where('cpf', $cpf)->first();
-            if(isset($existe) && isset($gerenti["registro"]) && (!isset($existe->registro) || ($existe->registro != $gerenti["registro"])))
-                $existe->update($gerenti);
-            if(isset($existe) && !isset($gerenti["registro"]) && isset($existe->registro))
-                $existe->update(['registro' => null]);
-
-            if(!isset($existe))
+            if(isset($existe))
+                $existe->atualizarComGerenti($gerenti);
+            else
                 $existe = isset($gerenti["registro"]) ? self::create($gerenti) : self::create(['cpf' => $cpf]);
 
-            return $existe;
+            return $existe->fresh();
         }
 
         throw new \Exception('Não pode buscar responsável técnico sem CPF.', 400);

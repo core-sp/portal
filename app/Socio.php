@@ -38,14 +38,10 @@ class Socio extends Model
         ];
     }
 
-    private function validarUpdateAjax($campo, $valor, $gerenti, $canEdit = null)
+    private function validarUpdateAjax($campo, $valor)
     {
         if(($campo == 'cpf_cnpj') || (($campo == 'checkRT_socio') && ($valor == 'off')))
-        {
-            if(isset($valor) && ((strlen($valor) == 11) || (strlen($valor) == 14))) 
-                return self::buscar($valor, $gerenti, $canEdit);
             return 'remover';
-        }
 
         return null;
     }
@@ -71,11 +67,7 @@ class Socio extends Model
         {
             $campo = 'cpf_cnpj';
             $valor = $pj->responsavelTecnico->cpf;
-
-            return $pj->responsavelTecnico->dadosRTSocio()->toArray();
         }
-
-        return null;
     }
 
     protected static function criarFinal($campo, $valor, $gerenti, $pr)
@@ -83,7 +75,7 @@ class Socio extends Model
         if(!$pr->pessoaJuridica->podeCriarSocio())
             return ['limite' => 'Já alcançou o limite de sócios permitido'];
         
-        $dadosRT = self::confereRTSocio($campo, $valor, $pr->pessoaJuridica);
+        self::confereRTSocio($campo, $valor, $pr->pessoaJuridica);
 
         if($campo != 'cpf_cnpj')
             throw new \Exception('Não pode relacionar sócio sem CPF / CNPJ no pré-registro de ID ' . $pr->id . '.', 400);
@@ -91,17 +83,21 @@ class Socio extends Model
         $valido = self::buscar($valor, $gerenti, $pr->pessoaJuridica->getHistoricoCanEdit(self::class));
 
         if($valido == 'notUpdate')
-            $valido = ['update' => $pr->pessoaJuridica->getNextUpdateHistorico(self::class)];
-        elseif($pr->pessoaJuridica->socios->where('id', $valido->id)->first() !== null)
+            return ['update' => $pr->pessoaJuridica->getNextUpdateHistorico(self::class)];
+        
+        if($pr->pessoaJuridica->socioEstaRelacionado($valido->id))
             return ['existente' => 'O sócio com o CPF / CNPJ <strong>' . formataCpfCnpj($valido->cpf_cnpj) . '</strong> já está relacionado!'];
-        else{
-            $pr->pessoaJuridica->socios()->attach($valido->id, ['rt' => is_array($dadosRT)]);
-            $pr->pessoaJuridica->update(['historico_socio' => $pr->pessoaJuridica->setHistorico(self::class)]);
-            $valido = $pr->pessoaJuridica->fresh()->socios->find($valido->id);
-        }
 
-        return isset($valido) && (gettype($valido) == "object") && (get_class($valido) == self::class) ? 
-        ['tab' => $valido->tabHTML(), 'rt' => is_array($dadosRT)] : $valido;
+        return $pr->pessoaJuridica->relacionarSocio($valido)->only(['tab', 'rt']);
+    }
+
+    private function atualizarComGerenti($gerenti)
+    {
+        if(isset($gerenti["registro"]) && (!isset($this->registro) || ($this->registro != $gerenti["registro"])))
+            $this->update($gerenti);
+
+        if(!isset($gerenti["registro"]) && isset($this->registro))
+            $this->update(['registro' => null]);
     }
 
     public function pessoasJuridicas()
@@ -119,20 +115,15 @@ class Socio extends Model
         return isset($this->pivot) && $this->pivot->rt;
     }
 
-    public function atualizarFinal($campo, $valor, $gerenti, $pj)
+    public function atualizarFinal($campo, $valor, $pj)
     {
-        $valido = $this->validarUpdateAjax($campo, $valor, $gerenti, $pj->getHistoricoCanEdit(self::class));
-        if(isset($valido))
-        {
-            if($valido == 'notUpdate')
-                $valido = ['update' => $pj->getNextUpdateHistorico(self::class)];
-            elseif($valido == 'remover')
-                $this->pessoasJuridicas()->detach($pj->id);
-        }
+        $valido = $this->validarUpdateAjax($campo, $valor);
+        if(isset($valido) && ($valido == 'remover'))
+            $this->pessoasJuridicas()->detach($pj->id);
         else
         {
             $this->updateAjax($campo, $valor);
-            $this->pivot->update(['updated_at' => now()]);
+            $this->pivot->update(['updated_at' => now()->format('Y-m-d H:i:s')]);
             $pj->preRegistro->touch();
             $valido = ['atualizado' => $this->tabHTML(), 'id' => $this->id];
         }
@@ -148,15 +139,12 @@ class Socio extends Model
                 return 'notUpdate';
 
             $existe = self::where('cpf_cnpj', $cpf_cnpj)->first();
-            if(isset($existe) && isset($gerenti["registro"]) && (!isset($existe->registro) || ($existe->registro != $gerenti["registro"])))
-                $existe->update($gerenti);
-            if(isset($existe) && !isset($gerenti["registro"]) && isset($existe->registro))
-                $existe->update(['registro' => null]);
-
-            if(!isset($existe))
+            if(isset($existe))
+                $existe->atualizarComGerenti($gerenti);
+            else
                 $existe = isset($gerenti["registro"]) ? self::create($gerenti) : self::create(['cpf_cnpj' => $cpf_cnpj]);
 
-            return $existe;
+            return $existe->fresh();
         }
 
         throw new \Exception('Não pode buscar sócio sem CPF / CNPJ.', 400);
@@ -274,7 +262,7 @@ class Socio extends Model
             $texto .= !isset($this->complemento) ? '-----' : $this->complemento;
             $texto .= '</span>' . $final;
 
-            // Complemento
+            // Bairro
             $texto .= $inicio . '<span class="label_bairro bold">Bairro:</span> <span class="bairro_socio editar_dado">';
             $texto .= !isset($this->bairro) ? '-----' : $this->bairro;
             $texto .= '</span>' . $final;

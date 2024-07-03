@@ -1086,7 +1086,7 @@ class PreRegistroTest extends TestCase
     }
 
     /** @test */
-    public function cannot_update_table_pre_registros_by_ajax_with_blocked_historico_contabil()
+    public function cannot_update_table_pre_registros_by_ajax_with_new_cnpj_if_blocked_historico_contabil()
     {
         $externo = $this->signInAsUserExterno();
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
@@ -1106,6 +1106,14 @@ class PreRegistroTest extends TestCase
             'contabil_id' => 1,
         ]);
         $this->assertEquals(json_decode(PreRegistro::first()->historico_contabil, true)['tentativas'], 1);
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'contabil',
+            'campo' => 'cnpj_contabil',
+            'valor' => factory('App\Contabil')->raw()['cnpj']
+        ])
+        ->assertOk()
+        ->assertJsonFragment(["resultado" => "remover"]);
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'contabil',
