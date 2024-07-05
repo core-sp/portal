@@ -229,6 +229,25 @@ class UserExternoTest extends TestCase
         $this->assertEquals(1, UserExterno::first()->preRegistroDoc()->count());
     }
 
+    /** @test */
+    public function soft_delete()
+    {
+        $user = factory('App\UserExterno')->create();
+
+        $this->assertEquals(1, UserExterno::count());
+        $this->assertDatabaseHas('users_externo', ['id' => 1, 'deleted_at' => null]);
+
+        $user->delete();
+
+        $this->assertEquals(0, UserExterno::count());
+        $this->assertDatabaseMissing('users_externo', ['id' => 1, 'deleted_at' => null]);
+
+        UserExterno::withTrashed()->first()->restore();
+
+        $this->assertEquals(1, UserExterno::count());
+        $this->assertDatabaseHas('users_externo', ['id' => 1, 'deleted_at' => null]);
+    }
+
     /** 
      * =======================================================================================================
      * TESTES SERVICE

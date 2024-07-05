@@ -565,4 +565,23 @@ class SocioTest extends TestCase
             $pr->socios->find(3)->atualizarFinal($dado, $novo[$dado], $pr);
         }
     }
+
+    /** @test */
+    public function soft_delete()
+    {
+        $user = factory('App\Socio')->create();
+
+        $this->assertEquals(1, Socio::count());
+        $this->assertDatabaseHas('socios', ['id' => 1, 'deleted_at' => null]);
+
+        $user->delete();
+
+        $this->assertEquals(0, Socio::count());
+        $this->assertDatabaseMissing('socios', ['id' => 1, 'deleted_at' => null]);
+
+        Socio::withTrashed()->first()->restore();
+
+        $this->assertEquals(1, Socio::count());
+        $this->assertDatabaseHas('socios', ['id' => 1, 'deleted_at' => null]);
+    }
 }

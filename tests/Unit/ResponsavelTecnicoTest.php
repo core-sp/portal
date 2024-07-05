@@ -195,4 +195,23 @@ class ResponsavelTecnicoTest extends TestCase
         $this->assertEquals('remover', ResponsavelTecnico::find(2)->atualizarFinal('cpf', '12345678901', $pr));
         $this->assertDatabaseHas('pre_registros_cnpj', ['id' => 1, 'responsavel_tecnico_id' => null]);
     }
+
+    /** @test */
+    public function soft_delete()
+    {
+        $user = factory('App\ResponsavelTecnico')->create();
+
+        $this->assertEquals(1, ResponsavelTecnico::count());
+        $this->assertDatabaseHas('responsaveis_tecnicos', ['id' => 1, 'deleted_at' => null]);
+
+        $user->delete();
+
+        $this->assertEquals(0, ResponsavelTecnico::count());
+        $this->assertDatabaseMissing('responsaveis_tecnicos', ['id' => 1, 'deleted_at' => null]);
+
+        ResponsavelTecnico::withTrashed()->first()->restore();
+
+        $this->assertEquals(1, ResponsavelTecnico::count());
+        $this->assertDatabaseHas('responsaveis_tecnicos', ['id' => 1, 'deleted_at' => null]);
+    }
 }

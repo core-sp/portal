@@ -234,6 +234,25 @@ class ContabilTest extends TestCase
         Contabil::criarFinal('cnpj', null, $pr->preRegistro);
     }
 
+    /** @test */
+    public function soft_delete()
+    {
+        $user = factory('App\Contabil')->create();
+
+        $this->assertEquals(1, Contabil::count());
+        $this->assertDatabaseHas('contabeis', ['id' => 1, 'deleted_at' => null]);
+
+        $user->delete();
+
+        $this->assertEquals(0, Contabil::count());
+        $this->assertDatabaseMissing('contabeis', ['id' => 1, 'deleted_at' => null]);
+
+        Contabil::withTrashed()->first()->restore();
+
+        $this->assertEquals(1, Contabil::count());
+        $this->assertDatabaseHas('contabeis', ['id' => 1, 'deleted_at' => null]);
+    }
+
     /** 
      * =======================================================================================================
      * TESTES USEREXTERNOSERVICE

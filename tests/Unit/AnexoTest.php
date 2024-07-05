@@ -234,4 +234,25 @@ class AnexoTest extends TestCase
 
         $this->assertEquals(true, Anexo::first()->anexadoPeloAtendente());
     }
+
+    /** @test */
+    public function sem_soft_delete()
+    {
+        $user = factory('App\Anexo')->create([
+            'path' => 'teste/teste/img.pdf'
+        ]);
+
+        $this->assertEquals(1, Anexo::count());
+        $this->assertDatabaseHas('anexos', ['id' => 1]);
+        $this->assertDatabaseMissing('anexos', ['deleted_at' => null]);
+
+        $user->delete();
+
+        $this->assertEquals(0, Anexo::count());
+        $this->assertDatabaseMissing('anexos', ['id' => 1]);
+        $this->assertDatabaseMissing('anexos', ['deleted_at' => null]);
+
+        $this->expectException(\Exception::class);
+        Anexo::withTrashed()->first();
+    }
 }
