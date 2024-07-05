@@ -20,13 +20,16 @@ class PreRegistroCnpj extends Model
     const TOTAL_HIST_DIAS_UPDATE = 1;
     const TOTAL_HIST_DIAS_UPDATE_SOCIO = 2;
 
-    private function horaUpdateHistorico($classe = null)
+    const RELACAO_RT = 'App\ResponsavelTecnico';
+    const RELACAO_SOCIO = 'App\Socio';
+
+    private function horaUpdateHistorico($classe = self::RELACAO_RT)
     {
         $update = $this->getHistoricoArray($classe)['update'];
         $updateCarbon = Carbon::createFromFormat('Y-m-d H:i:s', $update);
 
         switch ($classe) {
-            case 'App\Socio':
+            case self::RELACAO_SOCIO:
                 return $updateCarbon->addDays(self::TOTAL_HIST_DIAS_UPDATE_SOCIO);
                 break;
             default:
@@ -94,7 +97,7 @@ class PreRegistroCnpj extends Model
         return $this->socios->count() < self::TOTAL_HIST_SOCIO;
     }
 
-    public function canUpdateStatus()
+    public function atendentePodeAprovar()
     {
         return isset($this->responsavelTecnico->registro) && (strlen($this->responsavelTecnico->registro) > 4);
     }
@@ -191,11 +194,11 @@ class PreRegistroCnpj extends Model
         return $this->socios->where('id', $id)->first() !== null;
     }
 
-    public function getHistoricoCanEdit($classe = null)
+    public function getHistoricoCanEdit($classe = self::RELACAO_RT)
     {
         $array = $this->getHistoricoArray($classe);
         switch ($classe) {
-            case 'App\Socio':
+            case self::RELACAO_SOCIO:
                 $can = intval($array['tentativas']) < self::TOTAL_HIST_SOCIO;
                 break;
             default:
@@ -207,28 +210,31 @@ class PreRegistroCnpj extends Model
         return $can || (!$can && ($horaUpdate < now()));
     }
 
-    public function getHistoricoArray($classe = null)
+    public function getHistoricoArray($classe = self::RELACAO_RT)
     {
         switch ($classe) {
-            case 'App\Socio':
-                return $this->fromJson(isset($this->historico_socio) ? $this->historico_socio : array());
+            case self::RELACAO_SOCIO:
+                return isset($this->historico_socio) ? $this->fromJson($this->historico_socio) : array();
                 break;
-            default:
-                return $this->fromJson(isset($this->historico_rt) ? $this->historico_rt : array());
+            case self::RELACAO_RT:
+                return isset($this->historico_rt) ? $this->fromJson($this->historico_rt) : array();
+                break;
         }
+
+        throw new \Exception('Histórico de tentativas de troca no pré-registro deve ser somente as opções: Responsavel Tecnico, Socio', 500);
     }
 
-    public function getNextUpdateHistorico($classe = null)
+    public function getNextUpdateHistorico($classe = self::RELACAO_RT)
     {
         return $this->horaUpdateHistorico($classe)->format('d\/m\/Y, \à\s H:i');
     }
 
-    public function setHistorico($classe = null)
+    public function setHistorico($classe = self::RELACAO_RT)
     {
         $array = $this->getHistoricoArray($classe);
 
         switch ($classe) {
-            case 'App\Socio':
+            case self::RELACAO_SOCIO:
                 $totalTentativas = intval($array['tentativas']) < self::TOTAL_HIST_SOCIO;
                 break;
             default:

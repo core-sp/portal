@@ -605,6 +605,78 @@ class PreRegistro extends Model
         return $this->only(['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf']);
     }
 
+    private static function statusPorSituacao($situacao)
+    {
+        switch ($situacao) {
+            case 'aprovar':
+                return ['status' => self::STATUS_APROVADO];
+                break;
+            case 'negar':
+                return ['status' => self::STATUS_NEGADO];
+                break;
+            case 'corrigir':
+                return ['status' => self::STATUS_CORRECAO];
+                break;
+            default:
+                return ['status' => ''];
+                break;
+        }
+    }
+
+    private function verificaAtendentePodeAprovar()
+    {
+        $anexosOk = true;
+        $anexos = array_keys($this->getConfereAnexosArray());
+        if(count($anexos) > 0)
+        {
+            $tipos = $this->anexos->first()->getObrigatoriosPreRegistro();
+            $anexosOk = count(array_filter($tipos, function($v) use($anexos){
+                return !in_array($v, $anexos);
+            })) == 0;
+        }
+
+        if((count($anexos) <= 0) || !$anexosOk)
+            return 'Faltou confirmar a entrega dos anexos';
+
+        if(isset($this->justificativa))
+            return 'Possui justificativa(s)';
+
+        if(!$this->userExterno->isPessoaFisica() && !$this->pessoaJuridica->atendentePodeAprovar())
+            return 'Faltou inserir o registro do Responsável Técnico';
+    }
+
+    private function verificaAtendentePodeNegar()
+    {
+        if(!isset($this->getJustificativaArray()['negado']))
+            return 'Não possui justificativa(s)';
+    }
+
+    private function verificaAtendentePodeCorrigir()
+    {
+        if(count($this->getJustificativaArray()) == 0)
+            return 'Não possui justificativa(s)';
+        if(isset($this->getJustificativaArray()['negado']))
+            return 'Existe justificativa de negação, informe CTI';
+    }
+
+    public function verificaAtendentePodeAtualizarStatus($situacao)
+    {
+        $status = self::statusPorSituacao($situacao);
+        $texto = $situacao == 'corrigir' ? 'enviado para correção' : strtolower($status['status']);
+
+        if(!$this->atendentePodeEditar())
+            return 'Não possui o status necessário para ser ' . $texto;
+
+        if($status['status'] == self::STATUS_APROVADO)
+            $resp = $this->verificaAtendentePodeAprovar();
+        if($status['status'] == self::STATUS_NEGADO)
+            $resp = $this->verificaAtendentePodeNegar();
+        if($status['status'] == self::STATUS_CORRECAO)
+            $resp = $this->verificaAtendentePodeCorrigir();
+
+        return isset($resp) ? $resp : $status;
+    }
+
     public function salvarAjax($request, $gerentiRepository = null)
     {
         $classe = $request['classe'];

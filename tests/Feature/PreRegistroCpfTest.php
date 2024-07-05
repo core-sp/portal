@@ -3913,7 +3913,7 @@ class PreRegistroCpfTest extends TestCase
         ->assertSessionHasErrors('status');
 
         $this->get(route('preregistro.view', $preRegistroCpf->pre_registro_id))
-        ->assertSeeText('Não possui justificativa(s)');
+        ->assertSeeText('Existe justificativa de negação, informe CTI');
 
         $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_CORRECAO);
     }
