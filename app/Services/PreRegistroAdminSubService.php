@@ -265,9 +265,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         if(!$preRegistro->atendentePodeEditar())
             throw new \Exception('Não autorizado a editar o pré-registro sendo elaborado, aguardando correção ou finalizado', 401);
 
-        $dados = $this->formatarCamposRequest($request, true);
-
-        $preRegistro->salvarAjax($dados);
+        $preRegistro->salvarAjax($request, null, true);
         $preRegistro->update(['idusuario' => $user->idusuario]);
 
         $request['acao'] == 'exclusao_massa' ? 

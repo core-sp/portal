@@ -24,38 +24,7 @@ class PreRegistro extends Model
     const STATUS_NEGADO = 'Negado';
     const TOTAL_HIST = 1;
     const TOTAL_HIST_DIAS_UPDATE = 1;
-
-    private function atualizarCampoEspelho($request, $final)
-    {
-        if($this->correcaoEnviada())
-        {
-            $camposEspelho = isset($this->campos_espelho) ? $this->fromJson($this->campos_espelho) : array();
-            $dados = array_merge(array_diff_assoc($camposEspelho, $request), array_diff_assoc($request, $camposEspelho));
-
-            $socios = !$this->userExterno->isPessoaFisica() ? $this->pessoaJuridica->socios->pluck('id')->toArray() : array();
-
-            $removidos_socio = implode(', ', array_unique(array_keys(collect(array_filter($dados, function($k) use($socios) {
-                if(strpos($k, '_socio_') !== false)
-                    return !in_array(apenasNumeros($k), $socios);
-            }, ARRAY_FILTER_USE_KEY))->keyBy(function($i, $k) {
-                return apenasNumeros($k);
-            })->toArray())));
-
-            if(strlen($removidos_socio) > 1)
-                $dados['removidos_socio'] = $removidos_socio;
-
-            $dados = array_filter($dados, function($v, $k) use($socios) {
-                return strpos($k, '_socio_') !== false ? in_array(apenasNumeros($k), $socios) : true;
-            }, ARRAY_FILTER_USE_BOTH);
-
-            $socios = null;
-
-            if(isset($dados['path']))
-                $dados['path'] = $final['path'];
-            $this->update(['campos_editados' => $this->asJson($dados)]);
-        }
-        $this->update(['campos_espelho' => $this->asJson($request)]);
-    }
+    const LIMITE_TOTAL_TELEFONES = 2;
 
     private function horaUpdateHistorico()
     {
@@ -66,11 +35,11 @@ class PreRegistro extends Model
         return $updateCarbon;
     }
 
-    protected function atualizarFinal($campo, $valor)
+    public function atualizarFinal($campo, $valor)
     {
         $resultado = null;
         $valido = $this->validarUpdateAjax($campo, $valor);
-        if(isset($valido))
+        if(isset($valido) && is_array($valido))
         {
             $this->update($valido);
             if(in_array($campo, array_keys($this->getEndereco())) && !$this->userExterno->isPessoaFisica())
@@ -80,36 +49,26 @@ class PreRegistro extends Model
         return $resultado;
     }
 
-    private function formatTelefones($campo, $valor)
+    private function formatacaoFinalTelefones($campo, $valor)
     {
-        switch ($campo) {
-            case 'tipo_telefone':
-            case 'tipo_telefone_1':
-                $temp = array_filter(explode(';', $this->tipo_telefone));
-                break;
-            case 'telefone':
-            case 'telefone_1':
-                $temp = array_filter(explode(';', $this->telefone));
-                break;
+        $campo_temp = $this->limparCampoTelefones($campo);
+        $index = (int) apenasNumeros($campo);
+
+        switch ($campo_temp) {
             case 'opcional_celular':
-            case 'opcional_celular_1':
-                $temp = array_filter(explode(';', $this->opcional_celular));
-                $temp[0] = isset($temp[0]) ? $temp[0] : null;
-                $temp[1] = isset($temp[1]) ? $temp[1] : null;
-                $array_opcoes = $campo == 'opcional_celular' ? array_filter(explode(',', $temp[0])) : array_filter(explode(',', $temp[1]));
+                $temp = array_values($this->getOpcionalCelular(true, null));
+                $array_opcoes = array_filter(explode(',', $temp[$index]));
                 $valor = !in_array($valor, $array_opcoes) ? implode(',', Arr::add($array_opcoes, count($array_opcoes), $valor)) : implode(',', Arr::except($array_opcoes, array_search($valor, $array_opcoes, true)));
                 break;
+            case 'telefone':
+                $temp = array_values($this->getTelefone(true));
+                break;
+            case 'tipo_telefone':
+                $temp = array_values($this->getTipoTelefone(true));
+                break;
         }
 
-        if(strpos($campo, '_1') === false)
-            $temp[0] = $valor;
-        else
-        {
-            $temp[0] = isset($temp[0]) ? $temp[0] : '';
-            $temp[1] = $valor;
-        }
-
-        ksort($temp, SORT_NUMERIC);
+        $temp[$index] = $valor;
 
         return implode(';', $temp);
     }
@@ -145,15 +104,13 @@ class PreRegistro extends Model
 
     private function validarUpdateAjax($campo, $valor)
     {
-        switch ($campo) {
+        $temp = $this->limparCampoTelefones($campo);
+        switch ($temp) {
             case 'tipo_telefone':
-            case 'tipo_telefone_1':
             case 'telefone':
-            case 'telefone_1':
             case 'opcional_celular':
-            case 'opcional_celular_1':
-                $valor = $this->formatTelefones($campo, $valor);
-                $campo = str_replace('_1', '', $campo);
+                $valor = $this->formatacaoFinalTelefones($campo, $valor);
+                $campo = $temp;
                 break;
             case 'justificativa':
                 $valor = $this->formatTextoCorrecaoAdmin($valor['campo'], $valor['valor']);
@@ -330,6 +287,11 @@ class PreRegistro extends Model
         return $can || (!$can && ($horaUpdate < now()));
     }
 
+    public function relacionarContabil($id)
+    {
+        return $this->update(['contabil_id' => $id, 'historico_contabil' => $this->setHistorico()]);
+    }
+
     public function getLabelStatus($status = null)
     {
         return isset($status) && isset(self::colorLabelStatusAdmin()[$status]) ? self::colorLabelStatusAdmin()[$status] : self::colorLabelStatusAdmin()[$this->status];
@@ -379,9 +341,14 @@ class PreRegistro extends Model
         return $this->isAprovado() ? $this->anexos->whereNotNull('tipo')->where('pre_registro_id', $this->id) : collect();
     }
 
-    public function getTipoTelefone()
+    public function getTipoTelefone($nomeDosCampos = false)
     {
-        return array_filter(explode(';', $this->tipo_telefone));
+        $tipo_telefones = array_filter(explode(';', $this->tipo_telefone));
+
+        if(!$nomeDosCampos)
+            return $tipo_telefones;
+
+        return $this->formataTelefonesComCampo(self::LIMITE_TOTAL_TELEFONES, $tipo_telefones, 'tipo_telefone');
     }
 
     public function tipoTelefoneCelular()
@@ -394,16 +361,26 @@ class PreRegistro extends Model
         return isset($this->getTipoTelefone()[1]) && ($this->getTipoTelefone()[1] == mb_strtoupper(tipos_contatos()[0], 'UTF-8'));
     }
 
-    public function getTelefone()
+    public function getTelefone($nomeDosCampos = false)
     {
-        return array_filter(explode(';', $this->telefone));
+        $telefones = array_filter(explode(';', $this->telefone));
+
+        if(!$nomeDosCampos)
+            return $telefones;
+
+        return $this->formataTelefonesComCampo(self::LIMITE_TOTAL_TELEFONES, $telefones, 'telefone');
     }
 
-    public function getOpcionalCelular()
+    public function getOpcionalCelular($nomeDosCampos = false, $opcaoDeRetorno = [])
     {
-        return collect(array_filter(explode(';', $this->opcional_celular)))->map(function ($item, $key) {
-            return array_filter(explode(',', $item));
+        $opcional_celular = collect(array_filter(explode(';', $this->opcional_celular)))->map(function ($item, $key) use($opcaoDeRetorno){
+            return is_array($opcaoDeRetorno) ? array_filter(explode(',', $item)) : $item;
         })->toArray();
+
+        if(!$nomeDosCampos)
+            return $opcional_celular;
+
+        return $this->formataTelefonesComCampo(self::LIMITE_TOTAL_TELEFONES, $opcional_celular, 'opcional_celular', $opcaoDeRetorno);
     }
 
     public function getJustificativaArray()
@@ -418,7 +395,10 @@ class PreRegistro extends Model
 
     public function getJustificativaPorCampoData($campo, $data_hora)
     {
-        return Arr::get(collect($this->fromJson($this->historico_justificativas))->keyBy(function ($item, $chave){
+        if(!Carbon::hasFormat($data_hora, 'Y-m-d H:i:s'))
+            throw new \Exception('Formato de data / hora, para recuperar justificativa no histórico do pre-registro, não possui o formato válido: ano-mes-dia hora:minuto:segundo. ID: ' . $this->id, 500);
+
+        return Arr::get(collect($this->historicoJustificativas())->keyBy(function ($item, $chave){
             return array_filter(explode(';', $item))[1];
         })
         ->only([$data_hora])
@@ -480,7 +460,7 @@ class PreRegistro extends Model
 
     public function userPodeEditar()
     {
-        return ($this->status == PreRegistro::STATUS_CRIADO) || $this->correcaoEnviada();
+        return $this->criado() || $this->correcaoEnviada();
     }
 
     public function atendentePodeEditar()
@@ -488,6 +468,7 @@ class PreRegistro extends Model
         return in_array($this->status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]);
     }
 
+    // $arrayAba = getCodigosCampos()[n]
     public function getCodigosJustificadosByAba($arrayAba)
     {
         if($this->userPodeCorrigir())
@@ -505,9 +486,19 @@ class PreRegistro extends Model
         return null;
     }
 
-    public function setHistoricoStatus()
+    private function historicoStatus()
     {
-        $historico = isset($this->historico_status) ? $this->fromJson($this->historico_status) : array();
+        return isset($this->historico_status) ? $this->fromJson($this->historico_status) : array();
+    }
+
+    private function historicoJustificativas()
+    {
+        return isset($this->historico_justificativas) ? $this->fromJson($this->historico_justificativas) : array();
+    }
+
+    private function setHistoricoStatus()
+    {
+        $historico = $this->historicoStatus();
         $temp = $this->status . ';' . $this->updated_at;
         array_push($historico, $temp);
         $this->update(['historico_status' => $this->asJson($historico)]);
@@ -521,14 +512,14 @@ class PreRegistro extends Model
         if(strlen($this->justificativa) < 3)
             return null;
 
-        $justificativas = isset($this->historico_justificativas) ? $this->fromJson($this->historico_justificativas) : array();
+        $justificativas = $this->historicoJustificativas();
         array_push($justificativas, $this->justificativa . ';' . $data_update);
-        $this->update(['historico_justificativas' => $this->asJson($justificativas)]);
+        return $this->update(['historico_justificativas' => $this->asJson($justificativas)]);
     }
 
     public function getHistoricoStatus()
     {
-        return collect($this->fromJson($this->historico_status))->keyBy(function ($item, $chave){
+        return collect($this->historicoStatus())->keyBy(function ($item, $chave){
             return array_filter(explode(';', $item))[1];
         })
         ->map(function ($values){
@@ -545,7 +536,7 @@ class PreRegistro extends Model
         ->flip()
         ->toArray();
 
-        return collect($this->fromJson($this->historico_justificativas))->keyBy(function ($item, $chave){
+        return collect($this->historicoJustificativas())->keyBy(function ($item, $chave){
             return array_filter(explode(';', $item))[1];
         })
         ->transform(function ($values) use($campos){
@@ -562,25 +553,74 @@ class PreRegistro extends Model
         ->toArray();
     }
 
-    public function setCamposEspelho($request)
+    private function setCamposEspelho($request)
     {
-        $request = $this->formatarCamposRequest($request);
-        $idAnexos = isset($this->anexos) ? $this->anexos->pluck('id')->toArray() : array();
-        $request['path'] = !empty($idAnexos) ? implode(',', $idAnexos) : '';
-        $final['path'] = $request['path'];
+        if(!$this->correcaoEnviada() && !$this->criado())
+            return false;
 
-        if(isset($this->campos_espelho))
+        $camposEspelho = isset($this->campos_espelho) ? $this->fromJson($this->campos_espelho) : array();
+        $pathAntigo = isset($camposEspelho['path']) ? $camposEspelho['path'] : null;
+        $request = $this->formatarCamposRequest($request);
+        $path = $this->anexosCampoEspelho($pathAntigo);
+
+        if($this->correcaoEnviada())
         {
-            $anexosAntigo = explode(',', $this->fromJson($this->campos_espelho)['path']);
+            $dados = array_merge(array_diff_assoc($camposEspelho, $request), array_diff_assoc($request, $camposEspelho));
+
+            $dados = $this->sociosCampoEspelho($dados);
+
+            if(isset($dados['path']))
+                $dados['path'] = $path;
+
+            $this->update(['campos_editados' => $this->asJson($dados)]);
+        }
+
+        return $this->update(['campos_espelho' => $this->asJson($request)]);
+    }
+
+    private function anexosCampoEspelho($pathAntigo)
+    {
+        $idAnexos = isset($this->anexos) ? $this->anexos->pluck('id')->toArray() : array();
+        $path = !empty($idAnexos) ? implode(',', $idAnexos) : '';
+
+        if(isset($pathAntigo))
+        {
+            $anexosAntigo = explode(',', $pathAntigo);
             $idAnexos = array_filter($idAnexos, function($v, $k) use($anexosAntigo) {
                 return !in_array($v, $anexosAntigo);
             }, ARRAY_FILTER_USE_BOTH);
 
             if(!empty($idAnexos))
-                $final['path'] = implode(',', $idAnexos);
+                $path = implode(',', $idAnexos);
         }
 
-        $this->atualizarCampoEspelho($request, $final);
+        return $path;
+    }
+
+    private function sociosCampoEspelho($dados)
+    {
+        if(!$this->correcaoEnviada() || $this->userExterno->isPessoaFisica())
+            return $dados;
+
+        $socios = $this->pessoaJuridica->socios->pluck('id')->toArray();
+
+        $removidos_socio = implode(', ', array_unique(array_keys(collect(array_filter($dados, function($k) use($socios) {
+            if(strpos($k, '_socio_') !== false)
+                return !in_array(apenasNumeros($k), $socios);
+        }, ARRAY_FILTER_USE_KEY))->keyBy(function($i, $k) {
+            return apenasNumeros($k);
+        })->toArray())));
+
+        if(strlen($removidos_socio) > 0)
+            $dados['removidos_socio'] = $removidos_socio;
+
+        $dados = array_filter($dados, function($v, $k) use($socios) {
+            return strpos($k, '_socio_') !== false ? in_array(apenasNumeros($k), $socios) : true;
+        }, ARRAY_FILTER_USE_BOTH);
+
+        $socios = null;
+
+        return $dados;
     }
 
     public function possuiCamposEditados()
@@ -595,8 +635,10 @@ class PreRegistro extends Model
         return $this->correcaoEmAnalise() && $this->possuiCamposEditados() ? $this->fromJson($this->campos_editados) : array();
     }
 
-    public function confereJustificadosSubmit()
+    public function confereJustificadosSubmit($request)
     {
+        $this->setCamposEspelho($request);
+
         return !$this->correcaoEnviada() || ($this->correcaoEnviada() && $this->possuiCamposEditados());
     }
 
@@ -677,27 +719,26 @@ class PreRegistro extends Model
         return isset($resp) ? $resp : $status;
     }
 
-    public function salvarAjax($request, $gerentiRepository = null)
+    public function salvarAjax($request, $gerentiRepository = null, $admin = false)
     {
-        $classe = $request['classe'];
-        $request['campo'] = $this->limparNomeCamposAjax($request['classe'], $request['campo']);
-        $cpf_cnpj = (is_array($request['campo']) && ($request['campo'][1] == 'cpf_cnpj')) || (!is_array($request['campo']) && ($request['campo'] == 'cpf')) ? $request['valor'] : '';
-        $gerenti = $this->getRegistradoGerenti($request['classe'], $gerentiRepository, $cpf_cnpj);
-        $campo = $request['campo'];
-        $valor = $request['valor'];
+        $request = $this->formatarCamposRequest($request, $admin);
 
-        if((($classe == $this->getNomeClasses()[6]) && is_array($campo)) || (($classe != $this->getNomeClasses()[0]) && ($classe != $this->getNomeClasses()[4])))
-            return (is_array($campo) && ($campo[0] == 0)) || !$this->has($classe)->where('id', $this->id)->exists() ? $this->criarAjax($classe, $campo, $valor, $gerenti) : $this->atualizarAjax($classe, $campo, $valor);
+        if($request['classe'] == $this->relation_pre_registro)
+            $resp = $this->verificaSeCriaOuAtualiza($request, $gerentiRepository);
+        else
+            $resp = $this->verificaSeCriaOuAtualiza($request, $gerentiRepository, $this->has($request['classe'])->where('id', $this->id)->exists());
+        
+        $request = null;
 
-        if($classe == $this->getNomeClasses()[4])
-            return $this->atualizarAjax($classe, $campo, $valor);
+        if($resp['resp'] == 'criar')
+            return $this->criarAjax($resp['classe'], $resp['campo'], $resp['valor'], $resp['gerenti']);
 
-        return $this->criarAjax($classe, $campo, $valor, $gerenti);
+        return $this->atualizarAjax($resp['classe'], $resp['campo'], $resp['valor']);
     }
 
     public function salvar(/*$request, $gerentiRepository*/)
     {
-        try{
+        // try{
             // $camposLimpos = $this->getCamposLimpos($request, $this->userExterno->getCamposPreRegistro());
             // unset($request);
 
@@ -708,6 +749,10 @@ class PreRegistro extends Model
             // }
 
             // unset($camposLimpos);
+
+            if(!$this->criado() && !$this->correcaoEnviada())
+                return $this->status;
+
             $status = $this->criado() ? self::STATUS_ANALISE_INICIAL : self::STATUS_ANALISE_CORRECAO;
             $resultado = $this->update(['status' => $status]);
 
@@ -716,10 +761,10 @@ class PreRegistro extends Model
 
             $this->setHistoricoStatus();
             $resultado = $status;
-        }catch(\Throwable $e){
-            // throw new \Exception('Erro ao salvar dados finais do pré-registro com id ' . $this->id . ' na classe: ' . $classe .', com a seguinte mensagem: ' . $e->getMessage(), 500);
-            throw new \Exception('Erro ao salvar dados finais do pré-registro com id ' . $this->id .', com a seguinte mensagem: ' . $e->getMessage(), 500);
-        }
+        // }catch(\Throwable $e){
+        //     // throw new \Exception('Erro ao salvar dados finais do pré-registro com id ' . $this->id . ' na classe: ' . $classe .', com a seguinte mensagem: ' . $e->getMessage(), 500);
+        //     throw new \Exception('Erro ao salvar dados finais do pré-registro com id ' . $this->id .', com a seguinte mensagem: ' . $e->getMessage(), 500);
+        // }
 
         return $resultado;
     }
@@ -729,17 +774,6 @@ class PreRegistro extends Model
         $all = Arr::only($this->attributesToArray(), ['segmento', 'cep', 'bairro', 'logradouro', 'numero', 'complemento', 'cidade', 'uf', 'telefone', 
         'tipo_telefone', 'opcional_celular', 'idregional']);
 
-        $tel = explode(';', $this->telefone);
-        $tipo = explode(';', $this->tipo_telefone);
-        $opcional = explode(';', $this->opcional_celular);
-
-        $all['telefone'] = isset($tel[0]) ? $tel[0] : null;
-        $all['telefone_1'] = isset($tel[1]) ? $tel[1] : null;
-        $all['tipo_telefone'] = isset($tipo[0]) ? $tipo[0] : null;
-        $all['tipo_telefone_1'] = isset($tipo[1]) ? $tipo[1] : null;
-        $all['opcional_celular'] = isset($opcional[0]) ? array_filter(explode(',', $opcional[0])) : [];
-        $all['opcional_celular_1'] = isset($opcional[1]) ? array_filter(explode(',', $opcional[1])) : [];
-
-        return $all;
+        return array_merge($all, $this->getTelefone(true), $this->getTipoTelefone(true), $this->getOpcionalCelular(true));
     }
 }

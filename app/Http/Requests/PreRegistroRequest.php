@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class PreRegistroRequest extends FormRequest
 {
     private $regraDtNasc;
-    private $regraPath;
     private $regraReservistaPF;
     private $regraReservistaRT;
     private $externo;
@@ -44,7 +43,7 @@ class PreRegistroRequest extends FormRequest
         $tipos_identidade = $this->upperImplode(tipos_identidade());
 
         $rules = [
-            'path' => $this->regraPath,
+            'path' => 'required|not_in:0',
             'cnpj_contabil' => ['nullable', new Cnpj, 'unique:users_externo,cpf_cnpj'],
             'nome_contabil' => 'required_with:cnpj_contabil|nullable|min:5|max:191',
             'email_contabil' => 'required_with:cnpj_contabil|nullable|email:rfc,filter|min:10|max:191',
@@ -181,25 +180,11 @@ class PreRegistroRequest extends FormRequest
         $this->replace([]);
         $this->merge(['pergunta' => $pergunta]);
 
-        // Obrigatório salvar os anexos via rota ajax
-        $anexosCount = isset($preRegistro) ? $preRegistro->anexos->count() : 0;
-
-        $this->regraPath = '';
         $this->regraDtNasc = Carbon::today()->subYears(18)->format('Y-m-d');
         $dataReservista = Carbon::today()->subYears(45)->format('Y-m-d');
-
-        if($anexosCount == 0)
-        {
-            $this->regraPath = 'required';
-            $this->merge([
-                'path' => ''
-            ]);
-        }else
-            $this->merge([
-                'path' => $anexosCount
-            ]);
         
         // substitui com os dados já salvos
+        $this->merge(['path' => $preRegistro->anexos->count()]);
         $this->merge($preRegistro->arrayValidacaoInputs());
 
         // substitui com os dados já salvos
@@ -322,6 +307,7 @@ class PreRegistroRequest extends FormRequest
             'cnpj_contabil.unique' => 'O CNPJ fornecido já consta no Portal com outro tipo de conta',
             'email.unique' => 'E-mail já existe como Contabilidade',
             'not_in' => 'Valor não é aceito',
+            'path.not_in' => 'Obrigatório ter anexo(s)',
             'unique' => 'O valor já existe e não pode ser usado',
             'different' => 'O valor deve ser diferente do CPF do Responsável Técnico',
             'before_or_equal' => 'Deve ter 18 anos completos ou mais',

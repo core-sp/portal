@@ -62,12 +62,12 @@ class PreRegistroAjaxRequest extends FormRequest
         if(in_array($this->campo, array_keys($arrayIn)) && isset($this->valor))
             $this->regraValor = 'in:' . mb_strtoupper($arrayIn[$this->campo], 'UTF-8');
 
-        if(in_array($this->campo, ['opcional_celular[]', 'opcional_celular_1[]']))
+        if(preg_match('/(^opcional_celular\[\]$)|(^opcional_celular_[0-9]{1,2}\[\]$)/', $this->campo))
             $this->merge([
                 'campo' => str_replace('[]', '', $this->campo),
             ]);
 
-        if(in_array($this->campo, ['cep', 'cep_empresa', 'cep_rt', 'cep_socio']) && isset($this->valor))
+        if(preg_match('/(^cep$)|(^cep_empresa$)|(^cep_rt$)|(^cep_socio$)/', $this->campo) && isset($this->valor))
             $this->regraValor = ['size:9', 'regex:/([0-9]{5})\-([0-9]{3})$/'];
 
         if((strpos($this->campo, 'cpf') !== false) || (strpos($this->campo, 'cnpj') !== false))

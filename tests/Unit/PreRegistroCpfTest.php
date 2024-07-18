@@ -49,6 +49,10 @@ class PreRegistroCpfTest extends TestCase
 
         $this->assertEquals(1, PreRegistroCpf::find(1)->preRegistro()->count());
         $this->assertEquals(1, PreRegistroCpf::find(2)->preRegistro()->count());
+
+        PreRegistroCpf::find(1)->preRegistro()->delete();
+        $this->assertNotEquals(null, PreRegistroCpf::find(1)->preRegistro()->first()->deleted_at);
+        $this->assertEquals(1, PreRegistroCpf::find(1)->preRegistro()->count());
     }
 
     /** @test */

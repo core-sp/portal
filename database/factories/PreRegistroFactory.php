@@ -78,12 +78,12 @@ $factory->state(PreRegistro::class, 'analise_inicial', function (Faker $faker) {
 });
 
 $factory->state(PreRegistro::class, 'enviado_correcao', function (Faker $faker) {
-    $temp = now()->format('Y-m-d H:i:s');
+    $temp = now()->subHour()->format('Y-m-d H:i:s');
     
     return [
         'status' => PreRegistro::STATUS_CORRECAO,
         'historico_status' => json_encode([
-            PreRegistro::STATUS_CRIADO . ';' . now()->subDay()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_CRIADO . ';' . now()->subDay()->subHour()->format('Y-m-d H:i:s'),
             PreRegistro::STATUS_ANALISE_INICIAL . ';' . now()->subDay()->format('Y-m-d H:i:s'),
             PreRegistro::STATUS_CORRECAO . ';' . $temp
         ], JSON_FORCE_OBJECT),
@@ -102,7 +102,7 @@ $factory->state(PreRegistro::class, 'analise_correcao', function (Faker $faker) 
         'status' => PreRegistro::STATUS_ANALISE_CORRECAO,
         'historico_status' => json_encode([
             PreRegistro::STATUS_CRIADO . ';' . now()->subDays(2)->format('Y-m-d H:i:s'),
-            PreRegistro::STATUS_ANALISE_INICIAL . ';' . now()->subDay()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_ANALISE_INICIAL . ';' . now()->subDay()->subHour()->format('Y-m-d H:i:s'),
             PreRegistro::STATUS_CORRECAO . ';' . $temp,
             PreRegistro::STATUS_ANALISE_CORRECAO . ';' . now()->format('Y-m-d H:i:s')
         ], JSON_FORCE_OBJECT),
@@ -178,6 +178,16 @@ $factory->state(PreRegistro::class, 'anexos_ok_pj', function (Faker $faker) {
 
     return [
         'confere_anexos' => json_encode(array_fill_keys($anexos, "OK")),
+    ];
+});
+
+$factory->state(PreRegistro::class, 'campos_editados', function (Faker $faker) {
+    return [
+        'campos_editados' => json_encode([
+            'idregional' => '4',
+            'bairro' => 'OUTRO TESTE EDITADO',
+            'numero' => '123A',
+        ]),
     ];
 });
 

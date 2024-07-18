@@ -74,6 +74,10 @@ $factory->state(PreRegistroCnpj::class, 'bloqueado_socio', function (Faker $fake
     ];
 });
 
+$factory->state(PreRegistroCnpj::class, 'justificativas', function (Faker $faker) {
+    return [];
+});
+
 $factory->afterMakingState(PreRegistroCnpj::class, 'make_endereco', function ($prCnpj, $faker) {
     $prCnpj->makeHidden(['pre_registro_id', 'historico_rt', 'historico_socio', 'responsavel_tecnico_id', 'pre_registro']);
     $prCnpj->makeHidden(array_keys($prCnpj->getEndereco()));
@@ -99,4 +103,11 @@ $factory->afterCreatingState(PreRegistroCnpj::class, 'com_limite_socios', functi
     $socios_pf = factory('App\Socio', 4)->create();
     $socios_pj = factory('App\Socio', 4)->states('pj')->create();
     $prCnpj->socios()->attach(array_merge($socios_pf->pluck('id')->all(), $socios_pj->pluck('id')->all()));
+});
+
+$factory->afterCreatingState(PreRegistroCnpj::class, 'justificativas', function ($prCnpj, $faker) {
+    $keys = array_merge(array_keys($prCnpj->arrayValidacaoInputs()), array_keys($prCnpj->preRegistro->arrayValidacaoInputs()));
+    foreach($keys as $key)
+        $array[$key] = $faker->text(100);
+    $prCnpj->preRegistro->update(['justificativa' => json_encode($array)]);
 });

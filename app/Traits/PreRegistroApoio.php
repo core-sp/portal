@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use Carbon\Carbon;
 use App\Traits\Gerenti;
+use Illuminate\Support\Arr;
 
 trait PreRegistroApoio {
 
@@ -19,6 +20,9 @@ trait PreRegistroApoio {
 
     private function criarAjax($relacao, $campo, $valor, $gerenti)
     {
+        if(get_class($this) != 'App\PreRegistro')
+            throw new \Exception('Este método somente a classe App\PreRegistro deve usar', 500);
+
         $classe = array_search($relacao, $this->getRelacoes());
 
         switch ($relacao) {
@@ -39,16 +43,19 @@ trait PreRegistroApoio {
 
     private function atualizarAjax($classe, $campo, $valor)
     {
+        if(get_class($this) != 'App\PreRegistro')
+            throw new \Exception('Este método somente a classe App\PreRegistro deve usar', 500);
+
         switch ($classe) {
             case $this->relation_pre_registro:
+                return $this->atualizarFinal($campo, $valor);
+                break;
             case $this->relation_pf:
             case $this->relation_pj:
-                $temp = $classe == $this->relation_pre_registro ? $this : $this->loadMissing($classe)[$classe];
-                return isset($temp) ? $temp->atualizarFinal($campo, $valor) : null;
+                return $this->loadMissing($classe)[$classe]->atualizarFinal($campo, $valor);
                 break;
             case $this->relation_contabil:
-                $pr = $this;
-                return $this->loadMissing($classe)[$classe]->atualizarFinal($campo, $valor, $pr);
+                return $this->loadMissing($classe)[$classe]->atualizarFinal($campo, $valor, $this);
                 break;
             case $this->relation_rt:
                 $pj = $this->loadMissing($classe)->pessoaJuridica;
@@ -94,6 +101,22 @@ trait PreRegistroApoio {
 
     //     throw new \Exception('Classe não está configurada para ser salva no array final', 500);
     // }
+    
+    private function limparCampoTelefones($campo)
+    {
+        return preg_replace('/_[0-9]{1,2}$/', '', $campo);
+    }
+    
+    private function formataTelefonesComCampo($limite, $array, $nomeCampo, $retorno = null)
+    {
+        for($cont = 0; $cont < $limite; ++$cont)
+        {
+            $chave = $cont > 0 ? $nomeCampo . '_' . $cont : $nomeCampo;
+            $temp[$chave] = isset($array[$cont]) ? $array[$cont] : $retorno;
+        }
+
+        return $temp;
+    }
     
     private function getRelacoes()
     {
@@ -178,7 +201,7 @@ trait PreRegistroApoio {
         return $campo;
     }
 
-    public function formatarCamposRequest($request, $admin = false)
+    private function formatarCamposRequest($request, $admin = false)
     {
         if($admin)
         {
@@ -206,12 +229,11 @@ trait PreRegistroApoio {
             return ['classe' => $classe, 'campo' => $campo, 'valor' => $valor];
         }
 
-        $request['opcional_celular'] = isset($request['opcional_celular']) ? implode(',', $request['opcional_celular']) : null;
-        if(isset($request['opcional_celular_1']))
-            $request['opcional_celular_1'] = implode(',', $request['opcional_celular_1']);
-        unset($request['pergunta']);
-        
-        return $request;
+        return Arr::except(array_merge($request, array_map(function($valor){
+            return count($valor) == 0 ? null : implode(',', $valor);
+        }, array_filter($request, function($v, $k) {
+            return preg_match('/(^opcional_celular$)|(^opcional_celular_[0-9]{1,2}$)/', $k);
+        }, ARRAY_FILTER_USE_BOTH))), ['pergunta']);
     }
 
     public function getNomeClasses()
@@ -358,5 +380,38 @@ trait PreRegistroApoio {
             $this->getSocioGerenti($ass_id, $gerentiRepository, $cpf_cnpj, $gerenti, $tipo);
 
         return $gerenti;
+    }
+
+    public function verificaSeCriaOuAtualiza($request, $gerentiRepository, $objetoExiste = false)
+    {
+        $request['campo'] = $this->limparNomeCamposAjax($request['classe'], $request['campo']);
+
+        $cpf_cnpj = $this->getCpfCnpjRequest($request['campo'], $request['valor']);
+
+        $gerenti = $this->getRegistradoGerenti($request['classe'], $gerentiRepository, $cpf_cnpj);
+
+        return [
+            'resp' => $this->podeCriarRequest($request['classe'], $request['campo'], $objetoExiste) ? 'criar' : 'atualizar',
+            'gerenti' => $gerenti,
+            'classe' => $request['classe'],
+            'campo' => $request['campo'],
+            'valor' => $request['valor'],
+        ];
+    }
+
+    private function getCpfCnpjRequest($campo, $valor)
+    {
+        return (is_array($campo) && ($campo[1] == 'cpf_cnpj')) || (!is_array($campo) && ($campo == 'cpf')) ? $valor : '';
+    }
+
+    private function podeCriarRequest($classe, $campo, $objetoExiste)
+    {
+        if((($classe == $this->relation_socio) && is_array($campo)) || (($classe != $this->relation_anexos) && ($classe != $this->relation_pre_registro)))
+            return (is_array($campo) && ($campo[0] == 0)) || !$objetoExiste;
+
+        if($classe == $this->relation_pre_registro)
+            return false;
+
+        return true;
     }
 }

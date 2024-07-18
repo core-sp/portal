@@ -40,3 +40,14 @@ $factory->state(PreRegistroCpf::class, 'low', function (Faker $faker) {
         'pre_registro_id' => factory('App\PreRegistro')->states('low'),
     ];
 });
+
+$factory->state(PreRegistroCpf::class, 'justificativas', function (Faker $faker) {
+    return [];
+});
+
+$factory->afterCreatingState(PreRegistroCpf::class, 'justificativas', function ($prCpf, $faker) {
+    $keys = array_merge(array_keys($prCpf->arrayValidacaoInputs()), array_keys($prCpf->preRegistro->arrayValidacaoInputs()));
+    foreach($keys as $key)
+        $array[$key] = $faker->text(100);
+    $prCpf->preRegistro->update(['justificativa' => json_encode($array)]);
+});

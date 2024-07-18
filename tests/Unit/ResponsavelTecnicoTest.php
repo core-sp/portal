@@ -24,6 +24,10 @@ class ResponsavelTecnicoTest extends TestCase
         factory('App\PreRegistroCnpj')->create();
 
         $this->assertEquals(2, ResponsavelTecnico::first()->pessoasJuridicas->count());
+
+        ResponsavelTecnico::find(1)->pessoasJuridicas()->first()->delete();
+        $this->assertNotEquals(null, ResponsavelTecnico::find(1)->pessoasJuridicas()->first()->deleted_at);
+        $this->assertEquals(1, ResponsavelTecnico::find(1)->pessoasJuridicas()->first()->count());
     }
 
     /** @test */

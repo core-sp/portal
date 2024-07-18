@@ -197,8 +197,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         if(!$preRegistro->userPodeEditar())
             throw new \Exception('Não autorizado a editar o formulário com a solicitação em análise ou finalizada', 401);
 
-        $preRegistro->setCamposEspelho($request);
-        if(!$preRegistro->confereJustificadosSubmit())
+        if(!$preRegistro->confereJustificadosSubmit($request))
             return [
                 'message' => '<i class="fas fa-times"></i> Formulário não foi enviado para análise da correção, pois precisa editar dados(s) conforme justificativa(s).',
                 'class' => 'alert-danger'

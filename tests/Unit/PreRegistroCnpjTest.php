@@ -46,6 +46,10 @@ class PreRegistroCnpjTest extends TestCase
 
         $this->assertEquals(1, PreRegistroCnpj::find(1)->preRegistro()->count());
         $this->assertEquals(1, PreRegistroCnpj::find(2)->preRegistro()->count());
+
+        PreRegistroCnpj::find(1)->preRegistro()->delete();
+        $this->assertNotEquals(null, PreRegistroCnpj::find(1)->preRegistro()->first()->deleted_at);
+        $this->assertEquals(1, PreRegistroCnpj::find(1)->preRegistro()->count());
     }
 
     /** @test */
@@ -62,6 +66,12 @@ class PreRegistroCnpjTest extends TestCase
 
         $this->assertEquals(0, PreRegistroCnpj::find(1)->responsavelTecnico()->count());
         $this->assertEquals(0, PreRegistroCnpj::find(2)->responsavelTecnico()->count());
+
+        PreRegistroCnpj::find(1)->update(['responsavel_tecnico_id' => 1]);
+
+        PreRegistroCnpj::find(1)->responsavelTecnico()->delete();
+        $this->assertNotEquals(null, PreRegistroCnpj::find(1)->responsavelTecnico()->first()->deleted_at);
+        $this->assertEquals(1, PreRegistroCnpj::find(1)->responsavelTecnico()->count());
     }
 
     /** @test */

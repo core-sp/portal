@@ -46,7 +46,7 @@ class Contabil extends Authenticatable
         if($valido == 'notUpdate')
             $valido = ['update' => $pr->getNextUpdateHistorico()];
         else
-            $pr->update(['contabil_id' => $valido->id, 'historico_contabil' => $pr->setHistorico()]);
+            $pr->relacionarContabil($valido->id);
 
         return $valido;
     }
