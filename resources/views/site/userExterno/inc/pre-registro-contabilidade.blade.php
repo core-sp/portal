@@ -9,7 +9,7 @@
         <span class="font-weight-bolder">Observações:</span>
         <br>
         {!! auth()->guard('contabil')->check() ? 
-            'Para alterar os dados abaixo, vá na aba "Alterar dados do cadastro" do menu da esquerda.' : 
+            'Para alterar os dados abaixo, acesse a aba <a class="text-primary" href="' . route('externo.editar.view') . '"><i>Alterar dados do cadastro</i></a> do menu.' : 
             'Se registro realizado por Escritório de Contabilidade, inserir os dados solicitados abaixo, caso contrário, avançar esta etapa sem o preenchimento. <br>
             <span class="text-danger font-weight-bolder">*</span> Campos obrigatórios caso preencha CNPJ da contabilidade <br>
             Caso a contabilidade possua login no Portal, somente ela poderá alterar os dados.'
@@ -20,7 +20,7 @@
 <div class="form-row mb-3 mt-4">
     <div class="col-sm mb-2-576">
         <label {{ !auth()->guard('contabil')->check() ? 'for=cnpj_contabil' : '' }}>{{ $nome_campos['cnpj_contabil'] }} - CNPJ</label> 
-        <small class="text-muted text-left ml-2">
+        <small class="text-{{ auth()->guard('contabil')->check() ? 'black' : 'muted' }} text-left ml-2">
             <em>
                 {{ auth()->guard('contabil')->check() ? 
                     'Somente o representante pode alterar / remover o CNPJ da contabilidade' : 'Após inserir um CNPJ válido aguarde ' . $resultado::TOTAL_HIST_DIAS_UPDATE * 24 . 'h caso queira trocar' }}

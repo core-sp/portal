@@ -1309,7 +1309,7 @@ function putDadosPreRegistro(campo, valor, acao)
         success: function(response) {
             $("#modalLoadingPreRegistro").modal('hide');
             if(campo == 'negado')
-                $('#submitNegarPR').submit();
+              submitNegar();
             if(acao == 'justificar')
                 addJustificado(campo, valor);
             if(acao == 'exclusao_massa')
@@ -1337,6 +1337,12 @@ function putDadosPreRegistro(campo, valor, acao)
             console.clear();
         }
     });
+}
+
+function submitNegar(){
+  $('#submitNegarPR').submit();
+  $("#modalLoadingBody").html('<span class="spinner-border text-danger mr-3"></span> Enviando...');
+  $("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
 }
 
 function getErrorMsg(request)
@@ -1538,6 +1544,11 @@ $('#doc_pre_registro').on('change',function(e){
 
 $('.link-tab-rt').click(function(){
 	$("#accordionPreRegistro #parte_contato_rt.collapse").collapse('show');
+});
+
+$('button[value="aprovado"]').click(function(){
+	$("#modalLoadingBody").html('<span class="spinner-border text-success mr-3"></span> Enviando...');
+  $("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
 });
 
 // Fim da Funcionalidade Pre-Registro
