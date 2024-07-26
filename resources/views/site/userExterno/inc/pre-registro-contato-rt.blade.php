@@ -318,12 +318,12 @@
 
     <div class="form-row mb-2">
         <div class="col-md col-lg mb-2-576">
-            <label for="rua_rt">{{ $nome_campos['logradouro_rt'] }} - Logradouro <span class="text-danger">*</span></label>
+            <label for="logradouro_rt">{{ $nome_campos['logradouro_rt'] }} - Logradouro <span class="text-danger">*</span></label>
             <input
                 type="text"
                 name="logradouro_rt"
                 class="{{ $classe }} text-uppercase form-control {{ $errors->has('logradouro_rt') ? 'is-invalid' : '' }} obrigatorio"
-                id="rua_rt"
+                id="logradouro_rt"
                 value="{{ empty(old('logradouro_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->logradouro) ? $resultado->pessoaJuridica->responsavelTecnico->logradouro : old('logradouro_rt') }}"
                 maxlength="191"
             />

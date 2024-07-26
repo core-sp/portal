@@ -41,12 +41,12 @@
 
 <div class="form-row mb-2">
     <div class="col-md col-lg mb-2-576">
-        <label for="rua_pre">{{ $nome_campos['logradouro'] }} - Logradouro <span class="text-danger">*</span></label>
+        <label for="logradouro_pre">{{ $nome_campos['logradouro'] }} - Logradouro <span class="text-danger">*</span></label>
         <input
             type="text"
             name="logradouro"
             class="{{ $classe }} text-uppercase form-control {{ $errors->has('logradouro') ? 'is-invalid' : '' }} obrigatorio"
-            id="rua_pre"
+            id="logradouro_pre"
             value="{{ empty(old('logradouro')) && isset($resultado->logradouro) ? $resultado->logradouro : old('logradouro') }}"
             maxlength="191"
         />
@@ -196,12 +196,12 @@
 
     <div class="form-row mb-2">
         <div class="col-md col-lg mb-2-576">
-            <label for="rua_empresa">{{ $nome_campos['logradouro_empresa'] }} - Logradouro <span class="text-danger">*</span></label>
+            <label for="logradouro_empresa">{{ $nome_campos['logradouro_empresa'] }} - Logradouro <span class="text-danger">*</span></label>
             <input
                 type="text"
                 name="logradouro_empresa"
                 class="{{ $classe_pj }} text-uppercase form-control {{ $errors->has('logradouro_empresa') ? 'is-invalid' : '' }} obrigatorio"
-                id="rua_empresa"
+                id="logradouro_empresa"
                 value="{{ empty(old('logradouro_empresa')) && isset($resultado->pessoaJuridica->logradouro) ? $resultado->pessoaJuridica->logradouro : old('logradouro_empresa') }}"
                 maxlength="191"
             />

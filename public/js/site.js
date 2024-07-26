@@ -1234,7 +1234,7 @@ $('[name="tipo_conta"]').change(function(){
 
 function preenche_formulario_cep(id, dados)
 {
-	$("#rua_" + id).val(dados.logradouro);
+	$("#logradouro_" + id).val(dados.logradouro);
 	$("#bairro_" + id).val(dados.bairro);
 	$("#cidade_" + id).val(dados.localidade);
 	$("#uf_" + id).val(dados.uf);
@@ -1242,7 +1242,7 @@ function preenche_formulario_cep(id, dados)
 
 function limpa_formulário_cep_by_class(id) {
 	// Limpa valores do formulário de cep.
-	$("#rua_" + id).val("");
+	$("#logradouro_" + id).val("");
 	$("#bairro_" + id).val("");
 	$("#cidade_" + id).val("");
 	$("#uf_" + id)[0].selectedIndex = 0;
@@ -1258,7 +1258,7 @@ async function getEndereco(id)
 		if (cep != "") {
 			var validacep = /^[0-9]{8}$/;
 			if(validacep.test(cep)) {
-				$("#rua_" + id).val("...");
+				$("#logradouro_" + id).val("...");
 				$("#bairro_" + id).val("...");
 				$("#cidade_" + id).val("...");
 				$("#uf_" + id).val("...");
@@ -1490,14 +1490,14 @@ function removerMsgErroServer(objeto)
 	var dadosSocio = putDadosPR.campo.indexOf('_socio') >= 0 ? putDadosPR.dados : null;
 
 	if((putDadosPR.campo.indexOf('_socio') >= 0) && (dadosSocio !== null)){
-		if($('.erroPreRegistro[value="' + putDadosPR.campo + '_' + dadosSocio.id_socio + '"]').length > 0)
-			$('.erroPreRegistro[value="' + putDadosPR.campo + '_' + dadosSocio.id_socio + '"]').parent().remove();
+		if($('.erroPreRegistro[value="' + objeto.attr('name') + '_' + dadosSocio.id_socio + '"]').length > 0)
+			$('.erroPreRegistro[value="' + objeto.attr('name') + '_' + dadosSocio.id_socio + '"]').parent().remove();
 	}else{
 		// remove mensagem de validação do servidor
 		if(objeto.next().hasClass('invalid-feedback'))
 			objeto.removeClass('is-invalid').next().remove();
-		if($('.erroPreRegistro[value="' + putDadosPR.campo + '"]').length > 0)
-			$('.erroPreRegistro[value="' + putDadosPR.campo + '"]').parent().remove();
+		if($('.erroPreRegistro[value="' + objeto.attr('name') + '"]').length > 0)
+			$('.erroPreRegistro[value="' + objeto.attr('name') + '"]').parent().remove();
 	}
 
 	if(($('.erroPreRegistro').length == 0) && ($('#erroPreRegistro').length == 1))
@@ -1751,8 +1751,8 @@ function habDesabCamposSocio(tipo){
 
 async function callbackEnderecoPreRegistro(restoId)
 {
-	var dadosAntigos = [$("#rua_" + restoId).val(), $("#bairro_" + restoId).val(), $("#cidade_" + restoId).val(), $("#uf_" + restoId).val()];
-	var array = [$("#rua_" + restoId), $("#bairro_" + restoId), $("#cidade_" + restoId), $("#uf_" + restoId)];
+	var dadosAntigos = [$("#logradouro_" + restoId).val(), $("#bairro_" + restoId).val(), $("#cidade_" + restoId).val(), $("#uf_" + restoId).val()];
+	var array = [$("#logradouro_" + restoId), $("#bairro_" + restoId), $("#cidade_" + restoId), $("#uf_" + restoId)];
 	var dados = await getEndereco(restoId);
 	preenche_formulario_cep(restoId, dados);
 	for (let i = 0; i < array.length; i++) {

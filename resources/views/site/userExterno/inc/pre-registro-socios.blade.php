@@ -188,12 +188,12 @@
 
         <div class="form-row mb-2 esconder-rt-socio">
             <div class="col-md col-lg mb-2-576">
-                <label for="rua_socio">{{ $nome_campos['logradouro_socio'] }} - Logradouro <span class="text-danger">*</span></label>
+                <label for="logradouro_socio">{{ $nome_campos['logradouro_socio'] }} - Logradouro <span class="text-danger">*</span></label>
                 <input
                     type="text"
                     name="logradouro_socio"
                     class="{{ $classe }} text-uppercase form-control obrigatorio"
-                    id="rua_socio"
+                    id="logradouro_socio"
                     value=""
                     maxlength="191"
                 />
