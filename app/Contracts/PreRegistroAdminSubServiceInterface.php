@@ -3,6 +3,7 @@
 namespace App\Contracts;
 
 use App\Contracts\MediadorServiceInterface;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\User;
 
 interface PreRegistroAdminSubServiceInterface {
@@ -11,7 +12,7 @@ interface PreRegistroAdminSubServiceInterface {
 
     public function getTiposAnexos($idPreRegistro);
 
-    public function listar($request, MediadorServiceInterface $service, User $user, $filtro = null);
+    public function listar($request, MediadorServiceInterface $service, User $user, $temFiltro = false);
 
     public function view($id);
 
@@ -23,7 +24,7 @@ interface PreRegistroAdminSubServiceInterface {
 
     public function uploadDoc($id, $file, $tipo_doc);
 
-    public function getJustificativa($user, $id, $campo, $data_hora = null);
+    public function getJustificativa(Authenticatable $user, $id, $campo, $data_hora = null);
 
     public function executarRotina();
 }

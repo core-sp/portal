@@ -16,29 +16,34 @@ class UserPolicy
     * Reutilizando os métodos
     */
 
+    private function nomeController()
+    {
+        return isset($GLOBALS['testController']) && (config('app.env') == 'testing') ? $GLOBALS['testController'] : class_basename(\Route::current()->controller);
+    }
+
     public function viewAny(User $user)
     {
-        return perfisPermitidos(class_basename(\Route::current()->controller), 'index');
+        return perfisPermitidos($this->nomeController(), 'index');
     }
     
     public function create(User $user)
     {
-        return perfisPermitidos(class_basename(\Route::current()->controller), 'create');
+        return perfisPermitidos($this->nomeController(), 'create');
     }
 
     public function updateOther(User $user)
     {
-        return perfisPermitidos(class_basename(\Route::current()->controller), 'edit');
+        return perfisPermitidos($this->nomeController(), 'edit');
     }
 
     public function updateShow(User $user)
     {
-        return perfisPermitidos(class_basename(\Route::current()->controller), 'show');
+        return perfisPermitidos($this->nomeController(), 'show');
     }
 
     public function delete(User $user)
     {
-        return perfisPermitidos(class_basename(\Route::current()->controller), 'destroy');
+        return perfisPermitidos($this->nomeController(), 'destroy');
     }
 
     public function updateOwn(User $user)
@@ -65,7 +70,7 @@ class UserPolicy
     {
         $tipo = ucfirst(Str::camel(request()->tipo_doc));
 
-        if(class_basename(\Route::current()->controller) == 'GerarTextoController')
+        if($this->nomeController() == 'GerarTextoController')
             return perfisPermitidos($tipo, 'index');
     }
 
@@ -73,7 +78,7 @@ class UserPolicy
     {
         $tipo = ucfirst(Str::camel(request()->tipo_doc));
 
-        if(class_basename(\Route::current()->controller) == 'GerarTextoController')
+        if($this->nomeController() == 'GerarTextoController')
             return perfisPermitidos($tipo, 'edit');
     }
 }

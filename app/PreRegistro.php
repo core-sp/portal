@@ -443,6 +443,11 @@ class PreRegistro extends Model
         return $this->status == PreRegistro::STATUS_APROVADO;
     }
 
+    public function negado()
+    {
+        return $this->status == PreRegistro::STATUS_NEGADO;
+    }
+
     public function correcaoEnviada()
     {
         return $this->status == PreRegistro::STATUS_CORRECAO;
@@ -561,7 +566,7 @@ class PreRegistro extends Model
         $camposEspelho = isset($this->campos_espelho) ? $this->fromJson($this->campos_espelho) : array();
         $pathAntigo = isset($camposEspelho['path']) ? $camposEspelho['path'] : null;
         $request = $this->formatarCamposRequest($request);
-        $path = $this->anexosCampoEspelho($pathAntigo);
+        $path = $this->anexosCampoEspelho($request, $pathAntigo);
 
         if($this->correcaoEnviada())
         {
@@ -578,10 +583,11 @@ class PreRegistro extends Model
         return $this->update(['campos_espelho' => $this->asJson($request)]);
     }
 
-    private function anexosCampoEspelho($pathAntigo)
+    private function anexosCampoEspelho(&$request, $pathAntigo)
     {
         $idAnexos = isset($this->anexos) ? $this->anexos->pluck('id')->toArray() : array();
         $path = !empty($idAnexos) ? implode(',', $idAnexos) : '';
+        $request['path'] = $path;
 
         if(isset($pathAntigo))
         {

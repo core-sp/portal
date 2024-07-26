@@ -21,9 +21,8 @@ class PreRegistroController extends Controller
         $this->authorize('viewAny', auth()->user());
 
         try{
-            $filtro = \Route::is('preregistro.filtro') ? true : null;
             $user = auth()->user();
-            $dados = $this->service->getService('PreRegistro')->admin()->listar($request, $this->service, $user, $filtro);
+            $dados = $this->service->getService('PreRegistro')->admin()->listar((object) $request->all(), $this->service, $user, \Route::is('preregistro.filtro'));
             session(['url_pre_registro' => url()->full()]);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');

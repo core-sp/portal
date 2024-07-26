@@ -9,13 +9,11 @@ use App\Contabil;
 
 interface PreRegistroServiceInterface {
 
-    public function getNomesCampos();
-    
     public function verificacao(GerentiRepositoryInterface $gerentiRepository, UserExterno $externo);
 
-    public function setPreRegistro(GerentiRepositoryInterface $gerentiRepository, MediadorServiceInterface $service, Contabil $externo, $dados);
+    public function setPreRegistro(GerentiRepositoryInterface $gerentiRepository, MediadorServiceInterface $service, Contabil $contabil, $dados);
 
-    public function getPreRegistros(Contabil $externo);
+    public function getPreRegistros(Contabil $contabil);
     
     public function getPreRegistro(MediadorServiceInterface $service, UserExterno $externo);
 

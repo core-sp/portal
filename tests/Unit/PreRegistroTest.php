@@ -11,10 +11,17 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use App\Repositories\GerentiRepositoryMock;
+use App\Services\PreRegistroService;
+use App\Services\PreRegistroAdminSubService;
+use App\Services\MediadorService;
 
 class PreRegistroTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
+
+    const CPF_GERENTI = '86294373085';
+    const CNPJ_GERENTI = '11748345000144';
 
     /** 
      * =======================================================================================================
@@ -693,6 +700,26 @@ class PreRegistroTest extends TestCase
     }
 
     /** @test */
+    public function negado()
+    {
+        $dados = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('negado')->create()
+        ])->preRegistro;
+
+        $this->assertEquals(true, $dados->negado());
+
+        $dados = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()
+        ])->preRegistro;
+
+        $this->assertEquals(false, $dados->negado());
+
+        $dados = factory('App\PreRegistroCpf')->create()->preRegistro;
+        
+        $this->assertEquals(false, $dados->negado());
+    }
+
+    /** @test */
     public function is_aprovado()
     {
         $dados = factory('App\PreRegistroCpf')->create([
@@ -1018,9 +1045,12 @@ class PreRegistroTest extends TestCase
         factory('App\Anexo')->states('pre_registro')->create();
         $request = array_merge($dados->arrayValidacaoInputs(), $dados->pessoaFisica->arrayValidacaoInputs(), ['path' => $dados->fresh()->anexos->count()]);
 
-        $dados->confereJustificadosSubmit($request);
-        $this->assertNotEquals($antigoAnexos, json_decode($dados->campos_espelho, true)['path']);
-        $this->assertNotEquals('1, 2', json_decode($dados->campos_editados, true)['path']);
+        $dados->fresh()->confereJustificadosSubmit($request);
+        $this->assertNotEquals($antigoAnexos, json_decode($dados->fresh()->campos_espelho, true)['path']);
+        $this->assertNotEquals('1,2', json_decode($dados->fresh()->campos_editados, true)['path']);
+        $this->assertNotEquals('3', json_decode($dados->fresh()->campos_editados, true)['path']);
+        $this->assertEquals('4', json_decode($dados->fresh()->campos_editados, true)['path']);
+        $this->assertEquals('3,4', json_decode($dados->fresh()->campos_espelho, true)['path']);
     }
 
     /** @test */
@@ -1531,15 +1561,1374 @@ class PreRegistroTest extends TestCase
      * =======================================================================================================
      */
 
+    /** @test */
+    public function get_menu()
+    {
+        $dados = factory('App\PreRegistroCpf')->create()->preRegistro;
+
+        $this->assertEquals([
+            'Contabilidade',
+            'Dados Gerais',
+            'Endereço',
+            'Contato / RT',
+            'Sócios',
+            'Canal de Relacionamento',
+            'Anexos',
+        ], $dados->getMenu());
+    }
+
+    /** @test */
+    public function get_nomes_relacoes()
+    {
+        $dados = factory('App\PreRegistroCpf')->create()->preRegistro;
+
+        $this->assertEquals([
+            'anexos',
+            'contabil',
+            'pessoaFisica',
+            'pessoaJuridica',
+            'preRegistro',
+            'pessoaJuridica.responsavelTecnico',
+            'pessoaJuridica.socios',
+        ], $dados->getNomesRelacoes());
+    }
+
+    /** @test */
+    public function get_nomes_campos()
+    {
+        $dados = factory('App\PreRegistroCpf')->create()->preRegistro;
+
+        $this->assertEquals([
+            'anexos' => 'path',
+            'contabil' => 'nome_contabil,cnpj_contabil,email_contabil,nome_contato_contabil,telefone_contabil',
+            'preRegistro' => 'segmento,idregional,cep,bairro,logradouro,numero,complemento,cidade,uf,tipo_telefone,telefone,opcional_celular,tipo_telefone_1,telefone_1,opcional_celular_1,pergunta',
+            'pessoaFisica' => 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade_cidade,naturalidade_estado,nome_mae,nome_pai,tipo_identidade,identidade,orgao_emissor,dt_expedicao,titulo_eleitor,zona,secao,ra_reservista',
+            'pessoaJuridica' => 'razao_social,nome_fantasia,capital_social,nire,tipo_empresa,dt_inicio_atividade,checkEndEmpresa,cep_empresa,bairro_empresa,logradouro_empresa,numero_empresa,complemento_empresa,cidade_empresa,uf_empresa',
+            'pessoaJuridica.responsavelTecnico' => 'nome_rt,nome_social_rt,sexo_rt,dt_nascimento_rt,cpf_rt,tipo_identidade_rt,identidade_rt,orgao_emissor_rt,dt_expedicao_rt,titulo_eleitor_rt,zona_rt,secao_rt,ra_reservista_rt,cep_rt,bairro_rt,logradouro_rt,numero_rt,complemento_rt,cidade_rt,uf_rt,nome_mae_rt,nome_pai_rt',
+            'pessoaJuridica.socios' => 'checkRT_socio,cpf_cnpj_socio,nome_socio,nome_social_socio,dt_nascimento_socio,identidade_socio,orgao_emissor_socio,cep_socio,bairro_socio,logradouro_socio,numero_socio,complemento_socio,cidade_socio,uf_socio,nome_mae_socio,nome_pai_socio,nacionalidade_socio,naturalidade_estado_socio',
+        ], $dados->getNomesCampos());
+    }
+
+    /** @test */
+    public function get_codigos_campos()
+    {
+        $dados = factory('App\PreRegistroCpf')->create()->preRegistro;
+
+        $this->assertEquals([
+            [
+                "cnpj_contabil" => "1.1",
+                "nome_contabil" => "1.2",
+                "email_contabil" => "1.3",
+                "nome_contato_contabil" => "1.4",
+                "telefone_contabil" => "1.5",
+            ],
+            [
+                "nome_social" => "2.1",
+                "sexo" => "2.2",
+                "dt_nascimento" => "2.3",
+                "estado_civil" => "2.4",
+                "nacionalidade" => "2.5",
+                "naturalidade_cidade" => "2.6",
+                "naturalidade_estado" => "2.7",
+                "nome_mae" => "2.8",
+                "nome_pai" => "2.9",
+                "tipo_identidade" => "2.10",
+                "identidade" => "2.11",
+                "orgao_emissor" => "2.12",
+                "dt_expedicao" => "2.13",
+                "titulo_eleitor" => "2.14",
+                "zona" => "2.15",
+                "secao" => "2.16",
+                "ra_reservista" => "2.17",
+                "segmento" => "2.18",
+                "idregional" => "2.19",
+                "pergunta" => "2.20",
+            ],
+            [
+                "cep" => "3.1",
+                "bairro" => "3.2",
+                "logradouro" => "3.3",
+                "numero" => "3.4",
+                "complemento" => "3.5",
+                "cidade" => "3.6",
+                "uf" => "3.7",
+                "checkEndEmpresa" => "3.8",
+                "cep_empresa" => "3.9",
+                "bairro_empresa" => "3.10",
+                "logradouro_empresa" => "3.11",
+                "numero_empresa" => "3.12",
+                "complemento_empresa" => "3.13",
+                "cidade_empresa" => "3.14",
+                "uf_empresa" => "3.15",
+            ],
+            [
+                "cpf_rt" => "4.1",
+                "registro" => "4.2",
+                "nome_rt" => "4.3",
+                "nome_social_rt" => "4.4",
+                "dt_nascimento_rt" => "4.5",
+                "sexo_rt" => "4.6",
+                "tipo_identidade_rt" => "4.7",
+                "identidade_rt" => "4.8",
+                "orgao_emissor_rt" => "4.9",
+                "dt_expedicao_rt" => "4.10",
+                "titulo_eleitor_rt" => "4.11",
+                "zona_rt" => "4.12",
+                "secao_rt" => "4.13",
+                "ra_reservista_rt" => "4.14",
+                "cep_rt" => "4.15",
+                "bairro_rt" => "4.16",
+                "logradouro_rt" => "4.17",
+                "numero_rt" => "4.18",
+                "complemento_rt" => "4.19",
+                "cidade_rt" => "4.20",
+                "uf_rt" => "4.21",
+                "nome_mae_rt" => "4.22",
+                "nome_pai_rt" => "4.23",
+            ],
+            [
+                "checkRT_socio" => "5.1",
+                "cpf_cnpj_socio" => "5.2",
+                "registro_socio" => "5.3",
+                "nome_socio" => "5.4",
+                "nome_social_socio" => "5.5",
+                "dt_nascimento_socio" => "5.6",
+                "identidade_socio" => "5.7",
+                "orgao_emissor_socio" => "5.8",
+                "cep_socio" => "5.9",
+                "bairro_socio" => "5.10",
+                "logradouro_socio" => "5.11",
+                "numero_socio" => "5.12",
+                "complemento_socio" => "5.13",
+                "cidade_socio" => "5.14",
+                "uf_socio" => "5.15",
+                "nome_mae_socio" => "5.16",
+                "nome_pai_socio" => "5.17",
+                "nacionalidade_socio" => "5.18",
+                "naturalidade_estado_socio" => "5.19",
+            ],
+            [
+                "tipo_telefone" => "6.1",
+                "telefone" => "6.2",
+                "opcional_celular" => "6.3",
+                "tipo_telefone_1" => "6.4",
+                "telefone_1" => "6.5",
+                "opcional_celular_1" => "6.6",
+            ],
+            [
+                "path" => "7.1",
+            ],
+        ], $dados->getCodigosCampos());
+    }
+
+    /** @test */
+    public function verifica_se_cria_ou_atualiza_quando_atualizar_sem_gerenti()
+    {
+        $dados = factory('App\PreRegistroCpf')->create()->preRegistro;
+
+        $gerenti = null;
+        $objetoExiste = false;
+        $request = [
+            'classe' => 'preRegistro',
+            'campo' => 'cep',
+            'valor' => '05656-050',
+        ];
+
+        $this->assertEquals([
+            'resp' => 'atualizar',
+            'classe' => 'preRegistro',
+            'campo' => 'cep',
+            'valor' => '05656-050',
+            'gerenti' => $gerenti,
+        ], $dados->verificaSeCriaOuAtualiza($request, $gerenti, $objetoExiste));
+
+        $request = [
+            'classe' => 'pessoaFisica',
+            'campo' => 'nome_social',
+            'valor' => 'NOME FAKE PF',
+        ];
+        $objetoExiste = $dados->has($request['classe'])->where('id', $dados->id)->exists();
+
+        $this->assertEquals([
+            'resp' => 'atualizar',
+            'classe' => 'pessoaFisica',
+            'campo' => 'nome_social',
+            'valor' => 'NOME FAKE PF',
+            'gerenti' => $gerenti,
+        ], $dados->verificaSeCriaOuAtualiza($request, $gerenti, $objetoExiste));
+
+        $request = [
+            'classe' => 'contabil',
+            'campo' => 'nome_contabil',
+            'valor' => 'NOME FAKE CONTABIL',
+        ];
+        $objetoExiste = $dados->has($request['classe'])->where('id', $dados->id)->exists();
+
+        $this->assertEquals([
+            'resp' => 'atualizar',
+            'classe' => 'contabil',
+            'campo' => 'nome',
+            'valor' => 'NOME FAKE CONTABIL',
+            'gerenti' => $gerenti,
+        ], $dados->verificaSeCriaOuAtualiza($request, $gerenti, $objetoExiste));
+
+        // PJ
+        $dados = factory('App\PreRegistroCnpj')->create()->preRegistro;
+
+        $request = [
+            'classe' => 'pessoaJuridica',
+            'campo' => 'cep_empresa',
+            'valor' => '05656-050',
+        ];
+        $objetoExiste = $dados->has($request['classe'])->where('id', $dados->id)->exists();
+
+        $this->assertEquals([
+            'resp' => 'atualizar',
+            'classe' => 'pessoaJuridica',
+            'campo' => 'cep',
+            'valor' => '05656-050',
+            'gerenti' => $gerenti,
+        ], $dados->verificaSeCriaOuAtualiza($request, $gerenti, $objetoExiste));
+
+        $request = [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cep_rt',
+            'valor' => '05656-050',
+        ];
+        $objetoExiste = $dados->has($request['classe'])->where('id', $dados->id)->exists();
+
+        $this->assertEquals([
+            'resp' => 'atualizar',
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cep',
+            'valor' => '05656-050',
+            'gerenti' => $gerenti,
+        ], $dados->verificaSeCriaOuAtualiza($request, $gerenti, $objetoExiste));
+
+        $request = [
+            'classe' => 'pessoaJuridica.socios',
+            'campo' => [1, 'cep_socio'],
+            'valor' => '05656-050',
+        ];
+        $objetoExiste = $dados->has($request['classe'])->where('id', $dados->id)->exists();
+
+        $this->assertEquals([
+            'resp' => 'atualizar',
+            'classe' => 'pessoaJuridica.socios',
+            'campo' => [1, 'cep'],
+            'valor' => '05656-050',
+            'gerenti' => $gerenti,
+        ], $dados->verificaSeCriaOuAtualiza($request, $gerenti, $objetoExiste));
+    }
+
+    /** @test */
+    public function verifica_se_cria_ou_atualiza_quando_criar_sem_gerenti()
+    {
+        $dados = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => null
+            ]),
+        ])->preRegistro;
+
+        $gerenti = null;
+        $request = [
+            'classe' => 'contabil',
+            'campo' => 'cnpj_contabil',
+            'valor' => factory('App\Contabil')->raw()['cnpj'],
+        ];
+        $objetoExiste = $dados->has($request['classe'])->where('id', $dados->id)->exists();
+
+        $this->assertEquals([
+            'resp' => 'criar',
+            'classe' => 'contabil',
+            'campo' => 'cnpj',
+            'valor' => $request['valor'],
+            'gerenti' => $gerenti,
+        ], $dados->verificaSeCriaOuAtualiza($request, $gerenti, $objetoExiste));
+
+        $request = [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->image('random.jpg')->size(300)],
+        ];
+        $objetoExiste = $dados->has($request['classe'])->where('id', $dados->id)->exists();
+
+        $this->assertEquals([
+            'resp' => 'criar',
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => $request['valor'],
+            'gerenti' => $gerenti,
+        ], $dados->verificaSeCriaOuAtualiza($request, $gerenti, $objetoExiste));
+
+        // PJ
+        $dados = factory('App\PreRegistroCnpj')->create([
+            'responsavel_tecnico_id' => null
+        ])->preRegistro;
+
+        $request = [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf'],
+        ];
+        $objetoExiste = $dados->has($request['classe'])->where('id', $dados->id)->exists();
+
+        $this->assertEquals([
+            'resp' => 'criar',
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf',
+            'valor' => $request['valor'],
+            'gerenti' => $gerenti,
+        ], $dados->verificaSeCriaOuAtualiza($request, $gerenti, $objetoExiste));
+
+        $request = [
+            'classe' => 'pessoaJuridica.socios',
+            'campo' => [0, 'cpf_cnpj_socio'],
+            'valor' => factory('App\Socio')->raw()['cpf_cnpj'],
+        ];
+        $objetoExiste = $dados->has($request['classe'])->where('id', $dados->id)->exists();
+
+        $this->assertEquals([
+            'resp' => 'criar',
+            'classe' => 'pessoaJuridica.socios',
+            'campo' => [0, 'cpf_cnpj'],
+            'valor' => $request['valor'],
+            'gerenti' => $gerenti,
+        ], $dados->verificaSeCriaOuAtualiza($request, $gerenti, $objetoExiste));
+    }
+
+    /** @test */
+    public function verifica_se_cria_ou_atualiza_quando_criar_com_gerenti()
+    {
+        $gerenti = new GerentiRepositoryMock;
+
+        $dados = factory('App\PreRegistroCnpj')->create([
+            'responsavel_tecnico_id' => null
+        ])->preRegistro;
+
+        $request = [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => self::CPF_GERENTI,
+        ];
+        $objetoExiste = $dados->has($request['classe'])->where('id', $dados->id)->exists();
+
+        // Em caso de erro, mudar no metodo gerentiBusca() item ASS_TP_ASSOC para 5
+        $this->assertEquals([
+            'resp' => 'criar',
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf',
+            'valor' => $request['valor'],
+            'gerenti' => [
+                "nome" => "RC TESTE 1",
+                "registro" => "0000000001",
+                "nome_mae" => "MAE 1",
+                "nome_pai" => "PAI 1",
+                "identidade" => "111111111",
+                "orgao_emissor" => "SSP-SP",
+                "dt_expedicao" => "2012-03-05",
+                "dt_nascimento" => "1962-09-30",
+                "sexo" => "M",
+                "cpf" => "86294373085",
+            ],
+        ], $dados->verificaSeCriaOuAtualiza($request, $gerenti, $objetoExiste));
+
+        $request = [
+            'classe' => 'pessoaJuridica.socios',
+            'campo' => [0, 'cpf_cnpj_socio'],
+            'valor' => self::CNPJ_GERENTI,
+        ];
+        $objetoExiste = $dados->has($request['classe'])->where('id', $dados->id)->exists();
+
+        $this->assertEquals([
+            'resp' => 'criar',
+            'classe' => 'pessoaJuridica.socios',
+            'campo' => [0, 'cpf_cnpj'],
+            'valor' => $request['valor'],
+            'gerenti' => [
+                "nome" => "RC TESTE 2",
+                "registro" => "0000000002",
+                "cpf_cnpj" => "11748345000144",
+            ],
+        ], $dados->verificaSeCriaOuAtualiza($request, $gerenti, $objetoExiste));
+    }
+
     /** 
      * =======================================================================================================
      * TESTES SERVICE PREREGISTROSERVICE
      * =======================================================================================================
      */
 
+    /** @test */
+    public function verificacao()
+    {
+        $gerenti = new GerentiRepositoryMock;
+        $service = new PreRegistroService;
+
+        $externo = factory('App\UserExterno')->create();
+
+        $this->assertEquals([
+            'gerenti' => null,
+        ], $service->verificacao($gerenti, $externo));
+
+        $externo = factory('App\UserExterno')->create([
+            'cpf_cnpj' => self::CPF_GERENTI,
+        ]);
+
+        $this->assertEquals([
+            'gerenti' => '0000000001',
+        ], $service->verificacao($gerenti, $externo));
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Somente usuário externo pode ser verificado no sistema se consta registro.');
+        $service->verificacao($gerenti, null);
+    }
+
+    /** @test */
+    public function set_pre_registro_com_pre_registro_em_andamento()
+    {
+        $gerenti = new GerentiRepositoryMock;
+        $service = new MediadorService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create()
+        ])->preRegistro;
+
+        $contabil = factory('App\Contabil')->create();
+
+        $dados = [
+            'cpf_cnpj' => $dadosUser->userExterno->cpf_cnpj,
+            'email' => $dadosUser->userExterno->email,
+            'nome' => $dadosUser->userExterno->nome,
+        ];
+
+        $this->assertEquals([
+            'message' => 'Este CPF / CNPJ já possui uma solicitação de registro em andamento. Por gentileza, peça que o representante insira no formulário o seu CNPJ.',
+            'class' => 'alert-warning'
+        ], $service->getService('PreRegistro')->setPreRegistro($gerenti, $service, $contabil, $dados));
+    }
+
+    /** @test */
+    public function set_pre_registro_com_pre_registro_e_usuario_externo_existente_no_gerenti()
+    {
+        $gerenti = new GerentiRepositoryMock;
+        $service = new MediadorService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('negado')->create()
+        ])->preRegistro;
+        $dadosUser->userExterno->update(['cpf_cnpj' => self::CPF_GERENTI]);
+
+        $contabil = factory('App\Contabil')->create();
+
+        $dados = [
+            'cpf_cnpj' => $dadosUser->userExterno->cpf_cnpj,
+            'email' => $dadosUser->userExterno->email,
+            'nome' => $dadosUser->userExterno->nome,
+        ];
+
+        $this->assertEquals([
+            'message' => 'Este CPF / CNPJ já possui registro ativo no Core-SP: 000000/0001',
+            'class' => 'alert-info'
+        ], $service->getService('PreRegistro')->setPreRegistro($gerenti, $service, $contabil, $dados));
+    }
+
+    /** @test */
+    public function set_pre_registro_com_pre_registro_aprovado()
+    {
+        $gerenti = new GerentiRepositoryMock;
+        $service = new MediadorService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()
+        ])->preRegistro;
+
+        $contabil = factory('App\Contabil')->create();
+
+        $dados = [
+            'cpf_cnpj' => $dadosUser->userExterno->cpf_cnpj,
+            'email' => $dadosUser->userExterno->email,
+            'nome' => $dadosUser->userExterno->nome,
+        ];
+
+        $this->assertEquals([
+            'message' => 'Este CPF / CNPJ já possui uma solicitação aprovada.',
+            'class' => 'alert-warning'
+        ], $service->getService('PreRegistro')->setPreRegistro($gerenti, $service, $contabil, $dados));
+    }
+
+    /** @test */
+    public function set_pre_registro_com_usuario_externo_existente()
+    {
+        $gerenti = new GerentiRepositoryMock;
+        $service = new MediadorService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('negado')->create()
+        ])->preRegistro;
+
+        $contabil = factory('App\Contabil')->create();
+
+        $dados = [
+            'cpf_cnpj' => $dadosUser->userExterno->cpf_cnpj,
+            'email' => $dadosUser->userExterno->email,
+            'nome' => $dadosUser->userExterno->nome,
+        ];
+
+        $this->assertEquals(PreRegistro::class, get_class($service->getService('PreRegistro')->setPreRegistro($gerenti, $service, $contabil, $dados)));
+        $this->assertEquals(2, PreRegistro::find(2)->contabil_id);
+    }
+
+    /** @test */
+    public function set_pre_registro_sem_usuario_externo_existente_e_no_gerenti()
+    {
+        $gerenti = new GerentiRepositoryMock;
+        $service = new MediadorService;
+
+        $externo = (object) factory('App\UserExterno')->raw();
+        $contabil = factory('App\Contabil')->create();
+
+        $dados = [
+            'cpf_cnpj' => self::CPF_GERENTI,
+            'email' => $externo->email,
+            'nome' => $externo->nome,
+        ];
+
+        $this->assertEquals([
+            'message' => 'Este CPF / CNPJ já possui registro ativo no Core-SP: 000000/0001',
+            'class' => 'alert-info'
+        ], $service->getService('PreRegistro')->setPreRegistro($gerenti, $service, $contabil, $dados));
+    }
+
+    /** @test */
+    public function set_pre_registro_sem_usuario_externo_existente()
+    {
+        $gerenti = new GerentiRepositoryMock;
+        $service = new MediadorService;
+
+        $externo = (object) factory('App\UserExterno')->raw();
+        $contabil = factory('App\Contabil')->create();
+
+        $dados = [
+            'cpf_cnpj' => $externo->cpf_cnpj,
+            'email' => $externo->email,
+            'nome' => $externo->nome,
+        ];
+
+        $this->assertEquals(PreRegistro::class, get_class($service->getService('PreRegistro')->setPreRegistro($gerenti, $service, $contabil, $dados)));
+        $this->assertEquals(1, PreRegistro::first()->contabil_id);
+    }
+
+    /** @test */
+    public function get_pre_registros()
+    {
+        $service = new PreRegistroService;
+
+        $contabil = factory('App\Contabil')->create();
+
+        $this->assertEquals(0, $service->getPreRegistros($contabil)['resultados']->count());
+
+        $dadosUser = factory('App\PreRegistroCpf')->create()->preRegistro;
+
+        $this->assertEquals(1, $service->getPreRegistros($contabil)['resultados']->count());
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('negado')->create()
+        ])->preRegistro;
+
+        $this->assertEquals(2, $service->getPreRegistros($contabil)['resultados']->count());
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()
+        ])->preRegistro;
+
+        $this->assertEquals(3, $service->getPreRegistros($contabil)['resultados']->count());
+    }
+
+    /** @test */
+    public function get_pre_registro()
+    {
+        $service = new MediadorService;
+
+        $externo = factory('App\UserExterno')->create();
+
+        $this->assertEquals(0, PreRegistro::count());
+        $this->assertEquals(PreRegistro::class, get_class($service->getService('PreRegistro')->getPreRegistro($service, $externo)['resultado']));
+        $this->assertEquals(1, PreRegistro::count());
+
+        $dadosUser = factory('App\PreRegistroCpf')->create()->preRegistro->userExterno;
+
+        $this->assertEquals(PreRegistro::STATUS_CRIADO, $service->getService('PreRegistro')->getPreRegistro($service, $externo)['resultado']->status);
+        $this->assertEquals(2, PreRegistro::count());
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()
+        ])->preRegistro;
+
+        $this->assertEquals('Este CPF / CNPJ já possui uma solicitação aprovada.', $service->getService('PreRegistro')->getPreRegistro($service, $externo)['message']);
+        $this->assertEquals(3, PreRegistro::count());
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Somente usuário externo ou contabilidade vinculada a um usuário externo pode solicitar registro.');
+        $service->getService('PreRegistro')->getPreRegistro($service, null);
+    }
+
+    /** @test */
+    public function save_site_ajax()
+    {
+        Storage::fake('local');
+
+        $service = new PreRegistroService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create()->preRegistro;
+        $request = [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [
+                UploadedFile::fake()->image('random.jpg')->size(300),
+            ],
+        ];
+
+        $resp = $service->saveSiteAjax($request, null, $dadosUser->userExterno);
+        $this->assertEquals([
+            'resultado', 'dt_atualizado',
+        ], array_keys($resp));
+
+        $this->assertEquals('App\Anexo', get_class($resp['resultado']));
+
+        $request = [
+            'classe' => 'pessoaFisica',
+            'campo' => 'nome_social',
+            'valor' => 'TESTE NOVO DO NOME SOCIAL',
+        ];
+
+        $this->assertEquals([
+            'resultado', 'dt_atualizado',
+        ], array_keys($service->saveSiteAjax($request, null, $dadosUser->userExterno)));
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Não autorizado a acessar a solicitação de registro por falta relacionamento com usuário externo');
+        $service->saveSiteAjax([], null, null, null);
+    }
+
+    /** @test */
+    public function save_site_ajax_exception_externo()
+    {
+        $service = new PreRegistroService;
+
+        $externo = factory('App\UserExterno')->create();
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Não autorizado a acessar a solicitação de registro');
+        $service->saveSiteAjax([], null, $externo, null);
+    }
+
+    /** @test */
+    public function save_site_ajax_exception_user_editar()
+    {
+        $service = new PreRegistroService;
+
+        $externo = factory('App\UserExterno')->create();
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
+        ])->preRegistro;
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Não autorizado a editar o formulário com a solicitação em análise ou finalizada');
+        $service->saveSiteAjax([], null, $externo, null);
+    }
+
+    /** @test */
+    public function save_site()
+    {
+        $service = new PreRegistroService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create()->preRegistro;
+        $request = [
+            "cep" => "01234-001",
+            "bairro" => "TESTE",
+            "logradouro" => "RUA TESTE DA ESQUINA",
+            "numero" => "2671",
+            "complemento" => null,
+            "cidade" => "SÃO PAULO",
+            "uf" => "SP",
+        ];
+
+        $this->assertEquals([
+            'message' => '<i class="icon fa fa-check"></i> Solicitação de registro enviada para análise! <strong>Status atualizado para:</strong> Em análise inicial',
+            'class' => 'alert-success'
+        ], $service->saveSite($request, null, $dadosUser->userExterno));
+
+        factory('App\UserExterno')->create();
+
+        // ID do anexo
+        $request = array_merge($request, ['path' => '2']);
+        $dadosUser = factory('App\PreRegistroCpf')->states('justificativas')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create([
+                'campos_espelho' => json_encode($request),
+            ]),
+        ])->preRegistro;
+
+        $this->assertEquals([
+            'message' => '<i class="fas fa-times"></i> Formulário não foi enviado para análise da correção, pois precisa editar dados(s) conforme justificativa(s).',
+            'class' => 'alert-danger'
+        ], $service->saveSite($request, null, $dadosUser->userExterno));
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Não autorizado a acessar a solicitação de registro por falta relacionamento com usuário externo');
+        $service->saveSite([], null, null, null);
+    }
+
+    /** @test */
+    public function save_site_exception_externo()
+    {
+        $service = new PreRegistroService;
+
+        $externo = factory('App\UserExterno')->create();
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Não autorizado a acessar a solicitação de registro');
+        $service->saveSite([], null, $externo, null);
+    }
+
+    /** @test */
+    public function save_site_exception_user_editar()
+    {
+        $service = new PreRegistroService;
+
+        $externo = factory('App\UserExterno')->create();
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
+        ])->preRegistro;
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Não autorizado a editar o formulário com a solicitação em análise ou finalizada');
+        $service->saveSite([], null, $externo, null);
+    }
+
+    /** @test */
+    public function download_anexo()
+    {
+        Storage::fake('local');
+
+        $service = new PreRegistroService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create()->preRegistro;
+        $request = [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [
+                UploadedFile::fake()->image('random.jpg')->size(300),
+            ],
+        ];
+
+        $service->saveSiteAjax($request, null, $dadosUser->userExterno);
+
+        $this->assertEquals(Storage::disk('local')->path(Anexo::find(2)->path), $service->downloadAnexo(2, 1));
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Arquivo de anexo do pré-registro não existe / não pode acessar');
+        $service->downloadAnexo(1, 1);
+    }
+
+    /** @test */
+    public function download_anexo_exception_pre_registro()
+    {
+        $service = new PreRegistroService;
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('No query results for model [App\PreRegistro] 1');
+        $service->downloadAnexo(1, 1);
+    }
+
+    /** @test */
+    public function excluir_anexo()
+    {
+        Storage::fake('local');
+
+        $service = new PreRegistroService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create()->preRegistro;
+        $request = [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [
+                UploadedFile::fake()->image('random.jpg')->size(300),
+            ],
+        ];
+
+        $service->saveSiteAjax($request, null, $dadosUser->userExterno);
+
+        $this->assertEquals(2, $service->excluirAnexo(2, $dadosUser->userExterno)['resultado']);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Arquivo não existe / não pode acessar');
+        $service->excluirAnexo(1, $dadosUser->userExterno);
+    }
+
+    /** @test */
+    public function excluir_anexo_com_contabil()
+    {
+        Storage::fake('local');
+
+        $service = new PreRegistroService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create()->preRegistro;
+        $request = [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [
+                UploadedFile::fake()->image('random.jpg')->size(300),
+            ],
+        ];
+
+        $service->saveSiteAjax($request, null, $dadosUser->userExterno);
+
+        $this->assertEquals(2, $service->excluirAnexo(2, $dadosUser->userExterno, $dadosUser->contabil)['resultado']);
+    }
+
+    /** @test */
+    public function excluir_anexo_exception_user_editar()
+    {
+        $service = new PreRegistroService;
+
+        $externo = factory('App\UserExterno')->create();
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
+        ])->preRegistro;
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Não autorizado a excluir arquivo com status diferente de ' . PreRegistro::STATUS_CORRECAO);
+        $service->excluirAnexo(1, $dadosUser->userExterno);
+    }
+
+    /** @test */
+    public function admin()
+    {
+        $service = new PreRegistroService;
+
+        $this->assertEquals(PreRegistroAdminSubService::class, get_class($service->admin()));
+    }
+
     /** 
      * =======================================================================================================
      * TESTES SUB SERVICE PREREGISTROADMINSUBSERVICE
      * =======================================================================================================
      */
+
+    /** @test */
+    public function tipos_docs_atendente()
+    {
+        $service = new PreRegistroService;
+
+        $this->assertEquals(Anexo::tiposDocsAtendentePreRegistro(), $service->admin()->tiposDocsAtendente());
+    }
+
+    /** @test */
+    public function get_tipos_anexos()
+    {
+        $service = new PreRegistroService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
+        ])->preRegistro;
+
+        $this->assertEquals(Anexo::find(1)->getOpcoesPreRegistro(), $service->admin()->getTiposAnexos(1));
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()
+        ])->preRegistro;
+
+        $this->assertEquals(null, $service->admin()->getTiposAnexos(2));
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
+        ])->preRegistro;
+        Anexo::find(3)->delete();
+
+        $this->assertEquals(null, $service->admin()->getTiposAnexos(3));
+    }
+
+    /** @test */
+    public function listar_sem_filtro()
+    {
+        $this->inserirControllerUserPolicyParaUnitTest('PreRegistroController');
+
+        $service = new MediadorService;
+
+        $user = $this->signInAsAdmin();
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
+        ])->preRegistro;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()
+        ])->preRegistro;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()
+        ])->preRegistro;
+
+        $resp = $service->getService('PreRegistro')->admin()->listar([], $service, $user);
+        $this->assertEquals('string', gettype($resp['tabela']));
+        $this->assertEquals(false, $resp['temFiltro']);
+        $this->assertEquals(true, isset($resp['variaveis']));
+        $this->assertEquals(true, $resp['resultados'] instanceof \Illuminate\Pagination\LengthAwarePaginator);
+        $this->assertNotEquals('<i>(filtro ativo)</i>', $resp['variaveis']->continuacao_titulo);
+    }
+
+    /** @test */
+    public function listar_com_filtro()
+    {
+        $this->inserirControllerUserPolicyParaUnitTest('PreRegistroController');
+
+        $service = new MediadorService;
+
+        $user = $this->signInAsAdmin();
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
+        ])->preRegistro;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()
+        ])->preRegistro;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()
+        ])->preRegistro;
+
+        $request = new \Illuminate\Http\Request;
+        $request->replace(['regional' => 2]);
+        $request = (object) $request->all();
+
+        $resp = $service->getService('PreRegistro')->admin()->listar($request, $service, $user, true);
+        $this->assertEquals(1, $resp['resultados']->total());
+        $this->assertEquals('<i>(filtro ativo)</i>', $resp['variaveis']->continuacao_titulo);
+
+        $request = new \Illuminate\Http\Request;
+        $request->replace(['regional' => 'Todas', 'status' => PreRegistro::STATUS_CORRECAO]);
+        $request = (object) $request->all();
+
+        $resp = $service->getService('PreRegistro')->admin()->listar($request, $service, $user, true);
+        $this->assertEquals(1, $resp['resultados']->total());
+        $this->assertEquals('<i>(filtro ativo)</i>', $resp['variaveis']->continuacao_titulo);
+
+        $request = new \Illuminate\Http\Request;
+        $request->replace(['regional' => 'Todas', 'atendente' => 3]);
+        $request = (object) $request->all();
+
+        $resp = $service->getService('PreRegistro')->admin()->listar($request, $service, $user, true);
+        $this->assertEquals(1, $resp['resultados']->total());
+        $this->assertEquals('<i>(filtro ativo)</i>', $resp['variaveis']->continuacao_titulo);
+
+        $request = new \Illuminate\Http\Request;
+        $request->replace(['regional' => 7, 'atendente' => null, 'status' => 'Qualquer']);
+        $request = (object) $request->all();
+
+        $resp = $service->getService('PreRegistro')->admin()->listar($request, $service, $user, true);
+        $this->assertEquals(0, $resp['resultados']->total());
+        $this->assertEquals('<i>(filtro ativo)</i>', $resp['variaveis']->continuacao_titulo);
+    }
+
+    /** @test */
+    public function view_admin()
+    {
+        $service = new PreRegistroService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
+        ])->preRegistro;
+
+        $resp = $service->admin()->view(1);
+        $this->assertEquals(PreRegistro::find(1)->cep, $resp['resultado']->cep);
+        $this->assertEquals('<a href="'.route('preregistro.index').'" class="btn btn-primary mr-1">Lista dos Pré-registros</a>', $resp['variaveis']->btn_lista);
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()
+        ])->preRegistro;
+
+        $resp = $service->admin()->view(2);
+        $this->assertEquals(PreRegistro::find(2)->status, $resp['resultado']->status);
+        $this->assertEquals('<a href="'.route('preregistro.index').'" class="btn btn-primary mr-1">Lista dos Pré-registros</a>', $resp['variaveis']->btn_lista);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('No query results for model [App\PreRegistro] 5');
+        $service->admin()->view(5);
+    }
+
+    /** @test */
+    public function buscar_admin()
+    {
+        $this->inserirControllerUserPolicyParaUnitTest('PreRegistroController');
+
+        $service = new MediadorService;
+
+        $user = $this->signInAsAdmin();
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create()
+        ])->preRegistro;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create([
+                'user_externo_id' => factory('App\UserExterno')
+            ])
+        ])->preRegistro;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create([
+                'user_externo_id' => factory('App\UserExterno')
+            ])
+        ])->preRegistro;
+
+        $request = new \Illuminate\Http\Request;
+        $request->replace(['q' => $dadosUser->userExterno->cpf_cnpj]);
+        $request = (object) $request->all();
+
+        $resp = $service->getService('PreRegistro')->admin()->buscar($request->q, $user);
+        $this->assertEquals(1, $resp['resultados']->total());
+
+        $request = new \Illuminate\Http\Request;
+        $request->replace(['q' => 'a']);
+        $request = (object) $request->all();
+
+        $resp = $service->getService('PreRegistro')->admin()->buscar($request->q, $user);
+        $this->assertEquals(3, $resp['resultados']->total());
+
+        $request = new \Illuminate\Http\Request;
+        $request->replace(['q' => $dadosUser->userExterno->nome]);
+        $request = (object) $request->all();
+
+        $resp = $service->getService('PreRegistro')->admin()->buscar($request->q, $user);
+        $this->assertEquals(1, $resp['resultados']->total());
+
+        $request = new \Illuminate\Http\Request;
+        $request->replace(['q' => null]);
+        $request = (object) $request->all();
+
+        $resp = $service->getService('PreRegistro')->admin()->buscar($request->q, $user);
+        $this->assertEquals(3, $resp['resultados']->total());
+    }
+
+    /** @test */
+    public function save_ajax_admin()
+    {
+        $service = new PreRegistroService;
+
+        $user = $this->signInAsAdmin();
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_correcao')->create()
+        ])->preRegistro;
+
+        $resp = $service->admin()->saveAjaxAdmin(['acao' => 'justificar', 'campo' => 'cep', 'valor' => '09876-090'], 1, $user);
+        $this->assertEquals($user->nome, $resp['user']);
+    }
+
+    /** @test */
+    public function save_ajax_admin_exception_atendente_editar()
+    {
+        $service = new PreRegistroService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()
+        ])->preRegistro;
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Não autorizado a editar o pré-registro sendo elaborado, aguardando correção ou finalizado');
+        $service->admin()->saveAjaxAdmin(['acao' => 'justificar', 'campo' => 'cep'], 1, $dadosUser->user);
+    }
+
+    /** @test */
+    public function update_status()
+    {
+        $service = new PreRegistroService;
+
+        $user = $this->signInAsAdmin();
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('analise_correcao')->create()
+        ])->preRegistro;
+
+        $this->assertDatabaseHas('anexos', ['pre_registro_id' => 1]);
+
+        $this->assertEquals([
+            'message' => '<i class="icon fa fa-check"></i>Pré-registro com a ID: 1 foi atualizado para "' . PreRegistro::STATUS_NEGADO . '" com sucesso', 
+            'class' => 'alert-success'
+        ], $service->admin()->updateStatus(1, $user, PreRegistro::STATUS_NEGADO));
+        $this->assertDatabaseMissing('anexos', ['pre_registro_id' => 1]);
+    }
+
+    /** @test */
+    public function update_status_exception_atendente_editar()
+    {
+        $service = new PreRegistroService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()
+        ])->preRegistro;
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Não permitido atualizar o status do pré-registro já finalizado (Aprovado ou Negado)');
+        $service->admin()->updateStatus(1, $dadosUser->user, PreRegistro::STATUS_APROVADO);
+    }
+
+    /** @test */
+    public function upload_doc()
+    {
+        Storage::fake('local');
+
+        $service = new PreRegistroService;
+
+        $user = $this->signInAsAdmin();
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('negado')->create()
+        ])->preRegistro;
+
+        $this->assertEquals([
+            'message' => '<i class="icon fas fa-times"></i> O pré-registro precisa estar aprovado para anexar documento.',
+            'class' => 'alert-danger'
+        ], $service->admin()->uploadDoc(1, UploadedFile::fake()->image('random.jpg')->size(300), 'boleto'));
+
+        $dadosUser = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()
+        ])->preRegistro;
+
+        $this->assertEquals([
+            'message' => '<i class="icon fa fa-check"></i> Boleto anexado com sucesso!',
+            'class' => 'alert-success'
+        ], $service->admin()->uploadDoc(2, UploadedFile::fake()->image('random.jpg')->size(300), 'boleto'));
+    }
+
+    /** @test */
+    public function get_justificativa_admin()
+    {
+        $this->inserirControllerUserPolicyParaUnitTest('PreRegistroController');
+
+        $service = new PreRegistroService;
+
+        $user = $this->signInAsAdmin();
+
+        $dadosUser = factory('App\PreRegistroCpf')->states('justificativas')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()
+        ])->preRegistro;
+
+        $now = now()->subDay()->format('Y-m-d H:i:s');
+
+        $justificativa = json_decode(PreRegistro::first()->justificativa, true)['nome_social'];
+        $this->assertEquals([
+            'justificativa' => $justificativa,
+            'data_hora' => null,
+        ], $service->admin()->getJustificativa($user, 1, 'nome_social'));
+
+        $this->assertEquals([
+            'justificativa' => 'Sem justificativa',
+            'data_hora' => null,
+        ], $service->admin()->getJustificativa($user, 1, 'teste'));
+
+        $resp = $service->admin()->getJustificativa($user, 1, 'cep', urlencode($now));
+        $this->assertNotEquals(null, $resp['justificativa']);
+        $this->assertEquals(formataData($now), $resp['data_hora']);
+
+        $dadosUser = factory('App\PreRegistroCpf')->states('justificativas')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()
+        ])->preRegistro;
+
+        $now = now()->subDay()->format('Y-m-d H:i:s');
+
+        $resp = $service->admin()->getJustificativa($user, 1, 'cep', $now);
+        $this->assertNotEquals(null, $resp['justificativa']);
+        $this->assertEquals(formataData($now), $resp['data_hora']);
+    }
+
+    /** @test */
+    public function get_justificativa_exception_atendente_sem_permissao()
+    {
+        $this->inserirControllerUserPolicyParaUnitTest('PreRegistroController');
+
+        $service = new PreRegistroService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->states('justificativas')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()
+        ])->preRegistro;
+
+        $user = $this->signInAsAdmin();
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Não permitido visualizar a justificativa do pré-registro na área administrativa sem permissão!');
+        $service->admin()->getJustificativa($dadosUser->user, 1, 'nome_social');
+    }
+
+    /** @test */
+    public function get_justificativa_exception_user_externo_diferente_do_pre_registro()
+    {
+        $service = new PreRegistroService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->states('justificativas')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()
+        ])->preRegistro;
+
+        $user = factory('App\UserExterno')->create();
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Não permitido visualizar a justificativa do pré-registro de outro usuário!');
+        $service->admin()->getJustificativa($user, 1, 'nome_social');
+    }
+
+    /** @test */
+    public function get_justificativa_exception_contabil_diferente_do_pre_registro()
+    {
+        $service = new PreRegistroService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->states('justificativas')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()
+        ])->preRegistro;
+
+        $user = factory('App\Contabil')->create();
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Não permitido visualizar a justificativa do pré-registro de outro usuário!');
+        $service->admin()->getJustificativa($user, 1, 'nome_social');
+    }
+
+    /** @test */
+    public function get_justificativa_exception_user_externo_com_pre_registro_finalizado()
+    {
+        $service = new PreRegistroService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->states('justificativas')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('negado')->create()
+        ])->preRegistro;
+
+        $user = $dadosUser->userExterno;
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Não permitido visualizar a justificativa do pré-registro finalizado!');
+        $service->admin()->getJustificativa($user, 1, 'nome_social');
+    }
+
+    /** @test */
+    public function get_justificativa_exception_contabil_com_pre_registro_finalizado()
+    {
+        $service = new PreRegistroService;
+
+        $dadosUser = factory('App\PreRegistroCpf')->states('justificativas')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('negado')->create()
+        ])->preRegistro;
+
+        $user = $dadosUser->contabil;
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Não permitido visualizar a justificativa do pré-registro finalizado!');
+        $service->admin()->getJustificativa($user, 1, 'nome_social');
+    }
+
+    /** @test */
+    public function executar_rotina()
+    {
+        Storage::fake('local');
+
+        $service = new PreRegistroService;
+
+        // Excluir arquivos
+        $dados = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create()
+        ])->preRegistro;
+        $dados->anexos()->first()->delete();
+
+        $anexo1 = $dados->salvarAjax([
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [
+                UploadedFile::fake()->image('random.jpg')->size(300),
+            ],
+        ]);
+        $dados->update(['updated_at' => now()->subMonth()->toDateString()]);
+        Storage::disk('local')->assertExists($anexo1->path);
+
+        // Excluir arquivos
+        $dados = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->states('enviado_correcao')->create()
+        ])->preRegistro;
+        $dados->anexos()->first()->delete();
+
+        $anexo2 = $dados->salvarAjax([
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [
+                UploadedFile::fake()->image('random.jpg')->size(300),
+            ],
+        ]);
+        $dados->update(['updated_at' => now()->subMonths(2)->toDateString()]);
+        Storage::disk('local')->assertExists($anexo2->path);
+
+        // Excluir arquivos
+        $dados = factory('App\PreRegistroCpf')->create()->preRegistro;
+        $dados->anexos()->first()->delete();
+
+        $anexo3 = $dados->salvarAjax([
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [
+                UploadedFile::fake()->image('random.jpg')->size(300),
+            ],
+        ]);
+        $dados->update(['updated_at' => now()->subMonths(2)->toDateString()]);
+        Storage::disk('local')->assertExists($anexo3->path);
+
+        // Manter arquivos
+        $dados = factory('App\PreRegistroCpf')->create()->preRegistro;
+        $dados->anexos()->first()->delete();
+
+        $anexo4 = $dados->salvarAjax([
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [
+                UploadedFile::fake()->image('random.jpg')->size(300),
+            ],
+        ]);
+        Storage::disk('local')->assertExists($anexo4->path);
+
+        $service->admin()->executarRotina();
+
+        // Teste somente do registro da última linha no log.
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: ';
+        $txt = $inicio . '[Rotina Portal] - Pré-Registro - Rotina de exclusão de arquivos do pré-registro: ';
+        $txt .= 'pré-registro com ID 3 possuía 1 e agora possui 0 no Storage e 0 no BD.';
+        $this->assertStringContainsString($txt, $log);
+
+        Storage::disk('local')->assertMissing($anexo1->path);
+        Storage::disk('local')->assertMissing($anexo2->path);
+        Storage::disk('local')->assertMissing($anexo3->path);
+        Storage::disk('local')->assertExists($anexo4->path);
+
+        $service->admin()->executarRotina();
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: ';
+        $txt = $inicio . '[Rotina Portal] - Pré-Registro - Rotina de exclusão de arquivos do pré-registro: nenhuma alteração.';
+        $this->assertStringContainsString($txt, $log);
+    }
 }

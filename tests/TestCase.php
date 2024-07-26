@@ -82,4 +82,9 @@ abstract class TestCase extends BaseTestCase
 
         return $externo;
     }
+
+    protected function inserirControllerUserPolicyParaUnitTest($nomeController)
+    {
+        $GLOBALS['testController'] = $nomeController;
+    }
 }

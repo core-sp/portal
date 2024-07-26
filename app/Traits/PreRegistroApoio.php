@@ -23,7 +23,7 @@ trait PreRegistroApoio {
         if(get_class($this) != 'App\PreRegistro')
             throw new \Exception('Este método somente a classe App\PreRegistro deve usar', 500);
 
-        $classe = array_search($relacao, $this->getRelacoes());
+        $classe = array_search($relacao, $this->getClassesRelacoes());
 
         switch ($relacao) {
             case $this->relation_rt:
@@ -75,7 +75,7 @@ trait PreRegistroApoio {
 
     // private function salvarArray($classe, $arrayCampos, $gerenti)
     // {
-    //     $nome_classe = array_search($classe, $this->getRelacoes());
+    //     $nome_classe = array_search($classe, $this->getClassesRelacoes());
     //     $obj_existe = ($classe == $this->relation_contabil) || ($classe == $this->relation_rt) ? $this->has($classe)->where('id', $this->id)->exists() : true;
 
     //     switch ($classe) {
@@ -118,7 +118,7 @@ trait PreRegistroApoio {
         return $temp;
     }
     
-    private function getRelacoes()
+    private function getClassesRelacoes()
     {
         return [
             'App\Anexo' => $this->relation_anexos,
@@ -155,21 +155,21 @@ trait PreRegistroApoio {
         return explode(',', 'Contabilidade,Dados Gerais,Endereço,Contato / RT,Sócios,Canal de Relacionamento,Anexos');
     }
 
-    public function getCodigos($classe)
+    private function getCampos($relacao)
     {
-        $model = array_keys($this->getRelacoes(), $classe, true);
+        $model = array_keys($this->getClassesRelacoes(), $relacao, true);
 
         if(isset($model[0]))
             return $model[0]::camposPreRegistro();
 
-        throw new \Exception('Classe não encontrada no serviço de pré-registro: ' . $classe, 404);
+        throw new \Exception('Classe não encontrada no serviço de pré-registro: ' . $relacao, 404);
     }
 
-    public function limparNomeCamposAjax($classe, $campo)
+    private function limparNomeCamposAjax($relacao, $campo)
     {
-        $campos = $this->getCodigos($classe);
+        $campos = $this->getCampos($relacao);
         $siglas = null;
-        switch ($classe) {
+        switch ($relacao) {
             case $this->relation_pj:
                 $siglas = '_empresa';
                 break;
@@ -236,9 +236,9 @@ trait PreRegistroApoio {
         }, ARRAY_FILTER_USE_BOTH))), ['pergunta']);
     }
 
-    public function getNomeClasses()
+    public function getNomesRelacoes()
     {
-        return array_values($this->getRelacoes());
+        return array_values($this->getClassesRelacoes());
     }
 
     public function getNomesCampos()
@@ -335,7 +335,7 @@ trait PreRegistroApoio {
             Carbon::createFromFormat('d/m/Y', $resultadosGerenti['Data de nascimento'])->format('Y-m-d') : null;
     }
 
-    public function getRegistradoGerenti($relacao, $gerentiRepository, $cpf_cnpj)
+    private function getRegistradoGerenti($relacao, $gerentiRepository, $cpf_cnpj)
     {
         if(!isset($gerentiRepository) || !isset(class_implements($gerentiRepository)["App\Repositories\GerentiRepositoryInterface"]))
             return null;
@@ -388,10 +388,12 @@ trait PreRegistroApoio {
 
         $cpf_cnpj = $this->getCpfCnpjRequest($request['campo'], $request['valor']);
 
-        $gerenti = $this->getRegistradoGerenti($request['classe'], $gerentiRepository, $cpf_cnpj);
+        $resp = $this->podeCriarRequest($request['classe'], $request['campo'], $objetoExiste) ? 'criar' : 'atualizar';
+
+        $gerenti = $resp == 'criar' ? $this->getRegistradoGerenti($request['classe'], $gerentiRepository, $cpf_cnpj) : null;
 
         return [
-            'resp' => $this->podeCriarRequest($request['classe'], $request['campo'], $objetoExiste) ? 'criar' : 'atualizar',
+            'resp' => $resp,
             'gerenti' => $gerenti,
             'classe' => $request['classe'],
             'campo' => $request['campo'],
