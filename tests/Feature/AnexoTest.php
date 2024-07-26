@@ -113,6 +113,9 @@ class AnexoTest extends TestCase
     /** @test */
     public function cannot_create_anexos_by_ajax_with_status_aprovado()
     {
+        Storage::fake('local');
+        Storage::disk('local')->deleteDirectory('userExterno');
+
         $externo = $this->signInAsUserExterno();
         factory('App\PreRegistroCpf')->create([
             'pre_registro_id' => factory('App\PreRegistro')->states('aprovado')->create(),
@@ -131,6 +134,7 @@ class AnexoTest extends TestCase
             'pre_registro_id' => 2
         ]);
 
+        
         Storage::disk('local')->assertMissing('userExterno/pre_registros/2');
     }
 
@@ -710,6 +714,8 @@ class AnexoTest extends TestCase
     public function owner_can_delete_file()
     {
         Storage::fake('local');
+        Storage::disk('local')->deleteDirectory('userExterno');
+
         $externo = $this->signInAsUserExterno();
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -1766,6 +1772,7 @@ class AnexoTest extends TestCase
     public function owner_can_delete_file_by_contabilidade()
     {
         Storage::fake('local');
+        Storage::disk('local')->deleteDirectory('userExterno');
 
         $externo = $this->signInAsUserExterno('contabil');
         $dados = factory('App\UserExterno')->states('cadastro_by_contabil')->make()->toArray();
