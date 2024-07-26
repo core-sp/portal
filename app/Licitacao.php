@@ -20,6 +20,7 @@ class Licitacao extends Model
     const MOD_CONCORRECIA_PUBLICA = 'Concorrência Pública';
     const MOD_CONCURSO = 'Concurso';
     const MOD_CONCURSO_LEI2021 = 'Concurso - Lei 14.133/2021';
+    const MOD_CONTRATA_DIRETA_LEI2021 = 'Contratação Direta - Lei 14.133/2021';
     const MOD_COTACAO_ELETRONICA = 'Cotação Eletrônica';
     const MOD_CREDENCIAMENTO = 'Credenciamento';
     const MOD_DIALOGO = 'Diálogo Competitivo - Lei 14.133/2021';
@@ -67,6 +68,7 @@ class Licitacao extends Model
             Licitacao::MOD_CONCORRECIA_PUBLICA,
             Licitacao::MOD_CONCURSO,
             Licitacao::MOD_CONCURSO_LEI2021,
+            Licitacao::MOD_CONTRATA_DIRETA_LEI2021,
             Licitacao::MOD_COTACAO_ELETRONICA,
             Licitacao::MOD_CREDENCIAMENTO,
             Licitacao::MOD_DIALOGO,
