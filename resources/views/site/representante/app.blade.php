@@ -103,8 +103,8 @@
               <a href="{{ route('representante.agendar.inserir.view') }}" onclick="showLoading()">
                 <h6 class="brancar">
                   <i class="fas fa-business-time"></i>&nbsp;&nbsp;Agendar Salas&nbsp;&nbsp;&nbsp;
-                  <span class="badge badge-warning">NOVO <span class="spinner-grow spinner-grow-sm align-middle"></span>
-                  </span>
+                  <!-- <span class="badge badge-warning">NOVO <span class="spinner-grow spinner-grow-sm align-middle"></span>
+                  </span> -->
                 </h6>
               </a>
             </div>
