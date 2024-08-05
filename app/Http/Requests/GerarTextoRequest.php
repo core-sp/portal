@@ -10,6 +10,7 @@ class GerarTextoRequest extends FormRequest
     private $niveis;
     private $comNumero;
     private $service;
+    private $validarConteudo;
 
     public function __construct(MediadorServiceInterface $service)
     {
@@ -36,11 +37,21 @@ class GerarTextoRequest extends FormRequest
             return;
         }
 
+        $this->validarConteudo = '';
+
         $this->niveis = '0,1,2,3';
         if(request()->filled('tipo'))
             $this->niveis = $this->tipo == 'Título' ? '0' : '1,2,3';
         if(request()->filled('tipo'))
             $this->comNumero = $this->tipo == 'Subtítulo' ? '1' : '0,1';
+
+        // Somente url
+        if($this->tipo_doc == 'prestacao-contas')
+        {
+            $conteudo = trim(str_replace('&nbsp;', '', strip_tags($this->conteudo)));
+            $this->merge(['conteudo' => $conteudo == "" ? null : $conteudo]);
+            $this->validarConteudo = '|starts_with:https://';
+        }
     }
 
     public function rules()
@@ -52,7 +63,7 @@ class GerarTextoRequest extends FormRequest
                 'texto_tipo' => 'required|max:191',
                 'com_numeracao' => 'required|in:'.$this->comNumero,
                 'nivel' => 'required|in:'.$this->niveis,
-                'conteudo' => 'nullable',
+                'conteudo' => 'nullable' . $this->validarConteudo,
             ];
         }
 
@@ -92,6 +103,7 @@ class GerarTextoRequest extends FormRequest
             'n_vezes.min' => 'Para criar vários textos o valor deve ser maior ou igual a :min',
             'n_vezes.max' => 'Para criar vários textos o valor deve ser menor ou igual a :max',
             'n_vezes.integer' => 'Para criar vários textos o valor deve ser um número inteiro',
+            'conteudo.starts_with' => 'Deve conter somente uma url e que comece com https://'
         ];
     }
 }

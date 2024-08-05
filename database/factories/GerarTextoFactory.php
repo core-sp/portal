@@ -35,7 +35,7 @@ $factory->state(GerarTexto::class, 'sumario_publicado', [
 
 $factory->afterCreatingState(GerarTexto::class, 'sumario_publicado', function ($texto, $faker) {
     $id = $texto->id;
-    $url = $faker->url;
+    $url = str_replace('http:', 'https:', $faker->url);
 
     switch ($id) {
         case 2:
@@ -65,7 +65,7 @@ $factory->afterCreatingState(GerarTexto::class, 'sumario_publicado', function ($
                 'ordem' => 4
             ]);
             if($texto->tipo_doc == 'prestacao-contas')
-                $texto->update(['conteudo' => '<p><a href="'.$url.'">'.$url.'</a></p>']);
+                $texto->update(['conteudo' => $url]);
             break;
         case 5:
         case 10:
