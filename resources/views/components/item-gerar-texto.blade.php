@@ -1,4 +1,4 @@
-<div class="form-check border border-left-0 border-info rounded-right mb-2 pl-2 {{ ($orientacao_sumario == 'vertical') && !$texto->tipoTitulo() ? 'ml-3' : '' }}">
+<div class="form-check border border-left-0 border-info rounded-right mb-2 pl-2 {{ ($orientacao_sumario == 'vertical') && !$texto->tipoTitulo() ? 'ml-' . (string) ($texto->nivel + 2) : '' }}">
     <button type="button" 
         class="btn btn-success btn-sm ml-0 mt-0 mb-0 mr-2 pt-0 pb-0 mover" 
         value="{{ $texto->id }}"
