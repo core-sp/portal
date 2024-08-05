@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Contracts\GerarTextoServiceInterface;
 use App\GerarTexto;
 use App\Events\CrudEvent;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 
@@ -90,6 +89,7 @@ class GerarTextoService implements GerarTextoServiceInterface {
 
         // Somente atualiza ordem e indice
         $resultado = GerarTexto::select('nivel', 'com_numeracao', 'ordem', 'indice', 'id')->where('tipo_doc', $tipo_doc)->orderBy('ordem','ASC')->get();
+        unset($dados['n_vezes']);
         GerarTexto::updateIndice($dados, $resultado);
         event(new CrudEvent('índice do texto do documento '.$tipo_doc, 'atualizou', '----'));
 
@@ -113,23 +113,21 @@ class GerarTextoService implements GerarTextoServiceInterface {
         $ids = array_filter($ids);
         $total = GerarTexto::where('tipo_doc', $tipo_doc)->count();
 
-        if(!empty($ids) && ($total > count($ids)))
-        {
-            $ok = array();
-            $textos = GerarTexto::where('tipo_doc', $tipo_doc)->whereIn('id', $ids)->get();
-            foreach($textos as $texto)
-            {
-                $nome_temp = $texto->texto_tipo;
-                $id_temp = $texto->id;
-                $temp = $texto->delete();
-                if($temp){
-                    event(new CrudEvent('o texto do documento '.$tipo_doc.' com o nome: '.$nome_temp, 'excluiu', $id_temp));
-                    array_push($ok, $id_temp);
-                }
-            }
-            GerarTexto::reordenarPorTipo($tipo_doc);
-        }else
+        if(empty($ids) || ($total <= count($ids)))
             throw new \Exception('Deve existir no mínimo um texto.', 400);
+
+        $ok = array();
+        $textos = GerarTexto::where('tipo_doc', $tipo_doc)->whereIn('id', $ids)->get();
+        foreach($textos as $texto)
+        {
+            $nome_temp = $texto->texto_tipo;
+            $id_temp = $texto->id;
+            if($texto->delete()){
+                event(new CrudEvent('o texto do documento '.$tipo_doc.' com o nome: '.$nome_temp, 'excluiu', $id_temp));
+                array_push($ok, $id_temp);
+            }
+        }
+        GerarTexto::reordenarPorTipo($tipo_doc);            
         
         return $ok;
     }
@@ -167,7 +165,7 @@ class GerarTextoService implements GerarTextoServiceInterface {
         }
 
         return [
-            'resultado' => $resultado,
+            'resultado' => GerarTexto::getLayoutCliente($resultado, $tipo_doc),
             'textos' => $textos,
             'btn_anterior' => isset($btn_anterior) ? route($tipo_doc, $btn_anterior->id) : null,
             'btn_proximo' => isset($btn_proximo) ? route($tipo_doc, $btn_proximo->id) : null,
@@ -179,22 +177,14 @@ class GerarTextoService implements GerarTextoServiceInterface {
     {
         $resultado = GerarTexto::resultadoByDoc($tipo_doc, $user);
 
-        $textos = array();
-
-        if(isset($busca))
-        {
-            $busca = $resultado->filter(function ($value, $key) use($busca) {
+        return [
+            'resultado' => $resultado,
+            'busca' => isset($busca) ? $resultado->filter(function ($value, $key) use($busca) {
                 $conteudo = strip_tags($value->conteudo);
                 $conteudo = stripos($conteudo, htmlentities($busca, ENT_NOQUOTES, 'UTF-8')) !== false;
                 $titulo = stripos($value->texto_tipo, $busca) !== false;
                 return $conteudo || $titulo;
-            });
-        }else
-            $busca = collect();
-
-        return [
-            'resultado' => $resultado,
-            'busca' => $busca
+            }) : collect(),
         ];
     }
 }

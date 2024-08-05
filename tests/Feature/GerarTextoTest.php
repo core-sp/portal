@@ -3,12 +3,9 @@
 namespace Tests\Feature;
 
 use App\GerarTexto;
-use App\Permissao;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Carbon\Carbon;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Str;
 
 class GerarTextoTest extends TestCase
 {
@@ -417,6 +414,37 @@ class GerarTextoTest extends TestCase
                 'tipo'
             ]);
         }
+    }
+
+    /** @test */
+    public function texto_cannot_be_updated_if_conteudo_without_https()
+    {
+        $user = $this->signInAsAdmin();
+
+        $texto = factory('App\GerarTexto')->states('prestacao-contas')->create()->toArray();
+        $texto['conteudo'] = 'http://teste.com';
+    
+        $this->get(route('textos.view', $texto['tipo_doc']))->assertOk();
+        $this->post(route('textos.update.campos', [$texto['tipo_doc'], $texto['id']]), $texto)
+        ->assertSessionHasErrors([
+            'conteudo'
+        ]);
+
+        $texto['conteudo'] = 'teste.com  ';
+    
+        $this->get(route('textos.view', $texto['tipo_doc']))->assertOk();
+        $this->post(route('textos.update.campos', [$texto['tipo_doc'], $texto['id']]), $texto)
+        ->assertSessionHasErrors([
+            'conteudo'
+        ]);
+
+        $texto['conteudo'] = 'https:/';
+    
+        $this->get(route('textos.view', $texto['tipo_doc']))->assertOk();
+        $this->post(route('textos.update.campos', [$texto['tipo_doc'], $texto['id']]), $texto)
+        ->assertSessionHasErrors([
+            'conteudo'
+        ]);
     }
 
     /** @test */
@@ -838,6 +866,9 @@ class GerarTextoTest extends TestCase
     /** @test */
     public function show_on_portal_not_published_and_authenticated_admin_when_tipo_doc_prestacao_contas()
     {
+        $this->get(route('prestacao-contas'))
+        ->assertSeeText('Informações sendo atualizadas.');
+
         $textos = factory('App\GerarTexto', 2)->states('prestacao-contas')->create();
 
         $this->assertGuest();
@@ -851,7 +882,7 @@ class GerarTextoTest extends TestCase
         ->assertDontSeeText('Informações sendo atualizadas.')
         ->assertSeeInOrder([
             '<div id="accordionPrimario" class="accordion">',
-            '<a href="#lista-'. Str::slug(strtolower($textos->get(0)->texto_tipo), '-') .'" data-toggle="collapse">',
+            '<a href="#lista-' . $textos->get(0)->id . '-' . $textos->get(0)->textoTipoSlug() .'" data-toggle="collapse">',
             '<strong><u>'.$textos->get(0)->texto_tipo.'</u></strong>'
         ]);
     }
@@ -900,7 +931,7 @@ class GerarTextoTest extends TestCase
         ->assertDontSeeText('Informações sendo atualizadas.')
         ->assertSeeInOrder([
             '<div id="accordionPrimario" class="accordion">',
-            '<a href="#lista-'. Str::slug(strtolower($textos->get(0)->texto_tipo), '-') .'" data-toggle="collapse">',
+            '<a href="#lista-' . $textos->get(0)->id . '-' . $textos->get(0)->textoTipoSlug() .'" data-toggle="collapse">',
             '<strong><u>'.$textos->get(0)->texto_tipo.'</u></strong>'
         ]);
     }
@@ -1245,43 +1276,43 @@ class GerarTextoTest extends TestCase
     /** @test */
     public function can_view_content_sumario_on_portal_when_published()
     {
+        // Carta de serviços
         $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
 
         $this->get(route($textos->get(0)->tipo_doc, $textos->get(3)->id))
         ->assertSeeText($textos->get(3)->conteudo)
         ->assertSee('<option value="'.$textos->get(3)->id.'" style="font-weight: bold;" selected>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(3)->subtituloFormatado().'</option>');
 
+        // Prestação de contas
         $textos = factory('App\GerarTexto', 5)->states('prestacao-contas', 'sumario_publicado')->create()->sortBy('ordem');
 
         $this->get(route($textos->get(0)->tipo_doc))
         ->assertSeeInOrder([
             '<div id="accordionPrimario" class="accordion">',
             '<strong><u>'.$textos->get(0)->texto_tipo.'</u></strong>',
-            '<div id="lista-'.Str::slug(strtolower($textos->get(0)->texto_tipo), '-').'" class="collapse" data-parent="#accordionPrimario">',
-            '<div id="accordion'.Str::studly(Str::slug(strtolower($textos->get(0)->texto_tipo), '-')).'" class="accordion">',
+            '<div id="lista-' . $textos->get(0)->id . '-' .$textos->get(0)->textoTipoSlug().'" class="collapse" data-parent="#accordionPrimario">',
+            '<div id="accordion'.$textos->get(0)->textoTipoStudly().'" class="accordion">',
             '<ul class="mb-0 pb-0">',
             '<li>',
-            '<a href="#lista-'.Str::slug(strtolower($textos->get(1)->texto_tipo), '-').'"',
+            '<a href="#lista-' . $textos->get(1)->id . '-' .$textos->get(1)->textoTipoSlug().'"',
             'target="_blank" rel="noopener"',
             'data-toggle="collapse"',
             $textos->get(1)->texto_tipo,
-            '<div id="lista-'.Str::slug(strtolower($textos->get(2)->texto_tipo), '-').'" class="collapse" data-parent="#lista-'.Str::slug(strtolower($textos->get(1)->texto_tipo), '-').'">',
+            '<div id="lista-' . $textos->get(2)->id . '-' .$textos->get(2)->textoTipoSlug().'" class="collapse"',
+            'data-parent="#lista-'. $textos->get(1)->id . '-' .$textos->get(1)->textoTipoSlug().'"',
             '<ul class="mb-0 pb-0">',
             '<li>',
-            '<a href="'.strip_tags($textos->get(3)->conteudo).'"',
+            '<a href="'.$textos->get(3)->conteudo.'"',
             $textos->get(3)->texto_tipo,
             '</li>',
-            '</ul></div></li></ul></div></li>',
-            '</ul>',
-            '</div>',
-            '</div>',
+            '</ul></div></li>',
+            '</ul></div></li>',
+            '</ul></div></div>',
             '<strong><u>'.$textos->get(4)->texto_tipo.'</u></strong>',
-            '<div id="lista-'.Str::slug(strtolower($textos->get(4)->texto_tipo), '-').'" class="collapse" data-parent="#accordionPrimario">',
-            '<div id="accordion'.Str::studly(Str::slug(strtolower($textos->get(4)->texto_tipo), '-')).'" class="accordion">',
+            '<div id="lista-' . $textos->get(4)->id . '-' .$textos->get(4)->textoTipoSlug().'" class="collapse" data-parent="#accordionPrimario">',
+            '<div id="accordion'.$textos->get(4)->textoTipoStudly().'" class="accordion">',
             '<ul class="mb-0 pb-0">',
-            '</ul>',
-            '</div>',
-            '</div>',
+            '</ul></div></div>',
             '</div>',
         ]);
     }
@@ -1296,13 +1327,9 @@ class GerarTextoTest extends TestCase
         ->assertDontSeeText($textos->get(4)->conteudo)
         ->assertSeeTextInOrder([
             $textos->get(0)->texto_tipo,
-            $textos->get(0)->conteudo,
             $textos->get(1)->texto_tipo,
-            $textos->get(1)->conteudo,
             $textos->get(2)->texto_tipo,
-            $textos->get(2)->conteudo,
             $textos->get(3)->texto_tipo,
-            $textos->get(3)->conteudo,
         ]);
 
         $textos = factory('App\GerarTexto', 5)->states('prestacao-contas', 'sumario_publicado')->create()->sortBy('ordem');
@@ -1312,7 +1339,6 @@ class GerarTextoTest extends TestCase
             $textos->get(0)->texto_tipo,
             $textos->get(1)->texto_tipo,
             $textos->get(2)->texto_tipo,
-            strip_tags($textos->get(3)->conteudo),
             $textos->get(3)->texto_tipo,
             $textos->get(4)->texto_tipo,
         ]);
