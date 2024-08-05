@@ -150,7 +150,7 @@
                 </h5>
                 <div class="card card-default bg-light">
                     <div class="card-body">
-
+                        <p class="text-danger"><b>Lembre de atualizar a índice após alterações na ordem, tipo do texto ou nível</b></p>
                         <div class="form-row mb-2">
                             <div class="col">
                                 <label for="tipo">Tipo do texto</label>
