@@ -65,7 +65,7 @@
         </p>
 
         <button type="button" class="btn btn-info btn-sm selecionarTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;Selecionar Todos</button>
-        <div class="{{-- textosSortable --}} sumario-{{ $orientacao_sumario }}" id="sumario">
+        <div class="sumario-{{ $orientacao_sumario }}" id="sumario">
         @php
         $col = 1;
         $row = 1;
@@ -76,16 +76,16 @@
 
         @foreach($resultado as $texto)
             
-            @if(in_array($texto->nivel, [0]))
-            {!! $texto->tipoTitulo() ? '<hr />' : '' !!}
-            <div class="row">
-                <div class="d-flex flex-wrap {{-- ($texto->nivel == 1) && $resultado->where('ordem', $texto->ordem + 1)->whereIn('nivel', [0])->isEmpty() ? 'mb-3' : '' --}}">
+            @if($texto->tipoTitulo())
+            <hr style="border-top: 2px dotted gray;" />
+            <div class="row ml-0">
+                <div class="d-flex flex-wrap ">
             @endif 
 
             @component('components.item-gerar-texto', ['texto' => $texto, 'orientacao_sumario' => $orientacao_sumario])
             @endcomponent
 
-            @if($resultado->where('ordem', $texto->ordem + 1)->whereIn('nivel', [0])->isNotEmpty() || $loop->last)
+            @if($loop->last || $resultado->get($loop->iteration)->tipoTitulo())
                 </div>
             </div>
             @endif
