@@ -258,7 +258,7 @@ class GerarTexto extends Model
 
     public function tipoTitulo()
     {
-        return $this->tipo == self::TIPO_TITULO;
+        return ($this->tipo == self::TIPO_TITULO) || ($this->nivel == 0);
     }
 
     public function indiceFormatada()
