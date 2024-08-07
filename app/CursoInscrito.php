@@ -5,6 +5,9 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use PDF;
+use Illuminate\Support\Facades\Storage;
+use App\QRCode;
 
 class CursoInscrito extends Model
 {
@@ -142,7 +145,7 @@ class CursoInscrito extends Model
         return isset($this->codigo_certificado);
     }
 
-    public function getChecksum()
+    private function getChecksum()
     {
         $checksum = (string) hash('sha256', $this->created_at->format('Y-m-d H:i:s') . '|' . $this->cpf . '|' . $this->idcurso . '|' . $this->idcursoinscrito . '|' . now()->timestamp);
         $this->update(['checksum' => $checksum]);
@@ -186,6 +189,38 @@ class CursoInscrito extends Model
                 'message' => 'Este CPF / CNPJ não teve a presença confirmada para gerar o certificado.',
                 'class' => 'alert-danger'
             ];
+    }
+
+    private function gerarQRCode($nome_rota_link_qrcode)
+    {
+        $nome_file = $this->idcursoinscrito . '_' . now()->timestamp . '.png';
+        $link = route($nome_rota_link_qrcode, $this->getChecksum());
+        $generator = new QRCode($link, ['s' => 'qr', 'wq' => 0, 'fc' => '#004587', 'sf' => 3]);
+
+        /* Create bitmap image. */
+        $image = $generator->render_image();
+        imagepng($image, storage_path('app/certificados/temp/' . $nome_file));
+        imagedestroy($image);
+
+        return $nome_file;
+    }
+
+    public function gerarCertificado($nome_rota_link_qrcode)
+    {
+        if(!Storage::disk('local')->exists('certificados/temp'))
+            Storage::disk('local')->makeDirectory('certificados/temp');
+
+        $nome_file = $this->gerarQRCode($nome_rota_link_qrcode);
+
+        $download = PDF::loadView('site.inc.certificadoPDF', ['inscrito' => $this, 'nome_file' => $nome_file])
+            ->setPaper('a4', 'landscape')
+            ->setWarnings(false)
+            // ->download('certificado.pdf')
+            ->stream('certificado.pdf');
+
+        Storage::disk('local')->delete('certificados/temp/' . $nome_file);
+
+        return $download;
     }
 
     // ------ PARA TESTES ----------

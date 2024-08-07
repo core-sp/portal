@@ -225,7 +225,7 @@ else
   <img class="qrcode" src="{{ storage_path('app/certificados/temp/' . $nome_file) }}">
 
   <!-- Sugestão de validação manual -->
-  <a href="{{ route('cursos.certificado.validar', $checksum) }}" class="link">{{ route('cursos.certificado.validar', $checksum) }}</a>
+  <a href="{{ route('cursos.certificado.validar', $inscrito->checksum) }}" class="link">{{ route('cursos.certificado.validar', $inscrito->checksum) }}</a>
 
   <div class="page-break"></div>
 
@@ -260,7 +260,7 @@ else
     <img class="qrcode" src="{{ storage_path('app/certificados/temp/' . $nome_file) }}">
 
     <!-- Sugestão de validação manual -->
-    <a href="{{ route('cursos.certificado.validar', $checksum) }}" class="link">{{ route('cursos.certificado.validar', $checksum) }}</a>
+    <a href="{{ route('cursos.certificado.validar', $inscrito->checksum) }}" class="link">{{ route('cursos.certificado.validar', $inscrito->checksum) }}</a>
 
   </div>
 

@@ -8,9 +8,6 @@ use App\Events\ExternoEvent;
 use App\Contracts\CursoSubServiceInterface;
 use App\Mail\CursoInscritoMailGuest;
 use Illuminate\Support\Facades\Mail;
-use PDF;
-use Illuminate\Support\Facades\Storage;
-use App\QRCode;
 
 class CursoSubService implements CursoSubServiceInterface {
 
@@ -114,20 +111,6 @@ class CursoSubService implements CursoSubServiceInterface {
 
         $tabela = montaTabela($headers, $contents, $classes);
         return $tabela;
-    }
-
-    private function gerarQRCode($checksum, $idinscrito)
-    {
-        $nome_file = $idinscrito . '_' . now()->timestamp . '.png';
-        $link = route('cursos.certificado.validar', $checksum);
-        $generator = new QRCode($link, ['s' => 'qr', 'wq' => 0, 'fc' => '#004587', 'sf' => 3]);
-
-        /* Create bitmap image. */
-        $image = $generator->render_image();
-        imagepng($image, storage_path('app/certificados/temp/' . $nome_file));
-        imagedestroy($image);
-
-        return $nome_file;
     }
 
     public function tiposInscricao()
@@ -404,23 +387,9 @@ class CursoSubService implements CursoSubServiceInterface {
 
         if($rep_autenticado)
             event(new ExternoEvent(' e realizou download do certificado.', 'Cursos'));
-
-            if(!Storage::disk('local')->exists('certificados/temp'))
-                Storage::disk('local')->makeDirectory('certificados/temp');
-
-            $checksum = $inscrito->getChecksum();
-            $nome_file = $this->gerarQRCode($checksum, $inscrito->idcursoinscrito);
-
-            $download = PDF::loadView('site.inc.certificadoPDF', compact('inscrito', 'nome_file', 'checksum'))
-                ->setPaper('a4', 'landscape')
-                ->setWarnings(false)
-                // ->download('certificado.pdf')
-                ->stream('certificado.pdf');
-
-            Storage::disk('local')->delete('certificados/temp/' . $nome_file);
             
         return [
-            'download' => $download,
+            'download' => $inscrito->gerarCertificado('cursos.certificado.validar'),
         ];
     }
 
