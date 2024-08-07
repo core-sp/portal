@@ -261,7 +261,7 @@ class CursoService implements CursoServiceInterface {
             return Curso::where('datatermino','>=', $now)
             ->where('publicado','Sim')
             ->where('acesso', Curso::ACESSO_PRI)
-            ->paginate(6);
+            ->paginate(6, ['*'], 'cursosPage');
             
         return Curso::where('datatermino','>=', $now)
             ->where('publicado','Sim')
@@ -296,7 +296,7 @@ class CursoService implements CursoServiceInterface {
                 });
             })
             ->orderBy('created_at', 'DESC')
-            ->paginate(6);
+            ->paginate(6, ['*'], 'certificadosPage');
     }
 
     public function inscritos(Curso $curso = null)
