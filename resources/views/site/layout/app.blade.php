@@ -209,7 +209,7 @@
                       <a href="/consulta-de-situacao" class="dropdown-item">Consulta Pública</a>
                       <a href="/cursos" class="dropdown-item">Cursos</a>
                       <a href="/downloads" class="dropdown-item">Downloads</a>
-                      <a href="/programa-de-incentivos" class="dropdown-item">Programa de Incentivos</a>
+                      <a href="/programa-de-beneficios-core-sp" class="dropdown-item">Programa de Benefícios</a>
                       <a href="/simulador" class="dropdown-item bb-0">Simulador de Valores</a>
                     </div>
                   </li>
@@ -340,7 +340,7 @@
               <p class="branco"><a href="/cursos">Cursos</a></p>
               <p class="branco"><a href="/downloads">Downloads</a></p>
               <p class="branco"><a href="/politica-de-privacidade">Política de Privacidade</a></p>
-              <p class="branco"><a href="/programa-de-incentivos">Programa de Incentivos</a></p>
+              <p class="branco"><a href="/programa-de-beneficios-core-sp">Programa de Benefícios</a></p>
               <p class="branco"><a href="/simulador">Simulador de Valores</a></p>
             </div>
             <div class="col-md-4">
