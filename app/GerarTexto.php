@@ -85,7 +85,6 @@ class GerarTexto extends Model
 
         foreach($chunk as $key => $valor)
         {
-            $ordem = $key + 1;
             $indice_array = explode(self::SEPARADOR, $indice);
             $id = (int) apenasNumeros($valor);
             $final = $resultado->find($id);
@@ -94,34 +93,31 @@ class GerarTexto extends Model
 
             $nivel = $final->nivel;
 
-            if($final->com_numeracao)
+            if($nivel == 0)
             {
-                if($nivel == 0)
+                $indice = (int) substr($indice, 0, $indice_array[0]);
+                $indice = $final->com_numeracao ? (string) ++$indice : (string) $indice;
+            }
+            else{
+                $total = substr_count($indice, self::SEPARADOR);
+                if($total < $nivel)
+                    $indice = $indice . self::SEPARADOR . '1';
+                elseif($total >= $nivel)
                 {
-                    $indice = (int) substr($indice, 0, $indice_array[0]);
-                    $indice = (string) ++$indice;
-                }
-                else{
-                    $total = substr_count($indice, self::SEPARADOR);
-                    if($total < $nivel)
-                        $indice = $indice . self::SEPARADOR . '1';
-                    elseif($total >= $nivel)
-                    {
-                        $temp = (int) $indice_array[$nivel];
-                        $indice_array[$nivel] = ++$temp;
-                        $indice_array = array_filter($indice_array, function($v, $k) use($nivel){
-                            return $k <= $nivel;
-                        }, ARRAY_FILTER_USE_BOTH);
-                        $indice = implode(self::SEPARADOR, $indice_array);
-                    }
+                    $temp = (int) $indice_array[$nivel];
+                    $indice_array[$nivel] = ++$temp;
+                    $indice_array = array_filter($indice_array, function($v, $k) use($nivel){
+                        return $k <= $nivel;
+                    }, ARRAY_FILTER_USE_BOTH);
+                    $indice = implode(self::SEPARADOR, $indice_array);
                 }
             }
                 
-            $final->atualizaOrdemIndice($ordem, $indice);
+            $final->atualizaOrdemIndice($key + 1, $indice);
         }
     }
 
-    public static function resultadoByDoc($tipo_doc, $user)
+    public static function resultadoByDoc($tipo_doc, $user = null)
     {
         return self::where('tipo_doc', $tipo_doc)
             ->when(!isset($user), function($query){
@@ -155,6 +151,8 @@ class GerarTexto extends Model
 
         foreach($resultado as $key => $texto)
         {
+            $proximo = $key + 1;
+
             // Fecha os collapses que sobraram antes do próximo collapse caso o nível atual seja menor ou igual ao nivel do collapse da fila
             foreach($fila as $chave => $collapse)
                 if(($chave >= $texto->nivel) && ($chave > 0))
@@ -182,11 +180,11 @@ class GerarTexto extends Model
                 // Se não for último loop, verifica se o próximo é um collapse e o anterior não é titulo
                     // Se for o atual maior que o próximo, fecha o collapse pai do nivel atual
                         // Se for igual fecha o collapse atual se existir
-                if(($key + 1) < $resultado->count())
+                if(($proximo) < $resultado->count())
                 {
-                    if(($texto->nivel > $resultado->get($key + 1)->nivel) && !$collapse_texto_anterior->tipoTitulo())
+                    if(($texto->nivel > $resultado->get($proximo)->nivel) && isset($collapse_texto_anterior) && !$collapse_texto_anterior->tipoTitulo())
                         $final .= $fila->pull($collapse_texto_anterior->nivel);
-                    elseif(($texto->nivel == $resultado->get($key + 1)->nivel) && $fila->has($texto->nivel))
+                    elseif(($texto->nivel == $resultado->get($proximo)->nivel) && $fila->has($texto->nivel))
                         $final .= $fila->pull($texto->nivel);
                 }
             }
@@ -195,7 +193,7 @@ class GerarTexto extends Model
               $collapse_texto_anterior = $texto;
 
             // Fecha tudo que sobrou do nivel maior ao menor
-            if(($key + 1) >= $resultado->count())
+            if(($proximo) >= $resultado->count())
                 foreach($fila->sortKeysDesc() as $chave => $collapse)
                     $final .= $fila->pull($chave);
         }
@@ -280,7 +278,7 @@ class GerarTexto extends Model
     {
         if($this->tipo_doc == self::DOC_PREST_CONT)
             return isset($this->conteudo) && Str::startsWith($this->conteudo, 'https://');
-        return false;
+        return strlen($this->conteudo) > 0;
     }
 
     public function textoTipoSlug()
@@ -291,17 +289,6 @@ class GerarTexto extends Model
     public function textoTipoStudly()
     {
         return Str::studly($this->textoTipoSlug());
-    }
-
-    public function subTituloSemConteudo()
-    {
-        if(($this->tipo_doc == self::DOC_PREST_CONT) && !$this->possuiConteudoPrestacaoContas() && in_array($this->nivel, [1,2]))
-            return true;
-
-        if(($this->tipo_doc != self::DOC_PREST_CONT) && (is_null($this->conteudo)) && ($this->nivel > 0))
-            return true;
-
-        return false;
     }
 
     public function existeImg()
