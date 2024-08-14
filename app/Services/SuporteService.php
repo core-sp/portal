@@ -293,9 +293,9 @@ class SuporteService implements SuporteServiceInterface {
         return Storage::disk('local')->exists($this->nomeFileErros) ? Storage::disk('local')->path($this->nomeFileErros) : null;
     }
 
-    public function ipsBloqueados()
+    public function ipsBloqueados($ip = null)
     {
-        return SuporteIp::select('ip')->where('status', SuporteIp::BLOQUEADO)->get();
+        return !isset($ip) ? SuporteIp::select('ip')->where('status', SuporteIp::BLOQUEADO)->get() : SuporteIp::where('status', SuporteIp::BLOQUEADO)->where('ip', $ip)->exists();
     }
 
     public function ips()

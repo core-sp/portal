@@ -1844,6 +1844,9 @@ class SuporteTest extends TestCase
             $ips->get(3)->ip,
             $ips->get(4)->ip,
         ], $ips_array);
+
+        $this->assertTrue($service->getService('Suporte')->ipsBloqueados($ips->get(2)->ip));
+        $this->assertTrue(!$service->getService('Suporte')->ipsBloqueados('192.168.55.23'));
     }
 
     /** @test */

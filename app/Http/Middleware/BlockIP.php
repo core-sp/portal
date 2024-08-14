@@ -17,13 +17,13 @@ class BlockIP
     {
         try{
             $service = resolve('App\Contracts\MediadorServiceInterface');
-            $ips = $service->getService('Suporte')->ipsBloqueados()->pluck('ip')->all();
+            $bloqueia = $service->getService('Suporte')->ipsBloqueados($request->ip());
         }catch(\Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             return abort(500, 'Erro interno! Tente novamente mais tarde.');
         }
 
-        if(in_array($request->ip(), $ips)) {
+        if($bloqueia) {
             return abort(423);
         }
 
