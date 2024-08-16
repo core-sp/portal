@@ -134,56 +134,38 @@ class GerarTextoService implements GerarTextoServiceInterface {
 
     public function show($tipo_doc, $id = null, $user = null)
     {
-        $resultado = in_array($tipo_doc, [GerarTexto::DOC_PREST_CONT]) ? GerarTexto::resultadoByDoc($tipo_doc, $user) : GerarTexto::resultadoByDoc($tipo_doc, $user)->except(['conteudo']);
+        $resultado = GerarTexto::resultadoByDoc($tipo_doc, $user);
         $dt_atualizacao = onlyDate(GerarTexto::ultimaAtualizacao($tipo_doc));
 
-        $textos = array();
         if(isset($id))
         {
             $texto = $resultado->find($id);
             if(!isset($texto))
                 throw new ModelNotFoundException("No query results for model [App\GerarTexto] no documento ".$tipo_doc.", id = " . $id);
 
-            array_push($textos, $texto);
-            // junta os subtítulos com o título escolhido
-            if($texto->tituloNumerado())
-            {
-                foreach($resultado as $key => $val)
-                {
-                    // somente verifica os itens das ordens seguintes
-                    if($val->ordem <= $texto->ordem)
-                        continue;
-                    // quando encontra o próximo título, encerra
-                    if($val->tipoTitulo())
-                        break;
-                    array_push($textos, $val);
-                }
-            }
-
-            $btn_anterior = $resultado->where('ordem', '<', $texto->ordem)->where('tipo', GerarTexto::TIPO_TITULO)->last();
-            $btn_proximo = $resultado->where('ordem', '>', $texto->ordem)->where('tipo', GerarTexto::TIPO_TITULO)->first();
+            $final = $texto->conteudoTituloComSubtitulo($resultado);
         }
 
         return [
             'resultado' => GerarTexto::getLayoutCliente($resultado, $tipo_doc),
-            'textos' => $textos,
-            'btn_anterior' => isset($btn_anterior) ? route($tipo_doc, $btn_anterior->id) : null,
-            'btn_proximo' => isset($btn_proximo) ? route($tipo_doc, $btn_proximo->id) : null,
+            'textos' => isset($final['textos']) ? $final['textos'] : array(),
+            'btn_anterior' => isset($final['btn_anterior']) ? route($tipo_doc, $final['btn_anterior']->id) : null,
+            'btn_proximo' => isset($final['btn_proximo']) ? route($tipo_doc, $final['btn_proximo']->id) : null,
             'dt_atualizacao' => $dt_atualizacao,
         ];
     }
 
     public function buscar($tipo_doc, $busca, $user = null)
     {
-        $resultado = GerarTexto::resultadoByDoc($tipo_doc, $user);
+        $resultado = GerarTexto::resultadoByDoc($tipo_doc, $user, isset($busca));
 
         return [
             'resultado' => $resultado,
             'busca' => isset($busca) ? $resultado->filter(function ($value, $key) use($busca) {
                 $conteudo = strip_tags($value->conteudo);
-                $conteudo = stripos($conteudo, htmlentities($busca, ENT_NOQUOTES, 'UTF-8')) !== false;
-                $titulo = stripos($value->texto_tipo, $busca) !== false;
-                return $conteudo || $titulo;
+                $value->fill(['conteudo' => null]);
+                return $value->tipoTitulo() ? stripos($value->texto_tipo, $busca) !== false : 
+                stripos($conteudo, htmlentities($busca, ENT_NOQUOTES, 'UTF-8')) !== false;
             }) : collect(),
         ];
     }

@@ -117,14 +117,46 @@ class GerarTexto extends Model
         }
     }
 
-    public static function resultadoByDoc($tipo_doc, $user = null)
+    public static function resultadoByDoc($tipo_doc, $user = null, $buscar = false)
     {
         return self::where('tipo_doc', $tipo_doc)
             ->when(!isset($user), function($query){
                 $query->where('publicar', true);
             })
+            ->when(($tipo_doc != self::DOC_PREST_CONT) && !$buscar, function($query){
+                // sem conteúdo
+                $query->select('id', 'tipo', 'texto_tipo', 'com_numeracao', 'ordem', 'nivel', 'tipo_doc', 'indice', 'publicar', 'updated_at');
+            })
             ->orderBy('ordem', 'ASC')
             ->get();
+    }
+
+    public function conteudoTituloComSubtitulo($resultado)
+    {
+        // ->fresh() carrega o conteúdo
+        $textos = array();
+        array_push($textos, $this->fresh());
+        
+        // junta os subtítulos com o título escolhido
+        if($this->tituloNumerado())
+        {
+            foreach($resultado as $key => $val)
+            {
+                // somente verifica os itens das ordens seguintes
+                if($val->ordem <= $this->ordem)
+                    continue;
+                // quando encontra o próximo título, encerra
+                if($val->tipoTitulo())
+                    break;
+                array_push($textos, $val->fresh());
+            }
+        }
+
+        return [
+            'textos' => $textos,
+            'btn_anterior' => $resultado->where('ordem', '<', $this->ordem)->where('tipo', self::TIPO_TITULO)->last(),
+            'btn_proximo' => $resultado->where('ordem', '>', $this->ordem)->where('tipo', self::TIPO_TITULO)->first(),
+        ];
     }
 
     public static function ultimaAtualizacao($tipo_doc)

@@ -6,6 +6,8 @@ use App\GerarTexto;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
+use App\Services\GerarTextoService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class GerarTextoTest extends TestCase
 {
@@ -149,29 +151,96 @@ class GerarTextoTest extends TestCase
     {
         $user = factory('App\User')->create();
         $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
-        $textos = factory('App\GerarTexto', 7)->states('sumario_publicado', 'prestacao-contas')->create();
+        $textos = factory('App\GerarTexto', 10)->states('sumario_publicado', 'prestacao-contas')->create();
 
         $resultado = GerarTexto::resultadoByDoc('carta-servicos');
         $this->assertEquals(5, $resultado->count());
+        $this->assertFalse(isset($resultado->get(0)->conteudo));
+        $this->assertFalse(isset($resultado->get(3)->conteudo));
         $resultado = GerarTexto::resultadoByDoc('prestacao-contas');
-        $this->assertEquals(7, $resultado->count());
+        $this->assertEquals(10, $resultado->count());
+        $this->assertTrue(isset($resultado->get(8)->conteudo));
+
+        // buscar
+        $resultado = GerarTexto::resultadoByDoc('carta-servicos', null, true);
+        $this->assertEquals(5, $resultado->count());
+        $this->assertTrue(isset($resultado->get(0)->conteudo));
+        $this->assertTrue(isset($resultado->get(3)->conteudo));
 
         $resultado = GerarTexto::resultadoByDoc('carta-servicos', $user);
         $this->assertEquals(5, $resultado->count());
+        $this->assertFalse(isset($resultado->get(0)->conteudo));
+        $this->assertFalse(isset($resultado->get(3)->conteudo));
         $resultado = GerarTexto::resultadoByDoc('prestacao-contas', $user);
-        $this->assertEquals(7, $resultado->count());
+        $this->assertEquals(10, $resultado->count());
+        $this->assertTrue(isset($resultado->get(8)->conteudo));
+
+        // buscar
+        $resultado = GerarTexto::resultadoByDoc('carta-servicos', $user, true);
+        $this->assertEquals(5, $resultado->count());
+        $this->assertTrue(isset($resultado->get(0)->conteudo));
+        $this->assertTrue(isset($resultado->get(3)->conteudo));
 
         GerarTexto::where('publicar', true)->update(['publicar' => false]);
 
         $resultado = GerarTexto::resultadoByDoc('carta-servicos');
         $this->assertEquals(0, $resultado->count());
+        $this->assertFalse(isset($resultado->get(0)->conteudo));
+        $this->assertFalse(isset($resultado->get(3)->conteudo));
         $resultado = GerarTexto::resultadoByDoc('prestacao-contas');
         $this->assertEquals(0, $resultado->count());
 
+        // buscar
+        $resultado = GerarTexto::resultadoByDoc('carta-servicos', null, true);
+        $this->assertEquals(0, $resultado->count());
+        $this->assertFalse(isset($resultado->get(0)->conteudo));
+        $this->assertFalse(isset($resultado->get(3)->conteudo));
+
         $resultado = GerarTexto::resultadoByDoc('carta-servicos', $user);
         $this->assertEquals(5, $resultado->count());
+        $this->assertFalse(isset($resultado->get(0)->conteudo));
+        $this->assertFalse(isset($resultado->get(3)->conteudo));
         $resultado = GerarTexto::resultadoByDoc('prestacao-contas', $user);
-        $this->assertEquals(7, $resultado->count());
+        $this->assertEquals(10, $resultado->count());
+        $this->assertTrue(isset($resultado->get(8)->conteudo));
+
+        // buscar
+        $resultado = GerarTexto::resultadoByDoc('carta-servicos', $user, true);
+        $this->assertEquals(5, $resultado->count());
+        $this->assertTrue(isset($resultado->get(0)->conteudo));
+        $this->assertTrue(isset($resultado->get(3)->conteudo));
+    }
+
+    /** @test */
+    public function conteudo_titulo_com_subtitulo()
+    {
+        $user = factory('App\User')->create();
+
+        factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
+        $resultado = GerarTexto::resultadoByDoc('carta-servicos', $user);
+
+        $final = GerarTexto::find(1)->conteudoTituloComSubtitulo($resultado);
+        $this->assertEquals([
+            GerarTexto::find(1), GerarTexto::find(2), GerarTexto::find(3), GerarTexto::find(4),
+        ], $final['textos']);
+        $this->assertEquals(GerarTexto::find(1)->conteudo, $final['textos'][0]->conteudo);
+        $this->assertEquals(GerarTexto::find(2)->conteudo, $final['textos'][1]->conteudo);
+        $this->assertEquals(GerarTexto::find(3)->conteudo, $final['textos'][2]->conteudo);
+        $this->assertEquals(GerarTexto::find(4)->conteudo, $final['textos'][3]->conteudo);
+
+        $this->assertEquals(null, $final['btn_anterior']);
+        $this->assertEquals(GerarTexto::select([
+            'id', 'tipo', 'texto_tipo', 'com_numeracao', 'ordem', 'nivel', 'tipo_doc', 'indice', 'publicar', 'updated_at'
+        ])->find(5), $final['btn_proximo']);
+
+        $final = GerarTexto::find(3)->conteudoTituloComSubtitulo($resultado);
+        $this->assertEquals(GerarTexto::select([
+            'id', 'tipo', 'texto_tipo', 'com_numeracao', 'ordem', 'nivel', 'tipo_doc', 'indice', 'publicar', 'updated_at'
+        ])->find(1), $final['btn_anterior']);
+        $this->assertEquals(GerarTexto::select([
+            'id', 'tipo', 'texto_tipo', 'com_numeracao', 'ordem', 'nivel', 'tipo_doc', 'indice', 'publicar', 'updated_at'
+        ])->find(5), $final['btn_proximo']);
+        
     }
 
     /** @test */
@@ -389,4 +458,237 @@ class GerarTextoTest extends TestCase
      * TESTES NO GERARTEXTOSERVICE
      * =======================================================================================================
      */
+
+    /** @test */
+    public function limite_criar_textos()
+    {
+        $service = new GerarTextoService;
+        $this->assertEquals(10, $service->limiteCriarTextos());
+    }
+
+    /** @test */
+    public function view()
+    {
+        $this->signInAsAdmin();
+
+        $texto = factory('App\GerarTexto')->create();
+
+        $service = new GerarTextoService;
+
+        $final = $service->view('carta-servicos');
+
+        $this->assertEquals("Illuminate\Database\Eloquent\Collection", get_class($final['resultado']));
+        $this->assertEquals([
+            "id", "tipo", "texto_tipo", "com_numeracao", "ordem", "nivel", "indice", "publicar"
+        ], array_keys($final['resultado']->get(0)->attributesToArray()));
+        $this->assertEquals("vertical", $final['orientacao_sumario']);
+        $this->assertEquals(10, $final['limite_criar_textos']);
+
+        $final = $service->view('carta-servicos', 1);
+
+        $this->assertEquals("Illuminate\Database\Eloquent\Collection", get_class($final['resultado']));
+        $this->assertEquals([
+            "tipo", "texto_tipo", "com_numeracao", "nivel", "indice", "conteudo"
+        ], array_keys($final['resultado']->get(0)->attributesToArray()));
+        $this->assertEquals("vertical", $final['orientacao_sumario']);
+        $this->assertEquals(10, $final['limite_criar_textos']);
+    }
+
+    /** @test */
+    public function criar_pelo_service()
+    {
+        $this->signInAsAdmin();
+
+        $texto = factory('App\GerarTexto')->create();
+
+        $service = new GerarTextoService;
+
+        $final = $service->criar('carta-servicos');
+
+        $this->assertEquals(['novo_texto' => 2], $final['novo_texto']);
+        $this->assertEquals(GerarTexto::class, get_class($final));
+
+        $final = $service->criar('carta-servicos', 3);
+
+        $this->assertEquals(['novos_textos' => [3, 4, 5]], $final->novo_texto);
+        $this->assertEquals('TÍTULO DO TEXTO...', $final->texto_tipo);
+    }
+
+    /** @test */
+    public function update()
+    {
+        $this->signInAsAdmin();
+
+        $texto = factory('App\GerarTexto', 5)->create();
+
+        $service = new GerarTextoService;
+
+        // atualizar campos
+        $dados = [
+            'tipo' => 'Subtítulo',
+            'texto_tipo' => $this->faker()->sentence(100),
+            'com_numeracao' => 1,
+            'nivel' => 1,
+            'conteudo' => $this->faker()->sentence(300)
+        ];
+
+        $this->assertEquals(' - ' . $dados['texto_tipo'], $service->update('carta-servicos', $dados, 1)->texto_tipo);
+
+        $dados['com_numeracao'] = 0;
+        $this->assertEquals(false, $service->update('carta-servicos', $dados, 3)->com_numeracao);
+
+        // atualizar ordem e indice
+        $dados = [3, 5, 4, 2, 1];
+
+        $this->assertTrue($service->update('carta-servicos', $dados));
+
+        $this->assertEquals(1, GerarTexto::orderBy('ordem')->find(3)->ordem);
+        $this->assertEquals(2, GerarTexto::orderBy('ordem')->find(5)->ordem);
+        $this->assertEquals(3, GerarTexto::orderBy('ordem')->find(4)->ordem);
+        $this->assertEquals(4, GerarTexto::orderBy('ordem')->find(2)->ordem);
+        $this->assertEquals(5, GerarTexto::orderBy('ordem')->find(1)->ordem);
+
+        $this->assertEquals(null, GerarTexto::orderBy('ordem')->find(3)->indice);
+        $this->assertEquals('1', GerarTexto::orderBy('ordem')->find(5)->indice);
+        $this->assertEquals('2', GerarTexto::orderBy('ordem')->find(4)->indice);
+        $this->assertEquals('3', GerarTexto::orderBy('ordem')->find(2)->indice);
+        $this->assertEquals('3.1', GerarTexto::orderBy('ordem')->find(1)->indice);
+    }
+
+    /** @test */
+    public function publicar()
+    {
+        $this->signInAsAdmin();
+
+        $texto = factory('App\GerarTexto')->create();
+
+        $service = new GerarTextoService;
+
+        $this->assertTrue((bool) $service->publicar('carta-servicos', true));
+        $this->assertTrue((bool) GerarTexto::first()->publicar);
+
+        $this->assertTrue((bool) $service->publicar('carta-servicos', false));
+        $this->assertFalse((bool) GerarTexto::first()->publicar);
+    }
+
+    /** @test */
+    public function excluir()
+    {
+        $this->signInAsAdmin();
+
+        $texto = factory('App\GerarTexto', 5)->create();
+
+        $service = new GerarTextoService;
+
+        $this->assertEquals([2, 4], $service->excluir('carta-servicos', [2, 4]));
+        $this->assertEquals([1, 2, 3], GerarTexto::orderBy('ordem')->get()->pluck('ordem')->all());
+    }
+
+    /** @test */
+    public function nao_excluir_sem_ids()
+    {
+        $this->signInAsAdmin();
+
+        $texto = factory('App\GerarTexto', 5)->create();
+
+        $service = new GerarTextoService;
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Deve existir no mínimo um texto.');
+
+        $service->excluir('carta-servicos');
+    }
+
+    /** @test */
+    public function nao_excluir_com_total_ids_maior_ou_igual()
+    {
+        $this->signInAsAdmin();
+
+        $texto = factory('App\GerarTexto', 5)->create();
+
+        $service = new GerarTextoService;
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Deve existir no mínimo um texto.');
+
+        $service->excluir('carta-servicos', [1, 2, 3, 4, 5]);
+    }
+
+    /** @test */
+    public function show_pelo_service_sem_publicar()
+    {
+        $user = $this->signInAsAdmin();
+
+        $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create([
+            'com_numeracao' => false
+        ]);
+
+        $service = new GerarTextoService;
+        $resultado = GerarTexto::resultadoByDoc('carta-servicos');
+
+        $final = $service->show('carta-servicos');
+        $this->assertEquals([], $final['textos']);
+        $this->assertEquals(null, $final['btn_anterior']);
+        $this->assertEquals(null, $final['btn_proximo']);
+        $this->assertEquals($resultado, $final['resultado']);
+
+        $resultado = GerarTexto::resultadoByDoc('carta-servicos', $user);
+
+        $final = $service->show('carta-servicos', null, $user);
+        $this->assertEquals([], $final['textos']);
+        $this->assertEquals(null, $final['btn_anterior']);
+        $this->assertEquals(null, $final['btn_proximo']);
+        $this->assertEquals($resultado, $final['resultado']);
+
+        // Com ID
+        $resultado = GerarTexto::resultadoByDoc('carta-servicos', $user);
+
+        $final = $service->show('carta-servicos', 1, $user);
+        $this->assertEquals(GerarTexto::find(1), $final['textos'][0]);
+        $this->assertEquals(null, $final['btn_anterior']);
+        $this->assertEquals(route('carta-servicos', 5), $final['btn_proximo']);
+
+        $final = $service->show('carta-servicos', 3, $user);
+        $this->assertEquals(GerarTexto::find(3), $final['textos'][0]);
+        $this->assertEquals(route('carta-servicos', 1), $final['btn_anterior']);
+        $this->assertEquals(route('carta-servicos', 5), $final['btn_proximo']);
+    }
+
+    /** @test */
+    public function show_pelo_service_com_id_inexistente_ou_sem_publicar()
+    {
+        $textos = factory('App\GerarTexto', 5)->create([
+            'com_numeracao' => false
+        ]);
+
+        $service = new GerarTextoService;
+
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [App\GerarTexto] no documento carta-servicos, id = 3');
+
+        $service->show('carta-servicos', 3);
+    }
+
+    /** @test */
+    public function buscar()
+    {
+        $user = $this->signInAsAdmin();
+
+        factory('App\GerarTexto', 5)->states('sumario_publicado')->create([
+            'com_numeracao' => false
+        ]);
+
+        GerarTexto::find(1)->update(['texto_tipo' => GerarTexto::find(1)->texto_tipo . ' teste.']);
+        GerarTexto::find(2)->update(['conteudo' => GerarTexto::find(2)->conteudo . ' teste.']);
+
+        $service = new GerarTextoService;
+
+        $resultado = GerarTexto::resultadoByDoc('carta-servicos', $user);
+
+        $final = $service->buscar('carta-servicos', 'teste', $user);
+        $this->assertEquals(2, $final['busca']->count());
+
+        $final = $service->buscar('carta-servicos', null, $user);
+        $this->assertEquals(0, $final['busca']->count());
+    }
 }
