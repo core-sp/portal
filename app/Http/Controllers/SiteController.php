@@ -30,7 +30,7 @@ class SiteController extends Controller
         $latestNoticias = $this->service->getService('Noticia')->latest();
         $noticias = $latestNoticias['noticias'];
         $cotidianos = $latestNoticias['cotidianos'];
-        $imagens = $this->service->getService('HomeImagem')->carrossel()['resultado'];
+        $imagens = $this->service->getService('HomeImagem')->carrossel()['resultado']->whereNotNull('url');
         $posts = $this->service->getService('Post')->latest();
 
         return response()

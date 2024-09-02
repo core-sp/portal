@@ -1,20 +1,13 @@
 $(document).ready(function(){
   // Btns
   $('#lfm').filemanager('image');
-  $('#lfm-1').filemanager('image');
-  $('#lfm-2').filemanager('image');
-  $('#lfm-3').filemanager('image');
-  $('#lfm-4').filemanager('image');
-  $('#lfm-5').filemanager('image');
-  $('#lfm-6').filemanager('image');
-  $('#lfm-7').filemanager('image');
-  $('#lfm-m-1').filemanager('image');
-  $('#lfm-m-2').filemanager('image');
-  $('#lfm-m-3').filemanager('image');
-  $('#lfm-m-4').filemanager('image');
-  $('#lfm-m-5').filemanager('image');
-  $('#lfm-m-6').filemanager('image');
-  $('#lfm-m-7').filemanager('image');
+
+  if($('#total-bannerprincipal').length > 0)
+    for(var i = 1; i <= $('#total-bannerprincipal').val(); ++i){
+      $('#lfm-' + i).filemanager('image');
+      $('#lfm-m-' + i).filemanager('image');
+    }
+
   $('#edital').filemanager('file');
   // Máscaras gerais
   $('.nrlicitacaoInput').mask('99999/9999');

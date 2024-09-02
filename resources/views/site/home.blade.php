@@ -8,27 +8,24 @@
 
 @include('site.inc.popup')
 
+@if($imagens->isNotEmpty())
 <section>
   <div class="container-fluid">
     <div class="row" id="conteudo-principal">
       <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="6000">
         <ol class="carousel-indicators">
-          @foreach($imagens as $key => $img)
-          @if(!empty($img->url))
-            <li data-target="#carousel" data-slide-to="{{ $key }}" class="{{ $key === 0 ? 'active' : '' }}"></li>
-          @endif
+          @foreach($imagens as $img)
+            <li data-target="#carousel" data-slide-to="{{ $loop->index }}" class="{{ $loop->first ? 'active' : '' }}"></li>
           @endforeach
         </ol>
         <div class="carousel-inner h-100">
           @foreach($imagens as $img)
-          @if(!empty($img->url))
-            <div class="carousel-item h-100 {{ $img->ordem === 1 ? 'active' : '' }}">
+            <div class="carousel-item h-100 {{ $loop->first ? 'active' : '' }}">
               <a href="{{ $img->link }}" target="{{ $img->target }}">
                 <img class="w-100 hide-576" src="{{ asset($img->url) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
                 <img class="w-100 show-576" src="{{ asset($img->url_mobile) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
               </a>
             </div>
-          @endif
           @endforeach
         </div>
         <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
@@ -43,6 +40,7 @@
     </div>
   </div>
 </section>
+@endif
 
 <section id="home-news" class="mb-2 mt-4">
   <div class="container">
@@ -251,16 +249,16 @@
       <div class="col-12">
         <div class="beneficios-box row nomargin">
           <div class="col-lg-7 beneficios-txt center-992">
-            <h2 class="stronger text-white text-uppercase">Programa de Incentivos</h2>
-            <p class="text-white light">O Core-SP traz benefícios diferenciados para Representantes Comerciais.</p>
+            <h2 class="stronger text-white text-uppercase">Programa de Benefícios</h2>
+            <p class="text-white light">O Core-SP traz serviços diferenciados para Representantes Comerciais.</p>
             <p class="text-white light">Faça parte do Grupo do WhatsApp e receba todos os dias os benefícios disponíveis.</p>
             <div>
-              <a href="/programa-de-incentivos" class="btn-beneficios">saiba mais</a>
+              <a href="/programa-de-beneficios-core-sp" class="btn-beneficios">saiba mais</a>
               <a href="https://chat.whatsapp.com/HPAXB7yne537CRQChfRfQe" class="btn-beneficios bg-white"><i class="fab fa-whatsapp fa-lg"></i> Grupo WhatsApp</a>
             </div>
           </div>
           <div class="col-lg-5 hide-992">
-            <img class="lazy" data-src="{{ asset('img/arte-capa004.png') }}" id="computer" alt="Programa de Benefícios | Core-SP" />
+            <img class="lazy" data-src="{{ asset('img/Imagem-celular002_beneficios_2024.png') }}" id="computer" alt="Programa de Benefícios | Core-SP" />
           </div>
         </div>
       </div>
