@@ -25,6 +25,11 @@ class HomeImagemService implements HomeImagemServiceInterface {
             ->orderBy('ordem','ASC')
             ->get();
 
+        if(!isset($array) && ($resultado->count() < HomeImagem::TOTAL))
+            for($cont = $resultado->count(); $cont < HomeImagem::TOTAL; ++$cont)
+                $resultado->push(HomeImagem::create(['ordem' => $cont + 1])->fresh());
+                
+
         if(isset($array) && is_array($array))
         {
             $chunk = HomeImagem::validacao($array);
@@ -45,6 +50,7 @@ class HomeImagemService implements HomeImagemServiceInterface {
         return [
             'resultado' => $resultado,
             'variaveis' => (object) $variaveis,
+            'total' => HomeImagem::TOTAL,
         ];
     }
 
