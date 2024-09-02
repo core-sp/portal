@@ -102,8 +102,8 @@ class HomeImagemTest extends TestCase
         ]);
         $this->assertEquals(HomeImagem::whereNull('url_mobile')->count(), 2);
         $this->assertEquals(HomeImagem::where('target', '_self')->count(), 2);
-        $this->assertEquals(HomeImagem::whereNotNull('url_mobile')->count(), 5);
-        $this->assertEquals(HomeImagem::where('target', '_blank')->count(), 5);
+        $this->assertEquals(HomeImagem::whereNotNull('url_mobile')->count(), 8);
+        $this->assertEquals(HomeImagem::where('target', '_blank')->count(), 8);
     }
 
     /** @test */
@@ -131,6 +131,60 @@ class HomeImagemTest extends TestCase
     }
 
     /** @test */
+    public function admin_create_remaining_banner()
+    {
+        $banners = factory('App\HomeImagem', 3)->create();
+
+        $user = $this->signInAsAdmin();
+
+        $this->assertDatabaseHas("home_imagens", [
+            "ordem" => 1, "ordem" => 2, "ordem" => 3,
+        ]);
+
+        $this->assertDatabaseMissing("home_imagens", [
+            "ordem" => 4, "ordem" => 5, "ordem" => 6, "ordem" => 7, 
+            "ordem" => 8, "ordem" => 9, "ordem" => 10,
+        ]);
+
+        $this->assertEquals(HomeImagem::count(), 3);
+
+        $this->get(route('imagens.banner'))->assertOk();
+
+        $this->assertDatabaseHas("home_imagens", [
+            "ordem" => 1, "ordem" => 2, "ordem" => 3, "ordem" => 4, "ordem" => 5,
+            "ordem" => 6, "ordem" => 7, "ordem" => 8, "ordem" => 9, "ordem" => 10,
+        ]);
+
+        $this->assertEquals(HomeImagem::count(), 10);
+    }
+
+    /** @test */
+    public function site_create_remaining_banner()
+    {
+        $banners = factory('App\HomeImagem', 3)->create();
+
+        $this->assertDatabaseHas("home_imagens", [
+            "ordem" => 1, "ordem" => 2, "ordem" => 3,
+        ]);
+
+        $this->assertDatabaseMissing("home_imagens", [
+            "ordem" => 4, "ordem" => 5, "ordem" => 6, "ordem" => 7, 
+            "ordem" => 8, "ordem" => 9, "ordem" => 10,
+        ]);
+
+        $this->assertEquals(HomeImagem::count(), 3);
+
+        $this->get(route('site.home'))->assertOk();
+
+        $this->assertDatabaseHas("home_imagens", [
+            "ordem" => 1, "ordem" => 2, "ordem" => 3, "ordem" => 4, "ordem" => 5,
+            "ordem" => 6, "ordem" => 7, "ordem" => 8, "ordem" => 9, "ordem" => 10,
+        ]);
+
+        $this->assertEquals(HomeImagem::count(), 10);
+    }
+
+    /** @test */
     public function cannot_update_banner_with_input_name_wrong()
     {
         $campos = ['img-' => 'url', 'img-mobile-' => 'url_mobile', 'link-' => 'link', 'target-' => 'target'];
@@ -152,7 +206,7 @@ class HomeImagemTest extends TestCase
         ->assertRedirect(route('imagens.banner'));
 
         $this->get(route('imagens.banner'))
-        ->assertSeeText('Campo (img-mobil-1) não é válido ao atualizar o carrossel devido não ser compatível com: img-1 ou img-mobile-1 ou link-1 ou target-1.');
+        ->assertSeeText('Campo (img-mobil-1) não é válido ao atualizar o carrossel.');
     }
 
     /** @test */
@@ -170,14 +224,14 @@ class HomeImagemTest extends TestCase
                 $dados[$key . $cont] = $banner[$val];
         }
 
-        $dados['img-mobile-8'] = $dados['img-mobile-1'];
+        $dados['img-mobile-11'] = $dados['img-mobile-1'];
         unset($dados['img-mobile-1']);
 
         $this->put(route('imagens.banner.put', $dados))
         ->assertRedirect(route('imagens.banner'));
 
         $this->get(route('imagens.banner'))
-        ->assertSeeText('Campo (img-mobile-8) não é válido ao atualizar o carrossel devido não ser compatível com: img-1 ou img-mobile-1 ou link-1 ou target-1.');
+        ->assertSeeText('Campo (img-mobile-11) não é válido ao atualizar o carrossel.');
     }
 
     /** @test */
@@ -201,7 +255,7 @@ class HomeImagemTest extends TestCase
         ->assertRedirect(route('imagens.banner'));
 
         $this->get(route('imagens.banner'))
-        ->assertSeeText('Possui total de campos (27) diferente do permitido (28), então não é válido ao atualizar o carrossel.');
+        ->assertSeeText('Possui total de campos (39) diferente do permitido (40), então não é válido ao atualizar o carrossel.');
     }
 
     /** @test */
@@ -241,6 +295,28 @@ class HomeImagemTest extends TestCase
         $this->get(route('site.home'))
         ->assertOk()
         ->assertSeeInOrder($view);
+
+        HomeImagem::find(1)->update(['url' => null]);
+        HomeImagem::find(5)->update(['url' => null]);
+
+        $this->get(route('site.home'))
+        ->assertOk()
+        ->assertDontSee('<a href="'. HomeImagem::find(1)->link .'" target="'. HomeImagem::find(1)->target .'">')
+        ->assertDontSee('<a href="'. HomeImagem::find(5)->link .'" target="'. HomeImagem::find(5)->target .'">');
+    }
+
+    /** @test */
+    public function cannot_view_carrossel()
+    {
+        $view = array();
+        $banners = factory('App\HomeImagem', HomeImagem::TOTAL)->create([
+            'url' => null
+        ]);
+
+        $this->get(route('site.home'))
+        ->assertOk()
+        ->assertDontSee('<li data-target="#carousel" data-slide-to="0" class="active"></li>')
+        ->assertDontSee('<li data-target="#carousel" data-slide-to="0" class=""></li>');
     }
 
     /** 

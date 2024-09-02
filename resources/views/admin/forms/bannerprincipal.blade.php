@@ -16,6 +16,7 @@
             ** Para remover uma imagem, basta deixar seus campos vazios
             </i>
         </p>
+        <input id="total-bannerprincipal" type="hidden" value="{{ $total }}" />
         <ul id="sortable" class="mb-0 pl-0">
             @php $i = 0; @endphp
             @foreach($resultado as $img)
@@ -24,6 +25,9 @@
                 <div class="col">
                     <div class="card card-default bg-light">
                         <div class="card-body">
+                            <p class="text-danger mb-1">
+                                <b>Item {{ $i }}</b>
+                            </p>
                             <div class="form-row mb-2">
                                 <div class="col">
                                     <label for="lfm">Imagem para desktop (1920 x 540 px)</label>
