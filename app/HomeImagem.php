@@ -11,7 +11,7 @@ class HomeImagem extends Model
     protected $primaryKey = 'idimagem';
     protected $guarded = [];
 
-    const TOTAL = 7;
+    const TOTAL = 10;
     const TOTAL_ITENS_HOME = 10;
     const DEFAULT_CARD_ESCURO = "#004587";
     const DEFAULT_CARD_CLARO = "#15AAE2";
@@ -111,9 +111,9 @@ class HomeImagem extends Model
 
         foreach($array as $key => $value)
         {
-            $teste = preg_match('/^(img|img-mobile|link|target)-([1-' .self::TOTAL. ']){1}$/', $key);
+            $teste = preg_match('/^(img|img-mobile|link|target)-([1-9]|1[0])$/', $key);
             if(($teste === false) || ($teste === 0))
-                throw new \Exception('Campo (' .$key. ') não é válido ao atualizar o carrossel devido não ser compatível com: img-1 ou img-mobile-1 ou link-1 ou target-1.', 400);
+                throw new \Exception('Campo (' .$key. ') não é válido ao atualizar o carrossel.', 400);
             if((strpos($key, 'target') !== false) && (!in_array($value, ['_blank', '_self'])))
                 throw new \Exception('Campo (' .$key. ') não é válido ao atualizar o carrossel devido seu valor (' .$value. ') não ser aceito: _blank, _self.', 400);
         }
