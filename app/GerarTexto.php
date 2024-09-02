@@ -117,15 +117,22 @@ class GerarTexto extends Model
         }
     }
 
-    public static function resultadoByDoc($tipo_doc, $user = null, $buscar = false)
+    public static function resultadoByDoc($tipo_doc, $user = null, $buscar = null)
     {
+        if(isset($buscar) && (strlen($buscar) < 3))
+            return collect();
+
         return self::where('tipo_doc', $tipo_doc)
             ->when(!isset($user), function($query){
                 $query->where('publicar', true);
             })
-            ->when(($tipo_doc != self::DOC_PREST_CONT) && !$buscar, function($query){
+            ->when($tipo_doc != self::DOC_PREST_CONT, function($query){
                 // sem conteúdo
                 $query->select('id', 'tipo', 'texto_tipo', 'com_numeracao', 'ordem', 'nivel', 'tipo_doc', 'indice', 'publicar', 'updated_at');
+            })
+            ->when(isset($buscar), function($query) use($buscar){
+                $query->where('conteudo', 'LIKE', '%' . htmlentities($buscar, ENT_NOQUOTES, 'UTF-8') . '%')
+                ->orWhere('texto_tipo', 'LIKE', '%' . $buscar . '%');
             })
             ->orderBy('ordem', 'ASC')
             ->get();

@@ -157,16 +157,9 @@ class GerarTextoService implements GerarTextoServiceInterface {
 
     public function buscar($tipo_doc, $busca, $user = null)
     {
-        $resultado = GerarTexto::resultadoByDoc($tipo_doc, $user, isset($busca));
-
         return [
-            'resultado' => $resultado,
-            'busca' => isset($busca) ? $resultado->filter(function ($value, $key) use($busca) {
-                $conteudo = strip_tags($value->conteudo);
-                $value->fill(['conteudo' => null]);
-                return $value->tipoTitulo() ? stripos($value->texto_tipo, $busca) !== false : 
-                stripos($conteudo, htmlentities($busca, ENT_NOQUOTES, 'UTF-8')) !== false;
-            }) : collect(),
+            'resultado' => GerarTexto::resultadoByDoc($tipo_doc, $user),
+            'busca' => isset($busca) ? GerarTexto::resultadoByDoc($tipo_doc, $user, $busca) : collect(),
         ];
     }
 }

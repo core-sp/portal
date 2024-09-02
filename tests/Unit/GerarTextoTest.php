@@ -150,8 +150,8 @@ class GerarTextoTest extends TestCase
     public function resultado_by_doc()
     {
         $user = factory('App\User')->create();
-        $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
-        $textos = factory('App\GerarTexto', 10)->states('sumario_publicado', 'prestacao-contas')->create();
+        $textos_cs = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
+        $textos_pc = factory('App\GerarTexto', 10)->states('sumario_publicado', 'prestacao-contas')->create();
 
         $resultado = GerarTexto::resultadoByDoc('carta-servicos');
         $this->assertEquals(5, $resultado->count());
@@ -162,10 +162,9 @@ class GerarTextoTest extends TestCase
         $this->assertTrue(isset($resultado->get(8)->conteudo));
 
         // buscar
-        $resultado = GerarTexto::resultadoByDoc('carta-servicos', null, true);
-        $this->assertEquals(5, $resultado->count());
-        $this->assertTrue(isset($resultado->get(0)->conteudo));
-        $this->assertTrue(isset($resultado->get(3)->conteudo));
+        $resultado = GerarTexto::resultadoByDoc('carta-servicos', null, $textos_cs->get(0)->texto_tipo);
+        $this->assertEquals(1, $resultado->count());
+        $this->assertFalse(isset($resultado->get(0)->conteudo));
 
         $resultado = GerarTexto::resultadoByDoc('carta-servicos', $user);
         $this->assertEquals(5, $resultado->count());
@@ -176,10 +175,9 @@ class GerarTextoTest extends TestCase
         $this->assertTrue(isset($resultado->get(8)->conteudo));
 
         // buscar
-        $resultado = GerarTexto::resultadoByDoc('carta-servicos', $user, true);
-        $this->assertEquals(5, $resultado->count());
-        $this->assertTrue(isset($resultado->get(0)->conteudo));
-        $this->assertTrue(isset($resultado->get(3)->conteudo));
+        $resultado = GerarTexto::resultadoByDoc('carta-servicos', $user, $textos_cs->get(3)->texto_tipo);
+        $this->assertEquals(1, $resultado->count());
+        $this->assertFalse(isset($resultado->get(0)->conteudo));
 
         GerarTexto::where('publicar', true)->update(['publicar' => false]);
 
@@ -191,7 +189,7 @@ class GerarTextoTest extends TestCase
         $this->assertEquals(0, $resultado->count());
 
         // buscar
-        $resultado = GerarTexto::resultadoByDoc('carta-servicos', null, true);
+        $resultado = GerarTexto::resultadoByDoc('carta-servicos', null, 'blá blá');
         $this->assertEquals(0, $resultado->count());
         $this->assertFalse(isset($resultado->get(0)->conteudo));
         $this->assertFalse(isset($resultado->get(3)->conteudo));
@@ -205,10 +203,9 @@ class GerarTextoTest extends TestCase
         $this->assertTrue(isset($resultado->get(8)->conteudo));
 
         // buscar
-        $resultado = GerarTexto::resultadoByDoc('carta-servicos', $user, true);
-        $this->assertEquals(5, $resultado->count());
-        $this->assertTrue(isset($resultado->get(0)->conteudo));
-        $this->assertTrue(isset($resultado->get(3)->conteudo));
+        $resultado = GerarTexto::resultadoByDoc('carta-servicos', $user, $textos_cs->get(2)->texto_tipo);
+        $this->assertEquals(1, $resultado->count());
+        $this->assertFalse(isset($resultado->get(0)->conteudo));
     }
 
     /** @test */
@@ -689,6 +686,9 @@ class GerarTextoTest extends TestCase
         $this->assertEquals(2, $final['busca']->count());
 
         $final = $service->buscar('carta-servicos', null, $user);
+        $this->assertEquals(0, $final['busca']->count());
+
+        $final = $service->buscar('carta-servicos', 'te', $user);
         $this->assertEquals(0, $final['busca']->count());
     }
 }
