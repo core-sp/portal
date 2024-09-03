@@ -216,7 +216,7 @@ class GerarTextoTest extends TestCase
         factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
         $resultado = GerarTexto::resultadoByDoc('carta-servicos', $user);
 
-        $final = GerarTexto::find(1)->conteudoTituloComSubtitulo($resultado);
+        $final = GerarTexto::find(1)->conteudoTituloComSubtitulo(true);
         $this->assertEquals([
             GerarTexto::find(1), GerarTexto::find(2), GerarTexto::find(3), GerarTexto::find(4),
         ], $final['textos']);
@@ -227,17 +227,27 @@ class GerarTextoTest extends TestCase
 
         $this->assertEquals(null, $final['btn_anterior']);
         $this->assertEquals(GerarTexto::select([
-            'id', 'tipo', 'texto_tipo', 'com_numeracao', 'ordem', 'nivel', 'tipo_doc', 'indice', 'publicar', 'updated_at'
+            'id', 'ordem'
         ])->find(5), $final['btn_proximo']);
 
-        $final = GerarTexto::find(3)->conteudoTituloComSubtitulo($resultado);
+        $final = GerarTexto::find(3)->conteudoTituloComSubtitulo();
         $this->assertEquals(GerarTexto::select([
-            'id', 'tipo', 'texto_tipo', 'com_numeracao', 'ordem', 'nivel', 'tipo_doc', 'indice', 'publicar', 'updated_at'
+            'id'
         ])->find(1), $final['btn_anterior']);
         $this->assertEquals(GerarTexto::select([
-            'id', 'tipo', 'texto_tipo', 'com_numeracao', 'ordem', 'nivel', 'tipo_doc', 'indice', 'publicar', 'updated_at'
+            'id', 'ordem'
         ])->find(5), $final['btn_proximo']);
         
+        // retorno nulo, publicar == false
+        GerarTexto::where('publicar', true)->update(['publicar' => false]);
+
+        $final = GerarTexto::find(3)->conteudoTituloComSubtitulo();
+        $this->assertEquals(null, $final);
+
+        $final = GerarTexto::find(3)->conteudoTituloComSubtitulo(true);
+        $this->assertEquals(GerarTexto::select([
+            'id', 'ordem'
+        ])->find(5), $final['btn_proximo']);
     }
 
     /** @test */
@@ -661,7 +671,7 @@ class GerarTextoTest extends TestCase
         $service = new GerarTextoService;
 
         $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [App\GerarTexto] no documento carta-servicos, id = 3');
+        $this->expectExceptionMessage('No query results for model [App\GerarTexto].');
 
         $service->show('carta-servicos', 3);
     }

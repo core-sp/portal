@@ -138,31 +138,30 @@ class GerarTexto extends Model
             ->get();
     }
 
-    public function conteudoTituloComSubtitulo($resultado)
+    public function conteudoTituloComSubtitulo($user = false)
     {
-        // ->fresh() carrega o conteúdo
-        $textos = array();
-        array_push($textos, $this->fresh());
-        
-        // junta os subtítulos com o título escolhido
-        if($this->tituloNumerado())
-        {
-            foreach($resultado as $key => $val)
-            {
-                // somente verifica os itens das ordens seguintes
-                if($val->ordem <= $this->ordem)
-                    continue;
-                // quando encontra o próximo título, encerra
-                if($val->tipoTitulo())
-                    break;
-                array_push($textos, $val->fresh());
-            }
-        }
+        if(!$user && !$this->publicar)
+            return null;
+
+        $array_where = [
+            ['publicar', '=', $this->publicar],
+            ['tipo_doc', '=', $this->tipo_doc],
+        ];
+
+        $btn_proximo = self::select('id', 'ordem')->where($array_where)->where('ordem', '>', $this->ordem)->where('tipo', self::TIPO_TITULO)->first();
+
+        $textos = $this->tituloNumerado() ? 
+        self::where($array_where)
+        ->where('ordem', '>=', $this->ordem)
+        ->when(isset($btn_proximo), function($query) use($btn_proximo){
+            $query->where('ordem', '<', $btn_proximo->ordem);
+        })
+        ->get()->all() : array($this);
 
         return [
             'textos' => $textos,
-            'btn_anterior' => $resultado->where('ordem', '<', $this->ordem)->where('tipo', self::TIPO_TITULO)->last(),
-            'btn_proximo' => $resultado->where('ordem', '>', $this->ordem)->where('tipo', self::TIPO_TITULO)->first(),
+            'btn_anterior' => self::select('id')->where($array_where)->where('ordem', '<', $this->ordem)->where('tipo', self::TIPO_TITULO)->orderBy('ordem', 'DESC')->first(),
+            'btn_proximo' => $btn_proximo,
         ];
     }
 

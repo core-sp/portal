@@ -134,24 +134,21 @@ class GerarTextoService implements GerarTextoServiceInterface {
 
     public function show($tipo_doc, $id = null, $user = null)
     {
-        $resultado = GerarTexto::resultadoByDoc($tipo_doc, $user);
-        $dt_atualizacao = onlyDate(GerarTexto::ultimaAtualizacao($tipo_doc));
-
         if(isset($id))
-        {
-            $texto = $resultado->find($id);
-            if(!isset($texto))
-                throw new ModelNotFoundException("No query results for model [App\GerarTexto] no documento ".$tipo_doc.", id = " . $id);
-
-            $final = $texto->conteudoTituloComSubtitulo($resultado);
-        }
+            $final = GerarTexto::where('tipo_doc', $tipo_doc)
+            ->where('id', $id)
+            ->when(!isset($user), function($query){
+                $query->where('publicar', true);
+            })
+            ->firstOrFail()
+            ->conteudoTituloComSubtitulo(isset($user));
 
         return [
-            'resultado' => GerarTexto::getLayoutCliente($resultado, $tipo_doc),
+            'resultado' => GerarTexto::getLayoutCliente(GerarTexto::resultadoByDoc($tipo_doc, $user), $tipo_doc),
             'textos' => isset($final['textos']) ? $final['textos'] : array(),
             'btn_anterior' => isset($final['btn_anterior']) ? route($tipo_doc, $final['btn_anterior']->id) : null,
             'btn_proximo' => isset($final['btn_proximo']) ? route($tipo_doc, $final['btn_proximo']->id) : null,
-            'dt_atualizacao' => $dt_atualizacao,
+            'dt_atualizacao' => onlyDate(GerarTexto::ultimaAtualizacao($tipo_doc)),
         ];
     }
 
