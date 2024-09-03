@@ -156,6 +156,7 @@ class GerarTexto extends Model
         ->when(isset($btn_proximo), function($query) use($btn_proximo){
             $query->where('ordem', '<', $btn_proximo->ordem);
         })
+        ->orderBy('ordem', 'ASC')
         ->get()->all() : array($this);
 
         return [
