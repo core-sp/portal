@@ -166,7 +166,8 @@
                     <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" class="nav-link" target="_blank">Transparência</a>
                   </li>
                   <li class="nav-item">
-                    <a href="/prestacao-de-contas-do-core-sp" class="nav-link">Prestação de Contas</a>
+                    <!-- temporário até término da atualização da nova página -->
+                    <a href="/{{ \App\Pagina::where('slug', 'prestacao-de-contas-do-core-sp')->exists() ? 'prestacao-de-contas-do-core-sp' : 'prestacao-de-contas' }}" class="nav-link">Prestação de Contas</a>
                   </li>
                   <li class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownFiscal" role="button" data-toggle="dropdown">Fiscalização</a>

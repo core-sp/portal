@@ -442,7 +442,8 @@ Route::middleware(['block_ip'])->group(function () {
 
     Route::get('/carta-de-servicos-ao-usuario/buscar', 'GerarTextoController@buscar')->name('carta-servicos-buscar');
     Route::get('/carta-de-servicos-ao-usuario/{id?}', 'GerarTextoController@show')->name('carta-servicos');
-    Route::get('/prestacao-de-contas-do-core-sp', 'GerarTextoController@show')->name('prestacao-contas');
+    // página criada anteriormente 'prestacao-de-contas-do-core-sp' e menu em app.blade confere existencia da página
+    Route::get('/prestacao-de-contas', 'GerarTextoController@show')->name('prestacao-contas');
 
     // Páginas (deve ser inserido no final do arquivo de rotas)
     Route::get('{slug}', 'PaginaController@show')->name('paginas.site');
