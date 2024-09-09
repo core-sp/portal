@@ -628,7 +628,7 @@ function secondLine($situacao, $vencimento = null, $link = null, $descricao = nu
         else
             $str = '<strong class="text-info">PROC. ADM.</strong>';
     } else {
-        $str = '<strong class="text-info">INDEFINIDO</strong>';
+        $str = '<strong class="text-primary">VERIFICAR COM FINANCEIRO</strong>';
     }
 
     return $str;
