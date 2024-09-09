@@ -17,7 +17,7 @@
 
 <section id="pagina-erro">
   <div class="container text-center">
-    <h5>Foi bloqueado por segurança o acesso ao portal por este IP. Entre em contato com o Core-SP.</h5>
+    <h5>Foi bloqueado por segurança o acesso ao portal por este IP: {{ $exception->getMessage() }}.<br>Entre em contato com o Core-SP.</h5>
   </div>
 </section>
 

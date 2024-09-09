@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Str;
 
 class BlockIP
 {
@@ -23,8 +24,9 @@ class BlockIP
             return abort(500, 'Erro interno! Tente novamente mais tarde.');
         }
 
-        if($bloqueia) {
-            return abort(423);
+        if(isset($bloqueia)) {
+            $texto = Str::limit($bloqueia->ip, 7, '******') . ', bloqueio criado em ' . formataData($bloqueia->updated_at);
+            return abort(423, $texto);
         }
 
         return $next($request);

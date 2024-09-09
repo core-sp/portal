@@ -295,7 +295,7 @@ class SuporteService implements SuporteServiceInterface {
 
     public function ipsBloqueados($ip = null)
     {
-        return !isset($ip) ? SuporteIp::select('ip')->where('status', SuporteIp::BLOQUEADO)->get() : SuporteIp::where('status', SuporteIp::BLOQUEADO)->where('ip', $ip)->exists();
+        return !isset($ip) ? SuporteIp::select('ip')->where('status', SuporteIp::BLOQUEADO)->get() : SuporteIp::where('status', SuporteIp::BLOQUEADO)->where('ip', $ip)->first();
     }
 
     public function ips()
@@ -304,6 +304,7 @@ class SuporteService implements SuporteServiceInterface {
             'ips' => SuporteIp::where('status', SuporteIp::BLOQUEADO)
             ->orWhere('status', SuporteIp::LIBERADO)
             ->orderBy('status', 'DESC')
+            ->orderBy('updated_at', 'DESC')
             ->get(),
             'variaveis' => (object) $this->variaveisIps
         ];
