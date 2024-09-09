@@ -8,27 +8,24 @@
 
 @include('site.inc.popup')
 
+@if($imagens->isNotEmpty())
 <section>
   <div class="container-fluid">
     <div class="row" id="conteudo-principal">
       <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="6000">
         <ol class="carousel-indicators">
-          @foreach($imagens as $key => $img)
-          @if(!empty($img->url))
-            <li data-target="#carousel" data-slide-to="{{ $key }}" class="{{ $key === 0 ? 'active' : '' }}"></li>
-          @endif
+          @foreach($imagens as $img)
+            <li data-target="#carousel" data-slide-to="{{ $loop->index }}" class="{{ $loop->first ? 'active' : '' }}"></li>
           @endforeach
         </ol>
         <div class="carousel-inner h-100">
           @foreach($imagens as $img)
-          @if(!empty($img->url))
-            <div class="carousel-item h-100 {{ $img->ordem === 1 ? 'active' : '' }}">
+            <div class="carousel-item h-100 {{ $loop->first ? 'active' : '' }}">
               <a href="{{ $img->link }}" target="{{ $img->target }}">
                 <img class="w-100 hide-576" src="{{ asset($img->url) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
                 <img class="w-100 show-576" src="{{ asset($img->url_mobile) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
               </a>
             </div>
-          @endif
           @endforeach
         </div>
         <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
@@ -43,6 +40,7 @@
     </div>
   </div>
 </section>
+@endif
 
 <section id="home-news" class="mb-2 mt-4">
   <div class="container">
