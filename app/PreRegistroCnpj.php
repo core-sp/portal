@@ -271,16 +271,4 @@ class PreRegistroCnpj extends Model
 
         return $all;
     }
-
-    // public function finalArray($arrayCampos)
-    // {
-    //     if(isset($arrayCampos['checkEndEmpresa']))
-    //     {
-    //         if($arrayCampos['checkEndEmpresa'] == 'on')
-    //             $arrayCampos = array_merge($arrayCampos, $this->preRegistro->getEndereco());
-    //         unset($arrayCampos['checkEndEmpresa']);
-    //     }
-
-    //     return $this->update($arrayCampos);
-    // }
 }

@@ -73,35 +73,6 @@ trait PreRegistroApoio {
         }
     }
 
-    // private function salvarArray($classe, $arrayCampos, $gerenti)
-    // {
-    //     $nome_classe = array_search($classe, $this->getClassesRelacoes());
-    //     $obj_existe = ($classe == $this->relation_contabil) || ($classe == $this->relation_rt) ? $this->has($classe)->where('id', $this->id)->exists() : true;
-
-    //     switch ($classe) {
-    //         case $this->relation_pre_registro:
-    //         case $this->relation_pf:
-    //         case $this->relation_pj:
-    //             $temp = $this->relation_pre_registro == $classe ? $this : $this->loadMissing($classe)[$classe];
-    //             return $temp->finalArray($arrayCampos);
-    //             break;
-    //         case $this->relation_contabil:
-    //             $temp = !$obj_existe ? $nome_classe::buscar($arrayCampos['cnpj']) : $this->loadMissing($classe)[$classe];
-    //             return isset($temp) ? $temp->finalArray($arrayCampos, $this) : false;
-    //             break;
-    //         case $this->relation_rt:
-    //             $pj = $this->loadMissing($classe)->pessoaJuridica;
-    //             $temp = !$obj_existe ? $nome_classe::buscar($arrayCampos['cpf'], $gerenti) : $pj->responsavelTecnico;
-    //             return isset($temp) ? $temp->finalArray($arrayCampos, $pj) : false;
-    //             break;
-    //         case $this->relation_socio:
-    //             return true;
-    //             break;
-    //     }
-
-    //     throw new \Exception('Classe não está configurada para ser salva no array final', 500);
-    // }
-    
     private function limparCampoTelefones($campo)
     {
         return preg_replace('/_[0-9]{1,2}$/', '', $campo);
@@ -254,22 +225,6 @@ trait PreRegistroApoio {
         ];
     }
 
-    // public function camposPjOuPf($pf = true)
-    // {
-    //     $camposView = $this->getNomesCampos();
-    //     return $pf ? [
-    //         $this->relation_pre_registro => explode(',', $camposView[$this->relation_pre_registro]),
-    //         $this->relation_contabil => explode(',', $camposView[$this->relation_contabil]),
-    //         $this->relation_pf => explode(',', $camposView[$this->relation_pf]),
-    //     ] : [
-    //         $this->relation_pre_registro => explode(',', $camposView[$this->relation_pre_registro]),
-    //         $this->relation_contabil => explode(',', $camposView[$this->relation_contabil]),
-    //         $this->relation_pj => explode(',', $camposView[$this->relation_pj]),
-    //         $this->relation_rt => explode(',', $camposView[$this->relation_rt]),
-    //         $this->relation_socio => explode(',', $camposView[$this->relation_socio]),
-    //     ];
-    // }
-
     // Fazer os códigos automaticos
     public function getCodigosCampos($pessoaFisica = true)
     {
@@ -282,23 +237,6 @@ trait PreRegistroApoio {
         })
         ->toArray();
     }
-
-    // public function getCamposLimpos($request, $campos)
-    // {
-    //     $request = $this->formatarCamposRequest($request);
-
-    //     return $campos->map(function ($item, $key) use($request){
-    //         return array_intersect_key($request, array_fill_keys($item, ''));
-    //     })
-    //     ->map(function ($valores, $classe) {
-    //         return collect($valores)->mapWithKeys(function ($val, $campo) use($classe){
-    //             if(!isset($val))
-    //                 return [$this->limparNomeCamposAjax($classe, $campo) => null];
-    //             return [$this->limparNomeCamposAjax($classe, $campo) => in_array($campo, ['checkEndEmpresa', 'email_contabil', 'checkRT_socio']) ? $val : mb_strtoupper($val, 'UTF-8')];
-    //         });
-    //     })
-    //     ->toArray();
-    // }
 
     private function getRTGerenti($ass_id, $gerentiRepository, $cpf_cnpj, &$gerenti)
     {

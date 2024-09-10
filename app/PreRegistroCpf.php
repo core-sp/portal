@@ -65,11 +65,6 @@ class PreRegistroCpf extends Model
         return ($this->sexo == 'M') && !$this->maisDe45Anos();
     }
 
-    // public function finalArray($arrayCampos)
-    // {
-    //     return $this->update($arrayCampos);
-    // }
-
     public function arrayValidacaoInputs()
     {
         return Arr::except($this->attributesToArray(), ['id', 'pre_registro_id', 'created_at', 'updated_at', 'deleted_at']);

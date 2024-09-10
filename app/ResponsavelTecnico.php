@@ -123,22 +123,4 @@ class ResponsavelTecnico extends Model
             return $key . '_rt';
         })->toArray();
     }
-
-    // public function finalArray($arrayCampos, $pj)
-    // {
-    //     $resultado = 'remover';
-
-    //     if(isset($arrayCampos['cpf']) && (strlen($arrayCampos['cpf']) == 11))
-    //     {
-    //         unset($arrayCampos['cpf']);
-    //         $resultado = $this->update($arrayCampos);
-    //     }
-
-    //     if(($resultado === 'remover') && $pj->possuiRTSocio())
-    //         $pj->socios()->detach($pj->socios->where('pivot.rt', true)->first()->pivot->socio_id);
-    //     $resultado = $pj->update(['responsavel_tecnico_id' => $resultado === 'remover' ? null : $this->id]);
-    //     $pj->preRegistro->touch();
-
-    //     return $resultado;
-    // }
 }

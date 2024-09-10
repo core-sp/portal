@@ -102,26 +102,6 @@ class Contabil extends Authenticatable
         throw new \Exception('Não pode buscar contábil sem CNPJ.', 400);
     }
 
-    // public function finalArray($arrayCampos, $pr)
-    // {
-    //     $resultado = 'remover';
-
-    //     if(isset($arrayCampos['cnpj']) && (strlen($arrayCampos['cnpj']) == 14))
-    //     {
-    //         $resultado = '';
-    //         if(!$this->possuiLogin())
-    //         {
-    //             unset($arrayCampos['cnpj']);
-    //             $this->update($arrayCampos);
-    //         }
-    //     }
-
-    //     $resultado = $pr->update(['contabil_id' => $resultado === 'remover' ? null : $this->id]);
-    //     $pr->touch();
-
-    //     return $resultado;
-    // }
-
     public function podeAtivar()
     {
         $update = Carbon::createFromFormat('Y-m-d H:i:s', $this->updated_at);

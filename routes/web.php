@@ -348,11 +348,6 @@ Route::middleware(['block_ip'])->group(function () {
       Route::post('/novo-doc/{preRegistro}', 'PreRegistroController@uploadDoc')->name('preregistro.upload.doc');
     });
 
-    // Route::get('phpinfo', function () {
-    //   if(auth()->user()->isAdmin())
-    //     phpinfo();
-    // })->name('phpinfo');
-
   });
 
   /*

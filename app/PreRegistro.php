@@ -126,25 +126,6 @@ class PreRegistro extends Model
         return [$campo => $valor];
     }
 
-    // private function finalArray($arrayCampos)
-    // {
-    //     $arrayCampos['tipo_telefone'] = isset($arrayCampos['tipo_telefone_1']) ? 
-    //     $arrayCampos['tipo_telefone'] . ';' . $arrayCampos['tipo_telefone_1'] : $arrayCampos['tipo_telefone'] . ';';
-
-    //     $arrayCampos['telefone'] = isset($arrayCampos['telefone_1']) ? 
-    //     $arrayCampos['telefone'] . ';' . $arrayCampos['telefone_1'] : $arrayCampos['telefone'] . ';';
-
-    //     if(isset($arrayCampos['opcional_celular']) || isset($arrayCampos['opcional_celular_1']))
-    //         $arrayCampos['opcional_celular'] = isset($arrayCampos['opcional_celular_1']) ? 
-    //         $arrayCampos['opcional_celular'] . ';' . $arrayCampos['opcional_celular_1'] : $arrayCampos['opcional_celular'] . ';';
-
-    //     unset($arrayCampos['tipo_telefone_1']);
-    //     unset($arrayCampos['telefone_1']);
-    //     unset($arrayCampos['opcional_celular_1']);
-
-    //     return $this->update($arrayCampos);
-    // }
-
     private static function colorLabelStatusAdmin()
     {
         return [
@@ -742,35 +723,19 @@ class PreRegistro extends Model
         return $this->atualizarAjax($resp['classe'], $resp['campo'], $resp['valor']);
     }
 
-    public function salvar(/*$request, $gerentiRepository*/)
+    public function salvar()
     {
-        // try{
-            // $camposLimpos = $this->getCamposLimpos($request, $this->userExterno->getCamposPreRegistro());
-            // unset($request);
+        if(!$this->criado() && !$this->correcaoEnviada())
+            return $this->status;
 
-            // foreach($camposLimpos as $classe => $arrayCampos){
-            //     $cpf_cnpj = isset($arrayCampos['cpf']) ? $arrayCampos['cpf'] : '';
-            //     $cpf_cnpj = isset($arrayCampos['cpf_cnpj']) ? $arrayCampos['cpf_cnpj'] : $cpf_cnpj;
-            //     $resultado = $this->salvarArray($classe, $arrayCampos, $this->getRegistradoGerenti($classe, $gerentiRepository, $cpf_cnpj));
-            // }
+        $status = $this->criado() ? self::STATUS_ANALISE_INICIAL : self::STATUS_ANALISE_CORRECAO;
+        $resultado = $this->update(['status' => $status]);
 
-            // unset($camposLimpos);
+        if(!$resultado)
+            throw new \Exception('Não atualizou o status da solicitação de registro', 500);
 
-            if(!$this->criado() && !$this->correcaoEnviada())
-                return $this->status;
-
-            $status = $this->criado() ? self::STATUS_ANALISE_INICIAL : self::STATUS_ANALISE_CORRECAO;
-            $resultado = $this->update(['status' => $status]);
-
-            if(!$resultado)
-                throw new \Exception('Não atualizou o status da solicitação de registro', 500);
-
-            $this->setHistoricoStatus();
-            $resultado = $status;
-        // }catch(\Throwable $e){
-        //     // throw new \Exception('Erro ao salvar dados finais do pré-registro com id ' . $this->id . ' na classe: ' . $classe .', com a seguinte mensagem: ' . $e->getMessage(), 500);
-        //     throw new \Exception('Erro ao salvar dados finais do pré-registro com id ' . $this->id .', com a seguinte mensagem: ' . $e->getMessage(), 500);
-        // }
+        $this->setHistoricoStatus();
+        $resultado = $status;
 
         return $resultado;
     }

@@ -202,11 +202,6 @@ class PreRegistroRequest extends FormRequest
             $this->regraReservistaRT = $this->filled('dt_nascimento_rt') && Carbon::hasFormat($this->dt_nascimento_rt, 'Y-m-d') && 
             ($this->dt_nascimento_rt >= $dataReservista);
 
-            // if(!isset(request()->checkEndEmpresa) || (isset(request()->checkEndEmpresa) && (request()->checkEndEmpresa != 'on')))
-            //     $this->merge([
-            //         'checkEndEmpresa' => "off",
-            //     ]);
-
             $this->merge([
                 'cpf_rt' => apenasNumeros($this->cpf_rt),
                 'identidade_rt' => mb_strtoupper(apenasNumerosLetras($this->identidade_rt))
@@ -251,18 +246,6 @@ class PreRegistroRequest extends FormRequest
             $this->merge([
                 'cnpj_contabil' => apenasNumeros($this->cnpj_contabil),
             ]);
-
-        // if($user_contabil_check)
-        // {
-        //     $contabil = auth()->guard('contabil')->user();
-        //     $this->merge([
-        //         'cnpj_contabil' => $contabil->cnpj,
-        //         'nome_contabil' => $contabil->nome,
-        //         'email_contabil' => $contabil->email,
-        //         'nome_contato_contabil' => $contabil->nome_contato,
-        //         'telefone_contabil' => $contabil->telefone,
-        //     ]);
-        // }
     }
 
     public function rules()
