@@ -54,7 +54,13 @@
         >
           <option value="" style="font-style: italic;">Escolha um título ou subtítulo ...</option>
           @foreach($resultado as $texto)
-            <option value="{{ $texto->id }}" style="{{ $texto->tipoTitulo() ? '' : 'font-weight: bold;' }}" {{ request()->url() == route('carta-servicos', $texto->id) ? 'selected' : '' }}>{!! $texto->tipoTitulo() ? '' : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' !!}{{ $texto->tipoTitulo() ? $texto->tituloFormatado() : $texto->subtituloFormatado() }}</option>
+            <option 
+              value="{{ $texto->id }}" 
+              style="{{ $texto->tipoTitulo() ? '' : 'font-weight: bold;' }}" 
+              {{ request()->url() == route('carta-servicos', $texto->id) ? 'selected' : '' }}
+            >
+              {!! $texto->tipoTitulo() ? '' : str_repeat('&nbsp;', 5) !!}{{ $texto->tipoTitulo() ? $texto->tituloFormatado() : $texto->subtituloFormatado() }}
+            </option>
           @endforeach
         </select>
 
@@ -82,12 +88,14 @@
         @if(isset($busca))
           <hr />
           <p class="light">Busca por: <strong>{{ request()->query('buscaTexto') }}</strong>
-              <small><i>- {{ $busca->count() === 1 ? $busca->count() . ' resultado' : $busca->count() . ' resultados' }}</i></small>
+              <small><i>- {{ $busca->count() }} resultado{{ $busca->count() == 1 ? '' : 's' }}</i></small>
           </p>
           @if($busca->count() > 0)
           <div class="list-group list-group-flush">
             @foreach($busca as $t)
-              <a href="{{ route('carta-servicos', $t->id) }}" class="list-group-item list-group-item-action"><strong>{{ $t->tipoTitulo() ? $t->tituloFormatado() : $t->subtituloFormatado() }}</strong></a>
+              <a href="{{ route('carta-servicos', $t->id) }}" class="list-group-item list-group-item-action">
+                <strong>{{ $t->tipoTitulo() ? $t->tituloFormatado() : $t->subtituloFormatado() }}</strong>
+              </a>
             @endforeach
           </div>
           @endif
@@ -96,8 +104,16 @@
         <!-- RESULTADO TEXTO SELECIONADO *********************************************************************************************************** -->
         @if(isset($textos) && !empty($textos))
         <ul class="pagination p-0 mt-2 mb-2">
-          <li class="page-item {{ isset($btn_anterior) ? '' : 'disabled' }}"><a class="page-link" href="{{ isset($btn_anterior) ? $btn_anterior : '#' }}"><i class="fas fa-angle-double-left"></i></a></li>
-          <li class="page-item {{ isset($btn_proximo) ? '' : 'disabled' }}"><a class="page-link" href="{{ isset($btn_proximo) ? $btn_proximo : '#' }}"><i class="fas fa-angle-double-right"></i></a></li>
+          <li class="page-item {{ isset($btn_anterior) ? '' : 'disabled' }}">
+            <a class="page-link" href="{{ isset($btn_anterior) ? $btn_anterior : '#' }}">
+              <i class="fas fa-angle-double-left"></i>
+            </a>
+          </li>
+          <li class="page-item {{ isset($btn_proximo) ? '' : 'disabled' }}">
+            <a class="page-link" href="{{ isset($btn_proximo) ? $btn_proximo : '#' }}">
+              <i class="fas fa-angle-double-right"></i>
+            </a>
+          </li>
         </ul>
 
         <div class="border">
@@ -106,25 +122,25 @@
             <img src="{{ asset('img/LOGO-VERDE002.png') }}" class="mb-3" style="display: block;margin: 0 auto;"/>
             <hr />
             <span id="corpoTexto" tabindex="0"></span>
-          @foreach($textos as $t)
-              @switch($t->nivel)
-                @case(1)
-                  <p {!! $t->getCorTituloSub() !!}>&nbsp;&nbsp;&nbsp;<strong>{{ $t->subtituloFormatado() }}</strong></p>
-                  <div class="pl-3">{!! $t->conteudo !!}</div>
-                  @break
-                @case(2)
-                  <p {!! $t->getCorTituloSub() !!}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $t->subtituloFormatado() }}</strong></p>
-                  <div class="pl-4">{!! $t->conteudo !!}</div>
-                  @break
-                @case(3)
-                  <p {!! $t->getCorTituloSub() !!}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $t->subtituloFormatado() }}</strong></p>
-                  <div class="pl-5">{!! $t->conteudo !!}</div>
-                  @break
-                @default
-                  <h4 class="font-weight-bolder" {!! $t->getCorTituloSub() !!}>{{ $t->tituloFormatado() }}</h4>
-                  <div class="pl-0">{!! $t->conteudo !!}</div>
-              @endswitch
-          @endforeach
+
+            @php
+              $repeticao_str = [1 => 3, 2 => 5, 3 => 10];
+            @endphp
+
+            @foreach($textos as $t)
+
+              @if($t->nivel == 0)
+                <h4 class="font-weight-bolder" {!! $t->getCorTituloSub() !!}>{{ $t->tituloFormatado() }}</h4>
+                <div class="pl-0">{!! $t->conteudo !!}</div>
+                @continue
+              @endif
+
+              <p {!! $t->getCorTituloSub() !!}>
+                {!! str_repeat('&nbsp;', $repeticao_str[$t->nivel]) !!}<strong>{{ $t->subtituloFormatado() }}</strong>
+              </p>
+              <div class="pl-{{ $t->nivel + 2 }}">{!! $t->conteudo !!}</div>
+
+            @endforeach
           </div>
           <!-- rodapé da carta -->
           <img src="{{ asset('img/base_carta_servicos.png') }}" />
@@ -135,8 +151,16 @@
         </div>
 
         <ul class="pagination p-0 mt-2 mb-0">
-          <li class="page-item {{ isset($btn_anterior) ? '' : 'disabled' }}"><a class="page-link" href="{{ isset($btn_anterior) ? $btn_anterior : '#' }}"><i class="fas fa-angle-double-left"></i></a></li>
-          <li class="page-item {{ isset($btn_proximo) ? '' : 'disabled' }}"><a class="page-link" href="{{ isset($btn_proximo) ? $btn_proximo : '#' }}"><i class="fas fa-angle-double-right"></i></a></li>
+          <li class="page-item {{ isset($btn_anterior) ? '' : 'disabled' }}">
+            <a class="page-link" href="{{ isset($btn_anterior) ? $btn_anterior : '#' }}">
+              <i class="fas fa-angle-double-left"></i>
+            </a>
+          </li>
+          <li class="page-item {{ isset($btn_proximo) ? '' : 'disabled' }}">
+            <a class="page-link" href="{{ isset($btn_proximo) ? $btn_proximo : '#' }}">
+              <i class="fas fa-angle-double-right"></i>
+            </a>
+          </li>
         </ul>
         @endif
 

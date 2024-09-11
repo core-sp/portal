@@ -854,8 +854,18 @@ class GerarTextoTest extends TestCase
         $this->get(route('carta-servicos'))
         ->assertDontSeeText('Ainda não consta a publicação atual.')
         ->assertSeeInOrder([
-            '<option value="" style="font-style: italic;">Escolha um título ou subtítulo ...</option>',
-            '<option value="'.$textos->get(0)->id.'" style="" >'.$textos->get(0)->tituloFormatado().'</option>',
+            '<option ',
+            'value="" ',
+            'style="font-style: italic;"',
+            '>',
+            'Escolha um título ou subtítulo ...',
+            '</option>',
+            '<option ',
+            'value="'.$textos->get(0)->id.'" ',
+            'style="" ',
+            '>',
+            $textos->get(0)->tituloFormatado(),
+            '</option>',
             '</select>'
         ]);
 
@@ -906,8 +916,18 @@ class GerarTextoTest extends TestCase
         $this->get(route('carta-servicos'))
         ->assertDontSeeText('Ainda não consta a publicação atual.')
         ->assertSeeInOrder([
-            '<option value="" style="font-style: italic;">Escolha um título ou subtítulo ...</option>',
-            '<option value="'.$textos->get(0)->id.'" style="" >'.$textos->get(0)->tituloFormatado().'</option>',
+            '<option ',
+            'value="" ',
+            'style="font-style: italic;"',
+            '>',
+            'Escolha um título ou subtítulo ...',
+            '</option>',
+            '<option ',
+            'value="'.$textos->get(0)->id.'" ',
+            'style="" ',
+            '>',
+            $textos->get(0)->tituloFormatado(),
+            '</option>',
             '</select>'
         ]);
     }
@@ -1266,11 +1286,33 @@ class GerarTextoTest extends TestCase
 
         $this->get(route($textos->get(0)->tipo_doc))
         ->assertDontSee('<strong>Ainda não consta a publicação atual.</strong>')
-        ->assertSee('<option value="'.$textos->get(0)->id.'" style="" >'.$textos->get(0)->tituloFormatado().'</option>')
-        ->assertSee('<option value="'.$textos->get(1)->id.'" style="font-weight: bold;" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(1)->subtituloFormatado().'</option>')
-        ->assertSee('<option value="'.$textos->get(2)->id.'" style="font-weight: bold;" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(2)->subtituloFormatado().'</option>')
-        ->assertSee('<option value="'.$textos->get(3)->id.'" style="font-weight: bold;" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(3)->subtituloFormatado().'</option>')
-        ->assertSee('<option value="'.$textos->get(4)->id.'" style="" >'.$textos->get(4)->tituloFormatado().'</option>');
+        ->assertSeeInOrder([
+            '<option ',
+            'value="'.$textos->get(0)->id.'"',
+            'style="" ',
+            $textos->get(0)->tituloFormatado(),
+            '</option>',
+            '<option ',
+            'value="'.$textos->get(1)->id.'"',
+            'style="font-weight: bold;" ',
+            '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(1)->subtituloFormatado(),
+            '</option>',
+            '<option ',
+            'value="'.$textos->get(2)->id.'"',
+            'style="font-weight: bold;" ',
+            '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(2)->subtituloFormatado(),
+            '</option>',
+            '<option ',
+            'value="'.$textos->get(3)->id.'"',
+            'style="font-weight: bold;" ',
+            '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(3)->subtituloFormatado(),
+            '</option>',
+            '<option ',
+            'value="'.$textos->get(4)->id.'"',
+            'style="" ',
+            $textos->get(4)->tituloFormatado(),
+            '</option>',
+        ]);
     }
 
     /** @test */
@@ -1281,7 +1323,15 @@ class GerarTextoTest extends TestCase
 
         $this->get(route($textos->get(0)->tipo_doc, $textos->get(3)->id))
         ->assertSeeText($textos->get(3)->conteudo)
-        ->assertSee('<option value="'.$textos->get(3)->id.'" style="font-weight: bold;" selected>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(3)->subtituloFormatado().'</option>');
+        ->assertSeeInOrder([
+            '<option ', 
+            'value="'.$textos->get(3)->id.'" ', 
+            'style="font-weight: bold;" ', 
+            'selected', 
+            '>', 
+            '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(3)->subtituloFormatado(), 
+            '</option>'
+        ]);
 
         // Prestação de contas
         $textos = factory('App\GerarTexto', 5)->states('prestacao-contas', 'sumario_publicado')->create()->sortBy('ordem');
@@ -1409,21 +1459,24 @@ class GerarTextoTest extends TestCase
         ]))
         ->assertSee('<p class="light">Busca por: <strong>'.$textos->get(0)->texto_tipo.'</strong>')
         ->assertSee('<div class="list-group list-group-flush">')
-        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(0)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(0)->tituloFormatado().'</strong></a>');
+        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(0)->id).'" class="list-group-item list-group-item-action">')
+        ->assertSee('<strong>'.$textos->get(0)->tituloFormatado().'</strong>');
 
         $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
             'buscaTexto' => $textos->get(1)->texto_tipo
         ]))
         ->assertSee('<p class="light">Busca por: <strong>'.$textos->get(1)->texto_tipo.'</strong>')
         ->assertSee('<div class="list-group list-group-flush">')
-        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(1)->subtituloFormatado().'</strong></a>');
+        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action">')
+        ->assertSee('<strong>'.$textos->get(1)->subtituloFormatado().'</strong>');
 
         $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
             'buscaTexto' => 'xxxxxx'
         ]))
         ->assertSee('<p class="light">Busca por: <strong>xxxxxx</strong>')
         ->assertDontSee('<div class="list-group list-group-flush">')
-        ->assertDontSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(1)->subtituloFormatado().'</strong></a>');
+        ->assertDontSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action">')
+        ->assertDontSee('<strong>'.$textos->get(1)->subtituloFormatado().'</strong>');
     }
 
     /** @test */
@@ -1438,21 +1491,24 @@ class GerarTextoTest extends TestCase
         ]))
         ->assertSee('<p class="light">Busca por: <strong>'.$textos->get(0)->texto_tipo.'</strong>')
         ->assertSee('<div class="list-group list-group-flush">')
-        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(0)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(0)->tituloFormatado().'</strong></a>');
+        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(0)->id).'" class="list-group-item list-group-item-action">')
+        ->assertSee('<strong>'.$textos->get(0)->tituloFormatado().'</strong>');
 
         $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
             'buscaTexto' => $textos->get(1)->texto_tipo
         ]))
         ->assertSee('<p class="light">Busca por: <strong>'.$textos->get(1)->texto_tipo.'</strong>')
         ->assertSee('<div class="list-group list-group-flush">')
-        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(1)->tituloFormatado().'</strong></a>');
+        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action">')
+        ->assertSee('<strong>'.$textos->get(1)->tituloFormatado().'</strong>');
 
         $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
             'buscaTexto' => 'xxxxxx'
         ]))
         ->assertSee('<p class="light">Busca por: <strong>xxxxxx</strong>')
         ->assertDontSee('<div class="list-group list-group-flush">')
-        ->assertDontSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(1)->tituloFormatado().'</strong></a>');
+        ->assertDontSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action">')
+        ->assertDontSee('<strong>'.$textos->get(1)->tituloFormatado().'</strong></a>');
     }
 
     /** @test */
