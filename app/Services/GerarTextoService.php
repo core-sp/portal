@@ -46,6 +46,7 @@ class GerarTextoService implements GerarTextoServiceInterface {
             'variaveis' => (object) $this->variaveis,
             'orientacao_sumario' => GerarTexto::orientacaoSumario()[$tipo_doc],
             'limite_criar_textos' => GerarTexto::TOTAL_N_VEZES,
+            'ultima_atualizacao_backup' => GerarTexto::ultimaAtualizacaoBackup($tipo_doc),
         ];
     }
 
@@ -158,5 +159,41 @@ class GerarTextoService implements GerarTextoServiceInterface {
             'resultado' => GerarTexto::resultadoByDoc($tipo_doc, $user),
             'busca' => isset($busca) ? GerarTexto::resultadoByDoc($tipo_doc, $user, $busca) : collect(),
         ];
+    }
+
+    public function backup($tipo_doc, $acao)
+    {
+        $acoes = [
+            'ver' => 'visualizado',
+            'fazer' => 'feito',
+            'usar' => 'usado',
+        ];
+
+        if(!isset($acoes[$acao]))
+            return [
+                'message' => '<i class="icon fa fa-ban"></i>Ação do backup não existe!',
+                'class' => 'alert-danger'
+            ];
+
+        $resposta = GerarTexto::backup($tipo_doc, $acao);
+
+        $resposta !== false ? 
+        event(new CrudEvent('backup do documento '.$tipo_doc, $acao, '----')) :
+        event(new CrudEvent('erro com a ação de backup do documento '.$tipo_doc, $acao, '----'));
+
+        if($resposta !== false)
+            return $acao == 'ver' ? $resposta : [
+                'message' => '<i class="icon fa fa-check"></i>Backup ' . $acoes[$acao] . ' com sucesso!',
+                'class' => 'alert-success'
+            ];
+        return [
+            'message' => '<i class="icon fa fa-ban"></i>Backup não foi ' . $acoes[$acao] . '! Tente novamente.',
+            'class' => 'alert-danger'
+        ];
+    }
+
+    public function nomeDocumento($tipo_doc)
+    {
+        return GerarTexto::tiposDoc()[$tipo_doc];
     }
 }

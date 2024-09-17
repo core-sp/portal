@@ -1235,7 +1235,7 @@ $(".excluirTextos").click(function(){
 });
 
 $("#excluirTexto").click(function(){
-  crudGerarTexto('excluir_varios', $(this));
+  this.value.endsWith("-backup") ? backupGerarTexto(this) : crudGerarTexto('excluir_varios', $(this));
 });
 
 $(".textoTipo").change(function(){
@@ -1304,6 +1304,37 @@ $('#sumario').on('click', 'button.mover', function(e){
     .removeClass('btn-secondary')
     .removeClass('btn-warning')
     .addClass('btn-success');
+});
+
+function backupGerarTexto(objeto){
+  var token = $('meta[name="csrf-token"]').attr('content');
+  var acao = objeto.value.replace("-backup", '');
+  const acoes_com_confirmacao = ["fazer", "usar"];
+
+  if(acoes_com_confirmacao.indexOf(objeto.id) > -1){
+    var texto = objeto.id == "usar" ? 'Tem certeza que deseja usar o backup?<br><strong>Todos os dados serão recuperados para a data do backup!</strong>' : 
+    'Tem certeza que deseja criar um novo backup?<br><strong>O backup atual será sobrescrito!</strong>';
+    $('#avisoTextos').modal({backdrop: 'static', keyboard: false, show: true});
+    $('#avisoTextos .modal-title').html('<i class="fas fa-database"></i> ' + objeto.id.toUpperCase() + ' Backup');
+    $('#avisoTextos .modal-body').html(texto);
+    $('#avisoTextos .modal-footer').show();
+    $('#avisoTextos .modal-footer button.btn-danger').val(objeto.id + '-backup');
+    return;
+  }
+
+  $('#avisoTextos').modal('hide');
+  $('#loadingIndice').modal({backdrop: 'static', keyboard: false, show: true});
+  $('#loadingIndice .modal-body').html('<div class="spinner-border text-primary"></div>&nbsp;&nbsp;Realizando ação do backup...');
+
+  var link = "/admin/textos/backup/" + $('#tipo_doc').val() + "/" + acao;
+	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
+	$('body').append(form);
+	$(form).submit();
+}
+
+// Backup
+$(".acoes-backup button").click(function(){
+	backupGerarTexto(this);
 });
 
 // FIM da Funcionalidade GerarTexto ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

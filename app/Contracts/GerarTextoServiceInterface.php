@@ -19,4 +19,8 @@ interface GerarTextoServiceInterface {
     public function show($tipo_doc, $id = null, $user = null);
 
     public function buscar($tipo_doc, $busca, $user = null);
+
+    public function backup($tipo_doc, $acao);
+
+    public function nomeDocumento($tipo_doc);
 }

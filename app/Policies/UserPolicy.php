@@ -69,6 +69,14 @@ class UserPolicy
             return perfisPermitidos($tipo, 'index');
     }
 
+    public function gerarTextoCreate(User $user)
+    {
+        $tipo = ucfirst(Str::camel(request()->tipo_doc));
+
+        if(class_basename(\Route::current()->controller) == 'GerarTextoController')
+            return perfisPermitidos($tipo, 'create');
+    }
+
     public function gerarTextoUpdate(User $user)
     {
         $tipo = ucfirst(Str::camel(request()->tipo_doc));

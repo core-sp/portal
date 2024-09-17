@@ -129,6 +129,22 @@ class GerarTextoController extends Controller
             ->with('class', 'alert-success');
     }
 
+    public function backup($tipo_doc, $acao)
+    {
+        $this->authorize('gerarTextoCreate', auth()->user());
+
+        try{
+            $msg = $this->service->getService('GerarTexto')->backup($tipo_doc, $acao);
+            $nome_doc = $this->service->getService('GerarTexto')->nomeDocumento($tipo_doc);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao realizar a ação " . $acao . " com o backup do documento " . $tipo_doc . ".");
+        }
+
+        return ($acao == 'ver') && !isset($msg['message']) ? view('admin.views.backup_ver', ['backup' => $msg, 'tipo_doc' => $tipo_doc, 'nome_doc' => $nome_doc]) : 
+        redirect()->route('textos.view', $tipo_doc)->with($msg);
+    }
+
     public function show($id = null)
     {
         try{

@@ -88,6 +88,11 @@ return [
             'url' => env('APP_URL').'/imagens/home',
             'visibility' => 'public',
         ],
+
+        'gerar_textos' => [
+            'driver' => 'local',
+            'root' => storage_path('app/gerar_textos'),
+        ],
     ],
 
 ];

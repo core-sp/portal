@@ -13,18 +13,64 @@
     @method('PUT')
     <div class="card-body">
 
-        <p><strong>Orientação do sumário:</strong>
-            <a type="button" class="btn btn-link pt-0 {{ $orientacao_sumario == 'horizontal' ? 'disabled' : '' }}" href="{{ route('textos.orientacao', ['tipo_doc' => $tipo_doc, 'orientacao' => 'horizontal']) }}">Horizontal</a>
-            <strong>|</strong>
-            <a type="button" class="btn btn-link pt-0 {{ $orientacao_sumario != 'horizontal' ? 'disabled' : '' }}" href="{{ route('textos.orientacao', ['tipo_doc' => $tipo_doc, 'orientacao' => 'vertical']) }}">Vertical</a>
-        </p>
+        <div class="row d-flex ml-1 pb-2 pr-2">
+            <!-- Escolher Ordem Sumário -->
+            <div class="mr-auto">
+                <strong>Orientação do sumário:</strong>
+                <a type="button" class="btn btn-link {{ $orientacao_sumario == 'horizontal' ? 'disabled' : '' }}" href="{{ route('textos.orientacao', ['tipo_doc' => $tipo_doc, 'orientacao' => 'horizontal']) }}">Horizontal</a>
+                <strong>|</strong>
+                <a type="button" class="btn btn-link {{ $orientacao_sumario != 'horizontal' ? 'disabled' : '' }}" href="{{ route('textos.orientacao', ['tipo_doc' => $tipo_doc, 'orientacao' => 'vertical']) }}">Vertical</a>
+            </div>
+            <!-- FIM Escolher Ordem Sumário -->
+
+            <!-- Backup -->
+            <div class="acoes-backup">
+                <strong>Backup criado em: </strong><i>{{ isset($ultima_atualizacao_backup) ? $ultima_atualizacao_backup : 'Sem backup' }}</i>
+                @can('gerarTextoCreate', auth()->user())
+                    @if(isset($ultima_atualizacao_backup))
+                    <button type="button" class="btn btn-sm btn-primary ml-3" id="ver" value="ver">Ver Backup</button>
+                    <button type="button" class="btn btn-sm btn-danger ml-3" id="usar" value="usar">Usar Backup</button>
+                    @endif
+                <button type="button" class="btn btn-sm btn-warning ml-3" id="fazer" value="fazer">Fazer Backup</button>
+                @endcan
+            </div>
+            <!-- FIM Backup -->
+        </div>
+
+        <!-- Instruções -->
+        <div class="border border-info rounded my-3 p-2">
+            <h5><strong>Instruções:</strong></h5>
+            <p class="m-0">
+                <i><i class="fas fa-minus"></i>&nbsp;&nbsp;Para reordenar os itens da índice: clique no botão 
+                <button type="button" class="btn btn-success btn-sm m-0 pt-0 pb-0"><i class="{{ $orientacao_sumario == 'horizontal' ? 'fas fa-exchange-alt' : 'fas fa-exchange-alt fa-rotate-90' }}"></i></button> 
+                para inciar a ação de mover o item, em seguida clique no botão 
+                <button type="button" class="btn btn-secondary btn-sm m-0 pt-0 pb-0"><i class="{{ $orientacao_sumario == 'horizontal' ? 'fas fa-long-arrow-alt-right' : 'fas fa-long-arrow-alt-down' }}"></i></button>
+                para inserir o item na posição seguinte.</i> 
+            </p>
+            <p class="m-0">
+                <i><i class="fas fa-minus"></i>&nbsp;&nbsp;A nova ordem da índice é <u><b>salva somente</b></u> após clicar no botão <button type="button" class="btn btn-sm btn-primary">Atualizar índice</button> no final da página.</i>
+            </p>
+            <p class="m-0">
+                <i><i class="fas fa-minus"></i>&nbsp;&nbsp;Para criar um item: clique no botão <button type="button" class="btn btn-sm btn-success"><i class="fas fa-plus"></i>&nbsp;&nbsp;Texto</button>.</i>
+            </p>
+            <p class="m-0">
+                <i><i class="fas fa-minus"></i>&nbsp;&nbsp;Para editar o item: clique sobre o texto com o cursor <i class="far fa-hand-pointer"></i>.</i>
+            </p>
+            <p class="m-0">
+                <i><i class="fas fa-minus"></i>&nbsp;&nbsp;Para excluir um ou mais itens: selecione os itens clicando na caixinha <i class="fas fa-check-square"></i>, em seguida clique no botão <button type="button" class="btn btn-sm btn-danger"><i class="fas fa-check-square"></i>&nbsp;&nbsp;<i class="fas fa-trash"></i></button>.</i>
+            </p>
+            <p class="m-0">
+                <i><i class="fas fa-minus"></i>&nbsp;&nbsp;Somente usuário com <u><b>permissão para criar</b></u> pode realizar ações com o backup.</i>
+            </p>
+        </div>
+        <!-- FIM Instruções -->
 
         <p class="text-muted"><em>* Sumário após última atualização da índice.</em></p>
         <h4><strong>Sumário:</strong></h4>
 
-        <em>Opção de criar vários textos de uma vez <i>(até <span id="lim-max-criar">{{ $limite_criar_textos }}</span>)</i></em>
-        <div class="input-group col-2 mb-4 pl-0">
-            <div class="input-group-prepend">
+        <!-- Criar vários textos -->
+        <div class="input-group col-2 mb-4 mt-3 pl-0">
+            <div class="input-group-prepend"> 
                 <span class="input-group-text">Criar</span>
             </div>
             <input type="text" name="n_vezes" class="form-control {{ $errors->has('n_vezes') ? 'is-invalid' : '' }}" placeholder="Ex: 2">
@@ -36,35 +82,20 @@
                 {{ $errors->first('n_vezes') }}
             </div>
             @endif
+            <em><small>Opção para criar de 2 até <span id="lim-max-criar">{{ $limite_criar_textos }}</span> textos de uma vez</small></em>
         </div>
+        <!-- FIM Criar vários textos -->
 
         @if(isset($can_update) && $can_update)
-        <div class="row mt-3">
+        <div class="row my-3">
             <div class="col">
                 <button type="button" class="btn btn-danger excluirTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;<i class="fas fa-trash"></i></button>
                 <button type="button" class="btn btn-success ml-2 criarTexto"><i class="fas fa-plus"></i>&nbsp;&nbsp;Texto</button>
             </div>
         </div>
         @endif
-        
-        <p class="mt-3">
-            <i>* Clique no botão 
-            <button type="button" class="btn btn-success btn-sm m-0 pt-0 pb-0"><i class="{{ $orientacao_sumario == 'horizontal' ? 'fas fa-exchange-alt' : 'fas fa-exchange-alt fa-rotate-90' }}"></i></button> 
-            para inciar a ação de mover o item, em seguida clique no botão 
-            <button type="button" class="btn btn-secondary btn-sm m-0 pt-0 pb-0"><i class="{{ $orientacao_sumario == 'horizontal' ? 'fas fa-long-arrow-alt-right' : 'fas fa-long-arrow-alt-down' }}"></i></button>
-            para inserir o item na posição seguinte e reordenar a índice</i> 
-        </p>
-        <p>
-            <i>* A nova ordem da índice é salva somente após clicar no botão <button type="button" class="btn btn-sm btn-primary">Atualizar índice</button></i>
-        </p>
-        <p>
-            <i>* Clique sobre o título com o cursor <i class="far fa-hand-pointer"></i> para editar o item</i>
-        </p>
-        <p class="mb-4">
-            <i>* Clique na caixinha <i class="fas fa-check-square"></i> para selecionar o item a ser excluído</i>
-        </p>
-
-        <button type="button" class="btn btn-info btn-sm selecionarTextos"><i class="fas fa-check-square"></i>&nbsp;&nbsp;Selecionar Todos</button>
+    
+        <button type="button" class="btn btn-info btn-sm selecionarTextos mt-2"><i class="fas fa-check-square"></i>&nbsp;&nbsp;Selecionar Todos</button>
         <div class="sumario-{{ $orientacao_sumario }}" id="sumario">
         @php
         $col = 1;
@@ -150,7 +181,7 @@
                 </h5>
                 <div class="card card-default bg-light">
                     <div class="card-body">
-                        <p class="text-danger"><b>Lembre de atualizar a índice após alterações na ordem, tipo do texto ou nível</b></p>
+                        <p class="text-danger"><b>Lembre de atualizar a índice após alterações na ordem, tipo do texto, numeração ou nível</b></p>
                         <div class="form-row mb-2">
                             <div class="col">
                                 <label for="tipo">Tipo do texto</label>
@@ -164,7 +195,9 @@
                                 <label for="com_numeracao-">Possui numeração na índice?</label>
                                 <select class="form-control form-control-sm comNumero" id="com_numeracao">
                                     <option value="1">Sim</option>
+                                    @if($tipo_doc != 'prestacao-contas')
                                     <option value="0" style="">Não</option>
+                                    @endif
                                 </select>
                             </div>
 

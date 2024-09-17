@@ -4,6 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class GerarTexto extends Model
 {
@@ -42,11 +45,40 @@ class GerarTexto extends Model
         ];
     }
 
+    private static function nomeDocBackup($tipo_doc)
+    {
+        return 'bkp_gt_' . $tipo_doc . '.json';
+    }
+
     public static function reordenarPorTipo($tipo_doc)
     {
         self::where('tipo_doc', $tipo_doc)->orderBy('ordem')->get()->each(function ($item, $key) {
             $item->update(['ordem' => $key + 1]);
         });
+    }
+
+    public static function ultimaAtualizacaoBackup($tipo_doc)
+    {
+        if(Storage::disk('gerar_textos')->exists(self::nomeDocBackup($tipo_doc)))
+            return Carbon::parse(Storage::disk('gerar_textos')->lastModified(self::nomeDocBackup($tipo_doc)))->setTimezone('America/Sao_Paulo')->format('d/m/Y, \à\s H:i');
+    }
+
+    public static function backup($tipo_doc, $acao)
+    {
+        if(($acao == 'ver') && Storage::disk('gerar_textos')->exists(self::nomeDocBackup($tipo_doc)))
+            return Storage::disk('gerar_textos')->get(self::nomeDocBackup($tipo_doc));
+
+        if($acao == 'fazer')
+            return Storage::disk('gerar_textos')->put(self::nomeDocBackup($tipo_doc), self::where('tipo_doc', $tipo_doc)->orderBy('ordem','ASC')->get()->toJson());
+
+        if($acao == 'usar')
+        {
+            $total = self::where('tipo_doc', $tipo_doc)->delete();
+            if(self::where('tipo_doc', $tipo_doc)->count() == 0)
+                return DB::table('gerar_textos')->insert(json_decode(Storage::disk('gerar_textos')->get(self::nomeDocBackup($tipo_doc)), true));
+        }
+
+        return false;
     }
 
     public static function criar($tipo_doc, $n_vezes = null)

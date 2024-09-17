@@ -334,6 +334,8 @@ Route::middleware(['block_ip'])->group(function () {
       Route::post('/publicar/{tipo_doc}', 'GerarTextoController@publicar')->where('tipo_doc', 'carta-servicos|prestacao-contas')->name('textos.publicar');
       Route::delete('/{tipo_doc}/excluir', 'GerarTextoController@delete')->where('tipo_doc', 'carta-servicos|prestacao-contas')->name('textos.delete');
       Route::put('/{tipo_doc}', 'GerarTextoController@update')->where('tipo_doc', 'carta-servicos|prestacao-contas')->name('textos.update.indice');
+      Route::post('/backup/{tipo_doc}/{acao}', 'GerarTextoController@backup')->where('tipo_doc', 'carta-servicos|prestacao-contas')
+      ->where('acao', 'ver|fazer|usar')->name('textos.backup');
     });
     
   });
