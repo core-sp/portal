@@ -51,6 +51,7 @@ class GerarTextoRequest extends FormRequest
             $conteudo = trim(str_replace('&nbsp;', '', strip_tags($this->conteudo)));
             $this->merge(['conteudo' => $conteudo == "" ? null : $conteudo]);
             $this->validarConteudo = '|starts_with:https://';
+            $this->comNumero = '1';
         }
     }
 
