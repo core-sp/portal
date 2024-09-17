@@ -76,7 +76,7 @@
 
         @foreach($resultado as $texto)
             
-            @if($texto->tipoTitulo())
+            @if($texto->tipoTitulo() || ($loop->first && !$texto->tipoTitulo()))
             <hr style="border-top: 2px dotted gray;" />
             <div class="row ml-0">
                 <div class="d-flex flex-wrap ">
