@@ -317,6 +317,14 @@ class PermissoesTableSeeder extends Seeder
                 'controller' => 'PrestacaoContas',
                 'metodo' => 'edit',
                 'perfis' => '1,'
+            ], [
+                'controller' => 'CartaServicos',
+                'metodo' => 'create',
+                'perfis' => '1,'
+            ], [
+                'controller' => 'PrestacaoContas',
+                'metodo' => 'create',
+                'perfis' => '1,'
             ],
         ]);
     }

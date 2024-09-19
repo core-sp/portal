@@ -194,6 +194,6 @@ class GerarTextoService implements GerarTextoServiceInterface {
 
     public function nomeDocumento($tipo_doc)
     {
-        return GerarTexto::tiposDoc()[$tipo_doc];
+        return isset(GerarTexto::tiposDoc()[$tipo_doc]) ? GerarTexto::tiposDoc()[$tipo_doc] : '';
     }
 }

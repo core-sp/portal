@@ -68,10 +68,10 @@ class GerarTexto extends Model
         if(($acao == 'ver') && Storage::disk('gerar_textos')->exists(self::nomeDocBackup($tipo_doc)))
             return Storage::disk('gerar_textos')->get(self::nomeDocBackup($tipo_doc));
 
-        if($acao == 'fazer')
+        if(($acao == 'fazer') && (self::where('tipo_doc', $tipo_doc)->count() > 0))
             return Storage::disk('gerar_textos')->put(self::nomeDocBackup($tipo_doc), self::where('tipo_doc', $tipo_doc)->orderBy('ordem','ASC')->get()->toJson());
 
-        if($acao == 'usar')
+        if(($acao == 'usar') && Storage::disk('gerar_textos')->exists(self::nomeDocBackup($tipo_doc)))
         {
             $total = self::where('tipo_doc', $tipo_doc)->delete();
             if(self::where('tipo_doc', $tipo_doc)->count() == 0)

@@ -6,6 +6,7 @@ use App\GerarTexto;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Storage;
 
 class GerarTextoTest extends TestCase
 {
@@ -33,6 +34,9 @@ class GerarTextoTest extends TestCase
             $this->post(route('textos.publicar', $tipo))->assertRedirect(route('login'));
             $this->delete(route('textos.delete', $tipo))->assertRedirect(route('login'));
             $this->put(route('textos.update.indice', $tipo))->assertRedirect(route('login'));
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'fazer']))->assertRedirect(route('login'));
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'usar']))->assertRedirect(route('login'));
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'ver']))->assertRedirect(route('login'));
         }
     }
 
@@ -54,6 +58,9 @@ class GerarTextoTest extends TestCase
             $this->post(route('textos.publicar', $tipo))->assertForbidden();
             $this->delete(route('textos.delete', $tipo))->assertForbidden();
             $this->put(route('textos.update.indice', $tipo))->assertForbidden();
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'fazer']))->assertForbidden();
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'usar']))->assertForbidden();
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'ver']))->assertForbidden();
         }
     }
 
@@ -265,8 +272,8 @@ class GerarTextoTest extends TestCase
             $this->get(route('textos.view', $tipo))
             ->assertSee('<div class="d-flex flex-wrap ')
             ->assertDontSee('<div class="col-3">')
-            ->assertSee('<a type="button" class="btn btn-link pt-0 disabled" href="'.route('textos.orientacao', ['tipo_doc' => $tipo, 'orientacao' => 'horizontal']).'">Horizontal</a>')
-            ->assertSee('<a type="button" class="btn btn-link pt-0 " href="'.route('textos.orientacao', ['tipo_doc' => $tipo, 'orientacao' => 'vertical']).'">Vertical</a>');
+            ->assertSee('<a type="button" class="btn btn-link disabled" href="'.route('textos.orientacao', ['tipo_doc' => $tipo, 'orientacao' => 'horizontal']).'">Horizontal</a>')
+            ->assertSee('<a type="button" class="btn btn-link " href="'.route('textos.orientacao', ['tipo_doc' => $tipo, 'orientacao' => 'vertical']).'">Vertical</a>');
 
             $this->get(route('textos.orientacao', ['tipo_doc' => $tipo, 'orientacao' => 'vertical']))
             ->assertSessionHas('orientacao_sumario', 'vertical')
@@ -275,8 +282,8 @@ class GerarTextoTest extends TestCase
             $this->get(route('textos.view', $tipo))
             ->assertSee('<div class="col-3">')
             ->assertDontSee('<div class="d-flex flex-wrap ')
-            ->assertSee('<a type="button" class="btn btn-link pt-0 " href="'.route('textos.orientacao', ['tipo_doc' => $tipo, 'orientacao' => 'horizontal']).'">Horizontal</a>')
-            ->assertSee('<a type="button" class="btn btn-link pt-0 disabled" href="'.route('textos.orientacao', ['tipo_doc' => $tipo, 'orientacao' => 'vertical']).'">Vertical</a>');
+            ->assertSee('<a type="button" class="btn btn-link " href="'.route('textos.orientacao', ['tipo_doc' => $tipo, 'orientacao' => 'horizontal']).'">Horizontal</a>')
+            ->assertSee('<a type="button" class="btn btn-link disabled" href="'.route('textos.orientacao', ['tipo_doc' => $tipo, 'orientacao' => 'vertical']).'">Vertical</a>');
         }
     }
 
@@ -576,6 +583,21 @@ class GerarTextoTest extends TestCase
             ->assertSessionHasErrors([
                 'com_numeracao'
             ]);
+
+            if($tipo == 'prestacao-contas')
+            {
+                GerarTexto::where('tipo_doc', $tipo)->first()->update([
+                    'tipo' => 'Título'
+                ]);
+                $texto = GerarTexto::where('tipo_doc', $tipo)->first()->fresh()->toArray();
+                $texto['com_numeracao'] = 0;
+
+                $this->get(route('textos.view', $texto['tipo_doc']))->assertOk();
+                $this->post(route('textos.update.campos', [$texto['tipo_doc'], $texto['id']]), $texto)
+                ->assertSessionHasErrors([
+                    'com_numeracao'
+                ]);
+            }
         }
     }
 
@@ -1238,6 +1260,340 @@ class GerarTextoTest extends TestCase
             ->assertDontSee('<input type="hidden" name="id-23" value="23" />')
             ->assertDontSee('<input type="hidden" name="id-24" value="24" />')
             ->assertDontSee('<input type="hidden" name="id-25" value="25" />');
+        }
+    }
+
+    // backup
+    /** @test */
+    public function can_create_backup()
+    {
+        Storage::fake('gerar_textos');
+
+        $user = $this->signInAsAdmin();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {
+            $textos = factory('App\GerarTexto', 5)->states($tipo)->create();
+
+            $this->get(route('textos.view', $tipo))
+            ->assertSee('<strong>Backup criado em: </strong><i>Sem backup</i>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-warning ml-3" id="fazer" value="fazer">Fazer Backup</button>')
+            ->assertDontSee('<button type="button" class="btn btn-sm btn-primary ml-3" id="ver" value="ver">Ver Backup</button>')
+            ->assertDontSee('<button type="button" class="btn btn-sm btn-danger ml-3" id="usar" value="usar">Usar Backup</button>')
+            ->assertOk();
+
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'fazer']))
+            ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Backup feito com sucesso!')
+            ->assertSessionHas('class', 'alert-success');
+
+            Storage::disk('gerar_textos')->exists('bkp_gt_' . $tipo .'.json');
+
+            $this->get(route('textos.view', $tipo))
+            ->assertDontSee('<i>Sem backup</i>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-warning ml-3" id="fazer" value="fazer">Fazer Backup</button>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-primary ml-3" id="ver" value="ver">Ver Backup</button>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-danger ml-3" id="usar" value="usar">Usar Backup</button>')
+            ->assertOk();
+        }
+    }
+
+    /** @test */
+    public function log_is_generated_when_backup_is_created()
+    {
+        Storage::fake('gerar_textos');
+
+        $user = $this->signInAsAdmin();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {
+            $textos = factory('App\GerarTexto', 5)->states($tipo)->create();
+            
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'fazer']))
+            ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Backup feito com sucesso!')
+            ->assertSessionHas('class', 'alert-success');
+    
+            $log = tailCustom(storage_path($this->pathLogInterno()));
+            $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+            $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') fazer *backup do documento '.$tipo.'* (id: ----)';
+            $this->assertStringContainsString($txt, $log);
+        }
+    }
+
+    /** @test */
+    public function can_use_backup()
+    {
+        Storage::fake('gerar_textos');
+
+        $this->can_create_backup();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {
+            $texto = GerarTexto::where('tipo_doc', $tipo)->first()->texto_tipo;
+            GerarTexto::where('tipo_doc', $tipo)->first()->delete();
+
+            $this->get(route('textos.view', $tipo))
+            ->assertDontSee('<i>Sem backup</i>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-warning ml-3" id="fazer" value="fazer">Fazer Backup</button>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-primary ml-3" id="ver" value="ver">Ver Backup</button>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-danger ml-3" id="usar" value="usar">Usar Backup</button>')
+            ->assertDontSee($texto)
+            ->assertOk();
+
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'usar']))
+            ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Backup usado com sucesso!')
+            ->assertSessionHas('class', 'alert-success');
+
+            $this->get(route('textos.view', $tipo))
+            ->assertDontSee('<i>Sem backup</i>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-warning ml-3" id="fazer" value="fazer">Fazer Backup</button>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-primary ml-3" id="ver" value="ver">Ver Backup</button>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-danger ml-3" id="usar" value="usar">Usar Backup</button>')
+            ->assertSee(GerarTexto::where('tipo_doc', $tipo)->first()->texto_tipo)
+            ->assertOk();
+        }
+    }
+
+    /** @test */
+    public function log_is_generated_when_backup_is_used()
+    {
+        Storage::fake('gerar_textos');
+
+        $this->can_create_backup();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {            
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'usar']))
+            ->assertSessionHas('message', '<i class="icon fa fa-check"></i>Backup usado com sucesso!')
+            ->assertSessionHas('class', 'alert-success');
+    
+            $log = tailCustom(storage_path($this->pathLogInterno()));
+            $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+            $txt = $inicio . auth()->user()->nome . ' (usuário '.auth()->user()->idusuario.') usar *backup do documento '.$tipo.'* (id: ----)';
+            $this->assertStringContainsString($txt, $log);
+        }
+    }
+
+    /** @test */
+    public function can_view_backup()
+    {
+        Storage::fake('gerar_textos');
+
+        $this->can_create_backup();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {
+            $this->get(route('textos.view', $tipo))
+            ->assertDontSee('<i>Sem backup</i>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-warning ml-3" id="fazer" value="fazer">Fazer Backup</button>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-primary ml-3" id="ver" value="ver">Ver Backup</button>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-danger ml-3" id="usar" value="usar">Usar Backup</button>')
+            ->assertOk();
+
+            $nome_doc = GerarTexto::tiposDoc()[$tipo];
+            $conteudo = GerarTexto::where('tipo_doc', $tipo)->first()->conteudo;
+
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'ver']))
+            ->assertViewIs('admin.views.backup_ver')
+            ->assertSee('<h1 class="navbar-text"><i class="fas fa-database"></i>&nbsp;&nbsp;Visualizar backup <strong>' . $nome_doc . '</strong></h1>')
+            ->assertSeeInOrder([
+                '<p class="mb-0"><strong>ID -</strong>',
+                '<p class="mb-0"><strong>Título -</strong>',
+                '<p class="mb-0"><strong>Índice -</strong>',
+                '<p class="mb-0"><strong>Atualizado em -</strong>',
+                '<p class="mb-0"><strong>Conteúdo:</strong></p>',
+                '<div class="border border-dark p-2">',
+                !filter_var($conteudo, FILTER_VALIDATE_URL) ? '<p class="mb-0">' : '<a href="' . $conteudo . '" target="_blank" class="mb-0">',
+                '</div>',
+                '<hr />'
+            ]);
+        }
+    }
+
+    /** @test */
+    public function log_is_generated_when_backup_is_view()
+    {
+        Storage::fake('gerar_textos');
+
+        $this->can_create_backup();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {            
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'ver']))
+            ->assertViewIs('admin.views.backup_ver');
+    
+            $log = tailCustom(storage_path($this->pathLogInterno()));
+            $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+            $txt = $inicio . auth()->user()->nome . ' (usuário '.auth()->user()->idusuario.') ver *backup do documento '.$tipo.'* (id: ----)';
+            $this->assertStringContainsString($txt, $log);
+        }
+    }
+
+    /** @test */
+    public function cannot_create_backup_without_items()
+    {
+        Storage::fake('gerar_textos');
+
+        $user = $this->signInAsAdmin();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {
+            $this->get(route('textos.view', $tipo))
+            ->assertSee('<strong>Backup criado em: </strong><i>Sem backup</i>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-warning ml-3" id="fazer" value="fazer">Fazer Backup</button>')
+            ->assertDontSee('<button type="button" class="btn btn-sm btn-primary ml-3" id="ver" value="ver">Ver Backup</button>')
+            ->assertDontSee('<button type="button" class="btn btn-sm btn-danger ml-3" id="usar" value="usar">Usar Backup</button>')
+            ->assertOk();
+
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'fazer']))
+            ->assertSessionHas('message', '<i class="icon fa fa-ban"></i>Backup não foi feito! Tente novamente.')
+            ->assertSessionHas('class', 'alert-danger');
+
+            Storage::disk('gerar_textos')->missing('bkp_gt_' . $tipo .'.json');
+
+            $this->get(route('textos.view', $tipo))
+            ->assertSee('<i>Sem backup</i>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-warning ml-3" id="fazer" value="fazer">Fazer Backup</button>')
+            ->assertDontSee('<button type="button" class="btn btn-sm btn-primary ml-3" id="ver" value="ver">Ver Backup</button>')
+            ->assertDontSee('<button type="button" class="btn btn-sm btn-danger ml-3" id="usar" value="usar">Usar Backup</button>')
+            ->assertOk();
+        }
+    }
+
+    /** @test */
+    public function log_is_generated_when_cannot_create_backup_without_items()
+    {
+        Storage::fake('gerar_textos');
+
+        $user = $this->signInAsAdmin();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {            
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'ver']))
+            ->assertSessionHas('message', '<i class="icon fa fa-ban"></i>Backup não foi visualizado! Tente novamente.')
+            ->assertSessionHas('class', 'alert-danger');
+    
+            $log = tailCustom(storage_path($this->pathLogInterno()));
+            $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+            $txt = $inicio . auth()->user()->nome . ' (usuário '.auth()->user()->idusuario.') ver *erro com a ação de backup do documento '.$tipo.'* (id: ----)';
+            $this->assertStringContainsString($txt, $log);
+        }
+    }
+
+    /** @test */
+    public function cannot_use_backup_without_file_json()
+    {
+        Storage::fake('gerar_textos');
+
+        $user = $this->signInAsAdmin();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {
+            $this->get(route('textos.view', $tipo))
+            ->assertSee('<strong>Backup criado em: </strong><i>Sem backup</i>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-warning ml-3" id="fazer" value="fazer">Fazer Backup</button>')
+            ->assertDontSee('<button type="button" class="btn btn-sm btn-primary ml-3" id="ver" value="ver">Ver Backup</button>')
+            ->assertDontSee('<button type="button" class="btn btn-sm btn-danger ml-3" id="usar" value="usar">Usar Backup</button>')
+            ->assertOk();
+
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'usar']))
+            ->assertSessionHas('message', '<i class="icon fa fa-ban"></i>Backup não foi usado! Tente novamente.')
+            ->assertSessionHas('class', 'alert-danger');
+
+            Storage::disk('gerar_textos')->missing('bkp_gt_' . $tipo .'.json');
+
+            $this->get(route('textos.view', $tipo))
+            ->assertSee('<i>Sem backup</i>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-warning ml-3" id="fazer" value="fazer">Fazer Backup</button>')
+            ->assertDontSee('<button type="button" class="btn btn-sm btn-primary ml-3" id="ver" value="ver">Ver Backup</button>')
+            ->assertDontSee('<button type="button" class="btn btn-sm btn-danger ml-3" id="usar" value="usar">Usar Backup</button>')
+            ->assertOk();
+        }
+    }
+
+    /** @test */
+    public function log_is_generated_when_cannot_use_backup_without_file_json()
+    {
+        Storage::fake('gerar_textos');
+
+        $user = $this->signInAsAdmin();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {            
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'usar']))
+            ->assertSessionHas('message', '<i class="icon fa fa-ban"></i>Backup não foi usado! Tente novamente.')
+            ->assertSessionHas('class', 'alert-danger');
+    
+            $log = tailCustom(storage_path($this->pathLogInterno()));
+            $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+            $txt = $inicio . auth()->user()->nome . ' (usuário '.auth()->user()->idusuario.') usar *erro com a ação de backup do documento '.$tipo.'* (id: ----)';
+            $this->assertStringContainsString($txt, $log);
+        }
+    }
+
+    /** @test */
+    public function cannot_view_backup_without_file_json()
+    {
+        Storage::fake('gerar_textos');
+
+        $user = $this->signInAsAdmin();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {
+            $this->get(route('textos.view', $tipo))
+            ->assertSee('<strong>Backup criado em: </strong><i>Sem backup</i>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-warning ml-3" id="fazer" value="fazer">Fazer Backup</button>')
+            ->assertDontSee('<button type="button" class="btn btn-sm btn-primary ml-3" id="ver" value="ver">Ver Backup</button>')
+            ->assertDontSee('<button type="button" class="btn btn-sm btn-danger ml-3" id="usar" value="usar">Usar Backup</button>')
+            ->assertOk();
+
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'ver']))
+            ->assertSessionHas('message', '<i class="icon fa fa-ban"></i>Backup não foi visualizado! Tente novamente.')
+            ->assertSessionHas('class', 'alert-danger');
+
+            Storage::disk('gerar_textos')->missing('bkp_gt_' . $tipo .'.json');
+
+            $this->get(route('textos.view', $tipo))
+            ->assertSee('<i>Sem backup</i>')
+            ->assertSee('<button type="button" class="btn btn-sm btn-warning ml-3" id="fazer" value="fazer">Fazer Backup</button>')
+            ->assertDontSee('<button type="button" class="btn btn-sm btn-primary ml-3" id="ver" value="ver">Ver Backup</button>')
+            ->assertDontSee('<button type="button" class="btn btn-sm btn-danger ml-3" id="usar" value="usar">Usar Backup</button>')
+            ->assertOk();
+        }
+    }
+
+    /** @test */
+    public function log_is_generated_when_cannot_view_backup_without_file_json()
+    {
+        Storage::fake('gerar_textos');
+
+        $user = $this->signInAsAdmin();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {            
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'ver']))
+            ->assertSessionHas('message', '<i class="icon fa fa-ban"></i>Backup não foi visualizado! Tente novamente.')
+            ->assertSessionHas('class', 'alert-danger');
+    
+            $log = tailCustom(storage_path($this->pathLogInterno()));
+            $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+            $txt = $inicio . auth()->user()->nome . ' (usuário '.auth()->user()->idusuario.') ver *erro com a ação de backup do documento '.$tipo.'* (id: ----)';
+            $this->assertStringContainsString($txt, $log);
+        }
+    }
+
+    /** @test */
+    public function cannot_handle_backup_with_invalid_action()
+    {
+        Storage::fake('gerar_textos');
+
+        $user = $this->signInAsAdmin();
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {
+            $this->post(route('textos.backup', ['tipo_doc' => $tipo, 'acao' => 'teste']))
+            ->assertNotFound();
+    
+            Storage::disk('gerar_textos')->missing('bkp_gt_' . $tipo .'.json');
         }
     }
 

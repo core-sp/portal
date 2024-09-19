@@ -8,6 +8,7 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use App\Services\GerarTextoService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Storage;
 
 class GerarTextoTest extends TestCase
 {
@@ -44,6 +45,110 @@ class GerarTextoTest extends TestCase
             'carta-servicos' => 'Carta de serviços ao usuário',
             'prestacao-contas' => 'Prestação de Contas',
         ], GerarTexto::tiposDoc());
+    }
+
+    /** @test */
+    public function ultima_atualizacao_backup()
+    {
+        Storage::fake('gerar_textos');
+
+        $texto = factory('App\GerarTexto')->create();
+        Storage::disk('gerar_textos')->put('bkp_gt_' . $texto->tipo_doc . '.json', 'teste teste');
+
+        $this->assertEquals(now()->format('d/m/Y, \à\s H:i'), GerarTexto::ultimaAtualizacaoBackup($texto->tipo_doc));
+
+        $texto = factory('App\GerarTexto')->states('prestacao-contas')->create();
+        Storage::disk('gerar_textos')->put('bkp_gt_' . $texto->tipo_doc . '.json', 'teste teste');
+
+        $this->assertEquals(now()->format('d/m/Y, \à\s H:i'), GerarTexto::ultimaAtualizacaoBackup($texto->tipo_doc));
+    }
+
+    /** @test */
+    public function backup_acao_fazer()
+    {
+        Storage::fake('gerar_textos');
+
+        // Sem dados
+        $this->assertFalse(GerarTexto::backup('carta-servicos', 'fazer'));
+        Storage::disk('gerar_textos')->missing('bkp_gt_carta-servicos.json');
+
+        $this->assertFalse(GerarTexto::backup('prestacao-contas', 'fazer'));
+        Storage::disk('gerar_textos')->missing('bkp_gt_prestacao-contas.json');
+        
+        $texto = factory('App\GerarTexto', 5)->create();
+        $this->assertTrue(GerarTexto::backup($texto->get(0)->tipo_doc, 'fazer'));
+
+        $texto = factory('App\GerarTexto', 5)->states('prestacao-contas')->create([
+            'conteudo' => str_replace('http:', 'https:', $this->faker()->url)
+        ]);
+        $this->assertTrue(GerarTexto::backup($texto->get(0)->tipo_doc, 'fazer'));
+    }
+
+    /** @test */
+    public function backup_acao_ver()
+    {
+        Storage::fake('gerar_textos');
+
+        $this->backup_acao_fazer();
+
+        $texto = GerarTexto::backup('carta-servicos', 'ver');
+        $this->assertStringContainsString(GerarTexto::find(1)->conteudo, $texto);
+        $this->assertStringContainsString(GerarTexto::find(2)->texto_tipo, $texto);
+        $this->assertStringContainsString(GerarTexto::find(3)->id, $texto);
+
+        $texto = GerarTexto::backup('prestacao-contas', 'ver');
+        $this->assertStringContainsString(str_replace('/', '\/', GerarTexto::find(6)->conteudo), $texto);
+        $this->assertStringContainsString(GerarTexto::find(7)->texto_tipo, $texto);
+        $this->assertStringContainsString(GerarTexto::find(8)->id, $texto);
+
+        // Sem dados
+        Storage::disk('gerar_textos')->delete('bkp_gt_carta-servicos.json');
+        $this->assertFalse(GerarTexto::backup('carta-servicos', 'ver'));
+
+        Storage::disk('gerar_textos')->delete('bkp_gt_prestacao-contas.json');
+        $this->assertFalse(GerarTexto::backup('prestacao-contas', 'ver'));
+
+        GerarTexto::where('tipo_doc', 'carta-servicos')->delete();
+        $this->assertFalse(GerarTexto::backup('carta-servicos', 'fazer'));
+        $this->assertFalse(GerarTexto::backup('carta-servicos', 'ver'));
+    }
+
+    /** @test */
+    public function backup_acao_usar()
+    {
+        Storage::fake('gerar_textos');
+
+        $this->backup_acao_fazer();
+
+        $this->assertTrue(GerarTexto::find(3) !== null);
+
+        GerarTexto::find(3)->delete();
+
+        $this->assertTrue(GerarTexto::find(3) === null);
+        $this->assertTrue(GerarTexto::backup('carta-servicos', 'usar'));
+        $this->assertTrue(GerarTexto::find(3) !== null);
+
+        $this->assertTrue(GerarTexto::find(6) !== null);
+
+        GerarTexto::find(6)->delete();
+
+        $this->assertTrue(GerarTexto::find(6) === null);
+        $this->assertTrue(GerarTexto::backup('prestacao-contas', 'usar'));
+        $this->assertTrue(GerarTexto::find(6) !== null);
+
+        // Sem dados
+        Storage::disk('gerar_textos')->put('bkp_gt_carta-servicos.json', '[]');
+        $this->assertTrue(GerarTexto::backup('carta-servicos', 'usar'));
+
+        Storage::disk('gerar_textos')->put('bkp_gt_prestacao-contas.json', '[]');
+        $this->assertTrue(GerarTexto::backup('prestacao-contas', 'usar'));
+
+        // Sem arquivos
+        Storage::disk('gerar_textos')->delete('bkp_gt_carta-servicos.json');
+        $this->assertFalse(GerarTexto::backup('carta-servicos', 'usar'));
+
+        Storage::disk('gerar_textos')->delete('bkp_gt_prestacao-contas.json');
+        $this->assertFalse(GerarTexto::backup('prestacao-contas', 'usar'));
     }
 
     /** @test */
@@ -700,5 +805,79 @@ class GerarTextoTest extends TestCase
 
         $final = $service->buscar('carta-servicos', 'te', $user);
         $this->assertEquals(0, $final['busca']->count());
+    }
+
+    /** @test */
+    public function backup_service_sem_dados()
+    {
+        Storage::fake('gerar_textos');
+
+        $user = $this->signInAsAdmin();
+        $service = new GerarTextoService;
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {
+            $this->assertEquals([
+                'message' => '<i class="icon fa fa-ban"></i>Ação do backup não existe!',
+                'class' => 'alert-danger'
+            ], $service->backup($tipo, 'teste'));
+    
+            $this->assertEquals([
+                'message' => '<i class="icon fa fa-ban"></i>Backup não foi visualizado! Tente novamente.',
+                'class' => 'alert-danger'
+            ], $service->backup($tipo, 'ver'));
+    
+            $this->assertEquals([
+                'message' => '<i class="icon fa fa-ban"></i>Backup não foi usado! Tente novamente.',
+                'class' => 'alert-danger'
+            ], $service->backup($tipo, 'usar'));
+    
+            $this->assertEquals([
+                'message' => '<i class="icon fa fa-ban"></i>Backup não foi feito! Tente novamente.',
+                'class' => 'alert-danger'
+            ], $service->backup($tipo, 'fazer'));
+        }
+    }
+
+    /** @test */
+    public function backup_service_com_dados()
+    {
+        Storage::fake('gerar_textos');
+
+        $user = $this->signInAsAdmin();
+        $service = new GerarTextoService;
+
+        $texto = factory('App\GerarTexto', 5)->create();
+        $texto = factory('App\GerarTexto', 5)->states('prestacao-contas')->create([
+            'conteudo' => str_replace('http:', 'https:', $this->faker()->url)
+        ]);
+
+        foreach(array_keys(GerarTexto::tiposDoc()) as $tipo)
+        {
+            $this->assertEquals([
+                'message' => '<i class="icon fa fa-check"></i>Backup feito com sucesso!',
+                'class' => 'alert-success'
+            ], $service->backup($tipo, 'fazer'));
+    
+            $this->assertEquals([
+                'message' => '<i class="icon fa fa-check"></i>Backup usado com sucesso!',
+                'class' => 'alert-success'
+            ], $service->backup($tipo, 'usar'));
+
+            $texto = $service->backup($tipo, 'ver');
+            $this->assertStringContainsString(str_replace('/', '\/', GerarTexto::where('tipo_doc', $tipo)->first()->conteudo), $texto);
+            $this->assertStringContainsString(GerarTexto::where('tipo_doc', $tipo)->first()->texto_tipo, $texto);
+            $this->assertStringContainsString(GerarTexto::where('tipo_doc', $tipo)->first()->id, $texto);
+        }
+    }
+
+    /** @test */
+    public function nome_documento()
+    {
+        $service = new GerarTextoService;
+
+        $this->assertEquals('', $service->nomeDocumento('teste'));
+        $this->assertEquals('Carta de serviços ao usuário', $service->nomeDocumento('carta-servicos'));
+        $this->assertEquals('Prestação de Contas', $service->nomeDocumento('prestacao-contas'));
     }
 }
