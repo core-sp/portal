@@ -83,6 +83,11 @@ class PerfilTest extends TestCase
         ->assertSeeText('Senha alterada com sucesso!');
 
         $this->assertNotEquals($user->fresh()->password, $senha);
+
+        $this->assertDatabaseHas('users', [
+            'idusuario' => $user->idusuario,
+            'password_default' => false,
+        ]);
     }
 
     /** @test */
@@ -107,6 +112,11 @@ class PerfilTest extends TestCase
         ->assertSeeText('Senha do usuário '.$user->nome.' alterada com sucesso!');
 
         $this->assertNotEquals($user->fresh()->password, $senha);
+
+        $this->assertDatabaseHas('users', [
+            'idusuario' => $user->idusuario,
+            'password_default' => true,
+        ]);
     }
 
     // Mínimo 6 caracteres, com 1 letra maiúscula, 1 minúscula e 1 número.
@@ -173,5 +183,69 @@ class PerfilTest extends TestCase
         $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
         $texto .= $admin->nome.' (usuário '.$admin->idusuario.') alterou senha no admin do usuário *perfil* (id: ' . $user->idusuario . ')';
         $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test */
+    public function user_cannot_change_password_with_password_default_true_and_password_default_text()
+    {
+        $user = $this->signIn(
+                factory('App\User')->create([
+                'password_default' => true,
+            ])
+        );
+
+        $senhas = ['testeTeste102030', 'testeTeste102030teste', 'Teste1020304', 'Teste187654', 'Theste102030'];
+
+        foreach($senhas as $senha)
+            $this->put('/admin/perfil/senha', [
+                'current-password' => 'Teste102030',
+                'password' => $senha,
+                'password_confirmation' => $senha, 
+            ])
+            ->assertSessionHas('message', '<i class="icon fa fa-ban"></i>A senha atual digitada está incorreta ou a senha nova é igual a atual ou a senha nova ainda contém a senha padrão!');
+    }
+
+    /** @test */
+    public function user_cannot_access_services_with_password_default_true()
+    {
+        $user = $this->signIn(
+            factory('App\User')->create([
+                'password_default' => true,
+            ])
+        );
+
+        $this->get(route('regionais.index'))->assertRedirect(route('admin.info'));
+        $this->get(route('noticias.index'))->assertRedirect(route('admin.info'));
+        $this->get(route('licitacoes.index'))->assertRedirect(route('admin.info'));
+        $this->get(route('cursos.index'))->assertRedirect(route('admin.info'));
+        $this->get(route('fiscalizacao.index'))->assertRedirect(route('admin.info'));
+        $this->get(route('bdooportunidades.lista'))->assertRedirect(route('admin.info'));
+    }
+
+    /** @test */
+    public function user_can_access_services_with_password_default_false()
+    {
+        $user = $this->signIn(factory('App\User')->create());
+
+        $this->get(route('regionais.index'))->assertOk();
+        $this->get(route('noticias.index'))->assertOk();
+        $this->get(route('licitacoes.index'))->assertOk();
+        $this->get(route('cursos.index'))->assertOk();
+        $this->get(route('fiscalizacao.index'))->assertOk();
+        $this->get(route('bdooportunidades.lista'))->assertOk();
+    }
+
+    /** @test */
+    public function user_can_access_home_and_profile_with_password_default_true()
+    {
+        $user = $this->signIn(
+                factory('App\User')->create([
+                'password_default' => true,
+            ])
+        );
+
+        $this->get('/admin')->assertOk();
+        $this->get(route('admin.info'))->assertOk();
+        $this->get('/admin/perfil/senha')->assertOk();
     }
 }

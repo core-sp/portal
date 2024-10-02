@@ -63,6 +63,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'block_ip' => \App\Http\Middleware\BlockIP::class,
+        'password-default' => \App\Http\Middleware\PasswordDefault::class,
     ];
 
     /**

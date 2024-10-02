@@ -14,6 +14,7 @@ $factory->define(User::class, function (Faker $faker) {
         'idregional' => factory('App\Regional'),
         'idperfil' => factory('App\Perfil'),
         'password' => bcrypt('Teste102030'),
+        'password_default' => false,
         'remember_token' => Str::random(10),
         'created_at' => now(),
         'updated_at' => now()

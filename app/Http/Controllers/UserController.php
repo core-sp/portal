@@ -297,10 +297,19 @@ class UserController extends Controller
         $erros = $request->validate($regras, $mensagens);
 
         $current_password = Auth::User()->password;
-        if (isset($user) || (!isset($user) && Hash::check($request->input('current-password'), $current_password))) {
+        $senha_diferente = Hash::check($request->input('current-password'), $current_password) && !Hash::check($request->input('password'), $current_password);
+        $sem_default = true;
+
+        if(!isset($user) && Auth::User()->password_default){
+            $chunk = str_split($request->input('current-password'), intdiv(strlen($request->input('current-password')), 2) + 1);
+            $sem_default = (strpos($request->input('password'), $request->input('current-password')) === false) && (strpos($request->input('password'), $chunk[0]) === false) && (strpos($request->input('password'), $chunk[1]) === false);
+        }
+        
+        if (isset($user) || (!isset($user) && $senha_diferente && $sem_default)) {
             $user_id = isset($user) ? $user->idusuario : Auth::id();
             $obj_user = User::findOrFail($user_id);
             $obj_user->password = Hash::make($request->input('password'));
+            $obj_user->password_default = isset($user);
             $save = $obj_user->save();
             $txt = isset($user) ? 'do usuário '.$obj_user->nome.' alterada com sucesso!' : 'alterada com sucesso!';
             if(!$save)
@@ -311,7 +320,7 @@ class UserController extends Controller
                 ->with('class', 'alert-success');
         } else {
             return redirect()->route('admin.info')
-                ->with('message', '<i class="icon fa fa-ban"></i>A senha atual digitada está incorreta!')
+                ->with('message', '<i class="icon fa fa-ban"></i>A senha atual digitada está incorreta ou a senha nova é igual a atual ou a senha nova ainda contém a senha padrão!')
                 ->with('class', 'alert-danger');
         }
     }

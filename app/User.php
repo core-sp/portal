@@ -19,7 +19,7 @@ class User extends Authenticatable
     protected $guarded = [];
 
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token', 'password_default'
     ];
 
     protected $casts = [
