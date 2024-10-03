@@ -191,6 +191,24 @@ class Representante extends Authenticable
         return $contatos;
     }
 
+    public function estaHomologado(GerentiRepositoryInterface $gerenti, $servicoSolicitado = null)
+    {
+        $texto_erro = ' só é disponibilizada após a aprovação/homologação do Pedido de Registro junto a Diretoria. Aguarde a disponibilização, em média 20 dias após a finalização do pedido de registro inicial.';
+        $servicoSolicitado_array = [
+            'certidao' => 'A Certidão de Registro Profissional', 
+            'cedula' => 'A Cédula Profissional'
+        ];
+
+        $resultado = $gerenti->gerentiDadosGerais($this->tipoPessoa(), $this->ass_id);
+
+        $resposta = isset($resultado["Data de homologação"]) && ($resultado["Data de homologação"] != '----------');
+
+        if(isset($servicoSolicitado_array[$servicoSolicitado]) && !$resposta)
+            return $servicoSolicitado_array[$servicoSolicitado] . $texto_erro;
+
+        return $resposta;
+    }
+
     public function getPagamento($cobranca_id, $pagamento_id)
     {
         return $this->pagamentos()->where('cobranca_id', $cobranca_id)

@@ -2,6 +2,12 @@
 
 @section('content-representante')
 
+@if(Session::has('message'))
+<div class="d-block w-100">
+    <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
+</div>
+@endif
+
 <div class="representante-content">
     
     @if(Session::has('message-cartao'))
