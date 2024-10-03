@@ -804,4 +804,35 @@ class RepresentanteTest extends TestCase
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         $this->get(route('representante.bdo'))->assertDontSee('Alimentício');
     }
+
+    /** @test 
+     * Apagar dado do campo Data de Homologação nos dados gerais de PF no GerentiRepositoryMock
+    */
+    public function cannot_access_tab_certidao_without_approval_date()
+    {
+        $regional = factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO'
+        ]);
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO - Alameda Santos'
+        ]);
+        $representante = factory('App\Representante')->create();
+
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->post(route('representante.emitirCertidao'))
+        ->assertSessionHas('message', 'A Certidão de Registro Profissional só é disponibilizada após a aprovação/homologação do Pedido de Registro junto a Diretoria. Aguarde a disponibilização, em média 20 dias após a finalização do pedido de registro inicial.')
+        ->assertSessionHas('class', 'alert-danger')
+        ->assertRedirect(route('representante.dashboard'));
+
+        $this->get(route('representante.emitirCertidaoView'))
+        ->assertSessionHas('message', 'A Certidão de Registro Profissional só é disponibilizada após a aprovação/homologação do Pedido de Registro junto a Diretoria. Aguarde a disponibilização, em média 20 dias após a finalização do pedido de registro inicial.')
+        ->assertSessionHas('class', 'alert-danger')
+        ->assertRedirect(route('representante.dashboard'));
+
+        $this->get(route('representante.baixarCertidao'))
+        ->assertSessionHas('message', 'A Certidão de Registro Profissional só é disponibilizada após a aprovação/homologação do Pedido de Registro junto a Diretoria. Aguarde a disponibilização, em média 20 dias após a finalização do pedido de registro inicial.')
+        ->assertSessionHas('class', 'alert-danger')
+        ->assertRedirect(route('representante.dashboard'));
+    }
 }
