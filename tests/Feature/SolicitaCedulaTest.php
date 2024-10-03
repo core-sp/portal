@@ -647,7 +647,8 @@ class SolicitaCedulaTest extends TestCase
             'regional' => 'SÃO PAULO'
         ]);
         $representante = factory('App\Representante')->create([
-            'cpf_cnpj' => '11748345000144'
+            'cpf_cnpj' => '11748345000144',
+            'ass_id' => '000002'
         ]);
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         $this->get(route('representante.solicitarCedulaView'))->assertOk();
@@ -690,7 +691,8 @@ class SolicitaCedulaTest extends TestCase
             'regional' => 'SÃO PAULO'
         ]);
         $representante = factory('App\Representante')->create([
-            'cpf_cnpj' => '11748345000144'
+            'cpf_cnpj' => '11748345000144',
+            'ass_id' => '000002'
         ]);
         $cedula = factory('App\SolicitaCedula')->raw([
             'idrepresentante' => $representante->id,
@@ -716,7 +718,8 @@ class SolicitaCedulaTest extends TestCase
             'regional' => 'SÃO PAULO'
         ]);
         $representante = factory('App\Representante')->create([
-            'cpf_cnpj' => '11748345000144'
+            'cpf_cnpj' => '11748345000144',
+            'ass_id' => '000002'
         ]);
         $cedula = factory('App\SolicitaCedula')->raw([
             'idrepresentante' => $representante->id,
@@ -741,7 +744,8 @@ class SolicitaCedulaTest extends TestCase
             'regional' => 'SÃO PAULO'
         ]);
         $representante = factory('App\Representante')->create([
-            'cpf_cnpj' => '11748345000144'
+            'cpf_cnpj' => '11748345000144',
+            'ass_id' => '000002'
         ]);
         $cedula = factory('App\SolicitaCedula')->raw([
             'idrepresentante' => $representante->id,
@@ -766,7 +770,8 @@ class SolicitaCedulaTest extends TestCase
             'regional' => 'SÃO PAULO'
         ]);
         $representante = factory('App\Representante')->create([
-            'cpf_cnpj' => '11748345000144'
+            'cpf_cnpj' => '11748345000144',
+            'ass_id' => '000002'
         ]);
         $cedula = factory('App\SolicitaCedula')->raw([
             'idrepresentante' => $representante->id,
@@ -1078,7 +1083,8 @@ class SolicitaCedulaTest extends TestCase
             'regional' => 'SÃO PAULO'
         ]);
         $representante = factory('App\Representante')->create([
-            'cpf_cnpj' => '30735253000174'
+            'cpf_cnpj' => '30735253000174',
+            'ass_id' => '000002'
         ]);
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         $this->get(route('representante.solicitarCedulaView'))->assertOk();
@@ -1253,7 +1259,8 @@ class SolicitaCedulaTest extends TestCase
             'regional' => 'SÃO PAULO - Alameda Santos'
         ]);
         $representante = factory('App\Representante')->create([
-            'cpf_cnpj' => '30735253000174'
+            'cpf_cnpj' => '30735253000174',
+            'ass_id' => '000002'
         ]);
 
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
@@ -1261,5 +1268,81 @@ class SolicitaCedulaTest extends TestCase
         ->assertSee('<option value="Impressa" selected>Impressa</option>')
         ->assertDontSee('<option value="Impressa e Digital">Impressa e Digital</option>')
         ->assertDontSee('<option value="Digital">Digital</option>');
+    }
+
+    /** @test 
+     * Apagar dado do campo Data de Homologação nos dados gerais de PF no GerentiRepositoryMock
+    */
+    public function cannot_new_insert_pf_without_approval_date()
+    {
+        $regional = factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO'
+        ]);
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO - Alameda Santos'
+        ]);
+        $representante = factory('App\Representante')->create();
+
+        $cedula = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id,
+        ]);
+
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        unset($cedula['status']);
+        $this->post(route('representante.inserirSolicitarCedula'), $cedula)
+        ->assertSessionHas('message', 'A Cédula Profissional só é disponibilizada após a aprovação/homologação do Pedido de Registro junto a Diretoria. Aguarde a disponibilização, em média 20 dias após a finalização do pedido de registro inicial.')
+        ->assertSessionHas('class', 'alert-danger')
+        ->assertRedirect(route('representante.dashboard'));
+
+        $this->get(route('representante.inserirSolicitarCedulaView'))
+        ->assertSessionHas('message', 'A Cédula Profissional só é disponibilizada após a aprovação/homologação do Pedido de Registro junto a Diretoria. Aguarde a disponibilização, em média 20 dias após a finalização do pedido de registro inicial.')
+        ->assertSessionHas('class', 'alert-danger')
+        ->assertRedirect(route('representante.dashboard'));
+
+        $this->get(route('representante.solicitarCedulaView'))
+        ->assertSessionHas('message', 'A Cédula Profissional só é disponibilizada após a aprovação/homologação do Pedido de Registro junto a Diretoria. Aguarde a disponibilização, em média 20 dias após a finalização do pedido de registro inicial.')
+        ->assertSessionHas('class', 'alert-danger')
+        ->assertRedirect(route('representante.dashboard'));
+    }
+
+    /** @test 
+     * Apagar dado do campo Data de Homologação nos dados gerais de PJ no GerentiRepositoryMock
+    */
+    public function cannot_new_insert_pj_without_approval_date()
+    {
+        $regional = factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO'
+        ]);
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO - Alameda Santos'
+        ]);
+        $representante = factory('App\Representante')->create([
+            'cpf_cnpj' => '30735253000174',
+            'ass_id' => '000002'
+        ]);
+
+        $cedula = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id,
+            'tipo' => null
+        ]);
+
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        unset($cedula['status']);
+        $this->post(route('representante.inserirSolicitarCedula'), $cedula)
+        ->assertSessionHas('message', 'A Cédula Profissional só é disponibilizada após a aprovação/homologação do Pedido de Registro junto a Diretoria. Aguarde a disponibilização, em média 20 dias após a finalização do pedido de registro inicial.')
+        ->assertSessionHas('class', 'alert-danger')
+        ->assertRedirect(route('representante.dashboard'));
+
+        $this->get(route('representante.inserirSolicitarCedulaView'))
+        ->assertSessionHas('message', 'A Cédula Profissional só é disponibilizada após a aprovação/homologação do Pedido de Registro junto a Diretoria. Aguarde a disponibilização, em média 20 dias após a finalização do pedido de registro inicial.')
+        ->assertSessionHas('class', 'alert-danger')
+        ->assertRedirect(route('representante.dashboard'));
+
+        $this->get(route('representante.solicitarCedulaView'))
+        ->assertSessionHas('message', 'A Cédula Profissional só é disponibilizada após a aprovação/homologação do Pedido de Registro junto a Diretoria. Aguarde a disponibilização, em média 20 dias após a finalização do pedido de registro inicial.')
+        ->assertSessionHas('class', 'alert-danger')
+        ->assertRedirect(route('representante.dashboard'));
     }
 }
