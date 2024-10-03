@@ -376,6 +376,13 @@ class RepresentanteSiteController extends Controller
      */
     public function emitirCertidaoView() 
     {
+        $retorno = Auth::guard('representante')->user()->estaHomologado($this->gerentiRepository, 'certidao');
+        if(gettype($retorno) == "string")
+            return redirect()->route('representante.dashboard')->with([
+                'message' => $retorno,
+                'class' => 'alert-danger'
+            ]);
+
         try {
             $responseGetCertidao = $this->gerentiApiRepository->gerentiGetCertidao(Auth::guard('representante')->user()->ass_id);
         }
@@ -409,6 +416,13 @@ class RepresentanteSiteController extends Controller
      */
     public function emitirCertidao() 
     {
+        $retorno = Auth::guard('representante')->user()->estaHomologado($this->gerentiRepository, 'certidao');
+        if(gettype($retorno) == "string")
+            return redirect()->route('representante.dashboard')->with([
+                'message' => $retorno,
+                'class' => 'alert-danger'
+            ]);
+
         try {
             $responseGerentiJson = $this->gerentiApiRepository->gerentiGenerateCertidao(Auth::guard('representante')->user()->ass_id);
         }
@@ -460,6 +474,13 @@ class RepresentanteSiteController extends Controller
      */
     public function baixarCertidao(Request $request) 
     {
+        $retorno = Auth::guard('representante')->user()->estaHomologado($this->gerentiRepository, 'certidao');
+        if(gettype($retorno) == "string")
+            return redirect()->route('representante.dashboard')->with([
+                'message' => $retorno,
+                'class' => 'alert-danger'
+            ]);
+
         $responseGerentiJson = $this->gerentiApiRepository->gerentiGetCertidao(Auth::guard('representante')->user()->ass_id);
 
         $certidoes = $responseGerentiJson['data'];
@@ -525,6 +546,13 @@ class RepresentanteSiteController extends Controller
 
     public function cedulasView()
     {
+        $retorno = Auth::guard('representante')->user()->estaHomologado($this->gerentiRepository, 'cedula');
+        if(gettype($retorno) == "string")
+            return redirect()->route('representante.dashboard')->with([
+                'message' => $retorno,
+                'class' => 'alert-danger'
+            ]);
+
         try{
             $user = auth()->guard('representante')->user();
             $dados = $this->service->getService('Cedula')->getByRepresentante($user);
@@ -540,6 +568,13 @@ class RepresentanteSiteController extends Controller
 
     public function inserirsolicitarCedulaView()
     {
+        $retorno = Auth::guard('representante')->user()->estaHomologado($this->gerentiRepository, 'cedula');
+        if(gettype($retorno) == "string")
+            return redirect()->route('representante.dashboard')->with([
+                'message' => $retorno,
+                'class' => 'alert-danger'
+            ]);
+
         try{
             $representante = auth()->guard('representante')->user();
             $dados = $this->service->getService('Cedula')->getByRepresentante($representante, $this->gerentiRepository);
@@ -559,6 +594,13 @@ class RepresentanteSiteController extends Controller
 
     public function inserirsolicitarCedula(SolicitaCedulaRequest $request)
     {
+        $retorno = Auth::guard('representante')->user()->estaHomologado($this->gerentiRepository, 'cedula');
+        if(gettype($retorno) == "string")
+            return redirect()->route('representante.dashboard')->with([
+                'message' => $retorno,
+                'class' => 'alert-danger'
+            ]);
+
         try{
             $validate = $request->validated();
             $representante = auth()->guard('representante')->user();
