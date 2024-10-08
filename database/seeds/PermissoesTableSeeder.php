@@ -12,304 +12,310 @@ class PermissoesTableSeeder extends Seeder
      */
     public function run()
     {
-        Permissao::insert([
+        $array = [
             [
                 'controller' => 'UserController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Usuário'
             ], [
                 'controller' => 'RegionalController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Regional'
             ],[
                 'controller' => 'PaginaController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Página'
             ], [
                 'controller' => 'PaginaController',
                 'metodo' => 'create',
-                'perfis' => '1,'
+                'nome' => 'Página'
             ], [
                 'controller' => 'PaginaController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Página'
             ], [
                 'controller' => 'PaginaController',
                 'metodo' => 'destroy',
-                'perfis' => '1,'
+                'nome' => 'Página'
             ], [
                 'controller' => 'NoticiaController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Notícia'
             ], [
                 'controller' => 'NoticiaController',
                 'metodo' => 'create',
-                'perfis' => '1,'
+                'nome' => 'Notícia'
             ], [
                 'controller' => 'NoticiaController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Notícia'
             ], [
                 'controller' => 'NoticiaController',
                 'metodo' => 'destroy',
-                'perfis' => '1,'
+                'nome' => 'Notícia'
             ], [
                 'controller' => 'CursoController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Curso'
             ], [
                 'controller' => 'CursoController',
                 'metodo' => 'create',
-                'perfis' => '1,'
+                'nome' => 'Curso'
             ], [
                 'controller' => 'CursoController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Curso'
             ], [
                 'controller' => 'CursoController',
                 'metodo' => 'destroy',
-                'perfis' => '1,'
+                'nome' => 'Curso'
             ], [
                 'controller' => 'CursoInscritoController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Curso (Inscrito)'
             ], [
                 'controller' => 'CursoInscritoController',
                 'metodo' => 'create',
-                'perfis' => '1,'
+                'nome' => 'Curso (Inscrito)'
             ], [
                 'controller' => 'CursoInscritoController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Curso (Inscrito)'
             ], [
                 'controller' => 'CursoInscritoController',
                 'metodo' => 'destroy',
-                'perfis' => '1,'
+                'nome' => 'Curso (Inscrito)'
             ], [
                 'controller' => 'BdoEmpresaController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'B. de Oportunidades (Empresas)'
             ], [
                 'controller' => 'BdoEmpresaController',
                 'metodo' => 'create',
-                'perfis' => '1,'
+                'nome' => 'B. de Oportunidades (Empresas)'
             ], [
                 'controller' => 'BdoEmpresaController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'B. de Oportunidades (Empresas)'
             ], [
                 'controller' => 'BdoEmpresaController',
                 'metodo' => 'destroy',
-                'perfis' => '1,'
+                'nome' => 'B. de Oportunidades (Empresas)'
             ], [
                 'controller' => 'BdoOportunidadeController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'B. de Oportunidades (Oportunidades)'
             ], [
                 'controller' => 'BdoOportunidadeController',
                 'metodo' => 'create',
-                'perfis' => '1,'
+                'nome' => 'B. de Oportunidades (Oportunidades)'
             ], [
                 'controller' => 'BdoOportunidadeController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'B. de Oportunidades (Oportunidades)'
             ], [
                 'controller' => 'BdoOportunidadeController',
                 'metodo' => 'destroy',
-                'perfis' => '1,'
+                'nome' => 'B. de Oportunidades (Oportunidades)'
             ], [
                 'controller' => 'AgendamentoController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Agendamento / Sala de Reunião - Agendados'
             ], [
                 'controller' => 'AgendamentoController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Agendamento / Sala de Reunião - Agendados'
             ], [
                 'controller' => 'AgendamentoBloqueioController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Agendamentos Bloqueio / Sala de Reunião Bloqueio'
             ], [
                 'controller' => 'AgendamentoBloqueioController',
                 'metodo' => 'create',
-                'perfis' => '1,'
+                'nome' => 'Agendamentos Bloqueio / Sala de Reunião Bloqueio'
             ], [
                 'controller' => 'AgendamentoBloqueioController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Agendamentos Bloqueio / Sala de Reunião Bloqueio'
             ], [
                 'controller' => 'AgendamentoBloqueioController',
                 'metodo' => 'destroy',
-                'perfis' => '1,'
+                'nome' => 'Agendamentos Bloqueio / Sala de Reunião Bloqueio'
             ], [
                 'controller' => 'LicitacaoController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Licitação'
             ], [
                 'controller' => 'LicitacaoController',
                 'metodo' => 'create',
-                'perfis' => '1,'
+                'nome' => 'Licitação'
             ], [
                 'controller' => 'LicitacaoController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Licitação'
             ], [
                 'controller' => 'LicitacaoController',
                 'metodo' => 'destroy',
-                'perfis' => '1,'
+                'nome' => 'Licitação'
             ], [
                 'controller' => 'ConcursoController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Concurso'
             ], [
                 'controller' => 'ConcursoController',
                 'metodo' => 'create',
-                'perfis' => '1,'
+                'nome' => 'Concurso'
             ], [
                 'controller' => 'ConcursoController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Concurso'
             ], [
                 'controller' => 'ConcursoController',
                 'metodo' => 'destroy',
-                'perfis' => '1,'
+                'nome' => 'Concurso'
             ], [
                 'controller' => 'NewsletterController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Newsletter'
             ], [
                 'controller' => 'HomeImagemController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Imagem (Home)'
             ], [
                 'controller' => 'PostsController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Post'
             ], [
                 'controller' => 'PostsController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Post'
             ], [
                 'controller' => 'RepresentanteEnderecoController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Representante - Endereço'
             ], [
                 'controller' => 'RepresentanteEnderecoController',
                 'metodo' => 'show',
-                'perfis' => '1,'
+                'nome' => 'Representante - Endereço'
             ], [
                 'controller' => 'RepresentanteController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Representante - Cadastrados'
             ], [
                 'controller' => 'PostsController',
                 'metodo' => 'create',
-                'perfis' => '1,'
+                'nome' => 'Post'
             ], [
                 'controller' => 'PostsController',
                 'metodo' => 'destroy',
-                'perfis' => '1,'
+                'nome' => 'Post'
             ], [
                 'controller' => 'FiscalizacaoController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Fiscalização'
             ], [
                 'controller' => 'FiscalizacaoController',
                 'metodo' => 'create',
-                'perfis' => '1,'
+                'nome' => 'Fiscalização'
             ], [
                 'controller' => 'FiscalizacaoController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Fiscalização'
             ], [
                 'controller' => 'CompromissoController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Compromisso'
             ], [
                 'controller' => 'CompromissoController',
                 'metodo' => 'create',
-                'perfis' => '1,'
+                'nome' => 'Compromisso'
             ], [
                 'controller' => 'CompromissoController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Compromisso'
             ], [
                 'controller' => 'CompromissoController',
                 'metodo' => 'destroy',
-                'perfis' => '1,'
+                'nome' => 'Compromisso'
             ], [
                 'controller' => 'AvisoController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Aviso'
             ], [
                 'controller' => 'AvisoController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Aviso'
             ], [
                 'controller' => 'SolicitaCedulaController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Representante - Cédula'
             ], [
                 'controller' => 'SolicitaCedulaController',
                 'metodo' => 'show',
-                'perfis' => '1,'
+                'nome' => 'Representante - Cédula'
             ], [
                 'controller' => 'PlantaoJuridicoController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Plantão Jurídico'
             ], [
                 'controller' => 'PlantaoJuridicoController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Plantão Jurídico'
             ], [
                 'controller' => 'PlantaoJuridicoBloqueioController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Plantão Jurídico Bloqueio'
             ], [
                 'controller' => 'PlantaoJuridicoBloqueioController',
                 'metodo' => 'create',
-                'perfis' => '1,'
+                'nome' => 'Plantão Jurídico Bloqueio'
             ], [
                 'controller' => 'PlantaoJuridicoBloqueioController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Plantão Jurídico Bloqueio'
             ], [
                 'controller' => 'PlantaoJuridicoBloqueioController',
                 'metodo' => 'destroy',
-                'perfis' => '1,'
+                'nome' => 'Plantão Jurídico Bloqueio'
             ], [
                 'controller' => 'SalaReuniaoController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Sala Reunião'
             ], [
                 'controller' => 'SalaReuniaoController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Sala Reunião'
             ], [
                 'controller' => 'SuspensaoExcecaoController',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Sala Reunião - Suspensos / Exceções'
             ], [
                 'controller' => 'SuspensaoExcecaoController',
                 'metodo' => 'create',
-                'perfis' => '1,'
+                'nome' => 'Sala Reunião - Suspensos / Exceções'
             ], [
                 'controller' => 'SuspensaoExcecaoController',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Sala Reunião - Suspensos / Exceções'
             ], [
                 'controller' => 'AgendamentoController',
                 'metodo' => 'create',
-                'perfis' => '1,'
+                'nome' => 'Agendamento / Sala de Reunião - Agendados'
             ], [
                 'controller' => 'CartaServicos',
                 'metodo' => 'index',
-                'perfis' => '1,'
+                'nome' => 'Carta de Serviços'
             ], [
                 'controller' => 'CartaServicos',
                 'metodo' => 'edit',
-                'perfis' => '1,'
+                'nome' => 'Carta de Serviços'
             ],
-        ]);
+        ];
+
+        foreach($array as $campos)
+            Permissao::updateOrInsert(
+                ['controller' => $campos['controller'], 'metodo' => $campos['metodo']],
+                ['nome' => $campos['nome']]
+            );
     }
 }

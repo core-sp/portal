@@ -8,7 +8,7 @@ class Permissao extends Model
 {
     protected $primaryKey = 'idpermissao';
     protected $table = 'permissoes';
-    protected $fillable = ['controller', 'metodo', 'perfis'];
+    protected $guarded = [];
 
     public function variaveis()
     {
@@ -40,5 +40,10 @@ class Permissao extends Model
             'SuspensaoExcecaoController' => 'Sala Reunião - Suspensos / Exceções',
             'CartaServicos' => 'Carta de Serviços',
         ];
+    }
+
+    public function perfis()
+    {
+        return $this->belongsToMany('App\Perfil', 'perfil_permissao', 'permissao_id', 'perfil_id');
     }
 }

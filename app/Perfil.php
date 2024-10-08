@@ -12,7 +12,7 @@ class Perfil extends Model
 
     protected $primaryKey = 'idperfil';
     protected $table = 'perfis';
-    protected $fillable = ['nome'];
+    protected $guarded = [];
 
     public function user()
     {
@@ -66,5 +66,10 @@ class Perfil extends Model
             $this->tabelaContents($query),
             [ 'table', 'table-hover' ]
         );
+    }
+
+    public function permissoes()
+    {
+        return $this->belongsToMany('App\Permissao', 'perfil_permissao', 'perfil_id', 'permissao_id');
     }
 }
