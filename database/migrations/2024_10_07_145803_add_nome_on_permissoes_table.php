@@ -33,11 +33,14 @@ class AddNomeOnPermissoesTable extends Migration
 
             \Log::channel('interno')->info('Migrate AddNomeOnPermissoesTable: adicionado os perfis da tabela permissão na nova tabela intermediária "perfil_permissao".');
 
-            $table->string('nome', 255)->nullable()->after('metodo');
-            $table->string('perfis')->nullable()->change();
-        });
+            if (!Schema::hasColumn('permissoes', 'nome') && !Schema::hasColumn('permissoes', 'grupo_menu')) {
+                $table->string('nome', 255)->nullable()->after('metodo');
+                $table->string('grupo_menu', 255)->nullable()->after('nome');
+                $table->string('perfis')->nullable()->change();
 
-        \Log::channel('interno')->info('Migrate AddNomeOnPermissoesTable: criado campo "nome" e campo "perfis" como nullable.');
+                \Log::channel('interno')->info('Migrate AddNomeOnPermissoesTable: criado campo "nome" e "grupo_menu", e campo "perfis" como nullable.');
+            }
+        });
 
         $call = \Artisan::call('db:seed --class=PermissoesTableSeeder --force');
 
@@ -53,6 +56,7 @@ class AddNomeOnPermissoesTable extends Migration
     {
         Schema::table('permissoes', function (Blueprint $table) {
             $table->dropColumn('nome');
+            $table->dropColumn('grupo_menu');
             $table->string('perfis')->nullable(false)->change();
         });
     }

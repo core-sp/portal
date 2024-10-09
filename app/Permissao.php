@@ -10,6 +10,11 @@ class Permissao extends Model
     protected $table = 'permissoes';
     protected $guarded = [];
 
+    const G_CONTEUDO = 'CONTEÚDO';
+    const G_ATENDIMENTO = 'ATENDIMENTO';
+    const G_JURIDICO = 'JURÍDICO';
+    const G_FISCAL = 'FISCALIZAÇÃO';
+
     public function variaveis()
     {
         return [
