@@ -69,7 +69,7 @@ class TermoConsentimentoController extends Controller
     {
         try {
             $validated = $request->validated();
-            $message = $this->service->getService('TermoConsentimento')->uploadFile($validated, $tipo_servico);
+            $message = $this->service->getService('TermoConsentimento')->uploadFile($validated, $tipo_servico, auth()->user());
         } catch(\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [403]) ? abort($e->getCode(), $e->getMessage()) : 

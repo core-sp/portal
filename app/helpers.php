@@ -1,6 +1,5 @@
 <?php
 
-use App\Permissao;
 use App\Representante;
 
 function montaTabela($headers, $contents, $classes = null)
@@ -766,13 +765,6 @@ function validDate($date, $minDate, $format) {
     
 
     return ($errors['warning_count'] + $errors['error_count'] === 0) && $checkMinDate ? true : false;
-}
-
-function perfisPermitidos($nameController, $metodo)
-{
-    $idProfile = auth()->user()->idperfil;
-    $permissao = Permissao::where('controller', $nameController)->where('metodo', $metodo)->first();
-    return $permissao ? in_array($idProfile, explode(',', $permissao->perfis)) : false;
 }
 
 // Máscara para quantos dígitos forem necessários no rg
