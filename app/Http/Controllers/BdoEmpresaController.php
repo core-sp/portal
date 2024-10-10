@@ -204,7 +204,7 @@ class BdoEmpresaController extends Controller
         ];
 
         $contents = $query->map(function($row){
-            if(perfisPermitidos('BdoOportunidadeController', 'create')) {
+            if(auth()->user()->perfil->temPermissao('BdoOportunidadeController', 'create')) {
                 $acoes = '<a href="/admin/bdo/criar/'.$row->idempresa.'" class="btn btn-sm btn-secondary">Nova Oportunidade</a> ';
             }
             else {

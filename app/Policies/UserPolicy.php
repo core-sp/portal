@@ -18,27 +18,27 @@ class UserPolicy
 
     public function viewAny(User $user)
     {
-        return perfisPermitidos(class_basename(\Route::current()->controller), 'index');
+        return $user->perfil->temPermissao(class_basename(\Route::current()->controller), 'index');
     }
     
     public function create(User $user)
     {
-        return perfisPermitidos(class_basename(\Route::current()->controller), 'create');
+        return $user->perfil->temPermissao(class_basename(\Route::current()->controller), 'create');
     }
 
     public function updateOther(User $user)
     {
-        return perfisPermitidos(class_basename(\Route::current()->controller), 'edit');
+        return $user->perfil->temPermissao(class_basename(\Route::current()->controller), 'edit');
     }
 
     public function updateShow(User $user)
     {
-        return perfisPermitidos(class_basename(\Route::current()->controller), 'show');
+        return $user->perfil->temPermissao(class_basename(\Route::current()->controller), 'show');
     }
 
     public function delete(User $user)
     {
-        return perfisPermitidos(class_basename(\Route::current()->controller), 'destroy');
+        return $user->perfil->temPermissao(class_basename(\Route::current()->controller), 'destroy');
     }
 
     public function updateOwn(User $user)
@@ -66,7 +66,7 @@ class UserPolicy
         $tipo = ucfirst(Str::camel(request()->tipo_doc));
 
         if(class_basename(\Route::current()->controller) == 'GerarTextoController')
-            return perfisPermitidos($tipo, 'index');
+            return $user->perfil->temPermissao($tipo, 'index');
     }
 
     public function gerarTextoUpdate(User $user)
@@ -74,6 +74,6 @@ class UserPolicy
         $tipo = ucfirst(Str::camel(request()->tipo_doc));
 
         if(class_basename(\Route::current()->controller) == 'GerarTextoController')
-            return perfisPermitidos($tipo, 'edit');
+            return $user->perfil->temPermissao($tipo, 'edit');
     }
 }

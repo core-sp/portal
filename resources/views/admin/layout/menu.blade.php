@@ -1,13 +1,9 @@
 <!-- Sidebar Menu -->
-@php
-    $permitidos = perfisPermitidosMenu();
-    $idperfil = auth()->user()->idperfil;
-@endphp
 <nav class="mt-2 mb-2">
     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
         <!-- Usuários -->
-        @if(in_array($idperfil, $permitidos->find(1)['perfis']))
+        @if(auth()->user()->perfil->temPermissao('UserController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fa fa-users"></i>
@@ -81,24 +77,10 @@
         </li>
 
         <!-- Conteúdo -->
-
-        @php
-            $pagina = in_array($idperfil, $permitidos->find(3)['perfis']);
-            $noticia = in_array($idperfil, $permitidos->find(7)['perfis']);
-            $posts = in_array($idperfil, $permitidos->find(43)['perfis']);
-            $curso = in_array($idperfil, $permitidos->find(11)['perfis']);
-            $bdoEmpresa = in_array($idperfil, $permitidos->find(19)['perfis']);
-            $bdoOportunidade = in_array($idperfil, $permitidos->find(23)['perfis']);
-            $home = in_array($idperfil, $permitidos->find(42)['perfis']);
-            $compromisso = in_array($idperfil, $permitidos->find(53)['perfis']);
-            $aviso = in_array($idperfil, $permitidos->find(57)['perfis']);
-            $cartaServicos = in_array($idperfil, $permitidos->find(73)['perfis']);
-        @endphp
-
-        @if($pagina || $noticia || $posts || $curso || $bdoEmpresa || $bdoOportunidade || $home || $compromisso || $aviso || $cartaServicos)
+        @if(auth()->user()->perfil->podeAcessarMenuConteudo())
         <li class="nav-header">CONTEÚDO</li>
 
-        @if($pagina)
+        @if(auth()->user()->perfil->temPermissao('PaginaController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-file-alt"></i>
@@ -113,7 +95,7 @@
                     </a>
                 </li>
 
-                @if(in_array($idperfil, $permitidos->find(4)['perfis']))
+                @if(auth()->user()->perfil->temPermissao('PaginaController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('paginas.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -126,7 +108,7 @@
         </li>
         @endif
 
-        @if($noticia)
+        @if(auth()->user()->perfil->temPermissao('NoticiaController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon far fa-newspaper"></i>
@@ -140,7 +122,7 @@
                     </a>
                 </li>
 
-                @if(in_array($idperfil, $permitidos->find(8)['perfis']))
+                @if(auth()->user()->perfil->temPermissao('NoticiaController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('noticias.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -153,7 +135,7 @@
         </li>
         @endif
 
-        @if($posts)
+        @if(auth()->user()->perfil->temPermissao('PostsController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-rss"></i>
@@ -167,7 +149,7 @@
                     </a>
                 </li>
 
-                @if(in_array($idperfil, $permitidos->find(48)['perfis']))
+                @if(auth()->user()->perfil->temPermissao('PostsController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('posts.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -179,7 +161,7 @@
             </ul>
         @endif
 
-        @if($curso)
+        @if(auth()->user()->perfil->temPermissao('CursoController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-graduation-cap"></i>
@@ -193,7 +175,7 @@
                     </a>
                 </li>
 
-                @if(in_array($idperfil, $permitidos->find(12)['perfis']))
+                @if(auth()->user()->perfil->temPermissao('CursoController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('cursos.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -206,14 +188,14 @@
         </li>
         @endif
 
-        @if($bdoEmpresa || $bdoOportunidade)
+        @if(auth()->user()->perfil->podeAcessarSubMenuBalcao())
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-briefcase"></i>
                 <p>B. de Oportunidades<i class="right fa fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
-                @if($bdoEmpresa)
+            @if(auth()->user()->perfil->temPermissao('BdoEmpresaController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('bdoempresas.lista') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -222,7 +204,7 @@
                 </li>
                 @endif
 
-                @if($bdoOportunidade)
+                @if(auth()->user()->perfil->temPermissao('BdoOportunidadeController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('bdooportunidades.lista') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -235,7 +217,7 @@
         </li>
         @endif
 
-        @if($compromisso)
+        @if(auth()->user()->perfil->temPermissao('CompromissoController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-calendar-alt"></i>
@@ -249,7 +231,7 @@
                     </a>
                 </li>
 
-                @if(in_array($idperfil, $permitidos->find(54)['perfis']))
+                @if(auth()->user()->perfil->temPermissao('CompromissoController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('compromisso.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -262,7 +244,7 @@
         </li>
         @endif
 
-        @if($home)
+        @if(auth()->user()->perfil->temPermissao('HomeImagemController', 'edit'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon far fa-image"></i>
@@ -287,11 +269,7 @@
         </li>
         @endif
 
-        @if($aviso)
-        @php
-            $service = resolve('App\Contracts\MediadorServiceInterface');
-            $ativado = $service->getService('Aviso')->existeAtivado() ? '<span class="badge badge-pill badge-warning">Ativo</span>' : '';
-        @endphp
+        @if(auth()->user()->perfil->temPermissao('AvisoController', 'index'))
         <li class="nav-item">
             <a href="{{ route('avisos.index') }}" class="nav-link">
                 <i class="nav-icon fas fa-info-circle"></i>
@@ -300,7 +278,7 @@
         </li>
         @endif
 
-        @if($cartaServicos)
+        @if(auth()->user()->perfil->temPermissao('CartaServicos', 'index'))
         <li class="nav-item">
             <a href="{{ route('textos.view', 'carta-servicos') }}" class="nav-link">
                 <i class="nav-icon fas fa-envelope"></i>
@@ -311,27 +289,17 @@
         @endif
          
         <!-- Atendimento -->
-        @php
-            $agendamento = in_array($idperfil, $permitidos->find(27)['perfis']);
-            $agendamentobloqueio = in_array($idperfil, $permitidos->find(29)['perfis']);
-            $representante = in_array($idperfil, $permitidos->find(47)['perfis']);
-            $representanteEndereco = in_array($idperfil, $permitidos->find(45)['perfis']);
-            $representanteCedula = in_array($idperfil, $permitidos->find(59)['perfis']);
-            $salas = in_array($idperfil, $permitidos->find(67)['perfis']);
-            $suspensao = in_array($idperfil, $permitidos->find(69)['perfis']);
-        @endphp
-        
-        @if($agendamento || $agendamentobloqueio || $representante || $representanteEndereco || $representanteCedula || $salas || $suspensao)
+        @if(auth()->user()->perfil->podeAcessarMenuAtendimento())
         <li class="nav-header">ATENDIMENTO</li>
         
-        @if($agendamento || $agendamentobloqueio)
+        @if(auth()->user()->perfil->podeAcessarSubMenuAgendamento())
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon far fa-clock"></i>
                 <p>Agendamentos<i class="right fa fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
-                @if($agendamento)
+                @if(auth()->user()->perfil->temPermissao('AgendamentoController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('agendamentos.lista') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -340,7 +308,7 @@
                 </li>
                 @endif
 
-                @if($agendamentobloqueio)
+                @if(auth()->user()->perfil->temPermissao('AgendamentoBloqueioController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('agendamentobloqueios.lista') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -352,7 +320,7 @@
         </li>
         @endif
         
-        @if($representante || $representanteEndereco)
+        @if(auth()->user()->perfil->podeAcessarSubMenuRepresentante())
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fa fa-users"></i>
@@ -360,7 +328,7 @@
             </a>
 
             <ul class="nav nav-treeview">
-                @if($representante)
+                @if(auth()->user()->perfil->temPermissao('RepresentanteController', 'index'))
                 <li class="nav-item">
                     <a href="/admin/representantes/buscaGerenti" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -375,7 +343,7 @@
                 </li>
                 @endif
 
-                @if($representanteEndereco)
+                @if(auth()->user()->perfil->temPermissao('RepresentanteEnderecoController', 'index'))
                 <li class="nav-item">
                     <a href="/admin/representante-enderecos" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -384,7 +352,7 @@
                 </li>    
                 @endif
 
-                @if($representanteCedula)
+                @if(auth()->user()->perfil->temPermissao('SolicitaCedulaController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('solicita-cedula.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -397,7 +365,7 @@
         </li>
         @endif
 
-        @if($agendamento || $agendamentobloqueio || $salas || $suspensao)
+        @if(auth()->user()->perfil->podeAcessarSubMenuSalaReuniao())
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-building"></i>
@@ -405,7 +373,7 @@
             </a>
 
             <ul class="nav nav-treeview">
-                @if($salas)
+                @if(auth()->user()->perfil->temPermissao('SalaReuniaoController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('sala.reuniao.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -414,7 +382,7 @@
                 </li>
                 @endif
 
-                @if($agendamento)
+                @if(auth()->user()->perfil->temPermissao('AgendamentoController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('sala.reuniao.agendados.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -423,7 +391,7 @@
                 </li>
                 @endif
 
-                @if($agendamentobloqueio)
+                @if(auth()->user()->perfil->temPermissao('AgendamentoBloqueioController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('sala.reuniao.bloqueio.lista') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -432,7 +400,7 @@
                 </li>
                 @endif
 
-                @if($suspensao)
+                @if(auth()->user()->perfil->temPermissao('SuspensaoExcecaoController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('sala.reuniao.suspensao.lista') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -446,17 +414,10 @@
         @endif
 
         <!-- Jurídico -->
-        @php
-            $licitacao = in_array($idperfil, $permitidos->find(33)['perfis']);
-            $concurso = in_array($idperfil, $permitidos->find(37)['perfis']);
-            $plantao = in_array($idperfil, $permitidos->find(61)['perfis']);
-            $plantaoBloqueio = in_array($idperfil, $permitidos->find(63)['perfis']);
-        @endphp
-
-        @if($licitacao || $concurso || $plantao | $plantaoBloqueio)
+        @if(auth()->user()->perfil->podeAcessarMenuJuridico())
         <li class="nav-header">JURÍDICO</li>
 
-        @if($licitacao)
+        @if(auth()->user()->perfil->temPermissao('LicitacaoController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon far fa-file-alt"></i>
@@ -471,7 +432,7 @@
                     </a>
                 </li>
 
-                @if(in_array($idperfil, $permitidos->find(34)['perfis']))
+                @if(auth()->user()->perfil->temPermissao('LicitacaoController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('licitacoes.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -484,7 +445,7 @@
         </li>
         @endif
 
-        @if($concurso)
+        @if(auth()->user()->perfil->temPermissao('ConcursoController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon far fa-edit"></i>
@@ -499,7 +460,7 @@
                     </a>
                 </li>
 
-                @if(in_array($idperfil, $permitidos->find(38)['perfis']))
+                @if(auth()->user()->perfil->temPermissao('ConcursoController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('concursos.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -512,7 +473,7 @@
         </li>
         @endif
 
-        @if($plantao || $plantaoBloqueio)
+        @if(auth()->user()->perfil->podeAcessarSubMenuPlantao())
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-calendar-alt"></i>
@@ -520,7 +481,7 @@
             </a>
             
             <ul class="nav nav-treeview">
-                @if($plantao)
+                @if(auth()->user()->perfil->temPermissao('PlantaoJuridicoController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('plantao.juridico.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -529,7 +490,7 @@
                 </li>
                 @endif
 
-                @if($plantaoBloqueio)
+                @if(auth()->user()->perfil->temPermissao('PlantaoJuridicoBloqueioController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('plantao.juridico.bloqueios.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -544,7 +505,7 @@
         @endif
     
         <!-- Fiscalização -->
-        @if(in_array($idperfil, $permitidos->find(50)['perfis']))
+        @if(auth()->user()->perfil->podeAcessarMenuFiscal())
         <li class="nav-header">FISCALIZAÇÃO</li>
         
         <li class="nav-item has-treeview">
@@ -560,7 +521,7 @@
                     </a>
                     </li>
 
-                @if(in_array($idperfil, $permitidos->find(51)['perfis']))
+                @if(auth()->user()->perfil->temPermissao('FiscalizacaoController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('fiscalizacao.createperiodo') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>

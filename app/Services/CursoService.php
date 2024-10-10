@@ -41,7 +41,7 @@ class CursoService implements CursoServiceInterface {
         ];
         // Opções de conteúdo da tabela
         $contents = [];
-        $userInscritoView = perfisPermitidos('CursoInscritoController', 'index');
+        $userInscritoView = $user->perfil->temPermissao('CursoInscritoController', 'index');
         $userPodeEdit = $user->can('updateOther', $user);
         $userPodeDestroy = $user->can('delete', $user);
         foreach($resultados as $resultado) 

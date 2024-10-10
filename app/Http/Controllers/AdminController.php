@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Repositories\ChamadoRepository;
 use App\Repositories\NewsletterRepository;
 use App\Contracts\MediadorServiceInterface;
@@ -27,7 +24,7 @@ class AdminController extends Controller
     {
         $alertas = $this->alertas();
         $contagem = $this->contagemAtendimentos();
-        $chamados = $this->chamadoRepository->getChamadoByIdUsuario(Auth::user()->idusuario);
+        $chamados = $this->chamadoRepository->getChamadoByIdUsuario(auth()->user()->idusuario);
         $totalAgendamentos = $this->service->getService('Agendamento')->countAll();
         $totalInscritos = $this->service->getService('Curso')->inscritos()->getTotalInscritos();
         $totalNewsletter = $this->newsletterRepository->getCountAllNewsletter();
@@ -40,7 +37,7 @@ class AdminController extends Controller
         $alertas = [];
         $count = 0;
 
-        if(perfisPermitidos('AgendamentoController', 'index'))
+        if(auth()->user()->perfil->temPermissao('AgendamentoController', 'index'))
         {
             // Alerta de atendimentos sem status
             $count = $this->service->getService('Agendamento')->pendentesByPerfil();
