@@ -41,6 +41,16 @@ class User extends Authenticatable
         return $this->idperfil == 3;
     }
 
+    public function bloqueado()
+    {
+        return $this->idperfil == 24;
+    }
+
+    public function perfilGrupoAtendimento()
+    {
+        return in_array($this->idperfil, [6, 8, 10, 12, 13, 18, 21]);
+    }
+
     public function pagina()
     {
         return $this->hasMany('App\Pagina', 'idpagina');

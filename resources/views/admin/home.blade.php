@@ -14,6 +14,17 @@
       </div>
     </div>
   @endif
+
+  @if(auth()->user()->bloqueado())
+  <div class="row">
+        <div class="col">
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;Seu perfil está como <b>BLOQUEADO</b>, entre em contato com o setor de TI para atualizar.
+            </div>
+        </div>
+    </div>
+  @endif
+
   @if(!empty($alertas))
   	@include('admin.inc.alertashome')
   @endif
@@ -47,7 +58,7 @@
 			</div>
 		</div>
 		<div class="col">
-		@if(auth()->user()->idperfil == 1 || auth()->user()->idperfil == 3)
+		@if(auth()->user()->isAdmin() || auth()->user()->isEditor())
 		<a href="/admin/newsletter/download" class="inherit">
 		@endif
 		<div class="info-box">
@@ -57,16 +68,16 @@
 			<div class="info-box-content">
 				<span class="info-box-text inherit">Inscrições na Newsletter</span>
 				<span class="info-box-number inherit d-inline">{{ $totalNewsletter }}</span>
-				@if(auth()->user()->idperfil == 1 || auth()->user()->idperfil == 3)
+				@if(auth()->user()->isAdmin() || auth()->user()->isEditor())
 				&nbsp;<span class="linkDownload d-inline">(Baixar CSV)</span>
 				@endif
 			</div>
 		</div>
-		@if(auth()->user()->idperfil == 1 || auth()->user()->idperfil == 3)
+		@if(auth()->user()->isAdmin() || auth()->user()->isEditor())
 		</a>
 		@endif
 		</div>	 	
-		@if(auth()->user()->idperfil == 1 || auth()->user()->idperfil == 3)
+		@if(auth()->user()->isAdmin() || auth()->user()->isEditor())
 		<div class="col">
 			<a href="{{route('termo.consentimento.download')}}" class="inherit">
 				<div class="info-box">
@@ -117,7 +128,7 @@
 			</div>
 		</div>
 	  </div>
-	  @if(in_array(auth()->user()->idperfil, [1, 6, 8, 10, 12, 13, 18, 21]))
+	  @if(auth()->user()->isAdmin() || auth()->user()->perfilGrupoAtendimento())
 	  <div class="col">
 		<div class="card card-info">
 		  <div class="card-header">
