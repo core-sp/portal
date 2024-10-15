@@ -6,11 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\User;
-use App\Regional;
-use App\Perfil;
 use App\Http\Controllers\Helper;
 use App\Events\CrudEvent;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
+use App\Contracts\MediadorServiceInterface;
 
 class UserController extends Controller
 {
@@ -31,10 +30,12 @@ class UserController extends Controller
         'titulo' => 'Usuários Deletados',
         'cancela_idusuario' => true
     ];
+    private $service;
 
-    public function __construct()
+    public function __construct(MediadorServiceInterface $service)
     {
         $this->middleware('auth');
+        $this->service = $service;
     }
 
     public function resultados()
@@ -117,8 +118,8 @@ class UserController extends Controller
     {
         $this->authorize('onlyAdmin', auth()->user());
         $variaveis = (object) $this->variaveis;
-        $regionais = Regional::all();
-        $perfis = Perfil::all();
+        $regionais = $this->service->getService('Regional')->all();
+        $perfis = $this->service->getService('Perfil')->all();
         return view('admin.crud.criar', compact('variaveis', 'regionais', 'perfis'));
     }
 
@@ -161,8 +162,8 @@ class UserController extends Controller
     {
         $this->authorize('onlyAdmin', auth()->user());
         $resultado = User::findOrFail($id);
-        $regionais = Regional::all();
-        $perfis = Perfil::all();
+        $regionais = $this->service->getService('Regional')->all();
+        $perfis = $this->service->getService('Perfil')->all();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais', 'perfis'));
     }
