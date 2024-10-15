@@ -19,7 +19,7 @@
   <div class="row">
         <div class="col">
             <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;Seu perfil está como <b>BLOQUEADO</b>, entre em contato com o setor de TI para atualizar.
+                <i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;Seu perfil está como <b>{{ strtoupper(auth()->user()->perfil->nome) }}</b>, entre em contato com o setor de TI para atualizar.
             </div>
         </div>
     </div>

@@ -121,12 +121,14 @@ Route::middleware(['block_ip'])->group(function () {
       Route::get('/lixeira', 'UserController@lixeira');
       Route::get('/restore/{id}', 'UserController@restore');
       // Lida com a parte de Perfis
-      Route::get('/perfis', 'PerfilController@index')->name('perfis.lista');
-      Route::get('/perfis/criar', 'PerfilController@create');
-      Route::post('/perfis/criar', 'PerfilController@store');
-      Route::get('/perfis/editar/{id}', 'PerfilController@edit');
-      Route::put('/perfis/editar/{id}', 'PerfilController@update');
-      Route::delete('/perfis/apagar/{id}', 'PerfilController@destroy');
+      Route::prefix('perfis')->group(function(){
+        Route::get('/', 'PerfilController@index')->name('perfis.lista');
+        Route::get('/criar', 'PerfilController@create')->name('perfis.create');
+        Route::post('/criar', 'PerfilController@store')->name('perfis.store');
+        Route::get('/editar/{id}', 'PerfilController@edit')->name('perfis.permissoes.edit');
+        Route::put('/editar/{id}', 'PerfilController@update')->name('perfis.permissoes.put');
+        Route::delete('/apagar/{id}', 'PerfilController@destroy')->name('perfis.destroy');
+      });
     });
 
     
