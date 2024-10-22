@@ -7,6 +7,7 @@ use App\Perfil;
 use App\Permissao;
 use App\Events\CrudEvent;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 
 class PerfilService implements PerfilServiceInterface {
 
@@ -62,11 +63,15 @@ class PerfilService implements PerfilServiceInterface {
             'table-hover'
         ];
 
-        $legenda = '<p class="text-danger"><i class="fas fa-exclamation-triangle"></i><i>&nbsp;&nbsp;Somente perfil (exceto \'';
-        $temp = Perfil::select('nome')->whereIn('idperfil', [1, 24])->get();
-        $legenda .= $temp->get(0)->nome .'\' e \'' . $temp->get(1)->nome;
-        $legenda .= '\') sem usuário(s) ativo(s) pode ser excluído.</i></p>';
+        $legenda = '<p class="text-danger"><i class="fas fa-exclamation-triangle"></i><i>&nbsp;&nbsp;Somente perfil ';
 
+        $temp = Perfil::select('nome')->whereIn('idperfil', [1, 24])->get()->pluck('nome');
+        $legenda = $temp->whenNotEmpty(function ($temp) use($legenda) {
+            return $legenda .= '(exceto \'' . Arr::get($temp, 0, 'Admin') . '\' e \'' . Arr::get($temp, 1, 'Bloqueado') . '\')';
+        }, function ($legenda) {
+            return $legenda .= '';
+        }) . ' sem usuário(s) ativo(s) pode ser excluído.</i></p>';
+        
         return $legenda . montaTabela($headers, $contents, $classes);
     }
 

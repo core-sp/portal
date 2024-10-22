@@ -31,20 +31,23 @@ class AddNomeOnPermissoesTable extends Migration
                 }
             });
 
-            \Log::channel('interno')->info('Migrate AddNomeOnPermissoesTable: adicionado os perfis da tabela permissão na nova tabela intermediária "perfil_permissao".');
+            if(config('app.env') != "testing")
+                \Log::channel('interno')->info('Migrate AddNomeOnPermissoesTable: adicionado os perfis da tabela permissão na nova tabela intermediária "perfil_permissao".');
 
             if (!Schema::hasColumn('permissoes', 'nome') && !Schema::hasColumn('permissoes', 'grupo_menu')) {
                 $table->string('nome', 255)->nullable()->after('metodo');
                 $table->string('grupo_menu', 255)->nullable()->after('nome');
                 $table->string('perfis')->nullable()->change();
 
-                \Log::channel('interno')->info('Migrate AddNomeOnPermissoesTable: criado campo "nome" e "grupo_menu", e campo "perfis" como nullable.');
+                if(config('app.env') != "testing")
+                    \Log::channel('interno')->info('Migrate AddNomeOnPermissoesTable: criado campo "nome" e "grupo_menu", e campo "perfis" como nullable.');
             }
         });
 
         $call = \Artisan::call('db:seed --class=PermissoesTableSeeder --force');
 
-        \Log::channel('interno')->info('Migrate AddNomeOnPermissoesTable: campo "nome" preenchido pelo nome da permissão via seed.');
+        if(config('app.env') != "testing")
+            \Log::channel('interno')->info('Migrate AddNomeOnPermissoesTable: campo "nome" preenchido pelo nome da permissão via seed.');
     }
 
     /**

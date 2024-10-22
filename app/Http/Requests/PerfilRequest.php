@@ -28,7 +28,7 @@ class PerfilRequest extends FormRequest
             ];
 
         return [
-            'nome' => 'required|unique:perfis,nome|max:191',
+            'nome' => 'required|unique:perfis,nome|min:4|max:191',
         ];
     }
 
@@ -39,6 +39,7 @@ class PerfilRequest extends FormRequest
             'permissoes.required' => 'É obrigatório incluir ao menos uma permissão',
             'unique' => 'Este perfil já existe, seja em uso ou excluído',
             'max' => 'O campo :attribute excedeu o limite de :max caracteres',
+            'min' => 'O campo :attribute tem menos de :min caracteres obrigatórios',
             'permissoes.*.distinct' => 'Não pode incluir permissões repetidas',
             'permissoes.*.exists' => 'Não pode incluir permissão que não existe',
             'permissoes.array' => 'Formato errado de envio das permissões',
