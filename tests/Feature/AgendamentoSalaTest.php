@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Permissao;
 use Carbon\Carbon;
 use App\AgendamentoSala;
 use Illuminate\Support\Facades\Mail;
@@ -1037,7 +1036,7 @@ class AgendamentoSalaTest extends TestCase
         ]);
 
         $this->signIn($user);
-        Permissao::find(27)->update(['perfis' => '1,8']);
+        $this->relacionarPerfilPermissao($atendente, 'AgendamentoController', 'index');
 
         $this->get(route('sala.reuniao.agendados.filtro'))
         ->assertDontSeeText('Seccional')
@@ -1059,7 +1058,7 @@ class AgendamentoSalaTest extends TestCase
         ]);
 
         $this->signIn($user2);
-        Permissao::find(27)->update(['perfis' => '1,21']);
+        $this->relacionarPerfilPermissao($gerente, 'AgendamentoController', 'index');
 
         $this->get(route('sala.reuniao.agendados.filtro'))
         ->assertDontSeeText('Seccional')
@@ -1344,7 +1343,7 @@ class AgendamentoSalaTest extends TestCase
         ]);
 
         $user = $this->signIn($user);
-        Permissao::find(27)->update(['perfis' => '1,8']);
+        $this->relacionarPerfilPermissao($perfil, 'AgendamentoController', 'index');
 
         $agendamento = factory('App\AgendamentoSala')->create([
             'sala_reuniao_id' => factory('App\SalaReuniao')->create([
@@ -1384,7 +1383,7 @@ class AgendamentoSalaTest extends TestCase
         ]);
 
         $user = $this->signIn($user);
-        Permissao::find(27)->update(['perfis' => '1,21']);
+        $this->relacionarPerfilPermissao($perfil, 'AgendamentoController', 'index');
 
         $agendamento = factory('App\AgendamentoSala')->create([
             'sala_reuniao_id' => factory('App\SalaReuniao')->create([

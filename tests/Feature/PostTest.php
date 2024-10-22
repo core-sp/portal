@@ -199,7 +199,7 @@ class PostTest extends TestCase
         $faker = \Faker\Factory::create();
         $user = $this->signInAsAdmin();
 
-        $post = factory('App\Post')->create();
+        $post = factory('App\Post')->create()->makeHidden(['created_at', 'updated_at']);
 
         $antigo = $post->getAttributes();
         $attributes = $post->getAttributes();

@@ -303,4 +303,39 @@ class AdminTest extends TestCase
         $this->get('/admin')
         ->assertSeeText('Para alterar sua senha, clique em seu nome de usuário no menu da esquerda e depois selecione "Alterar Senha";');
     }
+
+    /** @test */
+    public function users_can_view_password_info()
+    {
+        $this->signInAsAdmin();
+
+        $this->get('/admin')
+        ->assertSeeText('Para alterar sua senha, clique em seu nome de usuário no menu da esquerda e depois selecione "Alterar Senha";');
+    }
+
+    /** @test */
+    public function users_with_profile_24_view_msg()
+    {
+        $user = $this->signIn(factory('App\User')->create([
+            'idperfil' => factory('App\Perfil')->states('bloqueado')->create()
+        ]));
+
+        $msg = '<i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;Seu perfil está como <b>';
+        $msg .= strtoupper($user->perfil->nome) . '</b>, entre em contato com o setor de TI para atualizar.';
+
+        $this->get('/admin')
+        ->assertSee($msg);
+    }
+
+    /** @test */
+    public function users_without_profile_24_cannot_view_msg()
+    {
+        $user = $this->signIn();
+
+        $msg = '<i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;Seu perfil está como <b>';
+        $msg .= strtoupper($user->perfil->nome) . '</b>, entre em contato com o setor de TI para atualizar.';
+
+        $this->get('/admin')
+        ->assertDontSee($msg);
+    }
 }

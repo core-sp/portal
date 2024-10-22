@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use PermissoesTableSeeder;
+use App\Permissao;
+use App\Perfil;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -42,13 +44,40 @@ abstract class TestCase extends BaseTestCase
         return 'logs/erros/laravel-'.date('Y-m-d').'.log';
     }
 
+    private function perfilAdminExiste()
+    {
+        return Perfil::where('idperfil', 1)->exists();
+    }
+
+    protected function relacionarPerfil($perfil)
+    {
+        Permissao::orderBy('idpermissao')->get()->each(function ($item, $key) use($perfil) {
+            $item->perfis()->sync([$perfil->idperfil]);
+        });
+    }
+
+    protected function relacionarPerfilPermissao($perfil, $controller, $metodo)
+    {
+        $permissao = Permissao::where('controller', $controller)->where('metodo', $metodo)->first();
+
+        if(isset($permissao))
+            isset($perfil) ? $permissao->perfis()->syncWithoutDetaching([$perfil->idperfil]) : $permissao->perfis()->sync(array());
+    }
+
     protected function signIn($user = null)
     {
         $this->seed(PermissoesTableSeeder::class);
-        factory('App\Perfil')->create([
-            'nome' => 'Admin'
-        ]);
 
+        if(!$this->perfilAdminExiste())
+        {
+            $perfilDeAdmin = factory('App\Perfil')->create([
+                'idperfil' => 1,
+                'nome' => 'Admin'
+            ]);
+
+            $this->relacionarPerfil($perfilDeAdmin);
+        }
+            
         $user = $user ?: factory('App\User')->create();
 
         $this->actingAs($user);
@@ -59,14 +88,19 @@ abstract class TestCase extends BaseTestCase
     protected function signInAsAdmin($email = null)
     {
         $this->seed(PermissoesTableSeeder::class);
-        $perfilDeAdmin = factory('App\Perfil')->create([
-            'nome' => 'Admin'
-        ]);
+
+        if(!$this->perfilAdminExiste())
+            factory('App\Perfil')->create([
+                'idperfil' => 1,
+                'nome' => 'Admin'
+            ]);
 
         $user = factory('App\User')->create([
-            'idperfil' => $perfilDeAdmin->idperfil,
+            'idperfil' => 1,
             'email' => isset($email) ? $email : 'email_fake_admin@core-sp.org.br'
         ]);
+        
+        $this->relacionarPerfil(Perfil::find(1));
 
         $this->actingAs($user);
 

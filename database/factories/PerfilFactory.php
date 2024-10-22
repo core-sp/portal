@@ -10,3 +10,10 @@ $factory->define(Perfil::class, function (Faker $faker) {
         'nome' => $faker->name
     ];
 });
+
+$factory->state(Perfil::class, 'bloqueado', function ($faker) {
+    return [
+        'idperfil' => 24,
+        'nome' => 'Bloqueado',
+    ];
+});

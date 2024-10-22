@@ -231,7 +231,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user);
-        Permissao::find(28)->update(['perfis' => '1,21']);
+        $this->relacionarPerfilPermissao($perfil, 'AgendamentoController', 'edit');
 
         $agendamento = factory('App\Agendamento')->create([
             'idregional' => $user->idregional
@@ -259,7 +259,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user);
-        Permissao::find(28)->update(['perfis' => '1,21']);
+        $this->relacionarPerfilPermissao($perfil, 'AgendamentoController', 'edit');
 
         $agendamento = factory('App\Agendamento')->create();
 
@@ -967,7 +967,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user);
-        Permissao::find(27)->update(['perfis' => '1,8']);
+        $this->relacionarPerfilPermissao($atendente, 'AgendamentoController', 'index');
 
         $this->get(route('agendamentos.lista'))
         ->assertDontSeeText('Seccional')
@@ -986,7 +986,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user2);
-        Permissao::find(27)->update(['perfis' => '1,21']);
+        $this->relacionarPerfilPermissao($gerente, 'AgendamentoController', 'index');
 
         $this->get(route('agendamentos.lista'))
         ->assertDontSeeText('Seccional')
@@ -1157,7 +1157,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user);
-        Permissao::find(27)->update(['perfis' => '1,21']);
+        $this->relacionarPerfilPermissao($perfil, 'AgendamentoController', 'index');
 
         $agendamento = factory('App\Agendamento')->create([
             'idregional' => $user->idregional,
@@ -1195,7 +1195,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user);
-        Permissao::find(28)->update(['perfis' => '1,21']);
+        $this->relacionarPerfilPermissao($perfil, 'AgendamentoController', 'edit');
 
         $agendamento = factory('App\Agendamento')->create([
             'dia' => date('Y-m-d')
@@ -1247,7 +1247,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user);
-        Permissao::find(28)->update(['perfis' => '1,21']);
+        $this->relacionarPerfilPermissao($perfil, 'AgendamentoController', 'edit');
 
         $agendamento = factory('App\Agendamento')->create([
             'idregional' => $user->idregional
@@ -1269,7 +1269,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user);
-        Permissao::find(28)->update(['perfis' => '1,21']);
+        $this->relacionarPerfilPermissao($perfil, 'AgendamentoController', 'edit');
 
         $agendamento = factory('App\Agendamento')->create();
 
@@ -1342,7 +1342,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $user = $this->signIn($user);
-        Permissao::find(27)->update(['perfis' => '1,8']);
+        $this->relacionarPerfilPermissao($perfil, 'AgendamentoController', 'index');
 
         $agendamento = factory('App\Agendamento')->create([
             'idregional' => $user->idregional,
@@ -1388,7 +1388,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $user = $this->signIn($user);
-        Permissao::find(27)->update(['perfis' => '1,21']);
+        $this->relacionarPerfilPermissao($perfil, 'AgendamentoController', 'index');
 
         $agendamento = factory('App\Agendamento')->create([
             'idregional' => $user->idregional,
@@ -1569,7 +1569,7 @@ class AgendamentoTest extends TestCase
 
         // Testando listagem com usuário 'Coordenadoria de Atendimento'
         $this->signIn($user_coordenadoria_atendimento);
-        Permissao::find(27)->update(['perfis' => '1,6']);
+        $this->relacionarPerfilPermissao($coordenadoria_atendimento, 'AgendamentoController', 'index');
 
         // Usuário deve ver todos os Agendamentos pendentes do passado (tanto sede como seccional)
         $this->get(route('agendamentos.pendentes'))
@@ -1583,7 +1583,7 @@ class AgendamentoTest extends TestCase
 
         // Testando listagem com usuário 'Gestão Atendimento Sede' 
         $this->signIn($user_gestao_atendimento_sede);
-        Permissao::find(27)->update(['perfis' => '1,12']);
+        $this->relacionarPerfilPermissao($gestao_atendimento_sede, 'AgendamentoController', 'index');
 
         // Usuário deve ver apenas os Agendamentos pendentes do passado da sede
         $this->get(route('agendamentos.pendentes'))
@@ -1597,7 +1597,7 @@ class AgendamentoTest extends TestCase
 
         // Testando listagem com usuário 'Gestão Atendimento Seccionais'
         $this->signIn($user_gestao_atendimento_seccional);
-        Permissao::find(27)->update(['perfis' => '1,13']);
+        $this->relacionarPerfilPermissao($gestao_atendimento_seccional, 'AgendamentoController', 'index');
 
         // Usuário deve ver apenas os Agendamentos pendentes do passado de todas as seccionais
         $this->get(route('agendamentos.pendentes'))
@@ -1611,7 +1611,7 @@ class AgendamentoTest extends TestCase
 
         // Testando listagem com usuário 'Atendimento'
         $this->signIn($user_atendimento);
-        Permissao::find(27)->update(['perfis' => '1,8']);
+        $this->relacionarPerfilPermissao($atendimento, 'AgendamentoController', 'index');
 
         // Usuário deve ver apenas os Agendamentos pendentes do passado da sua regional
         $this->get(route('agendamentos.pendentes'))

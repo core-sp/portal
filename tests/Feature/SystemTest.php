@@ -32,6 +32,7 @@ class SystemTest extends TestCase
             'Curso' => new \App\Services\CursoService(),
             'HomeImagem' => new \App\Services\HomeImagemService(),
             'GerarTexto' => new \App\Services\GerarTextoService(),
+            'Perfil' => new \App\Services\PerfilService(),
         ];
         $mediador = $this->app->make(MediadorServiceInterface::class);
 
@@ -70,6 +71,7 @@ class SystemTest extends TestCase
             'Aviso' => 'App\Contracts\AvisoServiceInterface',
             'Curso' => 'App\Contracts\CursoServiceInterface',
             'GerarTexto' => 'App\Contracts\GerarTextoServiceInterface',
+            'Perfil' => 'App\Contracts\PerfilServiceInterface',
         ];
 
         $this->get('/simulador')->assertOk();
@@ -256,5 +258,13 @@ class SystemTest extends TestCase
         $servico = new \App\Services\GerarTextoService();
         $mediador = $this->app->make(MediadorServiceInterface::class);
         $this->assertEquals($mediador->getService('GerarTexto'), $servico);
+    }
+
+    /** @test */
+    public function mediador_interface_get_instace_perfil_service()
+    {
+        $servico = new \App\Services\PerfilService();
+        $mediador = $this->app->make(MediadorServiceInterface::class);
+        $this->assertEquals($mediador->getService('Perfil'), $servico);
     }
 }

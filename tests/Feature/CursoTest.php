@@ -847,7 +847,7 @@ class CursoTest extends TestCase
     public function link_to_inscritos_curso_is_not_shown_on_admin_if_forbidden()
     {
         $this->signInAsAdmin();
-        Permissao::find(15)->update(['perfis' => '']);
+        $this->relacionarPerfilPermissao(null, 'CursoInscritoController', 'index');
 
         $curso = factory('App\Curso')->create();
 
