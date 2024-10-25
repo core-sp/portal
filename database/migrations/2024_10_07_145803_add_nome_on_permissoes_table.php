@@ -22,7 +22,7 @@ class AddNomeOnPermissoesTable extends Migration
             Permissao::orderBy('idpermissao')->get()->each(function ($item, $key) use($perfis){
                 
                 $perfis_aceitos = array_filter(explode(',', str_replace(' ', '', $item->perfis)), function($value) use($perfis) {
-                    return isset($value) && in_array($value, $perfis);
+                    return isset($value) && in_array($value, $perfis) && ($value != 1);
                 });
 
                 if(count($perfis_aceitos) > 0){

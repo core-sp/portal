@@ -69,14 +69,10 @@ abstract class TestCase extends BaseTestCase
         $this->seed(PermissoesTableSeeder::class);
 
         if(!$this->perfilAdminExiste())
-        {
             $perfilDeAdmin = factory('App\Perfil')->create([
                 'idperfil' => 1,
                 'nome' => 'Admin'
             ]);
-
-            $this->relacionarPerfil($perfilDeAdmin);
-        }
             
         $user = $user ?: factory('App\User')->create();
 
@@ -99,8 +95,6 @@ abstract class TestCase extends BaseTestCase
             'idperfil' => 1,
             'email' => isset($email) ? $email : 'email_fake_admin@core-sp.org.br'
         ]);
-        
-        $this->relacionarPerfil(Perfil::find(1));
 
         $this->actingAs($user);
 

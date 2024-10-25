@@ -413,7 +413,7 @@ class PerfilTest extends TestCase
             END 
         ')->get()
         ->transform(function ($item, $key) {
-            return ['<td>', '<input ', 'type="checkbox" ', 'class="form-check-input"', 
+            return ['<td>', '<input ', 'type="checkbox" ', 'class="form-check-input ml-0"', 
             'name="permissoes[]" value="' . $item->idpermissao . '"', 'checked', '/>', '</td>'];
         })->collapse()
         ->all();
@@ -455,6 +455,24 @@ class PerfilTest extends TestCase
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
         $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *permissões do perfil ' . $perfil->idperfil .'* (id: ' . implode(', ', $permissoes) . ')';
         $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function permissions_cannot_be_edit_with_id_1()
+    {
+        $this->signInAsAdmin();
+
+        $perfil = factory('App\Perfil')->create();
+        $permissoes = [1, 2, 3, 4, 5];
+
+        $this->get(route('perfis.permissoes.edit', 1))
+        ->assertOk();
+
+        $this->put(route('perfis.permissoes.put', 1), ['permissoes' => $permissoes])
+        ->assertSessionHas('message', 'Perfil de Admin já possui acesso a todas as permissões por padrão!');
+
+        foreach($permissoes as $id)
+            $this->assertDatabaseMissing('perfil_permissao', ['perfil_id' => 1, 'permissao_id' => $id]);
     }
 
     /** @test */

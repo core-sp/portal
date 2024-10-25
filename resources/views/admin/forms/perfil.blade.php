@@ -35,10 +35,10 @@
             </div>
             @endif
             
-        <table class="table table-bordered perfilEdit table-striped">
+        <table class="table table-bordered table-striped">
             <thead>
-                <tr>
-                    <th>#</th>
+                <tr class="text-center">
+                    <th>Serviço</th>
                     <th>Visualizar</th>
                     <th>Criar</th>
                     <th>Editar</th>
@@ -49,22 +49,21 @@
             <tbody>
 
             @foreach($permissoes as $controller => $permissao)
-                @php
-                    $metodos = $permissao->pluck('metodo', 'idpermissao');
-                @endphp
-                <tr>
+                <tr class="text-center">
                     <!-- Nome Grupo Permissão -->
                     <td>{{ $permissao->get(0)->nome }}</td>
 
                     <!-- Ações Permissão -->
                     @foreach(['index', 'create', 'edit', 'show', 'destroy'] as $acao)
                     <td>
+                        @if($permissao->where('metodo', $acao)->isNotEmpty())
                         <input 
                             type="checkbox" 
-                            class="form-check-input" 
-                            {!! $metodos->contains($acao) ? 'name="permissoes[]" value="' . $metodos->search($acao) . '" ' : 'disabled' !!}
-                            {{ $perfil->temPermissao($controller, $acao) ? 'checked' : '' }} 
+                            class="form-check-input ml-0" 
+                            name="permissoes[]" value="{{ $permissao->where('metodo', $acao)->first()->idpermissao }}"
+                            {{ ($id == 1) || $permissao->where('metodo', $acao)->first()->permitido ? 'checked' : '' }}
                         />
+                        @endif
                     </td>
                     @endforeach
 

@@ -50,6 +50,93 @@ class PerfilTest extends TestCase
     }
 
     /** @test */
+    public function permissoes_agrupadas_por_controller()
+    {                
+        // order by nome ASC
+        $this->assertEquals([
+            'AgendamentoController',
+            'AgendamentoBloqueioController',
+            'AvisoController',
+            'BdoEmpresaController',
+            'BdoOportunidadeController',
+            'CartaServicos',
+            'CompromissoController',
+            'ConcursoController',
+            'CursoController',
+            'CursoInscritoController',
+            'FiscalizacaoController',
+            'HomeImagemController',
+            'LicitacaoController',
+            'NewsletterController',
+            'NoticiaController',
+            'PlantaoJuridicoController',
+            'PlantaoJuridicoBloqueioController',
+            'PostsController',
+            'PaginaController',
+            'RegionalController',
+            'RepresentanteController',
+            'SolicitaCedulaController',
+            'RepresentanteEnderecoController',
+            'SalaReuniaoController',
+            'SuspensaoExcecaoController',
+            'UserController',
+        ], array_keys(Permissao::permissoesAgrupadasPorController()->toArray()));
+
+        // nova coluna "permitido" com valores 0 e sem ID
+        $this->assertEquals([
+            [
+                'idpermissao' => 57,
+                'controller' => 'AvisoController',
+                'metodo' => 'index',
+                'nome' => 'Aviso',
+                'id_intermediaria' => null,
+                'permitido' => 0,
+            ],
+            [
+                'idpermissao' => 58,
+                'controller' => 'AvisoController',
+                'metodo' => 'edit',
+                'nome' => 'Aviso',
+                'id_intermediaria' => null,
+                'permitido' => 0,
+            ]
+        ], Permissao::permissoesAgrupadasPorController()->get('AvisoController')->toArray());
+
+        $user = $this->signIn();
+        $this->relacionarPerfilPermissao($user->perfil, 'AvisoController', 'index');
+
+        // nova coluna "permitido" com valor 1 quando especifica ID
+        $this->assertEquals([
+            [
+                'idpermissao' => 57,
+                'controller' => 'AvisoController',
+                'metodo' => 'index',
+                'nome' => 'Aviso',
+                'id_intermediaria' => 1,
+                'permitido' => 1,
+            ],
+            [
+                'idpermissao' => 58,
+                'controller' => 'AvisoController',
+                'metodo' => 'edit',
+                'nome' => 'Aviso',
+                'id_intermediaria' => null,
+                'permitido' => 0,
+            ]
+        ], Permissao::permissoesAgrupadasPorController($user->perfil->idperfil)->get('AvisoController')->toArray());
+    }
+
+    /** @test */
+    public function perfil_admin()
+    {        
+        $user = factory('App\User')->create();
+        $perfil = factory('App\Perfil')->create();
+
+        $this->assertTrue(Perfil::find(1)->perfilAdmin());
+        $this->assertFalse(Perfil::find(2)->perfilAdmin());
+    }
+
+    /** @test */
     public function possui_relacionamento_users()
     {        
         $user = factory('App\User')->create();
@@ -332,42 +419,6 @@ class PerfilTest extends TestCase
     }
 
     /** @test */
-    public function permissoes_agrupadas_por_controller()
-    {        
-        $service = new PerfilService;
-        
-        // order by nome ASC
-        $this->assertEquals([
-            'AgendamentoController',
-            'AgendamentoBloqueioController',
-            'AvisoController',
-            'BdoEmpresaController',
-            'BdoOportunidadeController',
-            'CartaServicos',
-            'CompromissoController',
-            'ConcursoController',
-            'CursoController',
-            'CursoInscritoController',
-            'FiscalizacaoController',
-            'HomeImagemController',
-            'LicitacaoController',
-            'NewsletterController',
-            'NoticiaController',
-            'PlantaoJuridicoController',
-            'PlantaoJuridicoBloqueioController',
-            'PostsController',
-            'PaginaController',
-            'RegionalController',
-            'RepresentanteController',
-            'SolicitaCedulaController',
-            'RepresentanteEnderecoController',
-            'SalaReuniaoController',
-            'SuspensaoExcecaoController',
-            'UserController',
-        ], array_keys($service->permissoesAgrupadasPorController()->toArray()));
-    }
-
-    /** @test */
     public function listar()
     {        
         $service = new PerfilService;
@@ -437,10 +488,10 @@ class PerfilTest extends TestCase
         $final = $service->view(1);
         
         $this->assertEquals([
-            'perfil', 'permissoes', 'variaveis'
+            'id', 'permissoes', 'variaveis'
         ], array_keys($final));
 
-        $this->assertEquals("App\Perfil", get_class($final['perfil']));
+        $this->assertEquals(1, $final['id']);
         $this->assertEquals("Illuminate\Database\Eloquent\Collection", get_class($final['permissoes']));
         $this->assertEquals((object) [
             'singular' => 'perfil',
@@ -483,11 +534,24 @@ class PerfilTest extends TestCase
 
         $service = new PerfilService;
 
+        $dados = ['permissoes' => [1, 2, 3, 4, 5]];
+        $final = $service->save($dados, 1);
+
+        $this->assertEquals([
+            'message' => 'Perfil de Admin já possui acesso a todas as permissões por padrão!',
+            'class' => 'alert-warning',
+        ], $final);
+        $this->assertEquals(0, Perfil::find(1)->permissoes()->count());
+
         $this->assertEquals(0, Perfil::find(2)->permissoes()->count());
 
         $dados = ['permissoes' => [1, 2, 3, 4, 5]];
         $final = $service->save($dados, 2);
         
+        $this->assertEquals([
+            'message' => '<i class="icon fa fa-check"></i>Permissões do perfil com ID 2 foram atualizadas com sucesso!',
+            'class' => 'alert-success',
+        ], $final);
         $this->assertEquals(5, Perfil::find(2)->permissoes()->count());
     }
 

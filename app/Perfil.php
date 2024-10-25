@@ -24,39 +24,44 @@ class Perfil extends Model
         return $this->belongsToMany('App\Permissao', 'perfil_permissao', 'perfil_id', 'permissao_id');
     }
 
+    public function perfilAdmin()
+    {
+        return $this->idperfil == 1;
+    }
+
     public function temPermissao($controller, $metodo)
     {
-        return !is_null($this->permissoes->where('controller', $controller)->where('metodo', $metodo)->first());
+        return $this->perfilAdmin() || $this->permissoes->where('controller', $controller)->where('metodo', $metodo)->isNotEmpty();
     }
 
     public function podeAcessarMenuConteudo()
     {
-        return !is_null($this->permissoes->where('grupo_menu', Permissao::G_CONTEUDO)->first());
+        return $this->perfilAdmin() || $this->permissoes->where('grupo_menu', Permissao::G_CONTEUDO)->isNotEmpty();
     }
 
     public function podeAcessarMenuAtendimento()
     {
-        return !is_null($this->permissoes->where('grupo_menu', Permissao::G_ATENDIMENTO)->first());
+        return $this->perfilAdmin() || $this->permissoes->where('grupo_menu', Permissao::G_ATENDIMENTO)->isNotEmpty();
     }
 
     public function podeAcessarMenuJuridico()
     {
-        return !is_null($this->permissoes->where('grupo_menu', Permissao::G_JURIDICO)->first());
+        return $this->perfilAdmin() || $this->permissoes->where('grupo_menu', Permissao::G_JURIDICO)->isNotEmpty();
     }
 
     public function podeAcessarMenuFiscal()
     {
-        return !is_null($this->permissoes->where('grupo_menu', Permissao::G_FISCAL)->first());
+        return $this->perfilAdmin() || $this->permissoes->where('grupo_menu', Permissao::G_FISCAL)->isNotEmpty();
     }
 
     public function podeAcessarSubMenuBalcao()
     {
-        return $this->temPermissao('BdoEmpresaController', 'index') || $this->temPermissao('BdoOportunidadeController', 'index');
+        return $this->perfilAdmin() || $this->temPermissao('BdoEmpresaController', 'index') || $this->temPermissao('BdoOportunidadeController', 'index');
     }
 
     public function podeAcessarSubMenuAgendamento()
     {
-        return $this->temPermissao('AgendamentoController', 'index') || $this->temPermissao('AgendamentoBloqueioController', 'index');
+        return $this->perfilAdmin() || $this->temPermissao('AgendamentoController', 'index') || $this->temPermissao('AgendamentoBloqueioController', 'index');
     }
 
     public function podeAcessarSubMenuRepresentante()

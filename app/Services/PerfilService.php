@@ -80,17 +80,16 @@ class PerfilService implements PerfilServiceInterface {
         return Perfil::orderBy('nome')->get();
     }
 
-    public function permissoesAgrupadasPorController()
-    {
-        return Permissao::select('idpermissao', 'controller', 'metodo', 'nome')->orderBy('nome')->get()->groupBy('controller');
-    }
-
     public function listar()
     {
         $resultados = Perfil::select('idperfil','nome')
         ->withCount(['user', 'permissoes'])
         ->orderBy('nome','ASC')
         ->paginate(10);
+
+        $resultados->where('idperfil', 1)->transform(function ($item, $key) {
+            return $item->permissoes_count = Permissao::count();
+        });
 
         return [
             'resultados' => $resultados, 
@@ -104,12 +103,12 @@ class PerfilService implements PerfilServiceInterface {
         if(!isset($id))
             return ['variaveis' => (object) $this->variaveis];
 
-        $perfil = Perfil::findOrFail($id);
+        $perfil = Perfil::select('nome')->findOrFail($id);
         $this->variaveis['singulariza'] = 'o perfil ' . $perfil->nome;
 
         return [
-            'perfil' => $perfil,
-            'permissoes' => $this->permissoesAgrupadasPorController(),
+            'id' => $id,
+            'permissoes' => Permissao::permissoesAgrupadasPorController($id),
             'variaveis' => (object) $this->variaveis,
         ];
     }
@@ -126,6 +125,12 @@ class PerfilService implements PerfilServiceInterface {
             return $perfil;
         }
 
+        if($id == 1)
+            return [
+                'message' => 'Perfil de Admin já possui acesso a todas as permissões por padrão!',
+                'class' => 'alert-warning',
+            ];
+
         $dados = isset($dados['permissoes']) ? $dados['permissoes'] : array();
 
         // salvar permissões com rollback em caso de erro.
@@ -135,6 +140,11 @@ class PerfilService implements PerfilServiceInterface {
             event(new CrudEvent('permissões do perfil ' . $id, 'editou', implode(', ', $dados)));
 
         });
+
+        return [
+            'message' => '<i class="icon fa fa-check"></i>Permissões do perfil com ID ' . $id . ' foram atualizadas com sucesso!',
+            'class' => 'alert-success',
+        ];
     }
 
     public function delete($id)

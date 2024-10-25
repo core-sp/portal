@@ -6,8 +6,6 @@ interface PerfilServiceInterface {
 
     public function all();
 
-    public function permissoesAgrupadasPorController();
-
     public function listar();
 
     public function view($id = null);

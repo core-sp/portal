@@ -86,9 +86,7 @@ class PerfilController extends Controller
             abort(500, "Erro ao salvar as permissões do perfil.");
         }
 
-        return redirect()->route('perfis.lista')
-            ->with('message', '<i class="icon fa fa-check"></i>Permissões do perfil com ID ' . $id . ' foram atualizadas com sucesso!')
-            ->with('class', 'alert-success');
+        return redirect()->route('perfis.lista')->with($dados);
     }
 
     public function destroy($id)
