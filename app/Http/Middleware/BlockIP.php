@@ -25,7 +25,7 @@ class BlockIP
         }
 
         if(isset($bloqueia)) {
-            $texto = Str::limit($bloqueia->ip, 7, '******') . ', bloqueio criado em ' . formataData($bloqueia->updated_at);
+            $texto = Str::limit($bloqueia->ip, 7, '******') . ' - ' . formataData($bloqueia->updated_at);
             return abort(423, $texto);
         }
 
