@@ -36,6 +36,19 @@
                     </tbody>
                 </table>
             </div>
+
+            <hr />
+
+            <div class="float-left">
+            @if($ips instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                {{ $ips->appends(request()->input())->links() }}
+            @endif
+            </div>
+            <div class="float-left mt-1 ml-4 font-italic">
+            @if($ips instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                Total de {{ $ips->total() }} IPs
+            @endif
+            </div>
         </div>
     </div> 
     @else
