@@ -18,7 +18,13 @@ interface SuporteServiceInterface {
 
     public function filtros();
 
-    public function ipsBloqueados();
+    public function indexErros();
+
+    public function uploadFileErros($file);
+
+    public function getFileErros();
+
+    public function ipsBloqueados($ip = null);
 
     public function ips();
 
