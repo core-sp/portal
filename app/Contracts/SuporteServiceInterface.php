@@ -22,7 +22,7 @@ interface SuporteServiceInterface {
 
     public function getFileErros();
 
-    public function ipsBloqueados();
+    public function ipsBloqueados($ip = null);
 
     public function ips();
 
