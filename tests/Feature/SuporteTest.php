@@ -1374,6 +1374,7 @@ class SuporteTest extends TestCase
     }
 
     /** @test */
+    // executar em "--process-isolation" devido "Text file busy"
     public function sum_reports_tipo_interno()
     {
         Storage::disk('log_interno')->delete(Storage::disk('log_interno')->allFiles(date('Y\/m\/')));
