@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Str;
 
 class BlockIP
 {
@@ -17,14 +18,15 @@ class BlockIP
     {
         try{
             $service = resolve('App\Contracts\MediadorServiceInterface');
-            $ips = $service->getService('Suporte')->ipsBloqueados()->pluck('ip')->all();
+            $bloqueia = $service->getService('Suporte')->ipsBloqueados($request->ip());
         }catch(\Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             return abort(500, 'Erro interno! Tente novamente mais tarde.');
         }
 
-        if(in_array($request->ip(), $ips)) {
-            return abort(423);
+        if(isset($bloqueia)) {
+            $texto = Str::limit($bloqueia->ip, 7, '******') . ' - ' . formataData($bloqueia->updated_at);
+            return abort(423, $texto);
         }
 
         return $next($request);
