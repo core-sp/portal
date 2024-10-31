@@ -1374,6 +1374,7 @@ class SuporteTest extends TestCase
     }
 
     /** @test */
+    // executar em "--process-isolation" devido "Text file busy"
     public function sum_reports_tipo_interno()
     {
         Storage::disk('log_interno')->delete(Storage::disk('log_interno')->allFiles(date('Y\/m\/')));
@@ -1844,6 +1845,9 @@ class SuporteTest extends TestCase
             $ips->get(3)->ip,
             $ips->get(4)->ip,
         ], $ips_array);
+
+        $this->assertTrue($service->getService('Suporte')->ipsBloqueados($ips->get(2)->ip) !== null);
+        $this->assertTrue($service->getService('Suporte')->ipsBloqueados('192.168.55.23') === null);
     }
 
     /** @test */
