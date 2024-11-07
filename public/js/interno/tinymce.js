@@ -1,5 +1,4 @@
 // TinyMCE com File Manager
-var public_path = "{{ path('public') }}";  
 var editor_config = {
   path_absolute : "/",
   selector: "textarea.my-editor",
