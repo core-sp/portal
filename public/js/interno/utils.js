@@ -1,6 +1,6 @@
 function menuAtivoDinamico(){
     // Função para tornar menu ativo dinâmico
-    var url = window.location;
+    let url = window.location;
 
     $('ul.nav-sidebar a').filter(function() {
       return this.href == url;
@@ -14,9 +14,9 @@ function menuAtivoDinamico(){
 
 function logout(){
     $("#logout-interno").click(function(){
-        var token = $('meta[name="csrf-token"]').attr('content');
-        var link = "/admin/logout";
-        var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
+        let token = $('meta[name="csrf-token"]').attr('content');
+        let link = "/admin/logout";
+        let form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
         $('body').append(form);
         $(form).submit();
     });
@@ -26,7 +26,7 @@ function sortable(){
     // Draggable
     $("#sortable").sortable();
     $("#sortable").disableSelection();
-        var icons = {
+        let icons = {
         header: "fas fa-angle-right",
         activeHeader: "fas fa-angle-down"
     };
@@ -40,7 +40,7 @@ function sortable(){
 function filtrar(){
     // Filtro dinâmico do bootstrap
     $("#myInput").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
+        let value = $(this).val().toLowerCase();
         $("#myTable tr").filter(function() {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
         });
@@ -48,8 +48,8 @@ function filtrar(){
 
     // Filtro de data usado em filtro da listagem (visualizar) dos serviços
     $('#filtroDate').submit(function(e){
-        var maxDataFiltro = $('#datemax').val();
-        var minDataFiltro = $('#datemin').val();
+        let maxDataFiltro = $('#datemax').val();
+        let minDataFiltro = $('#datemin').val();
         if(new Date(minDataFiltro) > new Date(maxDataFiltro)) {
             alert('Data inválida. A data inicial deve ser menor ou igual a data de término.');
             $('#datemin').focus();
@@ -58,13 +58,13 @@ function filtrar(){
     });
 }
 
-export function utils(){
+export function executar(local = 'interno'){
 
     menuAtivoDinamico();
     logout();
 
     $(".custom-file-input").on("change", function(e) {
-        var fileName = e.target.files[0].name;
+        let fileName = e.target.files[0].name;
         $(this).next('.custom-file-label').html(fileName);
     });
 

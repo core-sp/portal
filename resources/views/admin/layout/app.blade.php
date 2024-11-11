@@ -13,6 +13,8 @@
         <link type="text/css" href="{{ asset('/css/custom.css?'.time()) }}" rel="stylesheet">
     </head>
     <body class="hold-transition sidebar-mini">
+      <input type="hidden" id="api-tiny" value="{{ env('TINY_API_KEY') }}" />
+      <input type="hidden" id="app_config" value="{{ config('app.env') }}" />
 
         <div class="wrapper">
           <!-- Navbar -->
@@ -106,9 +108,7 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.15/jquery.mask.js" integrity="sha512-+XD2OkHoxOL0odA3N+LmQb6tWel7+5MHO7KOuGhUHWvG0LNCNuspCpQ6Beq9WZf1CHF9IppshzA3AaHu/50vPw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
       
-      <script type="module" src="{{ asset('/js/mascaras.js?'.time()) }}" id="modulo-mascaras"></script>
-      <script type="module" src="{{ asset('/js/interno/utils.js?'.time()) }}" id="modulo-utils"></script>
-      <script type="module" src="{{ asset('/js/interno/filemanager.js?'.time()) }}" id="modulo-filemanager"></script>
+      <script type="module" src="{{ asset('/js/init.js?'.time()) }}" id="modulo-init"></script>
       <script type="module" src="{{ asset('/js/interno/custom.js?'.time()) }}" id="modulo-custom"></script>
     </body>
 </html>

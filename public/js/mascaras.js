@@ -1,4 +1,4 @@
-export function mascarasInternas(){
+function mascarasInternas(){
     
     $('.nrlicitacaoInput').mask('99999/9999');
     $('.nrprocessoInput').mask('999/9999');
@@ -14,7 +14,7 @@ export function mascarasInternas(){
     $('.anoInput').mask('0000');
 
     $('.telefoneInput').mask('(00) 0000-00009').focusout(function (event) {  
-        var target, phone, element;
+        let target, phone, element;
         target = (event.currentTarget) ? event.currentTarget : event.srcElement;
         phone = target.value.replace(/\D/g, '');
         element = $(target);
@@ -25,9 +25,9 @@ export function mascarasInternas(){
             element.mask("(99) 9999-99999");  
         }  
     });
-    var options = {
+    let options = {
         onKeyPress: function (cpf, ev, el, op) {
-            var masks = ['000.000.000-000', '00.000.000/0000-00'];
+            let masks = ['000.000.000-000', '00.000.000/0000-00'];
             $('.cpfOuCnpj').mask((cpf.length > 14) ? masks[1] : masks[0], op);
         }
     }
@@ -63,8 +63,8 @@ export function mascarasInternas(){
 	});
     $('#horaTermino').mask('00:00', {
         onComplete: function() {
-            var horaInicio = $('#horaInicio').val();
-            var horaTermino = $('#horaTermino').val();
+            let horaInicio = $('#horaInicio').val();
+            let horaTermino = $('#horaTermino').val();
             if(horaInicio) {
                 if(horaTermino <= horaInicio) {
                     alert('O horário de término não pode ser menor ou igual ao horário de início.');
@@ -75,8 +75,8 @@ export function mascarasInternas(){
     });
     $('#horaInicio').mask('00:00', {
         onComplete: function() {
-            var horaInicio = $('#horaInicio').val();
-            var horaTermino = $('#horaTermino').val();
+            let horaInicio = $('#horaInicio').val();
+            let horaTermino = $('#horaTermino').val();
             if(horaTermino) {
                 if(horaInicio > horaTermino) {
                     alert('O horário de início não pode ser maior que o horário de término.');
@@ -86,3 +86,8 @@ export function mascarasInternas(){
         }
     });
 };
+
+export function executar(local = 'interno'){
+    if(local == 'interno')
+        return mascarasInternas();
+}

@@ -137,3 +137,5 @@
         </div>
     </div>
 </form>
+
+<script type="module" src="{{ asset('/js/interno/agenda-bloqueio.js?'.time()) }}" id="modulo-agenda-bloqueio" class="modulo-editar"></script>

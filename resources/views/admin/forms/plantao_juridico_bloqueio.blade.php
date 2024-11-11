@@ -119,3 +119,5 @@
         </div>
     </div>
 </form>
+
+<script type="module" src="{{ asset('/js/interno/plantao-juridico-bloqueio.js?'.time()) }}" id="modulo-plantao-juridico-bloqueio" class="modulo-editar"></script>

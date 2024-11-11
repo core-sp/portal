@@ -185,3 +185,5 @@
         </div>
     </div>
 </form>
+
+<script type="module" src="{{ asset('/js/interno/agendamento.js?'.time()) }}" id="modulo-agendamento" class="modulo-editar"></script>
