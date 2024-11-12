@@ -128,7 +128,7 @@ $(document).ready(function(){
   });
 
   $('.timeInput').mask('00:00');
-  $('.vagasInput').mask('000');
+  $('.vagasInput').mask('0000');
 
   // Draggable
   $("#sortable").sortable();
