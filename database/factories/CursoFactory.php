@@ -18,7 +18,7 @@ $factory->define(Curso::class, function (Faker $faker) {
         'inicio_inscricao' => now()->format('Y-m-d H:i'),
         'termino_inscricao' => now()->addDay()->addHour()->format('Y-m-d H:i'),
         'endereco' => $faker->address,
-        'nrvagas' => $faker->numberBetween(10, 200),
+        'nrvagas' => $faker->numberBetween(10, 9999),
         'descricao' => $faker->text,
         'resumo' => $faker->sentence,
         'acesso' => Curso::ACESSO_PRI,
