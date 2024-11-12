@@ -10,7 +10,7 @@ function mascarasInternas(){
     $('.cpfInput').mask('000.000.000-00');
     $('#registro_core').mask('0000000/0000', {reverse: true});
     $('.timeInput').mask('00:00');
-    $('.vagasInput').mask('000');
+    $('.vagasInput').mask('0000');
     $('.anoInput').mask('0000');
 
     $('.telefoneInput').mask('(00) 0000-00009').focusout(function (event) {  
