@@ -114,6 +114,17 @@ class CursoTest extends TestCase
             'tema' => $attributes['tema'],
             'idusuario' => $user->idusuario
         ]);
+
+        $attributes = factory('App\Curso')->raw([
+            'nrvagas' => 8899
+        ]);
+
+        $this->get(route('cursos.create'))->assertOk();
+        $this->post(route('cursos.store'), $attributes);
+        $this->assertDatabaseHas('cursos', [
+            'tema' => $attributes['tema'],
+            'nrvagas' => 8899
+        ]);
     }
 
     /** @test */
