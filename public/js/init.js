@@ -1,38 +1,10 @@
 const link = location.protocol + '//' + location.hostname + '/js/';
 const inicio = "modulo-";
-let date = new Date();
-let tempo = date.setUTCSeconds(60);
-
-// Inicializa o editor Tiny somente se encontra o seletor para editar conteúdo
-function initTinyMCE(){
-
-    if($('textarea.my-editor').length <= 0)
-        return false;
-
-    // script local de configuração
-    const tiny = document.createElement('script');
-    tiny.setAttribute("type", "text/javascript");
-    tiny.setAttribute("src", link + 'interno/tinymce.js?' + tempo);
-    document.getElementById(inicio + "init").after(tiny);
-
-    if($('#app_config').val() == 'local'){
-        // app local sem API-KEY (deve ser incluído no DOM antes do script de configuração do tiny local)
-        const tiny_local = document.createElement('script');
-        tiny_local.setAttribute("type", "text/javascript");
-        tiny_local.setAttribute("src", link + 'tinymce/tinymce.min.js');
-        document.getElementById(inicio + "init").after(tiny_local);
-        return;
-    }
-
-    // CDN tiny com API-KEY (deve ser incluído no DOM antes do script de configuração do tiny local)
-    const tiny_cloud = document.createElement('script');
-    tiny_cloud.setAttribute("src", 'https://cdn.tiny.cloud/1/' + $('#api-tiny').val() + '/tinymce/5/tinymce.min.js');
-    tiny_cloud.setAttribute("referrerpolicy", "origin");
-    document.getElementById(inicio + "init").after(tiny_cloud);
-}
 
 export default function (local = 'interno'){
-    
+
+    let date = new Date();
+    let tempo = date.setUTCSeconds(60);
     const modulos_principais = ['mascaras', 'utils', 'filemanager'];
     const pastas_principais = ['', local + '/', local + '/'];
 
@@ -59,8 +31,6 @@ export default function (local = 'interno'){
 
 export function opcionais(){
     
-    initTinyMCE();
-
     // inicializa os módulos opcionais
 
     const opcionais = $('[type="module"][class^="' + inicio + '"]');

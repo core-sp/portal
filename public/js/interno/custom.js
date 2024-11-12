@@ -1,7 +1,14 @@
-let init = await import($('#modulo-init').attr('src'));
+"use strict";
 
-init.default();
-init.opcionais();
+import($('#modulo-init').attr('src'))
+.then((init) => {
+    init.default();
+    init.opcionais();
+})
+.catch((err) => {
+    console.log(err);
+    alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
+});
 
 // Funcionalidade Sala Reunião
 

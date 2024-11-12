@@ -13,8 +13,6 @@
         <link type="text/css" href="{{ asset('/css/custom.css?'.time()) }}" rel="stylesheet">
     </head>
     <body class="hold-transition sidebar-mini">
-      <input type="hidden" id="api-tiny" value="{{ env('TINY_API_KEY') }}" />
-      <input type="hidden" id="app_config" value="{{ config('app.env') }}" />
 
         <div class="wrapper">
           <!-- Navbar -->
@@ -101,6 +99,14 @@
         </div>
         <!-- ./wrapper -->
 
+      @if(config('app.env') == 'local')
+      <script type="text/javascript" src="{{ asset('/js/tinymce/tinymce.min.js') }}"></script>
+      @else
+      <script referrerpolicy="origin" src="{{ 'https://cdn.tiny.cloud/1/' . env('TINY_API_KEY') . '/tinymce/5/tinymce.min.js' }}"></script>
+      @endif
+
+      <script type="text/javascript" src="{{ asset('/js/interno/tinymce.js?'.time()) }}"></script>
+
       <script type="text/javascript" src="{{ asset('/js/app.js') }}"></script>
       <!-- <script type="text/javascript" src="{{-- asset('/js/jquery-ui.min.js') --}}"></script> -->
       <!-- <script type="text/javascript" src="{{-- asset('/js/jquery.mask.js') --}}"></script> -->
@@ -109,6 +115,6 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.15/jquery.mask.js" integrity="sha512-+XD2OkHoxOL0odA3N+LmQb6tWel7+5MHO7KOuGhUHWvG0LNCNuspCpQ6Beq9WZf1CHF9IppshzA3AaHu/50vPw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
       
       <script type="module" src="{{ asset('/js/init.js?'.time()) }}" id="modulo-init"></script>
-      <script type="module" src="{{ asset('/js/interno/custom.js?'.time()) }}" id="modulo-custom"></script>
+      <script type="text/javascript" src="{{ asset('/js/interno/custom.js?'.time()) }}"></script>
     </body>
 </html>
