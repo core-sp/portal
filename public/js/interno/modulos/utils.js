@@ -70,6 +70,11 @@ export function executar(local = 'interno'){
 
     $('.toast').toast({delay: 2000});
     $('.toast').toast('show');
+
+    // Recusar formulários
+    $('#recusar-trigger').on('click', function(){
+        $('#recusar-form').toggle();
+    });
     
     sortable();
     filtrar();

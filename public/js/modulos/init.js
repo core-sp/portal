@@ -1,12 +1,25 @@
 const link = location.protocol + '//' + location.hostname + '/js/';
 const inicio = "modulo-";
+let date = new Date();
+let tempo = date.setUTCSeconds(60);
+
+function tinyInit(){
+    
+    if($('.my-editor').length > 0){
+    
+        const tiny = document.createElement('script');
+        tiny.setAttribute("type", "text/javascript");
+        tiny.setAttribute("src", link + 'interno/tinymce.js?' + tempo);
+        document.body.appendChild(tiny);
+    }
+}
 
 export default function (local = 'interno'){
 
-    let date = new Date();
-    let tempo = date.setUTCSeconds(60);
     const modulos_principais = ['mascaras', 'utils', 'filemanager'];
-    const pastas_principais = ['', local + '/', local + '/'];
+    const pasta_modulos = 'modulos/';
+    const caminho_modulos = local + '/' + pasta_modulos;
+    const pastas_principais = [pasta_modulos, caminho_modulos, caminho_modulos];
 
     for (let i in modulos_principais) {
 
@@ -31,6 +44,8 @@ export default function (local = 'interno'){
 
 export function opcionais(){
     
+    tinyInit();
+
     // inicializa os módulos opcionais
 
     const opcionais = $('[type="module"][class^="' + inicio + '"]');
