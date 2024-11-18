@@ -814,3 +814,8 @@ function apenasLetras($string)
 {
     return preg_replace('/[^a-zA-Z]/', '', $string);
 }
+
+function hashScriptJs()
+{
+    return substr(hash('sha256', '0.1.0'), 0, 32);
+}

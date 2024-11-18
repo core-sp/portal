@@ -343,3 +343,5 @@
       </div>
     </div>
   </div>
+
+  <script type="module" src="{{ asset('/js/interno/modulos/sala-reuniao.js?'.hashScriptJs()) }}" id="modulo-sala-reuniao" class="modulo-editar"></script>

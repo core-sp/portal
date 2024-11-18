@@ -432,4 +432,4 @@
 
 </div>
 
-<script type="module" src="{{ asset('/js/interno/modulos/suporte.js?'.time()) }}" id="modulo-suporte" class="modulo-visualizar"></script>
+<script type="module" src="{{ asset('/js/interno/modulos/suporte.js?'.hashScriptJs()) }}" id="modulo-suporte" class="modulo-visualizar"></script>

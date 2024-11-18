@@ -40,20 +40,21 @@ function setCamposAgeBloqueio(horas_atendentes)
     $('#totalAtendentes').text(horas_atendentes['atendentes']);
 }
 
+function formatarSelect(){
+
+    let valor = $('#idregionalBloqueio').val();
+    optionTodas(valor);
+    if(valor > 0)
+        ajaxAgendamentoBloqueio(valor);
+}
+
 function editar(){
 
-    $('#idregionalBloqueio').ready(function(){
-        let valor = $('#idregionalBloqueio').val();
-        optionTodas(valor);
-        if(valor > 0)
-            ajaxAgendamentoBloqueio(valor);
-    });
+    if($('#idregionalBloqueio').length > 0)
+        formatarSelect();
 
     $('#idregionalBloqueio').change(function(){
-        let valor = $('#idregionalBloqueio').val();
-        optionTodas(valor);
-        if(valor > 0)
-            ajaxAgendamentoBloqueio(valor);
+        formatarSelect();
     });
 
 };

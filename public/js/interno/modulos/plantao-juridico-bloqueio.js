@@ -58,18 +58,22 @@ function ajaxPlantaoJuridico(valor, e)
     });
 }
 
+function chamarAjax(e){
+    
+    let valor = $('#plantaoBloqueio').val();
+
+    if(valor > 0)
+        ajaxPlantaoJuridico(valor, e);
+}
+
 function editar(){
 
     $('#plantaoBloqueio').ready(function(e){
-        let valor = $('#plantaoBloqueio').val();
-        if(valor > 0)
-            ajaxPlantaoJuridico(valor, e);
+        chamarAjax(e);
     });
 
     $('#plantaoBloqueio').change(function(e){
-        let valor = $('#plantaoBloqueio').val();
-        if(valor > 0)
-            ajaxPlantaoJuridico(valor, e);
+        chamarAjax(e);
     });
 };
 

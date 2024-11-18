@@ -16,16 +16,11 @@ function selectAtendenteByStatus(valor)
 function editar(){
 
     $('#statusAgendamentoAdmin').change(function(){
-        let valor = $('#statusAgendamentoAdmin').val();
-        selectAtendenteByStatus(valor);
+        selectAtendenteByStatus($(this).val());
     });
       
-    $('#statusAgendamentoAdmin').ready(function(){
-        if($('#statusAgendamentoAdmin').length > 0){
-            let valor = $('#statusAgendamentoAdmin').val();
-            selectAtendenteByStatus(valor);
-        }
-    });
+    if($('#statusAgendamentoAdmin').length > 0)
+        selectAtendenteByStatus($('#statusAgendamentoAdmin').val());
 
 };
 

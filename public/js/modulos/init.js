@@ -1,7 +1,7 @@
 const link = location.protocol + '//' + location.hostname + '/js/';
 const inicio = "modulo-";
-let date = new Date();
-let tempo = date.setUTCSeconds(60);
+const temp = $('#' + inicio + 'init').attr('src');
+const hash = temp.substring(temp.search(/\?/) + 1, temp.length);
 
 function tinyInit(){
     
@@ -9,7 +9,7 @@ function tinyInit(){
     
         const tiny = document.createElement('script');
         tiny.setAttribute("type", "text/javascript");
-        tiny.setAttribute("src", link + 'interno/tinymce.js?' + tempo);
+        tiny.setAttribute("src", link + 'interno/tinymce.js?' + hash);
         document.body.appendChild(tiny);
     }
 }
@@ -25,7 +25,7 @@ export default function (local = 'interno'){
 
         const script = document.createElement('script');
         script.type = "module";
-        script.src = link + pastas_principais[i] + modulos_principais[i] + '.js?' + tempo;
+        script.src = link + pastas_principais[i] + modulos_principais[i] + '.js?' + hash;
         script.id = inicio + modulos_principais[i];
         
         document.getElementById(inicio + "init").after(script);
