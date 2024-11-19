@@ -43,6 +43,7 @@ class DadoFiscalizacao extends Model
             "orientacaocontabil" => 'Orientação às contabilidades',
             "oficioprefeitura" => 'Ofício às prefeituras',
             "oficioincentivo" => 'Ofício de incentivo a contratação de representantes comerciais',
+            "notificacandidatoeleicao" => 'Notificação Candidatos Eleições',
         ];
     }
 
