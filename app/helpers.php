@@ -815,7 +815,15 @@ function apenasLetras($string)
     return preg_replace('/[^a-zA-Z]/', '', $string);
 }
 
+function versaoScriptJs()
+{
+    return '0.1.1';
+}
+
 function hashScriptJs()
 {
-    return substr(hash('sha256', '0.1.0'), 0, 32);
+    if(config('app.env') == 'local')
+        return time();
+
+    return substr(hash('sha256', versaoScriptJs()), 0, 32);
 }

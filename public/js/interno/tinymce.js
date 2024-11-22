@@ -1,7 +1,7 @@
 if(document.getElementsByClassName('my-editor').length > 0){
 
   // TinyMCE com File Manager
-  var editor_config = {
+  let editor_config = {
     path_absolute : "/",
     selector: "textarea.my-editor",
     language: "pt_BR",
@@ -15,13 +15,11 @@ if(document.getElementsByClassName('my-editor').length > 0){
     image_caption: true,
     relative_urls: false,
     file_picker_callback : function(callback, value, meta) {
-      var x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
-      var y = window.innerHeight|| document.documentElement.clientHeight|| document.getElementsByTagName('body')[0].clientHeight;
-      var cmsURL = editor_config.path_absolute + 'laravel-filemanager?editor=tinymce5';
-      if(meta.filetype == 'image')
-        cmsURL = cmsURL + "&type=Images";
-      else
-        cmsURL = cmsURL + "&type=Files";
+      let x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
+      let y = window.innerHeight|| document.documentElement.clientHeight|| document.getElementsByTagName('body')[0].clientHeight;
+      let cmsURL = editor_config.path_absolute + 'laravel-filemanager?editor=tinymce5';
+      cmsURL = meta.filetype == 'image' ? cmsURL + "&type=Images" : cmsURL + "&type=Files";
+
       tinyMCE.activeEditor.windowManager.openUrl({
         url : cmsURL,
         title : 'Filemanager',
