@@ -27,7 +27,12 @@ function hideShowHorasLimitesSala(){
 
 function ajaxHorariosViewSala(id){
 
-    const selectedValues = Array.from($('#' + id + ' option:selected'))
+    let horas_selecionadas = $('#' + id + ' option:selected');
+
+    if(horas_selecionadas.length <= 0)
+        return;
+
+    const selectedValues = Array.from(horas_selecionadas)
     .map(
         option => option.value,
     );
@@ -80,6 +85,11 @@ function editar(){
         let texto = $('#' + tipo + ' option[value="' + id + '"]').text();
         let numero = texto.replace(/[^0-9_,]/ig, '');
     
+        if((valor.trim().length == 0) || (valor.replace(/[0-9,]/ig, '').length > 0)){
+            $('#sala_reuniao_itens').modal('hide');
+            return;
+        }
+
         texto = texto.replace(numero, valor);
         $('#sala_reuniao_itens .modal-body input').remove();
         $('#' + tipo + ' option[value="' + id + '"]').val(texto).text(texto);
@@ -128,7 +138,7 @@ function editar(){
     });
     
     $('#form_salaReuniao #horarios_reuniao, #form_salaReuniao #horarios_coworking').change(function(){
-        ajaxHorariosViewSala(this.id);
+        this.selectedIndex >= 0 ? ajaxHorariosViewSala(this.id) : $('#' + this.id + '_rep').html('');
     });
 
 };

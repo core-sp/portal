@@ -88,6 +88,11 @@ function textoAoAtualizar(resultado, titulo = true){
 
 function atualizarViewTexto(acao, response){
 
+    if(response.length == 0){
+        msgRetorno('erro', 'Erro', '<strong>Texto não existe! Por favor, atualize a página!</strong>');
+        return;
+    }
+
     let resultado = acao == 'carregar' ? response[0] : response;
     let titulo = resultado.tipo == 'Título';
 
@@ -141,7 +146,7 @@ function msgRetorno(acao, title, texto){
     if(acao != 'erro')
         setTimeout(function(){
             $('#avisoTextos').modal('hide');
-        }, 1500);
+        }, 2500);
 }
 
 function gerarTextoAvisosCrud(acao, valor, response = null){
@@ -151,7 +156,7 @@ function gerarTextoAvisosCrud(acao, valor, response = null){
   
     switch (acao) {
         case 'excluir_varios':
-            msgExcluir(response, valor, title, 'Exclusão realizada com sucesso!');
+            msgExcluir(response, valor, title, 'Exclusão realizada com sucesso!<br>Se algum item permanecer, por favor atualize a página.');
             break;
         case 'atualizar':
             msgRetorno(acao, title, 'Campos do texto foram atualizados!');
@@ -204,9 +209,6 @@ function selecionarTodos(inverso = false){
 }
 
 function editar(){
-
-    if($('button.abrir .badge').length > 0)
-        $('button.abrir .badge').click();
 
     $(".criarTexto, #publicarTexto").click(function(){
         let link = this.id == 'publicarTexto' ? inicio_url + 'publicar/' + $('#tipo_doc').val() : inicio_url + $('#tipo_doc').val();
@@ -261,6 +263,9 @@ function editar(){
         $('#lista').show();
         $('#tipo').focus();
     });
+
+    if($('button.abrir .badge').length > 0)
+        $('button.abrir .badge').click();
   
     $('[name="excluir_ids"]').change(function(){
         selecionarTodos();

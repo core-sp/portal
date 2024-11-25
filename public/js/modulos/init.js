@@ -11,6 +11,7 @@ function tinyInit(){
         tiny.setAttribute("type", "text/javascript");
         tiny.setAttribute("src", link + 'interno/tinymce.js?' + hash);
         document.body.appendChild(tiny);
+        console.log('Editor TinyMCE carregado.');
     }
 }
 
