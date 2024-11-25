@@ -415,6 +415,32 @@
                 @endphp
             </div>
         </div>
+
+        <div class="form-row mb-2">
+            <div class="col-3">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="notificacandidatoeleicao" />
+                <label for="notificacandidatoeleicao">Notificação Candidatos Eleições</label>
+                <input type="number"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $cont) : $r->notificacandidatoeleicao }}"
+                    min="0" max="999999999"
+                />
+                @if($errors->has('dados.' . $cont . '.*'))
+                <div class="invalid-feedback">
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
+                </div>
+                @endif
+                @php
+                    $contCampos++;
+                @endphp
+            </div>
+        </div>
         </br></br>
         @php
             $cont++;
