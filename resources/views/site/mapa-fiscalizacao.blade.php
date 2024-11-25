@@ -194,6 +194,12 @@
                   <td class="align-middle text-center" colspan="2">{{ $r->oficioincentivo }}</td>
                 </tr>
                 @endisset
+                @isset($r->notificacandidatoeleicao)
+                <tr>
+                  <td class="text-left" style="width:60%; font-size: 15px">{{ $r->campos()['notificacandidatoeleicao'] }}</td>
+                  <td class="align-middle text-center" colspan="2">{{ $r->notificacandidatoeleicao }}</td>
+                </tr>
+                @endisset
               </tbody>
             </table>
             @if(isset($r->processofiscalizacaopf) || isset($r->processofiscalizacaopj))
