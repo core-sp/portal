@@ -199,6 +199,7 @@ class FiscalizacaoTest extends TestCase
             $total += $val->orientacaocontabil;
             $total += $val->oficioprefeitura;
             $total += $val->oficioincentivo;
+            $total += $val->notificacandidatoeleicao;
 
             $totalFinal += $total;
             $this->assertEquals($val->somaTotal(), $total);
@@ -242,6 +243,7 @@ class FiscalizacaoTest extends TestCase
             $acoes['Orientação às contabilidades'] += $val->orientacaocontabil;
             $acoes['Ofício às prefeituras'] += $val->oficioprefeitura;
             $acoes['Ofício de incentivo a contratação de representantes comerciais'] += $val->oficioincentivo;
+            $acoes['Notificação Candidatos Eleições'] += $val->notificacandidatoeleicao;
         }
 
         $this->assertEquals($periodo->somaTotalPorAcao(), $acoes);
@@ -974,6 +976,47 @@ class FiscalizacaoTest extends TestCase
 
     /** @test 
      * 
+    */
+    public function authorized_users_can_edit_notificacandidatoeleicao()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'notificacandidatoeleicao')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->notificacandidatoeleicao);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'notificacandidatoeleicao' => $dadoFiscalizacao->get($i)->notificacandidatoeleicao
+            ]);
+            $dadoFiscalizacao->get($i)->update(['notificacandidatoeleicao' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
      * Usuário com autorização pode publicar periodo de fiscalização.
     */
     public function authorized_users_can_publish_periodo_fiscalizacao()
@@ -1631,6 +1674,7 @@ class FiscalizacaoTest extends TestCase
             ->assertSeeText($dados->autoconstatacao)
             ->assertSeeText($dados->autosdeinfracao)
             ->assertSeeText($dados->multaadministrativa)
+            ->assertSeeText($dados->notificacandidatoeleicao)
             ->assertSeeText(onlyDate($dados->updated_at));
     }
 
