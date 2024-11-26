@@ -44,10 +44,7 @@ function crudGerarTexto(acao, valor){
             $('#loadingIndice').modal('hide');
         },
         success: function(response) {
-            $('.updateCampos').val(valor);
-            $('.deleteTexto').val(valor);
-            atualizarViewTexto(acao, response);
-            gerarTextoAvisosCrud(acao, valor, response);
+            atualizarViewTexto(acao, valor, response);
         },
         error: function(erro, textStatus, errorThrown) {
             let resposta = erro.status == 422 ? JSON.stringify(erro.responseJSON.errors) : 
@@ -62,17 +59,25 @@ function textoAoCarregar(resultado, titulo = true){
     let cor = titulo ? 'warning' : 'dark';
     let upper = titulo ? 'text-uppercase' : '';
     let conteudo = resultado.conteudo !== null ? resultado.conteudo : '';
+    let indice = resultado.indice !== null ? resultado.indice : '';
 
     $('#span-tipo').attr('class', 'text-' + cor).text(resultado.tipo);
     $('#span-nivel').text(resultado.nivel);
-    $('#span-texto_tipo').attr('class', upper).text(resultado.indice + ' - ' + resultado.texto_tipo);
+    $('#span-texto_tipo').attr('class', upper).text(indice + ' - ' + resultado.texto_tipo);
     $('#texto_tipo').val(resultado.texto_tipo);
     $('#tipo option[value="' + resultado.tipo + '"]').prop('selected', true);
     $('#com_numeracao option[value="' + resultado.com_numeracao + '"]').prop('selected', true);
     $('#nivel option[value="' + resultado.nivel + '"]').prop('selected', true);
 
-    tinymce.activeEditor.setContent(conteudo);
-    hideShowOptions();
+    try {
+        tinymce.activeEditor.setContent(conteudo);
+    } catch (error) {
+        console.log(error);
+        $('#loadingIndice').modal('hide');
+        gerarTextoAvisosCrud('erro', '<strong>Clique novamente no texto.</strong>');
+    } finally{
+        hideShowOptions();
+    }
 }
 
 function textoAoAtualizar(resultado, titulo = true){
@@ -86,10 +91,13 @@ function textoAoAtualizar(resultado, titulo = true){
     $('button[value="' + resultado.id + '"] .indice-texto').text(resultado.texto_tipo);
 }
 
-function atualizarViewTexto(acao, response){
+function atualizarViewTexto(acao, valor, response){
+
+    $('.updateCampos').val(valor);
+    $('.deleteTexto').val(valor);
 
     if(response.length == 0){
-        msgRetorno('erro', 'Erro', '<strong>Texto não existe! Por favor, atualize a página!</strong>');
+        gerarTextoAvisosCrud('erro', '<strong>Texto não existe! Por favor, atualize a página!</strong>');
         return;
     }
 
@@ -104,8 +112,10 @@ function atualizarViewTexto(acao, response){
             textoAoCarregar(resultado, titulo);
             break;
         default:
-            return;
+            break;
     }
+
+    gerarTextoAvisosCrud(acao, valor, response);
 }
 
 function msgExcluir(response, valor, title = '', texto = ''){
