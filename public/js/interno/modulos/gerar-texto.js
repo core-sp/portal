@@ -67,7 +67,6 @@ function textoAoCarregar(resultado, titulo = true){
     $('#texto_tipo').val(resultado.texto_tipo);
     $('#tipo option[value="' + resultado.tipo + '"]').prop('selected', true);
     $('#com_numeracao option[value="' + resultado.com_numeracao + '"]').prop('selected', true);
-    $('#nivel option[value="' + resultado.nivel + '"]').prop('selected', true);
 
     try {
         tinymce.activeEditor.setContent(conteudo);
@@ -76,7 +75,7 @@ function textoAoCarregar(resultado, titulo = true){
         $('#loadingIndice').modal('hide');
         gerarTextoAvisosCrud('erro', '<strong>Clique novamente no texto.</strong>');
     } finally{
-        hideShowOptions();
+        hideShowOptions(resultado.nivel);
     }
 }
 
@@ -177,7 +176,7 @@ function gerarTextoAvisosCrud(acao, valor, response = null){
     }
 }
 
-function hideShowOptions(){
+function hideShowOptions(nivel = 1){
 
     let titulo = $(".textoTipo").val() == 'Título';
 
@@ -188,7 +187,7 @@ function hideShowOptions(){
             titulo ? $(this).show() : $(this).hide();
     });
 
-    $('#nivel')[0].selectedIndex = titulo ? 0 : 1;
+    $('#nivel')[0].selectedIndex = titulo ? 0 : nivel;
     $('#com_numeracao option').show();
 
     if(!titulo)
