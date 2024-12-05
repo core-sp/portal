@@ -2,6 +2,24 @@ const pasta_img_principal = 'img/';
 const pasta_img_opcional = "/admin/imagens/itens-home/armazenamento";
 let openStorage_id = '';
 
+function lazyLoadImg(){
+
+    const link = $('#modulo-lazy-load-img').attr('src');
+
+    import(link)
+    .then((module) => {
+        console.log('Módulo lazy-load-img importado por opcional e carregado.');
+        console.log('Local do módulo: ' + link);
+
+        let root = document.querySelector('#armazenamento .modal-dialog .modal-content');
+        module.default(root);
+    })
+    .catch((err) => {
+        console.log(err);
+        alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
+    });
+}
+
 function limparTabelaStorage(){
     
     $('#armazenamento .card-columns .card').remove();
@@ -31,8 +49,8 @@ function preencheTabelaPath(caminho, folder_name, value) {
     + '"><i class="fas fa-trash"></i></button></div>';
 
     let texto_html = '<div class="card-body text-center pt-0 pl-0 pr-0"><div class="card-img-top"><a href="/' + href_path 
-    + '" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home_storage"><img src="/' + href_path 
-    + '"></a></div><br><button class="btn btn-link text-break storagePath" value="' + href_path + '">' + value 
+    + '" target="_blank" rel="noopener" data-toggle="lightbox" data-gallery="itens_home_storage"><img data-src="/' + href_path 
+    + '" class="lazy-loaded-image lazy"></a></div><br><button class="btn btn-link text-break storagePath" value="' + href_path + '">' + value 
     + '</button><br><hr><a href="' + pasta_img_opcional + '/download/' + folder_name + '/' + value 
     + '" class="btn btn-sm btn-primary mr-2"><i class="fas fa-download"></i></a>' + final_texto;
     
@@ -77,6 +95,7 @@ function receberArquivos(id, pasta = null){
             });
             eventClickSelecionar(id);
             eventClickExcluir(caminho);
+            lazyLoadImg();
         },
         error: function() {
             alert('Erro ao carregar os arquivos. Recarregue a página.');

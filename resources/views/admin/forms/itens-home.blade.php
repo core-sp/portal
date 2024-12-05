@@ -662,3 +662,4 @@
 </div>
 
 <script type="module" src="{{ asset('/js/interno/modulos/home-imagem-itens.js?'.hashScriptJs()) }}" id="modulo-home-imagem-itens" class="modulo-editar"></script>
+<script type="module" src="{{ asset('/js/modulos/lazy-load-img.js?'.hashScriptJs()) }}" id="modulo-lazy-load-img"></script>
