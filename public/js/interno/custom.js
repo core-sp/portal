@@ -8,7 +8,7 @@ $(document).ready(function(){
     .then((init) => {
         init.default();
         init.opcionais();
-        console.log('Versão dos scripts: ' + elemento_init.attr('class'));
+        console.log('[MÓDULOS] # Versão dos scripts: ' + elemento_init.attr('class'));
     })
     .catch((err) => {
         console.log(err);

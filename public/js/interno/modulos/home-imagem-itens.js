@@ -8,8 +8,8 @@ function lazyLoadImg(){
 
     import(link)
     .then((module) => {
-        console.log('Módulo lazy-load-img importado por opcional e carregado.');
-        console.log('Local do módulo: ' + link);
+        console.log('[MÓDULOS] # Módulo lazy-load-img importado por opcional e carregado.');
+        console.log('[MÓDULOS] # Local do módulo: ' + link);
 
         let root = document.querySelector('#armazenamento .modal-dialog .modal-content');
         module.default(root);
@@ -229,3 +229,5 @@ export function executar(funcao){
     if(funcao == 'editar')
         return editar();
 }
+
+export let scripts_para_importar = {modulo: ['lazy-load-img'], local: ['modulos/']};

@@ -15,6 +15,24 @@ function tinyInit(){
     }
 }
 
+function criarScriptParaImportar(modulo_atual, obj_modulos = {modulo:[], local:[]}){
+
+    if((obj_modulos === null) || (typeof obj_modulos !== 'object'))
+        return; 
+
+    if((Object.keys(obj_modulos).length === 0) || (obj_modulos.modulo.length === 0))
+        return;
+
+    obj_modulos.modulo.forEach((element, index) => {
+        const script = document.createElement('script');
+        script.type = "module";
+        script.src = link + obj_modulos.local[index] + element + '.js?' + hash;
+        script.id = inicio + element;
+
+        modulo_atual.after(script);
+    });
+}
+
 export default function (local = 'interno'){
 
     const modulos_principais = ['mascaras', 'utils', 'filemanager'];
@@ -22,39 +40,36 @@ export default function (local = 'interno'){
     const caminho_modulos = local + '/' + pasta_modulos;
     const pastas_principais = [pasta_modulos, caminho_modulos, caminho_modulos];
 
-    for (let i in modulos_principais) {
-
+    modulos_principais.forEach((element, index) => {
         const script = document.createElement('script');
         script.type = "module";
-        script.src = link + pastas_principais[i] + modulos_principais[i] + '.js?' + hash;
-        script.id = inicio + modulos_principais[i];
+        script.src = link + pastas_principais[index] + element + '.js?' + hash;
+        script.id = inicio + element;
         
         document.getElementById(inicio + "init").after(script);
 
-        import($('#' + inicio + modulos_principais[i]).attr('src'))
+        import($('#' + inicio + element).attr('src'))
         .then((module) => {
-            console.log('Módulo principal "' + modulos_principais[i] + '" carregado.');
+            console.log('[MÓDULOS] # Módulo principal "' + element + '" carregado.');
             module.executar(local);
         })
         .catch((err) => {
             console.log(err);
             alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
         });
-    }
+    });
 };
 
 export function opcionais(){
     
     tinyInit();
 
-    // inicializa os módulos opcionais
-
     const opcionais = $('[type="module"][class^="' + inicio + '"]');
   
     if(opcionais.length == 0)
         return false;
 
-    console.log('Total de módulos opcionais carregados na atual página: ' + opcionais.length);
+    console.log('[MÓDULOS] # Total de módulos opcionais carregados na atual página: ' + opcionais.length);
     opcionais.each(function(){
 
         let funcao = $(this).attr('class').replace(inicio, '');
@@ -62,8 +77,12 @@ export function opcionais(){
         
         import($(this).attr('src'))
         .then((module) => {
-            console.log('Módulo de "' + funcao + ' ' + modulo + '" carregado.');
-            console.log('Local do módulo: ' + $(this).attr('src').replace(link, 'js/'));
+            console.log('[MÓDULOS] # Módulo de "' + funcao + ' ' + modulo + '" carregado.');
+            console.log('[MÓDULOS] # Local do módulo: ' + $(this).attr('src').replace(link, 'js/'));
+
+            if('scripts_para_importar' in module)
+                criarScriptParaImportar(this, module.scripts_para_importar);
+
             module.executar(funcao);
         })
         .catch((err) => {
