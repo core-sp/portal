@@ -73,7 +73,7 @@
     <fieldset class="border border-primary pb-2 pl-3 pr-3 mt-2">
         <legend class="w-auto pr-2">Anexar Documentos</legend>
 
-        <form class="ml-1" action="{{ route('preregistro.upload.doc', $resultado->id) }}" method="POST" enctype="multipart/form-data">
+        <form class="ml-1" action="{{ route('preregistro.upload.doc', $resultado->id) }}" method="POST" enctype="multipart/form-data" id="form-anexo-docs">
             @csrf
 
             <div class="form-group">

@@ -1380,6 +1380,19 @@ function popObjetoPutDados(objeto){
 	putDadosPR.dados = null;
 	
 	if(putDadosPR.campo == 'path'){
+		let retorno = verificarArquivos(putDadosPR.valor);
+		let msg = 'Os anexos devem ter até 5MB de tamanho!<br>' + 
+		' E somente deve anexar até 15 arquivos num anexo!';
+
+		if(!retorno){
+			$("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + msg);
+			$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
+			setTimeout(function() {
+				$("#modalLoadingPreRegistro").modal('hide');
+			}, 4000);
+			return false;
+		}
+
 		for(var i = 0; i < putDadosPR.valor.length; i++)
 			frmData.append("valor[]", putDadosPR.valor[i]);
 		frmData.append('campo', putDadosPR.campo);
@@ -1441,8 +1454,10 @@ function acoesAposSucesso(response){
 
 function putDadosPreRegistro(objeto)
 {
-	popObjetoPutDados(objeto);
-
+	let final = popObjetoPutDados(objeto);
+	if(final === false)
+		return;
+		
 	$("#modalLoadingBody").html('<i class="spinner-border text-info"></i> Salvando');
 	$('#modalLoadingPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
 
@@ -1477,7 +1492,7 @@ function putDadosPreRegistro(objeto)
 				$("#modalLoadingPreRegistro").modal('hide');
 			}, errorFunction[1]); 
 			valorPreRegistro = null;
-			console.clear();
+			// console.clear();
 		}
 	});
 }
@@ -1883,6 +1898,25 @@ function modalExcluirPR(id, conteudo, titulo_exclusao, texto_tipo_exclusao){
 	$('#modalExcluir #textoExcluir').text(conteudo);
 	const classes = $('#modalExcluir #excluir-geral')[0].classList;
 	classes.replace(trocar, novo);
+}
+
+function verificarArquivos(arquivos){
+
+	let pode_anexar = true;
+	let total = 0;
+
+	if(arquivos.length > 15)
+		return false;
+
+	for (const element of arquivos) {
+		total += Math.round((element.size / 1024));
+		if(total > 5120){
+			pode_anexar = false;
+			break;
+		}
+	}
+
+	return pode_anexar;
 }
 
 $('#inserirPreRegistro').ready(function(){

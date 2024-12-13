@@ -1439,6 +1439,24 @@ function verificaJustificados()
         $('button[value="aprovado"]').addClass('disabled').attr('type', 'button');
 }
 
+function verificarArquivo(arquivo){
+
+  if(arquivo === undefined)
+    return false;
+  
+	if(Math.round((arquivo.size / 1024)) > 2048){
+    $("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> O arquivo deve ter até 2MB de tamanho!');
+    $("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
+    setTimeout(function() {
+      $("#modalLoadingPreRegistro").modal('hide');
+    }, 3000);
+
+    return false;
+  }
+
+	return true;
+}
+
 $('#accordionPreRegistro').ready(function() {
     verificaJustificados();
 });
@@ -1533,6 +1551,23 @@ $('#submitNegarPR button[value="negado"]').click(function(e) {
 $('#doc_pre_registro').on('change',function(e){
   var fileName = e.target.files[0].name;
   $(this).next('.custom-file-label').html(fileName);
+  verificarArquivo(e.target.files[0]);
+});
+
+$('#form-anexo-docs').submit(function(e){
+  let pode_enviar = verificarArquivo($('#doc_pre_registro')[0].files[0]);
+  let possui_doc = $('[name="tipo"]:checked').length > 0;
+
+  if(!possui_doc){
+    $("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> Deve selecionar o tipo de documento!');
+    $("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
+    setTimeout(function() {
+      $("#modalLoadingPreRegistro").modal('hide');
+    }, 3000);
+  }
+
+  if((pode_enviar === false) || !possui_doc)
+    e.preventDefault();
 });
 
 $('.link-tab-rt').click(function(){
