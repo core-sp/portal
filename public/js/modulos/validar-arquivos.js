@@ -41,7 +41,7 @@ export function validarUmArquivo(arquivo, mimeType = [], tamanho = 2048){
         return 'Arquivo inexistente';
       
     if(Math.round((arquivo.size / 1024)) > tamanho)
-        return 'Arquivo com tamanho de ' + tamanho + ' MB excedido';
+        return 'Arquivo com tamanho de ' + tamanho + ' KB excedido';
 
     if(mimeType.length == 0)
         return true;
