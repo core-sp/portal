@@ -16,8 +16,23 @@ function lazyLoadImg(){
     })
     .catch((err) => {
         console.log(err);
-        alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
+        alert('Erro na página! Módulo com erro! Tente novamente mais tarde!');
     });
+}
+
+async function validarArquivo(arquivo, mimeTypes = []){
+
+    const link = $('#modulo-validar-arquivos').attr('src');
+
+    try {
+        const module = await import(link);
+        console.log('[MÓDULOS] # Módulo validar-arquivos importado por opcional e carregado.');
+        console.log('[MÓDULOS] # Local do módulo: ' + link);
+        return module.validarUmArquivo(arquivo, mimeTypes);
+    } catch (err) {
+        console.log(err);
+        alert('Erro na página! Módulo com erro! Tente novamente mais tarde!');
+    }
 }
 
 function limparTabelaStorage(){
@@ -190,6 +205,7 @@ function editar(){
         $('#armazenamento #msgStorage').hide();
         $("#filtrarFile").val('');
         limparTabelaStorage();
+        $('#armazenamento .custom-file-label').text('Selecionar arquivo...');
     });
 
     $("#header_fundo_cor").change(function(){
@@ -209,12 +225,20 @@ function editar(){
         if($(this).val() == '')
             return;
     
-        let form = new FormData();
-        form.append('_method', "POST");
-        form.append('_token', $('meta[name="csrf-token"]').attr('content'));
-        form.append('file_itens_home', e.target.files[0]);
-    
-        ajaxAdicionaArquivo(form);
+        validarArquivo(e.target.files[0], ['image/png', 'image/jpeg'])
+        .then(function(value) {
+            if(typeof value === 'string'){
+                msgGerenciarArquivo(value, false);
+                return;
+            }
+
+            let form = new FormData();
+            form.append('_method', "POST");
+            form.append('_token', $('meta[name="csrf-token"]').attr('content'));
+            form.append('file_itens_home', e.target.files[0]);
+        
+            ajaxAdicionaArquivo(form);
+        });
     });
 
     $('#deleteFileStorage').on('click', function(){
@@ -230,4 +254,7 @@ export function executar(funcao){
         return editar();
 }
 
-export let scripts_para_importar = {modulo: ['lazy-load-img'], local: ['modulos/']};
+export let scripts_para_importar = {
+    modulo: ['lazy-load-img', 'validar-arquivos'], 
+    local: ['modulos/', 'modulos/']
+};
