@@ -99,3 +99,5 @@
         </div>
     </div>
 </div>
+
+<script type="module" src="{{ asset('/js/interno/modulos/cedula.js?'.hashScriptJs()) }}" id="modulo-cedula" class="modulo-editar"></script>
