@@ -330,6 +330,7 @@
         <!-- Modal Header -->
         <div class="modal-header">
           <h4 class="modal-title">Editar unidade do item</h4>
+          <span class="ml-2 mt-2"><i><small>(usar vírgula para decimal)</small></i></span>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <!-- Modal body -->
@@ -343,3 +344,5 @@
       </div>
     </div>
   </div>
+
+  <script type="module" src="{{ asset('/js/interno/modulos/sala-reuniao.js?'.hashScriptJs()) }}" id="modulo-sala-reuniao" class="modulo-editar"></script>
