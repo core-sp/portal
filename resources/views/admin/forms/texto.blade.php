@@ -296,3 +296,5 @@
         </div>
     </div>
 </div>
+
+<script type="module" src="{{ asset('/js/interno/modulos/gerar-texto.js?'.hashScriptJs()) }}" id="modulo-gerar-texto" class="modulo-editar"></script>
