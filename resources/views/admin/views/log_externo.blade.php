@@ -227,7 +227,7 @@
                         <div class="input-group mr-3" id="buscar-mes">
                             <div class="input-group-prepend">
                                 <div class="input-group-text">
-                                    <input type="radio" class="mr-1" name="optradio" {{ isset(request()->query()['mes']) || (!isset(request()->query()['mes']) && !isset(request()->query()['ano'])) ? 'checked' : '' }}><strong>Mês/Ano:</strong>
+                                    <input type="radio" class="mr-1" name="optradio" value="mes" {{ isset(request()->query()['mes']) || (!isset(request()->query()['mes']) && !isset(request()->query()['ano'])) ? 'checked' : '' }}><strong>Mês/Ano:</strong>
                                 </div>
                             </div>
                             <input type="month" 
@@ -248,7 +248,7 @@
                         <div class="input-group" id="buscar-ano">
                             <div class="input-group-prepend">
                                 <div class="input-group-text">
-                                    <input type="radio" class="mr-1" name="optradio" {{ isset(request()->query()['ano']) ? 'checked' : '' }}><strong>Ano:</strong>
+                                    <input type="radio" class="mr-1" name="optradio" value="ano" {{ isset(request()->query()['ano']) ? 'checked' : '' }}><strong>Ano:</strong>
                                 </div>
                             </div>
                             <input type="number" 
@@ -449,3 +449,5 @@
     </div>
 
 </div>
+
+<script type="module" src="{{ asset('/js/interno/modulos/suporte.js?'.hashScriptJs()) }}" id="modulo-suporte" class="modulo-visualizar"></script>

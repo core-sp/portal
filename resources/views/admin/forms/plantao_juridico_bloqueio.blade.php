@@ -119,3 +119,5 @@
         </div>
     </div>
 </form>
+
+<script type="module" src="{{ asset('/js/interno/modulos/plantao-juridico-bloqueio.js?'.hashScriptJs()) }}" id="modulo-plantao-juridico-bloqueio" class="modulo-editar"></script>
