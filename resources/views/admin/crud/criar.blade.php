@@ -32,8 +32,5 @@
   </div>
 </section>
 
-<!-- <script src="//cdn.tinymce.com/4/tinymce.min.js"></script> -->
-<script src="{{'https://cdn.tiny.cloud/1/' . env('TINY_API_KEY') . '/tinymce/5/tinymce.min.js'}}" referrerpolicy="origin"></script>
-<script type="text/javascript" src="{{ asset('js/tinymce.js?'.time()) }}"></script>
 
 @endsection

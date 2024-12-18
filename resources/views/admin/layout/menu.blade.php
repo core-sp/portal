@@ -275,8 +275,6 @@
                         <p>Banner principal</p>
                     </a>
                 </li>
-            </ul>
-            <ul class="nav nav-treeview">
                 <li class="nav-item">
                     <a href="{{ route('imagens.itens.home') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>

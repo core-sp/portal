@@ -234,3 +234,5 @@
         </div>
     </div>
 </div>
+
+<script type="module" src="{{ asset('/js/interno/modulos/sala-reuniao-agendados.js?'.hashScriptJs()) }}" id="modulo-sala-reuniao-agendados" class="modulo-criar"></script>
