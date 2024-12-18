@@ -312,3 +312,5 @@
         </div>
     </div>
 </form>
+
+<script type="module" src="{{ asset('/js/interno/modulos/curso.js?'.hashScriptJs()) }}" id="modulo-curso" class="modulo-editar"></script>
