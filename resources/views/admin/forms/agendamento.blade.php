@@ -185,3 +185,5 @@
         </div>
     </div>
 </form>
+
+<script type="module" src="{{ asset('/js/interno/modulos/agendamento.js?'.hashScriptJs()) }}" id="modulo-agendamento" class="modulo-editar"></script>

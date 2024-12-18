@@ -102,9 +102,19 @@
         </div>
         <!-- ./wrapper -->
 
+      @if(config('app.env') == 'local')
+      <script type="text/javascript" src="{{ asset('/js/tinymce/tinymce.min.js') }}"></script>
+      @else
+      <script referrerpolicy="origin" src="{{ 'https://cdn.tiny.cloud/1/' . env('TINY_API_KEY') . '/tinymce/5/tinymce.min.js' }}"></script>
+      @endif
+
       <script type="text/javascript" src="{{ asset('/js/app.js') }}"></script>
-      <script type="text/javascript" src="{{ asset('/js/jquery-ui.min.js') }}"></script>
-      <script type="text/javascript" src="{{ asset('/js/jquery.mask.js') }}"></script>
-      <script type="text/javascript" src="{{ asset('/js/custom.js?'.time()) }}"></script>
+      <!-- <script type="text/javascript" src="{{-- asset('/js/jquery-ui.min.js') --}}"></script> -->
+      <!-- <script type="text/javascript" src="{{-- asset('/js/jquery.mask.js') --}}"></script> -->
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.15/jquery.mask.min.js" integrity="sha512-gDWSGGWzTc0mD1P0NwDUsZsSrSyLsC8Mv0I14JtDFJXu2Pgo3ik5Uk1+BqxosbEJU2gDUD6W5DCpn7l29Ah9Ag==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>      
+      <script type="module" src="{{ asset('/js/modulos/init.js?'.hashScriptJs()) }}" id="modulo-init" class="{{ 'v=' . versaoScriptJs() }}"></script>
+      <script type="text/javascript" src="{{ asset('/js/interno/custom.js?'.hashScriptJs()) }}"></script>
     </body>
 </html>
