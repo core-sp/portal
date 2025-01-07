@@ -73,7 +73,7 @@
     <fieldset class="border border-primary pb-2 pl-3 pr-3 mt-2">
         <legend class="w-auto pr-2">Anexar Documentos</legend>
 
-        <form class="ml-1" action="{{ route('preregistro.upload.doc', $resultado->id) }}" method="POST" enctype="multipart/form-data" id="form-anexo-docs">
+        <form class="ml-1" action="{{ route('preregistro.upload.doc', $resultado->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="form-group">
@@ -105,7 +105,7 @@
                     </div>
                 </div>
                 <div class="col mt-2">
-                    <button type="submit" class="btn btn-sm btn-primary">Enviar</button>
+                    <button type="button" id="form-anexo-docs" class="btn btn-sm btn-primary">Enviar</button>
                 </div>
             </div>
         </form>
@@ -269,10 +269,7 @@
             @csrf
             @method('PUT')
             <input type="hidden" name="situacao" value="aprovar">
-            <button type="submit"
-                class="btn btn-success {{ isset($resultado->justificativa) ? '' : 'disabled' }}"
-                value="aprovado"
-            >
+            <button type="submit" class="btn btn-success" {{ isset($resultado->justificativa) ? '' : 'disabled' }} id="submitAprovarPR">
                 <i class="fas fa-check"></i> Aprovar
             </button>
         </form>
@@ -281,22 +278,16 @@
             @csrf
             @method('PUT')
             <input type="hidden" name="situacao" value="corrigir">
-            <button type="submit"
-                class="btn btn-warning"
-                value="correcao"
-            >
+            <button type="submit" class="btn btn-warning" id="submitCorrigirPR">
                 <i class="fas fa-times"></i> Enviar para correção
             </button>
         </form>
 
-        <form method="POST" action="{{ route('preregistro.update.status', $resultado->id) }}" class="ml-3" id="submitNegarPR">
+        <form method="POST" action="{{ route('preregistro.update.status', $resultado->id) }}" class="ml-3">
             @csrf
             @method('PUT')
             <input type="hidden" name="situacao" value="negar">
-            <button type="submit"
-                class="btn btn-danger justificativaPreRegistro"
-                value="negado"
-            >
+            <button type="button" class="btn btn-danger" id="submitNegarPR">
                 <i class="fas fa-ban"></i> Negar
             </button>
         </form>
@@ -350,4 +341,6 @@
         </div>
     </div>
 </div>
+
+<script type="module" src="{{ asset('/js/interno/modulos/pre-registro.js?'.hashScriptJs()) }}" id="modulo-pre-registro" class="modulo-editar"></script>
 

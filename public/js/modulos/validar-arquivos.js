@@ -2,6 +2,7 @@ const extensao = {
     image_gif: ["0,474946383761", "0,474946383961"],
     image_jpeg: ["0,FFD8"],
     image_png: ["0,89504E470D0A1A0A"],
+    application_pdf: ["0,25504446"],
 };
 
 function readBuffer(arquivo, start = 0, end = 2) {
