@@ -2,7 +2,7 @@
     $campoAnexo = isset($resultado->getCamposEditados()['path']) ? explode(',', $resultado->getCamposEditados()['path']) : array();
 @endphp
 
-<div class="card-body bg-light">
+<!-- <div class="card-body bg-light"> -->
 
     @include('admin.inc.pre-registro-btn-remover-just', ['aba' => $abas[6], 'valor_btn' => 'parte_anexos'])
 
@@ -193,4 +193,4 @@
     </p>
     {!! !$resultado->atendentePodeEditar() ? '</fieldset>' : '' !!}
     
-</div>
+<!-- </div> -->

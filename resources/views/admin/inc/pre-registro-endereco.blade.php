@@ -2,7 +2,7 @@
     $camposEditados = $resultado->getCamposEditados();
 @endphp
 
-<div class="card-body bg-light">
+<!-- <div class="card-body bg-light"> -->
 
     @include('admin.inc.pre-registro-btn-remover-just', ['aba' => $abas[2], 'valor_btn' => 'parte_endereco'])
 
@@ -208,4 +208,4 @@
     </p>
 
 @endif
-</div>
+<!-- </div> -->

@@ -80,12 +80,12 @@ function habilitarBotoesStatus(justificado){
 
 function verificaJustificados(){
 
-    $('#accordionPreRegistro .card').each(function() {
-        let menu = $(this).find('.menuPR');
+    $('#accordionPreRegistro .tab-pane').each(function() {
+        let menu = $('[href="#' + $(this).attr('id') + '"]').parent();
         let possui_just = $(this).find('.just').length > 0;
 
         if(possui_just && (menu.find('.justMenu').length == 0))
-            menu.append('<span class="badge badge-sm badge-warning justMenu ml-3">Justificado</span>');
+            menu.append('<i class="fas fa-circle text-warning justMenu"></i>');
 
         if(!possui_just)
             menu.find('.justMenu').remove();
@@ -267,11 +267,20 @@ function editar(){
         $(this).find('textarea').prop('readonly', somente_leitura);
     });
 
+    $('button.hide_menu').click(function(){
+        let ativo = $(this).parent().find('.active');
+
+        if(ativo.length > 0){
+            $(ativo.attr('href')).removeClass('active');
+            ativo.removeClass('active');
+        }
+    });
+
     if($('#accordionPreRegistro').length > 0)
         verificaJustificados();
 
     $('.link-tab-rt').click(function(){
-        $("#accordionPreRegistro #parte_contato_rt.collapse").collapse('show');
+        $('#accordionPreRegistro .nav-pills a[href="#parte_contato_rt"]').tab('show');
     });
 
     $('#doc_pre_registro').on('change',function(e){
