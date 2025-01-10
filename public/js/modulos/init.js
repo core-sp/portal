@@ -15,6 +15,16 @@ function tinyInit(){
     }
 }
 
+function securityInit(){
+
+    if($('#modulo-security').length > 0){
+        const _lib = document.createElement('script');
+        _lib.setAttribute("type", "text/javascript");
+        _lib.setAttribute("src", link + 'zxcvbn.js?' + hash);
+        document.body.appendChild(_lib);
+    }
+}
+
 function criarScriptParaImportar(modulo_atual, obj_modulos = {modulo:[], local:[]}){
 
     if((obj_modulos === null) || (typeof obj_modulos !== 'object'))
@@ -35,10 +45,19 @@ function criarScriptParaImportar(modulo_atual, obj_modulos = {modulo:[], local:[
 
 export default function (local = 'interno'){
 
-    const modulos_principais = ['mascaras', 'utils', 'filemanager'];
+    const locais = new Map([
+        ["interno", ['utils', 'filemanager']],
+        ["externo", []],
+    ]);
+    const modulos_principais = ['mascaras'].concat(locais.get(local));
     const pasta_modulos = 'modulos/';
     const caminho_modulos = local + '/' + pasta_modulos;
-    const pastas_principais = [pasta_modulos, caminho_modulos, caminho_modulos];
+    
+    const pastas_locais = new Map([
+        ["interno", [caminho_modulos, caminho_modulos]],
+        ["externo", []],
+    ]);
+    const pastas_principais = [pasta_modulos].concat(pastas_locais.get(local));
 
     modulos_principais.forEach((element, index) => {
         const script = document.createElement('script');
@@ -63,6 +82,7 @@ export default function (local = 'interno'){
 export function opcionais(){
     
     tinyInit();
+    securityInit();
 
     const opcionais = $('[type="module"][class^="' + inicio + '"]');
   

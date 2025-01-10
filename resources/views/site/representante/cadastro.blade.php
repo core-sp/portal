@@ -167,7 +167,6 @@
     </div>
 </section>
 
-<script type="text/javascript" src="{{ asset('/js/zxcvbn.js?'.time()) }}"></script>
-<script type="text/javascript" src="{{ asset('/js/security.js?'.time()) }}"></script>
+<script type="module" src="{{ asset('/js/modulos/security.js?'.hashScriptJs()) }}" id="modulo-security" class="modulo-visualizar"></script>
 
 @endsection
