@@ -143,6 +143,19 @@ body {
 	color: #FFFFFF !important;
 }
 
+.contraste-fundo-link {
+	background-color: #000 !important;
+	text-decoration: underline !important;
+}
+
+.contraste-fundo-branco {
+	background-color: #FFF !important;
+}
+
+.contraste-btn-acessibilidade {
+	background-color: #FF6161 !important;
+}
+
 img {
 	max-width: 100%;
 	height: auto;

@@ -47,7 +47,7 @@ export default function (local = 'interno'){
 
     const locais = new Map([
         ["interno", ['utils', 'filemanager']],
-        ["externo", []],
+        ["externo", ['acessibilidade']],
     ]);
     const modulos_principais = ['mascaras'].concat(locais.get(local));
     const pasta_modulos = 'modulos/';
@@ -55,7 +55,7 @@ export default function (local = 'interno'){
     
     const pastas_locais = new Map([
         ["interno", [caminho_modulos, caminho_modulos]],
-        ["externo", []],
+        ["externo", [pasta_modulos]],
     ]);
     const pastas_principais = [pasta_modulos].concat(pastas_locais.get(local));
 
