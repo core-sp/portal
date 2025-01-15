@@ -3107,15 +3107,6 @@ h5 {
 	font-size: 14px;
 }
   
-.btn-cookies {
-	font-size: 12px;
-	text-align: center;
-	background: #007bff;
-	cursor: pointer;
-	align-self: normal;
-	color: #fff;
-}
-  
 @media screen and (max-width: 900px) {
 	.box-cookies {
 	  flex-direction: column;

@@ -22,8 +22,8 @@
           @foreach($imagens as $img)
             <div class="carousel-item h-100 {{ $loop->first ? 'active' : '' }}">
               <a href="{{ $img->link }}" target="{{ $img->target }}">
-                <img class="w-100 hide-576" src="{{ asset($img->url) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
-                <img class="w-100 show-576" src="{{ asset($img->url_mobile) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
+                <img class="w-100 hide-576 lazy-loaded-image" data-src="{{ asset($img->url) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
+                <img class="w-100 show-576 lazy-loaded-image" data-src="{{ asset($img->url_mobile) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
               </a>
             </div>
           @endforeach
@@ -258,7 +258,7 @@
             </div>
           </div>
           <div class="col-lg-5 hide-992">
-            <img class="lazy" data-src="{{ asset('img/Imagem-celular002_beneficios_2024.png') }}" id="computer" alt="Programa de Benefícios | Core-SP" />
+            <img class="lazy-loaded-image lazy" data-src="{{ asset('img/Imagem-celular002_beneficios_2024.png') }}" id="computer" alt="Programa de Benefícios | Core-SP" />
           </div>
         </div>
       </div>
@@ -401,7 +401,7 @@
         <div class="row">
           <div class="col-sm-8">
             <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
-              <img class="lazy" data-src="{{ asset('img/computer.png') }}" alt="E-OUV | Core-SP" />
+              <img class="lazy-loaded-image lazy" data-src="{{ asset('img/computer.png') }}" alt="E-OUV | Core-SP" />
             </a>
           </div>
           <div class="col-sm-4 hide-576 eouv-imgs align-self-center pl-3 center-992">
@@ -442,7 +442,7 @@
         <div id="calendario" class="row">
           <div class="col-sm-8">
             <a href="/calendario-oficial-core-sp">
-              <img class="lazy" data-src="{{ isset($itens_home['calendario']) ? asset($itens_home['calendario']) : asset('img/arte-calendario-2023.png') }}" alt="Calendário | Core-SP" />
+              <img class="lazy-loaded-image lazy" data-src="{{ isset($itens_home['calendario']) ? asset($itens_home['calendario']) : asset('img/arte-calendario-2023.png') }}" alt="Calendário | Core-SP" />
             </a>
           </div>
           <div class="col-sm-4 hide-576 align-self-center text-right pr-4">

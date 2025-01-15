@@ -434,20 +434,19 @@
 
       <div class="container">
         <div class="row d-flex justify-content-center">
-          <div class="box-cookies hide">
+          <div class="border border-primary rounded box-cookies hide">
             <p class="msg-cookies">
               Coletamos dados e informações sobre a sessão exclusivamente para atendimento das atividades finais desta autarquia, por legítimo interesse do controlador, e para funcionamento de serviços de interesse do usuário de acordo com a nossa 
               <strong><u><a href="/politica-de-privacidade">Política de Privacidade</a></u></strong> 
               e, ao continuar navegando, você concorda com estas condições.
             </p>
-            <button class="btn-cookies btn btn-default">CONCORDO</button>
+            <button class="btn-cookies btn btn-sm btn-primary">CONCORDO</button>
           </div>     
         </div>    
       </div>     
 
       @component('components.scriptsExternoJS')
       @endcomponent
-      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js"></script>
       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.js"></script>
       <script type="text/javascript" src='https://www.google.com/recaptcha/api.js?hl=pt-BR'></script>
       <script type="text/javascript" src="{{ asset('/js/site.js?'.time()) }}"></script>

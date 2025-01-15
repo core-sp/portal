@@ -1,40 +1,5 @@
 $(document).ready(function(){
 	
-	// Menu responsivo
-	var first = document.getElementById('menu-principal');
-	var second = document.getElementById('sidebarContent');
-	second.innerHTML = first.innerHTML;
-	$('#sidebarBtn').on('click', function(){
-		$('#sidebar').toggleClass('leftando');
-		$('.overlay').toggleClass('active');
-	});
-	$('.overlay, #dismiss').on('click', function(){
-		$('.overlay').toggleClass('active');
-		$('#sidebar').toggleClass('leftando');
-	});
-	$('.dropdown').on('show.bs.dropdown', function() {
-		$(this).find('.dropdown-menu').first().stop(true, true).slideDown(200);
-	});
-	$('.dropdown').on('hide.bs.dropdown', function() {
-		$(this).find('.dropdown-menu').first().stop(true, true).slideUp(200);
-		$('.sub-dropdown').removeClass('menu-hoverable');
-		$('.sub-dropdown-menu').hide();
-		if($(window).width() < 768) {
-			$('.dropdown-item').removeClass('branco-azul');
-		}
-	});
-	// Segundo nível do menu
-	$('.sub-dropdown').on('click', function(e){
-		e.stopPropagation();
-		$(this).toggleClass('menu-hoverable');
-		$('.sub-dropdown').not($(this)).removeClass('menu-hoverable');
-		$(this).children('.sub-dropdown-menu').toggle('slide', { direction: "left" }, 200);
-		$('.sub-dropdown-menu').not($(this).children('.sub-dropdown-menu')).hide();
-		if($(window).width() < 768) {
-			$(this).children('.dropdown-item').toggleClass('branco-azul');
-			$('.dropdown-item').not($(this).children('.dropdown-item')).removeClass('branco-azul');
-		}
-	});
 	// Facebook Sharer
 	$('.fb-share').click(function(e) {
         e.preventDefault();
@@ -110,16 +75,6 @@ $(document).ready(function(){
 			}
 		}
 	});
-	// Scroll fixed menu
-	$(window).scroll(function(){
-		if($(window).width() > 767) {
-			if ($(document).scrollTop() > 300) {
-				$('#fixed-menu').slideDown(150);
-			} else {
-				$('#fixed-menu').hide();
-			}
-		}
-	});
 	// Interrogação (Descricão da Oportunidade)
 	$('#descricao-da-oportunidade').on({
 		"mouseover": function() {
@@ -151,35 +106,6 @@ $(document).ready(function(){
 			var value = $('#cnpj').val();
 			getInfoEmpresa(value);
 		}
-	}
-	// // Popup Campanha
-	// // carrega um video, mas no modal já faz isso
-	// var campanha = localStorage.getItem('campanha');
-	// if (campanha == null) {
-	// 	localStorage.setItem('campanha', 1);
-	// 	$(window).on('load', function(){
-	// 		$('#popup-campanha').modal('show');
-	// 	});
-	// }
-
-	$(window).on('load', function(){
-		if($('#popup-campanha').length > 0)
-			$('#popup-campanha').modal('show');
-	});
-	$('#popup-campanha').on('hidden.bs.modal', function(){
-		var youtube = $('#video-campanha').attr('src');
-		$('#video-campanha').attr('src', youtube);
-	});
-	// $('#video-campanha').on('ended', function(){
-	// 	$('#popup-campanha').modal('hide');
-	// });
-});
-
-// Lightbox
-$(document).on('click', '[data-toggle="lightbox"]', function(event) {
-	if($(window).width() > 767) {
-		event.preventDefault();
-		$(this).ekkoLightbox();
 	}
 });
 
@@ -974,12 +900,6 @@ function getDate() {
 		}
 	});
 
-	// Filename comprovante de residência
-	$('#comprovante-residencia, #comprovante-residencia-dois, #comprovante-justificativa').on('change',function(e){
-		var fileName = e.target.files[0].name;
-		$(this).next('.custom-file-label').html(fileName);
-	})
-
 	// Mostra Crimage Dois
 	$('#linkShowCrimageDois').on('click', function(){
 		$('#showCrimageDois').hide();
@@ -998,11 +918,6 @@ function getDate() {
 
 })(jQuery);
 
-// Lazy-load
-$(function() {
-	$('.lazy').Lazy();
-});
-
 function clickBoleto(descricao)
 {
 	$.get('/representante/evento-boleto', {
@@ -1020,24 +935,6 @@ $('.emitirCertidaoBtn').on('click', function(){
 	$('.emitirCertidaoBtn').hide();
 	$('.baixarCertidaoBtn').hide();
 });
-
-// Cuida do comportamento da mensagem do cookie e armazena na maquina do cliente a opção, e somente apos a limpeza que volta a pedir
-
-(() => {
-	if (!localStorage.pureJavaScriptCookies) {
-	  document.querySelector(".box-cookies").classList.remove('hide');
-	}
-	
-	const acceptCookies = () => {
-	  document.querySelector(".box-cookies").classList.add('hide');
-	  localStorage.setItem("pureJavaScriptCookies", "accept");
-	  window.clarity('consent');
-	};
-	
-	const btnCookies = document.querySelector(".btn-cookies");
-	
-	btnCookies.addEventListener('click', acceptCookies);
-  })();
 
   $('#cedula').submit(function() {
 	  var rg = $('#rg').val().replace(/[^a-zA-Z0-9]/g,'');
