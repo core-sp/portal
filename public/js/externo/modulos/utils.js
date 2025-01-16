@@ -56,7 +56,7 @@ function importLazyLoadImg(elemento){
 
     import(link)
     .then((module) => {
-        console.log('Módulo lazy-load-img importado por opcional e carregado.');
+        console.log('Módulo lazy-load-img importado por principal e carregado.');
         console.log('Local do módulo: ' + link);
         module.default(null, '0px', 0, elemento);
     })
@@ -87,6 +87,39 @@ function lazyLoad(resize = false){
         importLazyLoadImg(elemento);
         tamanho_anterior = window.innerWidth;
     }
+}
+
+function importCep(){
+    const link = $('#modulo-cep').attr('src');
+
+    import(link)
+    .then((module) => {
+        console.log('Módulo cep importado por principal e carregado.');
+        console.log('Local do módulo: ' + link);
+        module.getCep();
+    })
+    .catch((err) => {
+        console.log(err);
+        alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
+    });
+}
+
+function confereCep(retorno){
+
+    if(retorno == 'encontrado'){
+        $("#msgGeral").modal('hide');
+        return;
+    }
+
+    let texto = retorno == 'buscando' ? '<div class="spinner-grow text-info"></div>' : retorno;
+
+    $("#msgGeral .modal-header, #msgGeral .modal-footer").hide();
+    $("#msgGeral .modal-body").addClass('text-center').html(texto);
+    $("#msgGeral").modal({backdrop: "static", keyboard: false, show: true});
+
+    setTimeout(function(){
+        $("#msgGeral").modal('hide');
+    }, 2250);
 }
 
 export function executar(local = 'externo'){
@@ -121,9 +154,20 @@ export function executar(local = 'externo'){
         let fileName = e.target.files[0].name;
         $(this).next('.custom-file-label').html(fileName);
     });
+
+    $("#msgGeral").on('hide.bs.modal', function(){
+        $(this).find('.modal-body, .modal-title, .modal-footer').html('');
+    });
+
+    if($("#cep").length > 0){
+        importCep();
+        $("#cep").on('CEP CEP_ERRO', function(e){
+            confereCep(e.detail);
+        });
+    }
 };
 
 export let scripts_para_importar = {
-    modulo: ['lazy-load-img'], 
-    local: ['modulos/']
+    modulo: ['lazy-load-img', 'cep'], 
+    local: ['modulos/', 'modulos/']
 };
