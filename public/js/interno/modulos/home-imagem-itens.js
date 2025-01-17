@@ -73,26 +73,6 @@ function preencheTabelaPath(caminho, folder_name, value) {
     $('#armazenamento #cards .storageFile:last').append(texto_html);
 }
 
-function eventClickSelecionar(id){
-
-    $('.storagePath').on('click', function(){
-        $('#' + id).val(this.value);
-        $("#armazenamento").modal("hide");
-    });
-}
-
-function eventClickExcluir(caminho){
-
-    if(caminho == pasta_img_principal)
-        return;
-    
-    $('.deleteFileStorage').on('click', function(){
-        $('#confirmDelete #confirmFile').text(this.value);
-        $('#confirmDelete #deleteFileStorage').val(this.value);
-        $('#confirmDelete').modal({backdrop: 'static', keyboard: false, show: true});
-    });
-}
-
 function receberArquivos(id, pasta = null){
 
     $.ajax({
@@ -108,8 +88,12 @@ function receberArquivos(id, pasta = null){
             response.path.forEach(function(value, index, array) {
                 preencheTabelaPath(caminho, folder_name, value);
             });
-            eventClickSelecionar(id);
-            eventClickExcluir(caminho);
+            $(document)[0].dispatchEvent(new CustomEvent("ITENS_SELECIONAR", {
+                detail: id,
+            }));
+            $(document)[0].dispatchEvent(new CustomEvent("ITENS_EXCLUIR", {
+                detail: caminho,
+            }));
             lazyLoadImg();
         },
         error: function() {
@@ -246,6 +230,24 @@ function editar(){
     
         $('#confirmDelete').modal('hide');
         ajaxRemoveArquivo(arquivo);
+    });
+
+    $(document).on('ITENS_SELECIONAR', function(e){
+        $('.storagePath').on('click', function(){
+            $('#' + e.detail).val(this.value);
+            $("#armazenamento").modal("hide");
+        });
+    });
+
+    $(document).on('ITENS_EXCLUIR', function(e){
+        if(e.detail == pasta_img_principal)
+            return;
+        
+        $('.deleteFileStorage').on('click', function(){
+            $('#confirmDelete #confirmFile').text(this.value);
+            $('#confirmDelete #deleteFileStorage').val(this.value);
+            $('#confirmDelete').modal({backdrop: 'static', keyboard: false, show: true});
+        });
     });
 };
 
