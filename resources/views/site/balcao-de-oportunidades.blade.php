@@ -121,7 +121,7 @@ use \App\BdoOportunidade;
               </h6>
               <div class="linha-lg-mini"></div>
               <p>{{ $oportunidade->descricao }}</p>
-              <div class="bdo-info">
+              <div class="saiba-mais-info">
                 <div class="row mt-3 bot-lg">
                   <div class="col d-flex">
                     <div class="mr-2">

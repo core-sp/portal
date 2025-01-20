@@ -1571,7 +1571,7 @@ footer p {
 	line-height: 1.5;
 }
 
-.bdo-info {
+.saiba-mais-info {
 	display: none;
 }
 
@@ -2925,6 +2925,14 @@ h5 {
 	.representante-content .quinze {
 		width: 25%;
 	}
+
+	#prender {
+		margin-left: 0px;
+	}
+
+	#prender img {
+		max-width: 70%;
+	}
 }
 
 
@@ -3064,11 +3072,11 @@ h5 {
 		line-height: 1;
 	}
 
-	.bdo-info .row {
+	.saiba-mais-info .row {
 		display: block !important;
 	}
 
-	.bdo-info .col {
+	.saiba-mais-info .col {
 		margin-top: 10px;
 	}
 

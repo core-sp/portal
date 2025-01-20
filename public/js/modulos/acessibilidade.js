@@ -66,7 +66,7 @@ function mudaContraste(){
 		]).toggleClass('contraste');
 
 		$([
-			'.linha-verde', '.linha-azul', '.linha-azul-escuro', '.bdo-info i', '.consulta-linha hr', '.page-link', '.mr-item-selected a h6', 
+			'.linha-verde', '.linha-azul', '.linha-azul-escuro', '.saiba-mais-info i', '.consulta-linha hr', '.page-link', '.mr-item-selected a h6', 
 			'#popup-campanha h4', 'a:contains("Termos de Uso")'
 		]).toggleClass('contraste-branco');
 

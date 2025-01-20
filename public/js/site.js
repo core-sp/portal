@@ -1,24 +1,5 @@
 $(document).ready(function(){
 	
-	// Facebook Sharer
-	$('.fb-share').click(function(e) {
-        e.preventDefault();
-        window.open($(this).attr('href'), 'fbShareWindow', 'height=450, width=550, top=' + ($(window).height() / 2 - 275) + ', left=' + ($(window).width() / 2 - 225) + ', toolbar=0, location=0, menubar=0, directories=0, scrollbars=0');
-        return false;
-    });
-	// Twitter Sharer
-	$('.twitter-share').click(function(e) {
-        e.preventDefault();
-        window.open($(this).attr('href'), 'fbShareWindow', 'height=273, width=450, top=' + ($(window).height() / 2 - 275) + ', left=' + ($(window).width() / 2 - 225) + ', toolbar=0, location=0, menubar=0, directories=0, scrollbars=0');
-        return false;
-	});
-	// Facebook Sharer
-	$('.linkedin-share').click(function(e) {
-        e.preventDefault();
-        window.open($(this).attr('href'), 'fbShareWindow', 'height=700, width=450, top=' + ($(window).height() / 2 - 275) + ', left=' + ($(window).width() / 2 - 225) + ', toolbar=0, location=0, menubar=0, directories=0, scrollbars=0');
-        return false;
-	});
-
 	// Interrogação (Descricão da Oportunidade)
 	$('#descricao-da-oportunidade').on({
 		"mouseover": function() {
@@ -53,31 +34,6 @@ $(document).ready(function(){
 	}
 });
 
-// Scroll das redes sociais em posts do blog
-if(window.location.href.indexOf("/blog/") > -1) {
-	var prenderTop = $('#prender').offset().top;
-	$(window).scroll(function() {
-		var margin = 15;
-		var topson = $(document).scrollTop() + $('#fixed-menu').height() + margin;
-		var topsonPrender = $(document).scrollTop() + $('#fixed-menu').height() + margin + $('#prender').height();
-		var botson = $('.sociais-post').offset().top + $('.sociais-post').height();
-		if(topson >= prenderTop) {
-			$('#prender').addClass('prender').css('top', $('#fixed-menu').height() + margin);
-		} else {
-			$('#prender').removeClass('prender');
-		}
-		if(topsonPrender >= botson) {
-			$('#prender').addClass('prenderBot');
-		} else {
-			$('#prender').removeClass('prenderBot');
-		}
-	});
-}
-
-// Replica o conteúdo do menu no menu superior
-var primeira = document.getElementById('menu-principal');
-var segunda = document.getElementById('append-menu');
-segunda.innerHTML = primeira.innerHTML;
 // Feriados para desablitar calendário
 // natDays = [
 // 	[6, 20, 'br'],
@@ -133,25 +89,6 @@ function noWeekendsOrHolidays(date) {
 		return lotado;
 	}
 }
-
-// Funcionalidade Mapa Fiscalização ++++++++++++++++++++++++++++++++++++++++
-$('.mapa_regional').on({
-	"click": function() {
-		$(".dado-regional").addClass('d-none');
-		$(".mapa_regional").removeClass("regional-selecionada");
-		$("#instrucao-mapa").addClass('dado-oculto');
-
-		$("#dado-" + $(this).attr('id')).removeClass('d-none');
-		$("#" + $(this).attr('id')).addClass("regional-selecionada");
-	},
-});
-
-$('#ano-mapa').on({
-	"change": function() {
-		window.location.href = "/mapa-fiscalizacao/" + $(this).val();
-	},
-});
-// Fim da Funcionalidade Mapa Fiscalização ++++++++++++++++++++++++++++++++++++++++
 
 (function($){
 	$(function(){
@@ -643,31 +580,6 @@ $('#ano-mapa').on({
 	});
 
 	// FIM Funcionalidade Agendamentos Salas Area Restrita RC++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-		// Agenda Institucional
-		$("#agenda-institucional").datepicker({
-			dateFormat: 'dd-mm-yy',
-			todayHighlight: false,
-			dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
-			dayNamesMin: ['D','S','T','Q','Q','S','S'],
-			dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
-			monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-			monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
-		})
-		.datepicker('setDate', $('#data').text());
-
-		// Botão Saiba Mais do Banco de Oportunidades
-		$('.saiba-mais').on('click', function(){
-			var saibamais = $(this);
-			var bdoinfo = saibamais.prev('.bdo-info');
-			bdoinfo.slideToggle(function(){
-				if(bdoinfo.is(':visible')) {
-					saibamais.html('<i class="fas fa-angle-double-up"></i>&nbsp;&nbsp;Menos Detalhes');
-				} else {
-					saibamais.html('<i class="fas fa-angle-double-down"></i>&nbsp;&nbsp;Mais Detalhes');
-				}
-			});
-		});
 	
 		// Switch para máscaras de contato Gerenti
 		function switchMascaras(conteudo, id)
@@ -734,9 +646,6 @@ $('#ano-mapa').on({
 			$('#mobile-menu-representante').slideToggle();
 		});
 
-		$('#agenda-institucional').change(function(){
-			window.location.href = "/agenda-institucional/" + $(this).val();
-		});
 	});
 })(jQuery);
 
@@ -949,15 +858,3 @@ $('#btnPrintSimulador').click(function(){
 	myWindow.document.write(final + $('#simuladorTxt').html());
 	myWindow.print();
 });
-
-// Carta-serviços ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-$('#textosSumario').change(function(){
-	var id = $('#textosSumario').val();
-	var link = "/carta-de-servicos-ao-usuario/" + id;
-	window.location.replace(window.location.protocol + "//" + window.location.host + link);
-});
-
-if($('#corpoTexto').length > 0)
-	$('#corpoTexto').focus();
-
-// FIM Carta-serviços ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

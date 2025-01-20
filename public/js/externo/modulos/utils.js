@@ -1,9 +1,9 @@
-let tamanho_anterior = window.innerWidth;
+let tamanho_anterior = $(window).width();
 
 function menuResponsivo(){
 
     // Conteúdo do menu
-    $('#sidebarContent').html($('#menu-principal').html());
+    $('#sidebarContent, #append-menu').html($('#menu-principal').html());
 
 	$('#sidebarBtn, .overlay, #dismiss').on('click', function(){
 		$('#sidebar').toggleClass('leftando');
@@ -71,7 +71,7 @@ function lazyLoad(resize = false){
     let elemento = '.lazy-loaded-image.lazy';
 
     if($('.carousel-item').length > 0)
-        elemento += window.innerWidth > 576 ? ', .carousel-item .hide-576' : ', .carousel-item .show-576';
+        elemento += $(window).width() > 576 ? ', .carousel-item .hide-576' : ', .carousel-item .show-576';
 
     if($(elemento).length == 0)
         return;
@@ -81,11 +81,11 @@ function lazyLoad(resize = false){
         return;
     }
 
-    let mudou_tamanho = tamanho_anterior <= 576 ? window.innerWidth > 576 : window.innerWidth <= 576;
+    let mudou_tamanho = tamanho_anterior <= 576 ? $(window).width() > 576 : $(window).width() <= 576;
 
     if(mudou_tamanho){
         importLazyLoadImg(elemento);
-        tamanho_anterior = window.innerWidth;
+        tamanho_anterior = $(window).width();
     }
 }
 
@@ -130,10 +130,17 @@ export function executar(local = 'externo'){
     if($('#popup-campanha').length > 0)
         $('#popup-campanha').modal('show');
 
-    // Menu principal fixo se maior que 767
-	$(window).scroll(function(){
+    // Menu principal fixo
+	$(document).on('scroll', function(){
 		if($(window).width() > 767)
 			$(document).scrollTop() > 300 ? $('#fixed-menu').slideDown(150) : $('#fixed-menu').hide();
+
+        if($(window).width() <= 767){
+            $(document).scrollTop() > 300 ? 
+                $('#menuResponsivo').addClass('fixed-top').next().find('.sidebar-header, #dismiss').addClass('invisible') : 
+                $('#menuResponsivo').removeClass('fixed-top').next().find('.sidebar-header, #dismiss').removeClass('invisible');
+        }
+        
 	});
 
     // Lightbox
@@ -150,6 +157,12 @@ export function executar(local = 'externo'){
         lazyLoad(true);
     });
 
+    // Texto do link com quantidade de caracteres que ultrapassam a largura do conteúdo
+    $('.conteudo-txt a').each(function(){
+        if($('.conteudo-txt').width() < $(this).width())
+            $(this).addClass('text-break');
+    });
+        
     $(".custom-file-input").on("change", function(e) {
         let fileName = e.target.files[0].name;
         $(this).next('.custom-file-label').html(fileName);
@@ -165,6 +178,19 @@ export function executar(local = 'externo'){
             confereCep(e.detail);
         });
     }
+
+    $('.saiba-mais').on('click', function(){
+        let saibamais = $(this);
+        let info = saibamais.prev('.saiba-mais-info');
+
+        info.slideToggle(function(){
+            let texto = info.is(':visible') ? 'Menos' : 'Mais';
+
+            saibamais.html(saibamais.html().replace(/Menos|Mais/, texto))
+            .children()
+            .toggleClass('fa-angle-double-up').toggleClass('fa-angle-double-down');
+        });
+    });
 };
 
 export let scripts_para_importar = {
