@@ -73,7 +73,7 @@
                             </div>
                         @endif
                     </div>
-                    <div id="avLoading"><img src="{{ asset('img/ajax-loader.gif') }}" class="pt-0 mb-2" alt="Loading"></div>
+                    <!-- <div id="avLoading"><img src="{{-- asset('img/ajax-loader.gif') --}}" class="pt-0 mb-2" alt="Loading"></div> -->
                     <div id="avAlert" class="alert" role="alert"></div>
                     <div class="form-row mt-2 avHidden">
                         <div class="col-sm mb-2-576">
@@ -362,5 +362,7 @@
         </div>
     </div>
 </section>
+
+<script type="module" src="{{ asset('/js/externo/modulos/balcao-oportunidades.js?'.hashScriptJs()) }}" id="modulo-balcao-oportunidades" class="modulo-editar"></script>
 
 @endsection

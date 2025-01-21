@@ -1,37 +1,5 @@
 $(document).ready(function(){
 	
-	// Interrogação (Descricão da Oportunidade)
-	$('#descricao-da-oportunidade').on({
-		"mouseover": function() {
-			$(this).tooltip({
-				items: "#descricao-da-oportunidade",
-				content: "<h6 class='mb-2'><strong>Exemplo:</strong></h6>* Possuir carro;<br>* Possuir Empresa;<br>* Preferencialmente ter experiência no segmento do produto / serviço;<br>* Conhecer a região que irá atuar;<br>* Preferencialmente possuir carteira ativa de clientes;"
-			});
-			$(this).tooltip("open");
-		},
-		"mouseout": function() {
-			$(this).tooltip("disable");   
-		}
-	});
-	// Interrogação (Endereço da empresa)
-	$('#endereco-da-empresa').on({
-		"mouseover": function() {
-			$(this).tooltip({
-				items: "#endereco-da-empresa",
-				content: "<h6 class='mb-2'><strong>Exemplo:</strong></h6>Av. Brigadeiro Luís Antônio, 613 - 5º andar - Centro - São Paulo - SP"
-			});
-			$(this).tooltip("open");
-		},
-		"mouseout": function() {
-			$(this).tooltip("disable");   
-		}
-	});
-	if($('#cnpj').length != 0) {
-		if($('#cnpj').val().length == 18) {
-			var value = $('#cnpj').val();
-			getInfoEmpresa(value);
-		}
-	}
 });
 
 // Feriados para desablitar calendário
@@ -619,28 +587,6 @@ function noWeekendsOrHolidays(date) {
 			var id = $('#gerentiTipoContato option:selected').val();
 			switchMascaras(conteudo, id);
 		}
-		// Auto-preenche empresa Balcão de Oportunidades (anúncio)
-		$('#cnpj').on('keyup', function(){
-			var value = $(this).val();
-			if(value.length == 18) {
-				getInfoEmpresa(value);
-			}
-		});
-		// Após modal
-		$('#avInfo').on('hidden.bs.modal', function () {
-			$('#titulice').focus();
-		});
-		$('#avNull').on('hidden.bs.modal', function () {
-			$('#av01').focus();
-		});
-		// Abre campo para Outro Segmento
-		$('#avSegmentoOp').on('change', function(){
-			if($(this).val() == 'Outro') {
-				$('#outroSegmento').show();
-			} else {
-				$('#outroSegmento').hide();
-			}
-		});
 		// Menu mobile representante
 		$('#bars-representante').on('click', function(){
 			$('#mobile-menu-representante').slideToggle();
@@ -648,37 +594,6 @@ function noWeekendsOrHolidays(date) {
 
 	});
 })(jQuery);
-
-// Get informação empresa
-function getInfoEmpresa(value)
-{
-	return $.ajax({
-		type: 'GET',
-		url: '/info-empresa/' + encodeURIComponent(value.replace(/[^\d]+/g,'')),
-		beforeSend: function() {
-			$('#avLoading').show();	
-		},
-		success: function(data)
-		{
-			var json = $.parseJSON(data.empresa);
-			$('.avHidden').hide();
-			$('#av10').val(json.idempresa);
-			$('#av01, #avEmail').val('');
-			$('#titulice').focus();
-			$('#avLoading').hide();
-			// Mostra o alert
-			$('#avAlert').show().removeClass('alert-info alert-warning').addClass(data.class).html(data.message);
-		},
-		error: function()
-		{
-			$('.avHidden').css('display', 'flex');
-			$('#av10').val('0');
-			$('#av01').focus();
-			$('#avLoading').hide();
-			$('#avAlert').show().removeClass('alert-info alert-success').addClass('alert-info').text('Empresa não cadastrada. Favor informar os dados da empresa abaixo.');
-		}
-	});
-}
 
 // Get now date
 function getDate() {
