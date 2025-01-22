@@ -1,7 +1,7 @@
 const txt_descricao = '<h6 class="mb-2"><strong>Exemplo:</strong></h6>* Possuir carro;<br>* Possuir Empresa;<br>' + 
 '* Preferencialmente ter experiência no segmento do produto / serviço;<br>* Conhecer a região que irá atuar;<br>' + 
 '* Preferencialmente possuir carteira ativa de clientes;';
-const txt_endereco = '<h6 class="mb-2"><strong>Exemplo:</strong></h6>Av. Brigadeiro Luís Antônio, 613 - 5º andar - Centro - São Paulo - SP';
+const txt_endereco = '<h6 class="mb-2">Busque pelo CEP e complete o endereço. <strong>Exemplo:</strong></h6>Av. Brigadeiro Luís Antônio, 613 - 5º andar - Centro - São Paulo - SP';
 let cnpj_temp = '';
 
 function validarCnpj(cnpj){
@@ -73,6 +73,7 @@ function editar(){
         $('#avAlert').show()
         .removeClass('alert-info alert-success').addClass('alert-info')
         .text(e.detail);
+        $('#cep').val('');
     });
 
     $(document).on('BDO_COM_EMPRESA', function(e){
@@ -83,9 +84,11 @@ function editar(){
 		$('#avAlert').show()
         .removeClass('alert-info alert-warning').addClass(e.detail.class)
         .html(e.detail.message);
+        $('#cep, [name="endereco"]').val('');
     });
 
     $(document).on('BDO_ERRO', function(e){
+        $('#cep, [name="endereco"]').val('');
         $("#msgGeral .modal-header").show();
         $("#msgGeral .modal-footer").hide();
         $("#msgGeral .modal-body").addClass('text-center text-danger').html(e.detail);
@@ -131,6 +134,12 @@ function editar(){
 	$('#avSegmentoOp').on('change', function(){
 		$(this).val() == 'Outro' ? $('#outroSegmento').show() : $('#outroSegmento').hide();
 	});
+
+    $("#cep").on('CEP', function(e){
+        if(e.detail == 'encontrado')
+            $('[name="endereco"]')
+            .val($('#rua').val() + ', nº ... - Complemento ... - ' + $('#bairro').val() + ' - ' + $('#cidade').val() + ' - ' + $('#uf').val());
+    });
 }
 
 export function executar(funcao){

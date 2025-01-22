@@ -142,6 +142,13 @@
                     <div class="form-row mt-2 avHidden">
                         <div class="col-sm mb-2-576">
                             <label for="endereco">Endereço</label>  <i class="fas fa-question-circle d-inline azul" id="endereco-da-empresa"></i>
+                            <div class="input-group input-group-sm mb-1">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Buscar pelo CEP</span>
+                                </div>
+                                <input type="text" class="form-control cep" id="cep" placeholder="CEP">
+                            </div>
+                            <input type="hidden" id="rua"><input type="hidden" id="bairro"><input type="hidden" id="cidade"><input type="hidden" id="uf">
                             <input
                                 type="text"
                                 name="endereco"
@@ -250,13 +257,13 @@
                         </div>
                     </div>
                     @php
-                        old('regiaoAtuacao') !== null ? $oldRA = old('regiaoAtuacao') : $oldRA = []
+                        $oldRA = !empty(old('regiaoAtuacao')) ? old('regiaoAtuacao') : [];
                     @endphp
                     <div class="form-group mt-2">
                         <label for="regiaoAtuacao">Região de Atuação</label>
                         <select name="regiaoAtuacao[]" class="form-control {{ $errors->has('regiaoAtuacao') ? 'is-invalid' : '' }}" multiple>
                             @foreach ($regionais as $regional)
-                                <option value="{{ $regional->idregional }}" {{ in_array($regional->regional, $oldRA) ? 'selected' : '' }}>{{ $regional->regional }}</option>
+                                <option value="{{ $regional->idregional }}" {{ in_array($regional->idregional, $oldRA) ? 'selected' : '' }}>{{ $regional->regional }}</option>
                             @endforeach
                         </select>
                         @if($errors->has('regiaoAtuacao'))
