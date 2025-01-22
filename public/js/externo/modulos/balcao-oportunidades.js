@@ -30,12 +30,10 @@ function getInfoEmpresa(value){
 		type: 'GET',
 		url: '/info-empresa/' + encodeURIComponent(value.replace(/[^\d]+/g,'')),
 		beforeSend: function(){
-            $("#msgGeral .modal-header, #msgGeral .modal-footer").hide();
-            $("#msgGeral .modal-body").addClass('text-center').html('<div class="spinner-grow text-info"></div>');
-            $("#msgGeral").modal({backdrop: "static", keyboard: false, show: true});
+            $(document)[0].dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR"));
 		},
 		success: function(data){
-            $("#msgGeral").modal('hide');
+            $(document)[0].dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
             $('#avAlert').html('').hide();
 
             if(data.length == 0){
@@ -54,7 +52,7 @@ function getInfoEmpresa(value){
             }));
 		},
 		error: function(erro){
-            $("#msgGeral").modal('hide');
+            $(document)[0].dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
             $('#avAlert').html('').hide();
 
             $(document)[0].dispatchEvent(new CustomEvent("BDO_ERRO", {
@@ -89,10 +87,12 @@ function editar(){
 
     $(document).on('BDO_ERRO', function(e){
         $('#cep, [name="endereco"]').val('');
-        $("#msgGeral .modal-header").show();
-        $("#msgGeral .modal-footer").hide();
-        $("#msgGeral .modal-body").addClass('text-center text-danger').html(e.detail);
-        $("#msgGeral").modal({backdrop: "static", keyboard: false, show: true});
+        $(document)[0].dispatchEvent(new CustomEvent("MSG_GERAL_CONT_TITULO", {
+            detail: {
+                titulo: '<i class="fas fa-times text-danger"></i> Erro!', 
+                texto: '<span class="text-danger">' + e.detail + '</span>'
+            }
+        }));
     });
 
     if(($('#cnpj').length > 0) && ($('#cnpj').val().length === 18)){

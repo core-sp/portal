@@ -107,19 +107,17 @@ function importCep(){
 function confereCep(retorno){
 
     if(retorno == 'encontrado'){
-        $("#msgGeral").modal('hide');
+        $(document)[0].dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
         return;
     }
 
-    let texto = retorno == 'buscando' ? '<div class="spinner-grow text-info"></div>' : retorno;
+    if(retorno == 'buscando')
+        $(document)[0].dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR"));
 
-    $("#msgGeral .modal-header, #msgGeral .modal-footer").hide();
-    $("#msgGeral .modal-body").addClass('text-center').html(texto);
-    $("#msgGeral").modal({backdrop: "static", keyboard: false, show: true});
-
-    setTimeout(function(){
-        $("#msgGeral").modal('hide');
-    }, 2250);
+    if(retorno != 'buscando')
+        $(document)[0].dispatchEvent(new CustomEvent("MSG_GERAL_CONTEUDO", {
+            detail: {texto: retorno}
+        }));
 }
 
 export function executar(local = 'externo'){
@@ -166,10 +164,6 @@ export function executar(local = 'externo'){
     $(".custom-file-input").on("change", function(e) {
         let fileName = e.target.files[0].name;
         $(this).next('.custom-file-label').html(fileName);
-    });
-
-    $("#msgGeral").on('hide.bs.modal', function(){
-        $(this).find('.modal-body, .modal-title, .modal-footer').html('');
     });
 
     if($("#cep").length > 0){
