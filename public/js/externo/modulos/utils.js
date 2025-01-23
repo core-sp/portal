@@ -107,15 +107,15 @@ function importCep(){
 function confereCep(retorno){
 
     if(retorno == 'encontrado'){
-        $(document)[0].dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
+        document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
         return;
     }
 
     if(retorno == 'buscando')
-        $(document)[0].dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR"));
+        document.dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR"));
 
     if(retorno != 'buscando')
-        $(document)[0].dispatchEvent(new CustomEvent("MSG_GERAL_CONTEUDO", {
+        document.dispatchEvent(new CustomEvent("MSG_GERAL_CONTEUDO", {
             detail: {texto: retorno}
         }));
 }

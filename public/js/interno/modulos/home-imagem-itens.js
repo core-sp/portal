@@ -88,10 +88,10 @@ function receberArquivos(id, pasta = null){
             response.path.forEach(function(value, index, array) {
                 preencheTabelaPath(caminho, folder_name, value);
             });
-            $(document)[0].dispatchEvent(new CustomEvent("ITENS_SELECIONAR", {
+            document.dispatchEvent(new CustomEvent("ITENS_SELECIONAR", {
                 detail: id,
             }));
-            $(document)[0].dispatchEvent(new CustomEvent("ITENS_EXCLUIR", {
+            document.dispatchEvent(new CustomEvent("ITENS_EXCLUIR", {
                 detail: caminho,
             }));
             lazyLoadImg();

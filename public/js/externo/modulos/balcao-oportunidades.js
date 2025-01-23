@@ -14,7 +14,7 @@ function validarCnpj(cnpj){
         erro = 'CNPJ já foi verificado';
 
     if(erro.length > 0){
-        $(document)[0].dispatchEvent(new CustomEvent("BDO_ERRO", {
+        document.dispatchEvent(new CustomEvent("BDO_ERRO", {
             detail: erro
         }));
         return false;
@@ -30,20 +30,20 @@ function getInfoEmpresa(value){
 		type: 'GET',
 		url: '/info-empresa/' + encodeURIComponent(value.replace(/[^\d]+/g,'')),
 		beforeSend: function(){
-            $(document)[0].dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR"));
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR"));
 		},
 		success: function(data){
-            $(document)[0].dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
             $('#avAlert').html('').hide();
 
             if(data.length == 0){
-                $(document)[0].dispatchEvent(new CustomEvent("BDO_SEM_EMPRESA", {
+                document.dispatchEvent(new CustomEvent("BDO_SEM_EMPRESA", {
                     detail: 'Empresa não cadastrada. Favor informar os dados da empresa abaixo.',
                 }));
                 return;
             }
 
-            $(document)[0].dispatchEvent(new CustomEvent("BDO_COM_EMPRESA", {
+            document.dispatchEvent(new CustomEvent("BDO_COM_EMPRESA", {
                 detail: {
                     empresa: JSON.parse(data.empresa),
                     class: data.class,
@@ -52,10 +52,10 @@ function getInfoEmpresa(value){
             }));
 		},
 		error: function(erro){
-            $(document)[0].dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
             $('#avAlert').html('').hide();
 
-            $(document)[0].dispatchEvent(new CustomEvent("BDO_ERRO", {
+            document.dispatchEvent(new CustomEvent("BDO_ERRO", {
                 detail: erro.status == 422 ? erro.responseJSON.errors.cnpj : erro.responseJSON.message
             }));
 		}
@@ -87,7 +87,7 @@ function editar(){
 
     $(document).on('BDO_ERRO', function(e){
         $('#cep, [name="endereco"]').val('');
-        $(document)[0].dispatchEvent(new CustomEvent("MSG_GERAL_CONT_TITULO", {
+        document.dispatchEvent(new CustomEvent("MSG_GERAL_CONT_TITULO", {
             detail: {
                 titulo: '<i class="fas fa-times text-danger"></i> Erro!', 
                 texto: '<span class="text-danger">' + e.detail + '</span>'
