@@ -27,7 +27,7 @@
                 <input
                     type="text"
                     name="contato"
-                    class="form-control {{ $errors->has('contato') ? 'is-invalid' : '' }}"
+                    class="form-control gerentiContato {{ $errors->has('contato') ? 'is-invalid' : '' }}"
                     id="gerentiInserirContato"
                     placeholder="Conteúdo do contato"
                     disabled
@@ -44,5 +44,7 @@
         </form>
     </div>
 </div>
+
+<script type="module" src="{{ asset('/js/restrita-rc/modulos/contato.js?'.hashScriptJs()) }}" id="modulo-contato" class="modulo-editar"></script>
 
 @endsection

@@ -6,7 +6,9 @@ $(document).ready(function(){
 
     import(elemento_init.attr('src'))
     .then((init) => {
-        init.default('externo');
+        let subarea = window.location.pathname.search('/representante/') > -1 ? 'restrita-rc' : null;
+
+        init.default('externo', subarea);
         init.opcionais();
         console.log('[MÓDULOS] # Versão dos scripts: ' + elemento_init.attr('class'));
     })

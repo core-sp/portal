@@ -43,21 +43,33 @@ function criarScriptParaImportar(modulo_atual, obj_modulos = {modulo:[], local:[
     });
 }
 
-export default function (local = 'interno'){
+export default function (local = 'interno', subarea = null){
 
     const locais = new Map([
         ["interno", ['utils', 'filemanager']],
         ["externo", ['acessibilidade', 'utils', 'modal-geral']],
     ]);
-    const modulos_principais = ['mascaras'].concat(locais.get(local));
+    const subareas = new Map([
+        ["restrita-rc", ['utils']],
+    ]);
+    let modulos_principais = ['mascaras'].concat(locais.get(local));
     const pasta_modulos = 'modulos/';
     const caminho_modulos = local + '/' + pasta_modulos;
+    const caminho_modulos_subarea = typeof subarea == "string" ? subarea + '/' + pasta_modulos : '';
     
     const pastas_locais = new Map([
         ["interno", [caminho_modulos, caminho_modulos]],
         ["externo", [pasta_modulos, caminho_modulos, pasta_modulos]],
     ]);
-    const pastas_principais = [pasta_modulos].concat(pastas_locais.get(local));
+    const pastas_subareas = new Map([
+        ["restrita-rc", [caminho_modulos_subarea]],
+    ]);
+    let pastas_principais = [pasta_modulos].concat(pastas_locais.get(local));
+
+    if(typeof subarea == "string"){
+        modulos_principais = modulos_principais.concat(subareas.get(subarea));
+        pastas_principais = pastas_principais.concat(pastas_subareas.get(subarea));
+    }
 
     modulos_principais.forEach((element, index) => {
         const script = document.createElement('script');
@@ -71,7 +83,7 @@ export default function (local = 'interno'){
 
         import(modulo_criado.attr('src'))
         .then((module) => {
-            console.log('[MÓDULOS] # Módulo principal "' + element + '" carregado.');
+            console.log('[MÓDULOS] # Módulo principal "' + element + '" carregado, localizado em: ' + modulo_criado.attr('src') + '.');
 
             if('scripts_para_importar' in module)
                 criarScriptParaImportar(modulo_criado, module.scripts_para_importar);

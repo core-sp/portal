@@ -10,10 +10,14 @@
             {!! $mensagem !!}
         </p>
         @if($emitir)
+        {{--
         <form method="POST" class="d-inline">
             @csrf
             <input type="submit" value="Emitir certidão" class="emitirCertidaoBtn btn btn-primary link-nostyle branco"/>
         </form>
+        --}}
+
+        <button type="button" value="Emitir certidão" class="emitirCertidaoBtn btn btn-primary link-nostyle branco">Emitir certidão</button>
         @endif    
 
         @if(isset($certidoes))
@@ -48,5 +52,7 @@
         </div>
     </div>
 </div>
+
+<script type="module" src="{{ asset('/js/restrita-rc/modulos/certidao.js?'.hashScriptJs()) }}" id="modulo-certidao" class="modulo-visualizar"></script>
 
 @endsection

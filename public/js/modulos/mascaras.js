@@ -1,3 +1,46 @@
+function gerentiContato(conteudo, id){
+
+	conteudo.attr('type', 'text');
+	switch (id) {
+		case '1':
+		case '4':
+		case '6':
+		case '7':
+		case '8':
+			conteudo.mask('(99) 9999-9999');
+			break;
+		case '2':
+			conteudo.mask('(99) 99999-9999');
+			break;
+		case '3':
+			conteudo.unmask();
+			conteudo.attr('type', 'email');
+			break;
+		case '5':
+			conteudo.unmask();
+			break;
+		default:
+			conteudo.mask('9');
+			break;
+	}
+}
+
+function mascaraRG(rg){
+
+    rg = rg.replace(/[^a-zA-Z0-9]/g, '');
+    
+    let dv = '-' + rg.slice(rg.length - 1, rg.length);
+    let rgSemDV = rg.slice(0, rg.length - 1);
+    let rgFinal = dv;
+
+    while(rgSemDV.length > 3){
+        rgFinal = '.' + rgSemDV.slice(rgSemDV.length - 3, rgSemDV.length) + rgFinal;
+        rgSemDV = rgSemDV.slice(0, rgSemDV.length - 3);
+    }
+
+    return rgSemDV + rgFinal;
+}
+
 function mascarasGerais(){
 
     $('.cep').mask('00000-000');
@@ -57,6 +100,16 @@ function mascarasGerais(){
             $(field).mask(mask, options);
         }
     });
+
+    if(($(".rgInput").length > 0) && ($(".rgInput").val().length > 3))
+        $(".rgInput").val(mascaraRG($(".rgInput").val()));
+
+    $(".rgInput").on('keyup', function() {
+        let texto = $(this).val();
+    
+        if(texto.length > 3)
+            $(this).val(mascaraRG(texto));
+    });
 }
 
 function mascarasInternas(){
@@ -106,6 +159,10 @@ function mascarasExternas(){
 		    'Z': {pattern: /[0-9\-]/}
 		}
 	});
+
+    $('.gerentiContato').on('MASK', function(e){
+        gerentiContato($(this), e.detail);
+    });
 }
 
 export function executar(local = 'interno'){

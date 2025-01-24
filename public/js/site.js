@@ -1,33 +1,4 @@
-$(document).ready(function(){
-	
-});
-
-// Feriados para desablitar calendário
-// natDays = [
-// 	[6, 20, 'br'],
-// 	[6, 21, 'br'],
-// 	[11, 15, 'br'],
-// 	[11, 20, 'br'],
-// 	[12, 23, 'br'],
-// 	[12, 24, 'br'],
-// 	[12, 25, 'br'],
-// 	[12, 26, 'br'],
-// 	[12, 27, 'br'],
-// 	[12, 30, 'br'],
-// 	[12, 31, 'br'],
-// ];
 var lotados = [];
-
-// Função para adicionar feriados
-// function nationalDays(date) {
-//     for (i = 0; i < natDays.length; i++) {
-//       if (date.getMonth() == natDays[i][0] - 1
-//           && date.getDate() == natDays[i][1]) {
-//         return [false, natDays[i][2] + '_day'];
-//       }
-// 	}	
-// 	return [true, ''];
-// }
 
 // Função para adicionar feriados
 function diasLotados(date) {
@@ -549,48 +520,6 @@ function noWeekendsOrHolidays(date) {
 
 	// FIM Funcionalidade Agendamentos Salas Area Restrita RC++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	
-		// Switch para máscaras de contato Gerenti
-		function switchMascaras(conteudo, id)
-		{
-			conteudo.attr('type', 'text');
-			switch (id) {
-				case '1':
-				case '4':
-				case '6':
-				case '7':
-				case '8':
-					conteudo.mask('(99) 9999-9999');
-				break;
-				case '2':
-					conteudo.mask('(99) 99999-9999');
-				break;
-				case '3':
-					conteudo.unmask();
-					conteudo.attr('type', 'email');
-				break;
-				case '5':
-					conteudo.unmask();
-				break;
-				default:
-					conteudo.mask('9');
-				break;
-			}
-		}
-		// Gerenti Inserir Contato
-		$('#gerentiTipoContato').on('change', function(){
-			var conteudo = $('#gerentiInserirContato');
-			conteudo.prop("disabled", false).val('');
-			switchMascaras(conteudo, $(this).val());
-		});
-		if($('#gerentiTipoContato').is(':disabled')) {
-			conteudo = $('#gerentiInserirContato');
-			var id = $('#gerentiTipoContato option:selected').val();
-			switchMascaras(conteudo, id);
-		}
-		// Menu mobile representante
-		$('#bars-representante').on('click', function(){
-			$('#mobile-menu-representante').slideToggle();
-		});
 
 	});
 })(jQuery);
@@ -618,19 +547,6 @@ function getDate() {
 
 // Simulador
 (function($){
-	// Opções Datepicker
-	var options = {
-		dateFormat: 'dd/mm/yy',
-		dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
-		dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
-		dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
-		monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-		monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
-		nextText: 'Próximo',
-		prevText: 'Anterior',
-		maxDate: '0',
-		minDate: '-256m',
-	}
 	// Mostra loading button
 	$('#submitSimulador, #anoVigenteButton').on('click', function(){
 		$('#loadingSimulador').css('display', 'inline-block');
@@ -668,88 +584,7 @@ function getDate() {
 		}
 	});
 
-	// Mostra Crimage Dois
-	$('#linkShowCrimageDois').on('click', function(){
-		$('#showCrimageDois').hide();
-		$('#divCrimageDois').show();
-	});
-
-	$(document).on('change', ".nParcela", function() {
-		var id = $(this).attr('id');
-		var nParcela = parseFloat($('option:selected',this).attr('value'));
-		var total = parseFloat($('#total' + id).attr('value'));
-		var valorParcelado =  (total/nParcela).toFixed(2);
-
-		$('#parcelamento' + id).attr('value', valorParcelado);
-		$('#parcelamento' + id).html('R$ ' + valorParcelado.replace('.', ','));
-	});
-
 })(jQuery);
-
-function clickBoleto(descricao)
-{
-	$.get('/representante/evento-boleto', {
-		'descricao': descricao,
-	});
-}
-
-function showLoading()
-{
-	$('#rc-main').hide();
-	$('#loading').show();
-}
-
-$('.emitirCertidaoBtn').on('click', function(){
-	$('.emitirCertidaoBtn').hide();
-	$('.baixarCertidaoBtn').hide();
-});
-
-  $('#cedula').submit(function() {
-	  var rg = $('#rg').val().replace(/[^a-zA-Z0-9]/g,'');
-	  var cpf = $('#cpf').val().replace(/\D/g,'');
-	  $('#rg').val(rg);
-	  $('#cpf').val(cpf);
-  })
-
-  // Para quantos dígitos forem necessários, sendo o dígito verificador sempre unitário
-  function mascaraRG(rg){
-	  var dv = '-' + rg.slice(rg.length - 1, rg.length);
-	  var rgSemDV = rg.slice(0, rg.length - 1);
-	  var rgFinal = dv;
-	  while(rgSemDV.length > 3)
-	  {
-		  rgFinal = '.' + rgSemDV.slice(rgSemDV.length - 3, rgSemDV.length) + rgFinal;
-		  rgSemDV = rgSemDV.slice(0, rgSemDV.length - 3);
-	  }
-	  rgFinal = rgSemDV + rgFinal;
-	  return rgFinal;
-  }
-
-// Máscara para o RG ao digitar
-$(".rgInput").keyup(function() {
-	// Remove qualquer caracter que não seja número ou letra e somente a máscara insere os pontos e traço
-	var texto = $(this).val().replace(/[^a-zA-Z0-9]/g,'');
-	if(texto.length > 3)
-		$(this).val(mascaraRG(texto));
-});
-
-// Carrega a máscara quando já possui um rg
-$('#cedula').ready(function() {
-	if($(".rgInput").index($('#rg')) > -1){
-		var texto = $('#rg').val().replace(/[^a-zA-Z0-9]/g,'');
-		if(texto.length > 3)
-			$('#rg').val(mascaraRG(texto));
-	}
-});
-
-// Logout Representante
-$("#logout-representante").click(function(){
-	var token = $('meta[name="csrf-token"]').attr('content');
-	var link = "/representante/logout";
-	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
-	$('body').append(form);
-	$(form).submit();
-});
 
 $('#btnPrintSimulador').click(function(){
 	var myWindow = window.open();
