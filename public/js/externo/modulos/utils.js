@@ -185,6 +185,10 @@ export function executar(local = 'externo'){
             .toggleClass('fa-angle-double-up').toggleClass('fa-angle-double-down');
         });
     });
+
+    $('.loadingPagina').on('click', function(){
+		document.dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR"));
+	});
 };
 
 export let scripts_para_importar = {
