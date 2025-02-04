@@ -124,9 +124,6 @@
             </div>
             @endif
           </div>
-          <div id="loadCalendario" class="loadImage">
-            <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
-          </div>
         </div>
 
         <div class="col-sm mb-2-576">
@@ -149,9 +146,6 @@
             {{ $errors->first('periodo') }}
           </div>
           @endif
-          <div id="loadHorario" class="loadImage">
-            <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
-          </div>
         </div>
       </div>
 
@@ -312,7 +306,7 @@
           {{ !empty(old('aceite')) ? 'checked' : '' }}
           required
         /> 
-        <label for="termo" class="textoTermo text-justify">
+        <label for="aceite" class="textoTermo text-justify">
           Li e concordo com as <a href="{{ route('termo.consentimento.pdf', 'sala-reuniao') }}" target="_blank"><u>condições</u></a> do uso da sala.
         </label>
         @if($errors->has('aceite'))
@@ -351,7 +345,8 @@
   </div>
 </div>
 
-  <div id="dialog_agendamento" title="Atenção"></div>
 </section>
+
+<script type="module" src="{{ asset('/js/restrita-rc/modulos/sala-reuniao.js?'.hashScriptJs()) }}" id="modulo-sala-reuniao" class="modulo-editar"></script>
 
 @endsection

@@ -28,15 +28,16 @@ function msgSomenteConteudo(conteudo, timeout){
     }, timeout);
 }
 
-function msgConteudoTitulo(titulo, conteudo){
+function msgConteudoTitulo(titulo, conteudo, botao = ''){
 
     if(typeof titulo !== "string")
         titulo = '';
 
     if(typeof conteudo !== "string")
         conteudo = '';
-
-    $("#msgGeral .modal-footer").hide();
+    
+    (typeof botao === "string") && (botao.length > 0) ? 
+        $("#msgGeral .modal-footer").append(botao).show() : $("#msgGeral .modal-footer").html('').hide();
     $("#msgGeral .modal-header .modal-title").html(titulo);
     $("#msgGeral .modal-header").show();
     $("#msgGeral .modal-body").addClass('text-center').html(conteudo);
@@ -59,6 +60,10 @@ export function executar(local){
 
     $(document).on('MSG_GERAL_CONT_TITULO', function(e){
         msgConteudoTitulo(e.detail.titulo, e.detail.texto);
+    });
+
+    $(document).on('MSG_GERAL_BTN_ACAO', function(e){
+        msgConteudoTitulo(e.detail.titulo, e.detail.texto, e.detail.botao);
     });
 
     $("#msgGeral").on('hide.bs.modal', function(){

@@ -110,6 +110,10 @@ function mascarasGerais(){
         if(texto.length > 3)
             $(this).val(mascaraRG(texto));
     });
+
+    $('input[name="participantes_cpf[]"]').on('MASK', function(){
+        $(':input[name="participantes_cpf[]"]').val('').unmask().mask('999.999.999-99');
+    });
 }
 
 function mascarasInternas(){
