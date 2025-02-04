@@ -90,7 +90,7 @@
 						<div class="col-md-{{ $curso->add_campo ? '3' : '4' }} mt-2-768">
 							<label for="telefone">Telefone <span class="text-danger">*</span></label>
 							<input type="text"
-								class="form-control celularInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
+								class="form-control telefoneInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
 								name="telefone"
 								value="{{ isset($user_rep) ? $user_rep->telefone : old('telefone') }}"
 								placeholder="Telefone" 

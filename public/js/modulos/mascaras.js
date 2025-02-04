@@ -1,3 +1,10 @@
+const cpf_text = '000.000.000-00';
+const cnpj_text = '00.000.000/0000-00';
+const dt_text = '00/00/0000';
+const hora_text = '00:00';
+const fone_4_text = '(00) 0000-0000';
+const fone_5_text = '(00) 00000-0000';
+
 function gerentiContato(conteudo, id){
 
 	conteudo.attr('type', 'text');
@@ -7,10 +14,10 @@ function gerentiContato(conteudo, id){
 		case '6':
 		case '7':
 		case '8':
-			conteudo.mask('(99) 9999-9999');
+			conteudo.mask(fone_4_text);
 			break;
 		case '2':
-			conteudo.mask('(99) 99999-9999');
+			conteudo.mask(fone_5_text);
 			break;
 		case '3':
 			conteudo.unmask();
@@ -44,34 +51,33 @@ function mascaraRG(rg){
 function mascarasGerais(){
 
     $('.cep').mask('00000-000');
-    $('.cpfInput').mask('000.000.000-00');
-    $('.cnpjInput').mask('99.999.999/9999-99');
+    $('.cpfInput').mask(cpf_text);
+    $('.cnpjInput').mask(cnpj_text);
     $('.nrlicitacaoInput').mask('99999/9999');
     $('.nrprocessoInput').mask('999/9999');
-    $('.dataInput').mask('00/00/0000');
+    $('.dataInput').mask(dt_text);
     $('#registro_core').mask('0000000/0000', {reverse: true});
-    $('.celularInput').mask('(00) 0000-00009');
+    $('.celularInput').mask(fone_4_text + '9');
 
-    $('.telefoneInput').mask('(00) 0000-00009').focusout(function (event) {  
-        let target, phone, element;
-
-        target = (event.currentTarget) ? event.currentTarget : event.srcElement;
-        phone = target.value.replace(/\D/g, '');
-        element = $(target);
-        element.unmask();
-        phone.length > 10 ? element.mask("(99) 99999-9999") : element.mask("(99) 9999-99999");  
+    let SPMaskBehavior = function(val) {
+        return val.replace(/\D/g, '').length === 11 ? fone_5_text : fone_4_text + '9';
+    }
+    $('.telefoneInput').mask(SPMaskBehavior, {
+        onKeyPress: function(val, e, field, options) {
+            field.mask(SPMaskBehavior.apply({}, arguments), options);
+        }
     });
 
     // .cpfOuCnpj
-    let options = {
+    let options_cpf_cnpj = {
         onKeyPress: function (cpf, ev, el, op) {
-            let masks = ['000.000.000-000', '00.000.000/0000-00'];
+            let masks = [cpf_text + '0', cnpj_text];
             $('.cpfOuCnpj').mask((cpf.length > 14) ? masks[1] : masks[0], op);
         }
     }
     $('.cpfOuCnpj').index() > -1 && $('.cpfOuCnpj').val().length > 11 ? 
-	$('.cpfOuCnpj').mask('00.000.000/0000-00', options) : 
-	$('.cpfOuCnpj').mask('000.000.000-00#', options);
+	$('.cpfOuCnpj').mask(cnpj_text, options_cpf_cnpj) : 
+	$('.cpfOuCnpj').mask(cpf_text + '#', options_cpf_cnpj);
 
     // copiado
     $('.placaVeiculo').mask('AAA 0U00', {
@@ -112,7 +118,7 @@ function mascarasGerais(){
     });
 
     $('input[name="participantes_cpf[]"]').on('MASK', function(){
-        $(':input[name="participantes_cpf[]"]').val('').unmask().mask('999.999.999-99');
+        $(':input[name="participantes_cpf[]"]').val('').unmask().mask(cpf_text);
     });
 }
 
@@ -120,12 +126,12 @@ function mascarasInternas(){
     
     mascarasGerais();
 
-    $('.fixoInput').mask('(00) 0000-0000');
-    $('.timeInput').mask('00:00');
+    $('.fixoInput').mask(fone_4_text);
+    $('.timeInput').mask(hora_text);
     $('.vagasInput').mask('0000');
     $('.anoInput').mask('0000');
     
-    $('#horaTermino').mask('00:00', {
+    $('#horaTermino').mask(hora_text, {
         onComplete: function() {
             let horaInicio = $('#horaInicio').val();
             let horaTermino = $('#horaTermino').val();
@@ -137,7 +143,7 @@ function mascarasInternas(){
         }
     });
 
-    $('#horaInicio').mask('00:00', {
+    $('#horaInicio').mask(hora_text, {
         onComplete: function() {
             let horaInicio = $('#horaInicio').val();
             let horaTermino = $('#horaTermino').val();
@@ -154,7 +160,7 @@ function mascarasExternas(){
     
     mascarasGerais();
 
-    $('#datepicker').mask("99/99/9999");
+    $('#datepicker').mask(dt_text);
     $('.numeroInput').mask('99');
     $('.capitalSocial').mask('#.##0,00', {reverse: true});
     $('.codigo_certidao').mask('AAAAAAAA - AAAAAAAA - AAAAAAAA - AAAAAAAA');

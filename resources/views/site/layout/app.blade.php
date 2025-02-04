@@ -390,7 +390,7 @@
                   <div class="form-group">
                     <input type="text"
                       name="celularNl"
-                      class="form-control celularInput {{ $errors->has('celularNl') ? 'is-invalid' : '' }}"
+                      class="form-control telefoneInput {{ $errors->has('celularNl') ? 'is-invalid' : '' }}"
                       value="{{ old('celularNl') }}"
                       placeholder="Celular *"
                       required
