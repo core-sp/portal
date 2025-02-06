@@ -61,4 +61,12 @@ export function inicializa(){
 		$('#datepicker').css('background-color', cor_habilitado)
 		.prop('disabled', false).prop('placeholder', 'dd/mm/aaaa');
 	});
+
+	$(document).on('AGENDA_EMPTY_DTPICKER', function(){
+		$('#datepicker').prop('disabled', true).prop('placeholder', 'Sem datas disponíveis').val('');
+	});
+
+	$(document).on('AGENDA_OPTIONS_DTPICKER', function(e){
+		$('#datepicker').prop('placeholder', 'dd/mm/aaaa').datepicker('option', e.detail);
+	});
 }

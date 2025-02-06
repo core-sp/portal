@@ -106,7 +106,7 @@ class AgendamentoRequest extends FormRequest
             'nome' => 'sometimes|exclude_if:antigo,1|required|min:5|max:191|string|regex:/^\D*$/',
             'email' => 'sometimes|exclude_if:antigo,1|required|email|max:191',
             'cpf' => ['sometimes', 'exclude_if:antigo,1', 'required', 'max:14', new Cpf],
-            'celular' => 'sometimes|exclude_if:antigo,1|required|max:17|regex:/(\([0-9]{2}\))\s([0-9]{5})\-([0-9]{4})/',
+            'celular' => 'sometimes|exclude_if:antigo,1|required|max:17|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})/',
             'servico' => 'sometimes|required_without_all:tiposervico,antigo,idusuario,status,idagendamento|in:'.implode(',', $this->servicos),
             'tiposervico' => 'sometimes|required|in:'.implode(',', $this->completos),
             'pessoa' => 'sometimes|required|in:PF,PJ,PF e PJ',

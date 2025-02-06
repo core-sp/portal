@@ -124,7 +124,7 @@
               <div class="col-md-6 mt-2-768">
                 <label for="celular">Celular *</label>
                 <input type="text"
-                  class="form-control celularInput {{ $errors->has('celular') ? 'is-invalid' : '' }}"
+                  class="form-control telefoneInput {{ $errors->has('celular') ? 'is-invalid' : '' }}"
                   name="celular"
                   value="{{ old('celular') }}"
                   placeholder="Celular"
@@ -218,9 +218,6 @@
                   </div>
                   @endif
                 </div>
-                <div id="loadCalendario" class="loadImage">
-                  <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
-                </div>
               </div>
               <div class="col-md-4 mt-2-768">
                 <label for="hora">Horários disponíveis *</label>
@@ -238,9 +235,6 @@
                   {{ $errors->first('hora') }}
                 </div>
                 @endif
-                <div id="loadHorario" class="loadImage">
-                  <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
-                </div>
               </div>
             </div>
             <div class="form-check mt-3">
@@ -269,45 +263,8 @@
       </div>
     </div>
   </div>
-  <!-- The Modal -->
-  <div class="modal fade" id="avisoCarteirinha">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <!-- Modal Header -->
-        <div class="modal-header">
-          <h4 class="modal-title">Atenção, Representante Comercial!</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <!-- Modal body -->
-        <div class="modal-body" id="textoCarteirinha">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- The Modal -->
-  <div class="modal fade" id="tipo-outros">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <!-- Modal Header -->
-        <div class="modal-header">
-          <h4 class="modal-title">Atenção</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <!-- Modal body -->
-        <div class="modal-body" id="textoOutros">
-          Você é Representante Comercial?
-        </div>
-         <!-- Modal footer -->
-        <div class="modal-footer">
-          <button type="button" class="btn btn-success" data-dismiss="modal">Sim</button>
-          <button type="button" class="btn btn-secondary" id="notRC-agendamento">Não</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="dialog_agendamento" title="Atenção"></div>
 </section>
+
+<script type="module" src="{{ asset('/js/externo/modulos/agendamento.js?'.hashScriptJs()) }}" id="modulo-agendamento" class="modulo-editar"></script>
 
 @endsection

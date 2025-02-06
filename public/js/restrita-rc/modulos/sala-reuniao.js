@@ -56,7 +56,6 @@ function getDadosSalas(acao, _tipo, url, dados = ''){
             document.dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR"));
         },
         success: function(response) {
-            console.log(response);
             document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
 
             $('#itensShow').html('').parent().hide();
@@ -71,8 +70,8 @@ function getDadosSalas(acao, _tipo, url, dados = ''){
                 detail: {
                     titulo: '<i class="fas fa-times text-danger"></i> Erro!', 
                     texto: '<span class="text-danger">' + 
-                    'Falha ao recuperar calendário. <br> ' + 
-                    'Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.</span>',
+                        'Falha ao recuperar calendário. <br> ' + 
+                        'Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.</span>',
                     botao: '<button type="button" class="btn btn-sm btn-primary" onclick="location.reload(true)">Recarregar</button>'
                 }
             }));

@@ -37,7 +37,7 @@ function msgConteudoTitulo(titulo, conteudo, botao = ''){
         conteudo = '';
     
     (typeof botao === "string") && (botao.length > 0) ? 
-        $("#msgGeral .modal-footer").append(botao).show() : $("#msgGeral .modal-footer").html('').hide();
+        $("#msgGeral .modal-footer").append($(botao)).show() : $("#msgGeral .modal-footer").html('').hide();
     $("#msgGeral .modal-header .modal-title").html(titulo);
     $("#msgGeral .modal-header").show();
     $("#msgGeral .modal-body").addClass('text-center').html(conteudo);
@@ -64,6 +64,10 @@ export function executar(local){
 
     $(document).on('MSG_GERAL_BTN_ACAO', function(e){
         msgConteudoTitulo(e.detail.titulo, e.detail.texto, e.detail.botao);
+    });
+
+    $(document).on('MSG_GERAL_VARIOS_BTN_ACAO', function(e){
+        msgConteudoTitulo(e.detail.titulo, e.detail.texto, e.detail.botao.join(''));
     });
 
     $("#msgGeral").on('hide.bs.modal', function(){
