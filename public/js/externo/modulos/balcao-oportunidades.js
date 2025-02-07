@@ -69,7 +69,7 @@ function editar(){
         $('#av10').val('0');
         $('#av01').focus();
         $('#avAlert').show()
-        .removeClass('alert-info alert-success').addClass('alert-info')
+        .removeClass('alert-warning alert-success').addClass('alert-info')
         .text(e.detail);
         $('#cep').val('');
     });
@@ -80,7 +80,7 @@ function editar(){
 		$('#av01, #avEmail').val('');
 		$('#titulice').focus();
 		$('#avAlert').show()
-        .removeClass('alert-info alert-warning').addClass(e.detail.class)
+        .removeClass('alert-info alert-warning alert-success').addClass(e.detail.class)
         .html(e.detail.message);
         $('#cep, [name="endereco"]').val('');
     });

@@ -103,7 +103,7 @@
                     class="form-check-input"
                     {{ Request::input('filialCheck') == 'on' ? 'checked' : '' }}
                   />
-                  <label for="form-check-label" for="filialCheck">Filial</label>
+                  <label for="filialCheck">Filial</label>
                 </div>
                 <select name="filial" id="filial" class="form-control" {{ Request::input('filialCheck') == 'on' ? '' : 'disabled' }}>
                   <option value="50" {{ Request::input('filial') == 50 ? 'selected' : '' }}></option>
@@ -121,7 +121,7 @@
                     class="form-check-input"
                     {{ Request::input('empresaIndividual') == 'on' ? 'checked' : '' }}
                   />
-                  <label for="form-check-label" for="empresaIndividual">Empresa Individual</label>
+                  <label for="empresaIndividual">Empresa Individual</label>
                 </div>
               </div>
             </div>

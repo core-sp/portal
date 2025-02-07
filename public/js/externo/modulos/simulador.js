@@ -38,7 +38,7 @@ function criarHTMLPrint(){
     data = '<b>Data início das atividades:</b> ' + data + '</br>';
 
     let selectTipoPessoa = $('select[name="tipoPessoa"] option:selected').text();
-    let capital = '<b>Capital social:</b> ' + $('#capitalSocial').val() + '</br>';
+    let capital = '<b>Capital social:</b> R$ ' + $('#capitalSocial').val() + '</br>';
     let filial = $('#filialCheck:checked').length > 0 ? 'Com filial | ' + $('select[name="filial"] option:selected').text() + '</br>' : '';
     let empresa = $('#empresaIndividual:checked').length > 0 ? 'Empresa individual</br>' : '';
     let titulo = '<h4>RESULTADO DO SIMULADOR DE VALORES</h4><hr>';

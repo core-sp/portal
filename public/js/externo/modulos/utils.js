@@ -149,6 +149,16 @@ export function executar(local = 'externo'){
         }
     });
 
+    // Logout Representante
+    $("#logout-representante").click(function(){
+        let token = $('meta[name="csrf-token"]').attr('content');
+        let link = "/representante/logout";
+        let form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
+
+        $('body').append(form);
+        $(form).submit();
+    });
+    
     lazyLoad();
 
     $(window).resize(function(){
