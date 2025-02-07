@@ -73,7 +73,7 @@ function mudaContraste(){
 		$([
 			'.btn-atendimento', '.btn-buscaavancada', '.btn-voltar', '.btn-calendario', '.btn-como-foi', '.btn-edital', '.saiba-mais', '.btn-curso-grid',
             '.btn-curso-interna', '.btn-novo-core', '#dismiss', '.consulta-alert', 'label', '.menu-representante', '.representante-content', 
-			'.representante-content .table-bordered', '.msg-cookies'
+			'.representante-content .table-bordered', '.msg-cookies', '.modal-title', '.modal-body', '.modal-footer'
 		]).toggleClass('contraste-cinza');
 
 		$([
