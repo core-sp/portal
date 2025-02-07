@@ -817,7 +817,7 @@ function apenasLetras($string)
 
 function versaoScriptJs()
 {
-    return '0.1.1';
+    return '0.2.1';
 }
 
 function hashScriptJs()
