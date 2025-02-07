@@ -12,8 +12,16 @@ async function requestCertidao(){
         if(!response.ok)
             throw new Error(response.status + ", <b>Mensagem:</b> " + response.statusText);
 
-        if(response.headers.get("content-type").search('application/pdf') == -1)
-            throw new Error("Retorno de arquivo inválido!");
+        if(response.headers.get("content-type").search('application/pdf') == -1){
+            let json = await response.json();
+
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_CONT_TITULO", {
+                detail: {titulo: '<i class="fas fa-times text-danger"></i> ' + json.titulo, texto: json.mensagem}
+            }));
+            
+            return;
+        }
 
         let blob = await response.blob();
         const cd = response.headers.get("content-disposition");

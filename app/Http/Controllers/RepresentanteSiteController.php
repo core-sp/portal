@@ -438,7 +438,8 @@ class RepresentanteSiteController extends Controller
             $mensagem = 'Não foi possível emitir a certidão. Por favor entre em contato com o CORE-SP para mais informações.';
             $emitir = false;
 
-            return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
+            // return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
+            return response()->json(['titulo' => $titulo, 'mensagem' => $mensagem, 'emitir' => $emitir]);
         }
         catch (Exception $e) {
             Log::error($e->getTraceAsString());
