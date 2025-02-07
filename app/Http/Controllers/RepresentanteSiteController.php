@@ -418,10 +418,11 @@ class RepresentanteSiteController extends Controller
     {
         $retorno = Auth::guard('representante')->user()->estaHomologado($this->gerentiRepository, 'certidao');
         if(gettype($retorno) == "string")
-            return redirect()->route('representante.dashboard')->with([
-                'message' => $retorno,
-                'class' => 'alert-danger'
-            ]);
+            return response()->json(['titulo' => 'Atenção!', 'mensagem' => $retorno]);
+            // return redirect()->route('representante.dashboard')->with([
+            //     'message' => $retorno,
+            //     'class' => 'alert-danger'
+            // ]);
 
         try {
             $responseGerentiJson = $this->gerentiApiRepository->gerentiGenerateCertidao(Auth::guard('representante')->user()->ass_id);
