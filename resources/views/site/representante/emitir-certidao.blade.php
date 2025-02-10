@@ -34,11 +34,17 @@
                 </p>
                 @if(trim($certidao['status']) == 'Emitido')
                 <div class="contato-btns">
+                    {{--
                     <form action="{{ route('representante.baixarCertidao') }}" method="GET" class="d-inline">
                         @csrf
+                    --}}
                         <input type="hidden" name="numero" value="{{ $certidao['numeroDocumento'] }}" />
+                    {{--
                         <input type="submit" value="Baixar" class="baixarCertidaoBtn btn btn-sm btn-success" />
                     </form>
+                    --}}
+                    
+                    <button type="button" value="Baixar" class="baixarCertidaoBtn btn btn-sm btn-success">Baixar</button>
                 </div>
                 @endif
             </div>

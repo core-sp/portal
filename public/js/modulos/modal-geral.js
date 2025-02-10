@@ -6,7 +6,7 @@ function carregar(cor){
         cor = 'info';
 
     $("#msgGeral .modal-header, #msgGeral .modal-footer").hide();
-    $("#msgGeral .modal-body").addClass('text-center').html('<div class="spinner-grow text-' + cor + '"></div>');
+    $("#msgGeral .modal-body").addClass('text-center').html('<div class="spinner-border text-' + cor + '"></div>');
     $("#msgGeral").modal({backdrop: "static", keyboard: false, show: true});
 }
 

@@ -1,13 +1,40 @@
-async function requestCertidao(){
+function acaoFinal(baixar = false){
 
-    try {
-        let response = await fetch('/representante/emitir-certidao', {
+    let txt = baixar ? 'Download da Certidão realizado.' : 'Certidão emitida.';
+
+    document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
+    document.dispatchEvent(new CustomEvent("MSG_GERAL_CONTEUDO", {
+        detail: {texto: txt, timeout: 1500}
+    }));
+
+    if(baixar)
+        return;
+
+    $('.emitirCertidaoBtn').html('Emitida!').prop('disabled', true);
+    $('.baixarCertidaoBtn').val('Cancelada').prop('disabled', true);
+}
+
+async function requisicao(baixar = false){
+
+    return baixar ? await fetch('/representante/baixar-certidao?numero=' + $('input[name="numero"]').val(), {
+            method: 'GET', 
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8',
+            }
+        }) : 
+        await fetch('/representante/emitir-certidao', {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json;charset=utf-8',
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+}
+
+async function requestCertidao(baixar = false){
+
+    try {
+        let response = await requisicao(baixar);
 
         if(!response.ok)
             throw new Error(response.status + ", <b>Mensagem:</b> " + response.statusText);
@@ -36,13 +63,7 @@ async function requestCertidao(){
         a.click();
         window.URL.revokeObjectURL(url);
 
-        document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
-        document.dispatchEvent(new CustomEvent("MSG_GERAL_CONTEUDO", {
-            detail: {texto: 'Certidão emitida!', timeout: 1500}
-        }));
-
-        $('.emitirCertidaoBtn').html('Emitida!').prop('disabled', true);
-        $('.baixarCertidaoBtn').val('Cancelada').prop('disabled', true);
+        acaoFinal(baixar);
 
     }catch(erro){
         document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
@@ -64,6 +85,11 @@ function visualizar(){
 
         // $('.emitirCertidaoBtn').hide();
         // $('.baixarCertidaoBtn').hide();
+    });
+
+    $('.baixarCertidaoBtn').on('click', function(){
+        document.dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR"));
+        requestCertidao(true);
     });
 }
 

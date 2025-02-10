@@ -147,7 +147,7 @@ class AgendamentoRequest extends FormRequest
             'protocolo.not_regex' => 'Formato inválido',
             'size' => 'Deve conter :size caracteres',
             'nome.regex' => 'Não é permitido números',
-            'celular.regex' => 'Somente neste formato (00) 00000-0000',
+            'celular.regex' => 'Formato inválido',
         ];
     }
 }

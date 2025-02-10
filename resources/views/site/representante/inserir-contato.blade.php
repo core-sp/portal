@@ -39,7 +39,7 @@
                 @endif
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">Inserir</button>
+                <button type="submit" class="btn btn-primary loadingPagina">Inserir</button>
             </div>
         </form>
     </div>

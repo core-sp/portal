@@ -356,7 +356,7 @@
                     <div class="form-group mt-3">
                         <button
                             type="{{ isset($aviso) ? 'button' : 'submit' }}"
-                            class="btn btn-primary"
+                            class="btn btn-primary {{ isset($aviso) ? '' : 'loadingPagina' }}"
                         >
                             Enviar
                         </button>

@@ -151,7 +151,7 @@
 						
 					<div class="float-right">
 						<a href="{{ route('cursos.show', $curso->idcurso) }}" class="btn btn-default text-secondary">Cancelar</a>
-						<button type="submit" class="btn btn-primary">Inscrever-se</button>
+						<button type="submit" class="btn btn-primary loadingPagina">Inscrever-se</button>
 					</div>
 				</form>
 			</div>

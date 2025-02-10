@@ -256,7 +256,7 @@
             </div>
             <div class="float-right mt-4">
               <a href="/" class="btn btn-default">Cancelar</a>
-              <button type="submit" class="btn btn-primary">Agendar</button>
+              <button type="submit" class="btn btn-primary loadingPagina">Agendar</button>
             </div>
           </form>
         </div>

@@ -116,7 +116,7 @@
               @endif
           	</div>
             <div class="col-lg-4 col-md-12 align-self-end pesquisaLicitacao-btn">
-              <button type="submit" class="btn-buscaavancada"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
+              <button type="submit" class="btn-buscaavancada loadingPagina"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
               <a href="{{ route('licitacoes.siteGrid') }}" class="btn btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</a>
             </div>
           </div>

@@ -124,7 +124,7 @@
                     placeholder="Digite o que você procura"
                     accesskey="2" />
                   <div class="input-group-append">
-                    <button type="submit" class="btn btn-default">
+                    <button type="submit" class="btn btn-default loadingPagina">
                       <i class="fas fa-search"></i>
                     </button>
                   </div>
@@ -419,7 +419,7 @@
                     @endif
                   </div>
                   <div class="form-group">
-                    <button type="submit" class="btn btn-default">Inscrever-se</button>
+                    <button type="submit" class="btn btn-default loadingPagina">Inscrever-se</button>
                   </div>
                 </form>
               </div>

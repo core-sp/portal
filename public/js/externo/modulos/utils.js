@@ -199,6 +199,11 @@ export function executar(local = 'externo'){
     $('.loadingPagina').on('click', function(){
 		document.dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR"));
 	});
+
+    if($('.loadingPagina').length > 0)
+        $('input, select, textarea').on("invalid", function(e){
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
+        });
 };
 
 export let scripts_para_importar = {

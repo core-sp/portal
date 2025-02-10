@@ -319,7 +319,7 @@
             
       <div class="form-group float-right mt-4">
         <a href="{{ route('representante.agendar.inserir.view') }}" class="btn btn-secondary link-nostyle mr-2">Voltar</a>
-        <button type="submit" class="btn btn-{{ $acao == 'cancelar' ? 'danger' : 'primary' }}">
+        <button type="submit" class="btn btn-{{ $acao == 'cancelar' ? 'danger' : 'primary' }} loadingPagina">
         @switch($acao)
           @case('editar')
             Salvar
