@@ -193,7 +193,7 @@
                         class="form-control {{ $errors->has('municipio') ? 'is-invalid' : '' }}"
                         placeholder="Município"
                         value="{{ old('municipio') }}"
-                        minlength="4"
+                        minlength="3"
                         maxlength="100"
                         required
                     >
