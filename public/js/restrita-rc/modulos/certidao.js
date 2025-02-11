@@ -11,7 +11,7 @@ function acaoFinal(baixar = false){
         return;
 
     $('.emitirCertidaoBtn').html('Emitida!').prop('disabled', true);
-    $('.baixarCertidaoBtn').val('Cancelada').prop('disabled', true);
+    $('.baixarCertidaoBtn').html('Cancelada').prop('disabled', true);
 }
 
 async function requisicao(baixar = false){
