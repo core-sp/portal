@@ -977,7 +977,7 @@ class SolicitaCedulaTest extends TestCase
      * 
      * Erro ao não informar alguns dados obrigatórios ao inserir nova solicitação de cédula.
     */
-    public function cannot_insert_new_solicitacao_cedula_with_municipio_less_than_4_chars()
+    public function cannot_insert_new_solicitacao_cedula_with_municipio_less_than_3_chars()
     {
         $regional = factory('App\Regional')->create([
             'regional' => 'SÃO PAULO'
@@ -985,7 +985,7 @@ class SolicitaCedulaTest extends TestCase
         $representante = factory('App\Representante')->create();
         $cedula = factory('App\SolicitaCedula')->raw([
             'idrepresentante' => $representante->id,
-            'municipio' => 'tes',
+            'municipio' => 'te',
         ]);
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         $this->get(route('representante.solicitarCedulaView'))->assertOk();

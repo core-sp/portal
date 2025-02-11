@@ -135,18 +135,29 @@ class AgendamentoSala extends Model
         return $atual || $seguinte;
     }
 
-    public function getHorasPermitidas($horarios = array())
+    public function getHorasPermitidas($horarios = array(), $tipo = null, $limiteCoworking = null)
     {
         $duracao = Carbon::parse($this->inicioDoPeriodo())->diffInMinutes(Carbon::parse($this->fimDoPeriodo()));
+        $max = null;
+        $coworking_se_reuniao = null;
+
+        if(isset($tipo) && isset($limiteCoworking)){
+            $max = ($this->tipo_sala == 'coworking') && ($this->total >= $limiteCoworking);
+            $coworking_se_reuniao = ($this->tipo_sala == 'coworking') && ($tipo == 'reuniao');
+        }
 
         return Arr::except($horarios, 
-            array_values(array_keys(Arr::where($horarios, function ($value, $key) use($duracao) {
+            array_values(array_keys(Arr::where($horarios, function ($value, $key) use($duracao, $max, $coworking_se_reuniao) {
                 $temp = explode(' - ', $value);
                 $inicio_temp = Carbon::parse($temp[0]);
                 $periodo_inicio = Carbon::parse($this->inicioDoPeriodo());
                 $duracao_temp = $periodo_inicio->diffInMinutes($inicio_temp);
                 $periodo_inicio->addMinute();
-                return $periodo_inicio->between($temp[0], $temp[1]) || ($periodo_inicio->lt($inicio_temp) && ($duracao_temp < $duracao));
+                $resultado = $periodo_inicio->between($temp[0], $temp[1]) || ($periodo_inicio->lt($inicio_temp) && ($duracao_temp < $duracao));
+
+                if(isset($max) && isset($coworking_se_reuniao))
+                    return ($this->tipo_sala == 'reuniao') || $coworking_se_reuniao || $max ? $resultado : false;
+                return $resultado;
             }))));
     }
 
