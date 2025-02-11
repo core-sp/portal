@@ -3269,6 +3269,310 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
+    public function get_liberado_periodo_reuniao_coworking_different_rc()
+    {
+        // RC 1 REUNIAO E COWORKING
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $agenda1 = factory('App\AgendamentoSala')->states('reuniao')->create();
+        $horarios = $agenda1->sala->formatarHorariosAgendamento($agenda1->sala->getHorarios('reuniao'));
+        unset($horarios['09:00']);
+        unset($horarios['manha']);
+
+        $dia = Carbon::parse($agenda1->dia);
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'reuniao',
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios
+        ]);
+
+        $agenda1 = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $agenda1->sala_reuniao_id,
+            'periodo' => '13:00 - 17:00',
+            'periodo_todo' => true
+        ]);
+
+        // RC 2 SO VISUALIZA REUNIAO E COWORKING
+        $representante = factory('App\Representante')->create([
+            'cpf_cnpj' => '65271204006',
+            'ass_id' => '000002',
+            'registro_core' => '0000000002'
+        ]);
+        $this->actingAs($representante, 'representante');
+
+        $horarios['tarde'] = "13:00 - 17:00";
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'coworking',
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios
+        ]);
+
+        unset($horarios['tarde']);
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'reuniao',
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios
+        ]);
+    }
+
+    /** @test */
+    public function get_liberado_periodo_reuniao_coworking()
+    {
+        // RC REUNIAO E COWORKING SEM PERIODO DA TARDE, MESMO COM COWORKING COM VAGAS
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $agenda1 = factory('App\AgendamentoSala')->states('reuniao')->create();
+        $horarios = $agenda1->sala->formatarHorariosAgendamento($agenda1->sala->getHorarios('reuniao'));
+        unset($horarios['09:00']);
+        unset($horarios['manha']);
+
+        $dia = Carbon::parse($agenda1->dia);
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'reuniao',
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios
+        ]);
+
+        $agenda1 = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $agenda1->sala_reuniao_id,
+            'periodo' => '13:00 - 17:00',
+            'periodo_todo' => true
+        ]);
+
+        unset($horarios['tarde']);
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'coworking',
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios
+        ]);
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'reuniao',
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios
+        ]);
+    }
+
+    /** @test */
+    public function get_liberado_periodo_reuniao_coworking_1_hour()
+    {
+        // RC REUNIAO E COWORKING SEM PERIODO DE 1H, MESMO COWORKING COM VAGAS
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $agenda1 = factory('App\AgendamentoSala')->states('reuniao')->create();
+        $horarios = $agenda1->sala->formatarHorariosAgendamento($agenda1->sala->getHorarios('reuniao'));
+        unset($horarios['09:00']);
+        unset($horarios['manha']);
+
+        $dia = Carbon::parse($agenda1->dia);
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'reuniao',
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios
+        ]);
+
+        $agenda1 = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $agenda1->sala_reuniao_id,
+            'periodo' => '10:00 - 11:00',
+        ]);
+
+        unset($horarios['10:00']);
+        $horarios['tarde'] = "13:00 - 17:00";
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'coworking',
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios
+        ]);
+
+        $horarios['tarde'] = "14:00 - 17:00";
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'reuniao',
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios
+        ]);
+    }
+
+    /** @test */
+    public function get_liberado_periodo_reuniao_coworking_different_rc_empty()
+    {
+        // RC 1 REUNIAO E COWORKING
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $agenda1 = factory('App\AgendamentoSala')->states('reuniao')->create();
+        $horarios = $agenda1->sala->formatarHorariosAgendamento($agenda1->sala->getHorarios('reuniao'));
+        unset($horarios['09:00']);
+        unset($horarios['manha']);
+
+        $dia = Carbon::parse($agenda1->dia);
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'reuniao',
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios
+        ]);
+
+        $agenda1 = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $agenda1->sala_reuniao_id,
+            'periodo' => '13:00 - 17:00',
+            'periodo_todo' => true
+        ]);
+
+        // RC 2 
+        $representante = factory('App\Representante')->create([
+            'cpf_cnpj' => '65271204006',
+            'ass_id' => '000002',
+            'registro_core' => '0000000002'
+        ]);
+        $this->actingAs($representante, 'representante');
+
+        $agenda1 = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $agenda1->sala_reuniao_id,
+            'periodo' => '13:00 - 17:00',
+            'periodo_todo' => true
+        ]);
+
+        unset($horarios['tarde']);
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'coworking',
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios
+        ]);
+
+        unset($horarios['tarde']);
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'reuniao',
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios
+        ]);
+
+        // RC 3 
+        $representante = factory('App\Representante')->create([
+            'cpf_cnpj' => '88180056007',
+            'ass_id' => '000003',
+            'registro_core' => '0000000003'
+        ]);
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'coworking',
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios
+        ]);
+
+        $agenda1 = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $agenda1->sala_reuniao_id,
+            'periodo' => '11:00 - 12:00',
+        ]);
+
+        $agenda1 = factory('App\AgendamentoSala')->states('reuniao')->create([
+            'sala_reuniao_id' => $agenda1->sala_reuniao_id,
+            'periodo' => '10:00 - 11:00',
+        ]);
+
+        // RC 4
+        $representante = factory('App\Representante')->create([
+            'cpf_cnpj' => '90063844028',
+            'ass_id' => '000004',
+            'registro_core' => '0000000004'
+        ]);
+        $this->actingAs($representante, 'representante');
+
+        unset($horarios['10:00']);
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'coworking',
+        ]))
+        ->assertJsonFragment([
+            'horarios' => $horarios
+        ]);
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'reuniao',
+        ]))
+        ->assertJsonFragment([]);
+
+        $agenda1 = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $agenda1->sala_reuniao_id,
+            'periodo' => '11:00 - 12:00',
+        ]);
+
+        // RC 5
+        $representante = factory('App\Representante')->create([
+            'cpf_cnpj' => '53881384022',
+            'ass_id' => '000005',
+            'registro_core' => '0000000005'
+        ]);
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'coworking',
+        ]))
+        ->assertJsonFragment([]);
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda1->sala_reuniao_id,
+            'dia' => $dia->format('d/m/Y'),
+            'tipo' => 'reuniao',
+        ]))
+        ->assertJsonFragment([]);
+    }
+
+    /** @test */
     public function view_agendamento_after_created()
     {
         $representante = factory('App\Representante')->create();
