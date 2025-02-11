@@ -97,7 +97,7 @@
               </div>
 
               <div class="form-group mt-3">
-                <button type="submit" class="btn btn-primary">Alterar senha</button>
+                <button type="submit" class="btn btn-primary loadingPagina">Alterar senha</button>
               </div>
             </form>
           </div>
