@@ -1007,7 +1007,7 @@ class SuporteTest extends TestCase
         $this->signInAsAdmin();
 
         $this->get(route('suporte.log.externo.relatorios', [
-            'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => '2025', 'relat_opcoes' => Suporte::FILTRO_ACESSO
+            'relat_tipo' => 'externo', 'relat_data' => 'ano', 'relat_ano' => Carbon::today()->addYear()->format('Y'), 'relat_opcoes' => Suporte::FILTRO_ACESSO
         ]))
         ->assertSessionHasErrors('relat_ano');
     }

@@ -427,12 +427,12 @@ class SalaReuniao extends Model
             return $horarios_agendar;
 
         $agendados = $this->agendamentosSala()
-            ->select('periodo', 'periodo_todo', DB::raw('count(*) as total'))
-            ->where('tipo_sala', $tipo)
+            ->select('periodo', 'periodo_todo', 'tipo_sala', DB::raw('count(*) as total'))
             ->whereNull('status')
             ->whereDate('dia', $dia)
             ->groupBy('periodo')
             ->groupBy('periodo_todo')
+            ->groupBy('tipo_sala')
             ->orderBy('periodo_todo', 'DESC')
             ->get();
 
@@ -440,8 +440,7 @@ class SalaReuniao extends Model
         {
             foreach($agendados as $value)
             {
-                if(($tipo == 'reuniao') || (($tipo == 'coworking') && ($value->total >= $this->participantes_coworking)))
-                    $horarios_agendar = $value->getHorasPermitidas($horarios_agendar);
+                $horarios_agendar = $value->getHorasPermitidas($horarios_agendar, $tipo, $this->participantes_coworking);
             }
         }
         
