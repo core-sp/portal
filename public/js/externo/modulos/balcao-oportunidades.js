@@ -103,10 +103,11 @@ function editar(){
             getInfoEmpresa(cnpj);
     }
 
-    $('#cnpj').on('keyup', function(e){
-        let cnpj = $(this).val();
+    $('#cnpj').on('input', function(e){
+        let cnpj = $(this).masked($(this).val());
+        let dado = e.originalEvent.data;
 
-        if((e.key !== undefined) && (e.key.search(/[^0-9]/) > -1))
+        if((dado !== null) && (dado.length == 1) && (dado.search(/[^0-9]/) > -1))
             return;
 
         if(cnpj.length !== 18)

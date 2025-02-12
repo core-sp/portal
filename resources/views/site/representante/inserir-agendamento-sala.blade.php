@@ -172,7 +172,7 @@
 
             <div class="input-group mb-2-576">
               <div class="input-group-prepend">
-                <span class="input-group-text">Participante Responsável:</span>
+                <span class="input-group-text"><i class="fas fa-user"></i>&nbsp;&nbsp;Responsável:</span>
               </div>
               <input 
                 type="text" 
@@ -201,7 +201,7 @@
 
             <div class="input-group mb-2-576">
               <div class="input-group-prepend">
-                <span class="input-group-text">Participante:</span>
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
               </div>
               <input 
                 type="text" 
@@ -230,7 +230,7 @@
 
             <div class="input-group mb-2-576">
               <div class="input-group-prepend">
-                <span class="input-group-text">Participante:</span>
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
               </div>
               <input 
                 type="text" 

@@ -79,10 +79,11 @@ function wsCep(cep){
 
 export function getCep(){
 
-    campo_cep.on('keyup', function(e) {
-        let cep = $(this).val();
+    campo_cep.on('input', function(e) {
+        let cep = $(this).masked($(this).val());
+        let dado = e.originalEvent.data;
 
-        if((e.key !== undefined) && (e.key.search(/[^0-9]/) > -1))
+        if((dado !== null) && (dado.length == 1) && (dado.search(/[^0-9]/) > -1))
             return;
 
         if(cep.length !== 9)
