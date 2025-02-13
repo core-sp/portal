@@ -107,7 +107,7 @@ function editar(){
         let cnpj = $(this).masked($(this).val());
         let dado = e.originalEvent.data;
 
-        if((dado !== null) && (dado.length == 1) && (dado.search(/[^0-9]/) > -1))
+        if((dado !== undefined) && (dado !== null) && (dado.length == 1) && (dado.search(/[^0-9]/) > -1))
             return;
 
         if(cnpj.length !== 18)
