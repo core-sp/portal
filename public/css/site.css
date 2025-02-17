@@ -2386,6 +2386,14 @@ h5 {
 	.pagina-titulo-img h6 {
 		bottom: 7.5px;
 	}
+
+	.btn-beneficios {
+		margin-bottom: 0.65rem;
+	}
+
+	#computer {
+		margin-top: -0.5rem;
+	}
 }
 
 
@@ -3086,6 +3094,12 @@ h5 {
 
 	#popup-campanha video {
 		height: 100%;
+	}
+}
+
+@media screen and (max-width: 465px) {
+	.btn-beneficios {
+		margin-bottom: 0.25rem;
 	}
 }
 
