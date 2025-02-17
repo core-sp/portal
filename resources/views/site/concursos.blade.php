@@ -102,9 +102,9 @@
           <div class="licitacao-grid">
             <a href="{{ route('concursos.show', $concurso->idconcurso) }}}">
               <div class="licitacao-grid-main">
-                <h5 class="marrom">{{ $concurso->titulo }}</h5>
+                <h5 class="marrom text-break">{{ $concurso->titulo }}</h5>
                 <div class="linha-lg-mini"></div>
-                <p>{!! resumo($concurso->objeto) !!}</p>
+                <p class="text-break">{!! resumo($concurso->objeto) !!}</p>
                 <div class="mt-3 row bot-lg">
                   <div class="col-sm-4 d-flex">
                     <div class="mr-2">

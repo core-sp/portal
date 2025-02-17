@@ -78,7 +78,7 @@ use \App\BdoOportunidade;
                 @endforeach
               </select>
             </div>
-            <div class="col align-self-end pesquisaLicitacao-btn">
+            <div class="col-lg-4 col-md-12 align-self-end pesquisaLicitacao-btn">
               <button type="submit" class="btn-buscaavancada loadingPagina"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
               <a href="/balcao-de-oportunidades" class="btn btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</a>
             </div>
@@ -100,7 +100,7 @@ use \App\BdoOportunidade;
           @foreach($oportunidades as $oportunidade)
           <div class="licitacao-grid">
             <div class="licitacao-grid-main">
-              <h5 class="marrom mb-1">{{ $oportunidade->titulo }}</h5>
+              <h5 class="marrom mb-1 text-break">{{ $oportunidade->titulo }}</h5>
               <h6 class="light">
                 <i class="far fa-building"></i>&nbsp;
                 @if(isset($oportunidade->empresa->fantasia))
@@ -120,7 +120,7 @@ use \App\BdoOportunidade;
                 @endif
               </h6>
               <div class="linha-lg-mini"></div>
-              <p>{{ $oportunidade->descricao }}</p>
+              <p class="text-break">{{ $oportunidade->descricao }}</p>
               <div class="saiba-mais-info">
                 <div class="row mt-3 bot-lg">
                   <div class="col d-flex">

@@ -74,8 +74,8 @@
             <i></i>
             <h2 class="pr-3 ml-1">Espaço do Representante</h2>
           </blockquote>
-          <h5 class="float-right cinza-claro-bg">
-          <a href="{{ route('representante.login') }}"><i class="fas fa-user icon-title"></i> Área restrita do Representante</a>
+          <h5 class="float-right cinza-claro-bg hide-576">
+          <a href="{{ route('representante.login') }}"><i class="fas fa-lock icon-title"></i> Área restrita do Representante</a>
           </h5>
         </div>
       </div>
@@ -375,12 +375,15 @@
 <section id="eouv-calendario" class="pb-5">
   <div class="container">
     <div class="row mb-2">
-      <div class="col">
+      <div class="col-12">
         <div class="home-title">
           <blockquote>
             <i></i>
             <h2 class="pr-3 ml-1">Blog</h2>
           </blockquote>
+          <h5 class="float-right cinza-claro-bg">
+            <a href="{{ route('site.blog') }}"><i class="fas fa-plus-circle icon-title"></i> Ver mais posts</a>
+          </h5>
         </div>
         <div></div>
       </div>

@@ -662,7 +662,7 @@ function resumo($string)
     if (strlen($string) > 100)
         $string = strip_tags($string);
         $string = html_entity_decode($string);
-        $string = substr($string, 0, 240) . '...';
+        $string = mb_substr($string, 0, 240) . '...';
     return $string;
 }
 
@@ -817,7 +817,7 @@ function apenasLetras($string)
 
 function versaoScriptJs()
 {
-    return '0.2.1';
+    return '0.2.2';
 }
 
 function hashScriptJs()

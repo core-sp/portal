@@ -758,7 +758,7 @@ figure.align-left {
 	position: absolute;
 	z-index: 5;
 	right: 8px;
-	top: 8px;
+	top: 4px;
 	padding-left: .6rem;
 	padding-right: .3rem;
 	color: #444444;
@@ -799,7 +799,7 @@ figure.align-left {
 
 /* ESPAÇO DO REPRESENTANTE */
 #espaco-representante {
-	padding-bottom: 8rem;
+	padding-bottom: 3rem;
 	padding-top: 3rem;
 	background-color: #eaeaea;
 }
@@ -1117,7 +1117,7 @@ input[type=file]::-webkit-file-upload-button {
 /* E-OUV */
 #eouv-calendario {
 	background-color: #eaeaea;
-	padding-top: 7rem;
+	padding-top: 3rem;
 }
 
 .eouv-imgs img {
@@ -2835,7 +2835,7 @@ h5 {
 
 	#espaco-representante {
 		padding-top: 2.5rem;
-		padding-bottom: 7rem;
+		padding-bottom: 3.5rem;
 	}
 
 	#novo-core {

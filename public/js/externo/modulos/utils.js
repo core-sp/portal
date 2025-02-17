@@ -120,6 +120,12 @@ function confereCep(retorno){
         }));
 }
 
+function resizePagination(){
+
+    if($('.pagination').length > 0)
+        $(window).width() <= 576 ? $('.pagination').addClass('pagination-sm') : $('.pagination').removeClass('pagination-sm');
+}
+
 export function executar(local = 'externo'){
     menuResponsivo();
     cookies();
@@ -160,9 +166,11 @@ export function executar(local = 'externo'){
     });
     
     lazyLoad();
-
+    resizePagination();
+    
     $(window).resize(function(){
         lazyLoad(true);
+        resizePagination();
     });
 
     // Texto do link com quantidade de caracteres que ultrapassam a largura do conteúdo
