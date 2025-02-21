@@ -71,9 +71,6 @@
                         <button type="submit" class="btn btn-primary">Entrar</button>
                     </div>
                     <div class="form-group mt-2">
-                        <label>
-                            <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}> Lembrar senha
-                        </label>
                         <hr>
                         <p>
                             @if (Route::has('password.request'))

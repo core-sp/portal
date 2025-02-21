@@ -11,4 +11,6 @@ interface RepresentanteServiceInterface {
     public function getRepresentanteByCpfCnpj($cpfCnpj);
 
     public function getDadosInscricaoCurso($rep, GerentiRepositoryInterface $gerenti);
+
+    public function registrarUltimoAcesso($cpfCnpj);
 }

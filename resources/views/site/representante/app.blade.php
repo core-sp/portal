@@ -129,6 +129,12 @@
         <div class="row nomargin" id="rc-main">
           @yield('content-representante')
         </div>
+        <span class="font-italic w-auto float-right mt-2 mr-1">
+          <small>
+            <b>Último acesso: </b>
+            {{ formataData(Auth::guard('representante')->user()->ultimoAcesso()) }}
+          </small>
+        </span>
       </div>
     </div>
   </div>
