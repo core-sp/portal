@@ -311,7 +311,7 @@
               </div>
               <p class="branco mb-1">
                 <strong>E-mail:</strong>
-                <br />atendimento@core-sp.org.br
+                <br />atendimento.sede@core-sp.org.br
               </p>
               <p class="branco">
                 <strong>Telefone:</strong>
