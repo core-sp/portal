@@ -108,6 +108,7 @@ class LoginController extends Controller
     {
         $this->saveSession($request, $user);
         $this->service->getService('Suporte')->liberarIp($request->ip());
+        \Auth::logoutOtherDevices($request->input('password'));
     }
 
     public function decayMinutes()

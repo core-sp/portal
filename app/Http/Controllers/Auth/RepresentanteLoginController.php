@@ -127,6 +127,7 @@ class RepresentanteLoginController extends Controller
     protected function authenticated(Request $request, $user)
     {
         $this->service->getService('Suporte')->liberarIp($request->ip());
+        $this->guard()->logoutOtherDevices($request->input('password'));
     }
 
     public function decayMinutes()
