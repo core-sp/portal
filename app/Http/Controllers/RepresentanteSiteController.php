@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Exception;
-use App\Certidao;
 use App\Representante;
 use App\Rules\CpfCnpj;
 use GuzzleHttp\Client;

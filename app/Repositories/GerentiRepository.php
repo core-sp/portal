@@ -196,25 +196,25 @@ class GerentiRepository implements GerentiRepositoryInterface
         return range($min, $max);
     }
 
-    /**
-     * Método para formatar os dados de endereço do GERENTI para emissão de Certidão
-     */
-    public function gerentiEnderecoFormatado($ass_id) 
-    {
-        $enderecoGerenti = $this->gerentiEnderecos($ass_id);
+    // /**
+    //  * Método para formatar os dados de endereço do GERENTI para emissão de Certidão
+    //  */
+    // public function gerentiEnderecoFormatado($ass_id) 
+    // {
+    //     $enderecoGerenti = $this->gerentiEnderecos($ass_id);
 
-        $enderecoFormatado = $enderecoGerenti["Logradouro"];
+    //     $enderecoFormatado = $enderecoGerenti["Logradouro"];
         
-        if(!empty($enderecoGerenti["Complemento"])) {
-            $enderecoFormatado .= ", " . $enderecoGerenti["Complemento"];
-        }
+    //     if(!empty($enderecoGerenti["Complemento"])) {
+    //         $enderecoFormatado .= ", " . $enderecoGerenti["Complemento"];
+    //     }
 
-        $enderecoFormatado .= ", " . $enderecoGerenti["Bairro"];
-        $enderecoFormatado .= " - " . $enderecoGerenti["Cidade"] . "/" . $enderecoGerenti["UF"];
-        $enderecoFormatado .= " - CEP: " . $enderecoGerenti["CEP"];
+    //     $enderecoFormatado .= ", " . $enderecoGerenti["Bairro"];
+    //     $enderecoFormatado .= " - " . $enderecoGerenti["Cidade"] . "/" . $enderecoGerenti["UF"];
+    //     $enderecoFormatado .= " - CEP: " . $enderecoGerenti["CEP"];
 
-        return $enderecoFormatado;
-    }
+    //     return $enderecoFormatado;
+    // }
 
     public function gerentiDadosGeraisPF($ass_id)
     {
@@ -304,18 +304,18 @@ class GerentiRepository implements GerentiRepositoryInterface
         return $run->fetchAll()[0]['sequencia'];
     }
 
-    public function gerentiEnderecoInfos($ass_id, $sequencia)
-    {
-        $this->connect();
+    // public function gerentiEnderecoInfos($ass_id, $sequencia)
+    // {
+    //     $this->connect();
 
-        $run = $this->gerentiConnection->prepare('select first 1 * from ENDERECOS where ASS_ID = :ass_id and END_SEQUENCIA = :sequencia');
+    //     $run = $this->gerentiConnection->prepare('select first 1 * from ENDERECOS where ASS_ID = :ass_id and END_SEQUENCIA = :sequencia');
 
-        $run->execute([
-            'ass_id' => $ass_id,
-            'sequencia' => $sequencia
-        ]);
-        return $run->fetchAll();
-    }
+    //     $run->execute([
+    //         'ass_id' => $ass_id,
+    //         'sequencia' => $sequencia
+    //     ]);
+    //     return $run->fetchAll();
+    // }
 
     public function gerentiContatos($ass_id)
     {
