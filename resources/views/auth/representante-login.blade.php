@@ -67,7 +67,7 @@
                         @endcomponent
                     </div>
                     <div class="form-group mt-2">
-                        <input id="email_system" type="text" class="form-control" name="email_system" value="" tabindex="-1">
+                        {{--<input id="email_system" type="text" class="form-control" name="email_system" value="" tabindex="-1">--}}
                         <button type="submit" class="btn btn-primary loadingPagina">Entrar</button>
                     </div>
                     <div class="form-group mt-2">
