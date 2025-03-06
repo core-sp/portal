@@ -211,6 +211,18 @@ class SuporteService implements SuporteServiceInterface {
         return isset($conteudo) ? $conteudo : null;
     }
 
+    public function verificaHashLog($data, $tipo)
+    {
+        $log = Storage::disk('log_'.$tipo)->path($this->getPathLogFile($data, $tipo));
+        $data = Carbon::createFromFormat('Y-m-d', $data);
+        $hash_file = $data->year . '/hash.json';
+
+        if(Storage::disk('log_' . $tipo)->exists($hash_file))
+            $json = json_decode(Storage::disk('log_'.$tipo)->get($hash_file), true);
+
+        return isset($json[$data->format('Y-m-d')]) ? hash_file('sha256', $log) == $json[$data->format('Y-m-d')] : 'Hash ainda não foi criado!';
+    }
+
     public function relatorios($dados, $acao = null)
     {
         $suporte = new Suporte();
