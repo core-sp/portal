@@ -36,7 +36,7 @@
   <div class="container">
     @if(isset($post))
       <div class="row limite-sociais">
-        <div class="col-md-2 center sociais-post position-relative hide-768">
+        <div class="col-2 center sociais-post position-relative">
           <div id="prender">
             <a class="fb-share" href="https://www.facebook.com/dialog/share?app_id=788710944865049&display=popup&href={{ route('site.blog.post', $post->slug) }}" target="_blank">
               <img src="{{ asset('img/facebook-share.png') }}" alt="Core-SP | Facebook Share">
@@ -52,7 +52,7 @@
             </a>
           </div>
         </div>
-        <div class="col-md-8">
+        <div class="col-10 col-md-8">
           <div class="d-block mb-4">
             <h1 class="post-title mb-2">{{ $post->titulo }}</h1>
             <h4 class="post-subtitle mb-3">{{ $post->subtitulo }}</h4>
@@ -93,7 +93,7 @@
             <h5>Como podemos melhorar?</h5>
             <p>Tem alguma sugestão, critica ou elogio? Algo que gostaria de comentar? Sentiu falta de algum serviço que o Core-SP pode oferecer?</p>
             <p>Nosso objetivo é de aprimorar os serviços oferecidos para que possamos lhe atender cada vez melhor. Ajude a construir um novo Conselho!</p>
-            <p><strong>Email:</strong> comunicação@core-sp.org.br</p>
+            <p><strong>Email:</strong> comunicacao@core-sp.org.br</p>
           </div>
         </div>
       </div>
@@ -102,5 +102,7 @@
     @endif
   </div>
 </section>
+
+<script type="module" src="{{ asset('/js/externo/modulos/posts.js?'.hashScriptJs()) }}" id="modulo-posts" class="modulo-visualizar"></script>
 
 @endsection

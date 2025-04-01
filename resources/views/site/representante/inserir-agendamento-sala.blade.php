@@ -130,9 +130,6 @@
             </div>
             @endif
           </div>
-          <div id="loadCalendario" class="loadImage">
-            <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
-          </div>
         </div>
 
         <div class="col-sm mb-2-576">
@@ -155,9 +152,6 @@
             {{ $errors->first('periodo') }}
           </div>
           @endif
-          <div id="loadHorario" class="loadImage">
-            <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
-          </div>
         </div>
       </div>
 
@@ -184,7 +178,7 @@
 
             <div class="input-group mb-2-576">
               <div class="input-group-prepend">
-                <span class="input-group-text">Participante Responsável:</span>
+                <span class="input-group-text"><i class="fas fa-user"></i>&nbsp;&nbsp;Responsável:</span>
               </div>
               <input 
                 type="text" 
@@ -214,7 +208,7 @@
 
             <div class="input-group mb-2-576">
               <div class="input-group-prepend">
-                <span class="input-group-text">Participante:</span>
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
               </div>
               <input 
                 type="text" 
@@ -243,7 +237,7 @@
 
             <div class="input-group mb-2-576">
               <div class="input-group-prepend">
-                <span class="input-group-text">Participante:</span>
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
               </div>
               <input 
                 type="text" 
@@ -319,7 +313,7 @@
           {{ !empty(old('aceite')) ? 'checked' : '' }}
           required
         /> 
-        <label for="termo" class="textoTermo text-justify">
+        <label for="aceite" class="textoTermo text-justify">
           Li e concordo com as <a href="{{ route('termo.consentimento.pdf', 'sala-reuniao') }}" target="_blank"><u>condições</u></a> do uso da sala.
         </label>
         @if($errors->has('aceite'))
@@ -332,7 +326,7 @@
             
       <div class="form-group float-right mt-4">
         <a href="{{ route('representante.agendar.inserir.view') }}" class="btn btn-secondary link-nostyle mr-2">Voltar</a>
-        <button type="submit" class="btn btn-{{ $acao == 'cancelar' ? 'danger' : 'primary' }}">
+        <button type="submit" class="btn btn-{{ $acao == 'cancelar' ? 'danger' : 'primary' }} loadingPagina">
         @switch($acao)
           @case('editar')
             Salvar
@@ -358,38 +352,8 @@
   </div>
 </div>
 
-  <!-- The Modal -->
-  <div class="modal fade" id="verificaSala">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <!-- Modal Header -->
-        <div class="modal-header">
-          <h5 class="modal-title">Atenção, Representante Comercial!</h5>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <!-- Modal body -->
-        <div class="modal-body text-center">
-          <div id="cpfIrregular" data-clarity-mask="True"></div>
-        </div>
-        <!-- Modal footer -->
-        <div class="modal-footer">
-        <button type="button" class="btn btn-sm btn-outline-secondary" data-dismiss="modal">Fechar</button>
-      </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- The Modal -->
-  <div class="modal" id="loadingSala">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <!-- Modal body -->
-        <div class="modal-body text-center"></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="dialog_agendamento" title="Atenção"></div>
 </section>
+
+<script type="module" src="{{ asset('/js/restrita-rc/modulos/sala-reuniao.js?'.hashScriptJs()) }}" id="modulo-sala-reuniao" class="modulo-editar"></script>
 
 @endsection
