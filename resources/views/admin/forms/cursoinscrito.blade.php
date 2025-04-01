@@ -56,7 +56,7 @@
                 <label for="telefone">Telefone</label>
                 <input type="text"
                     name="telefone"
-                    class="form-control celularInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
+                    class="form-control telefoneInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
                     placeholder="(00) 00000-0000"
                     value="{{ isset($resultado->telefone) ? $resultado->telefone : old('telefone') }}"
                     required

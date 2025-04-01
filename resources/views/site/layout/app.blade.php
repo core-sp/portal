@@ -124,7 +124,7 @@
                     placeholder="Digite o que você procura"
                     accesskey="2" />
                   <div class="input-group-append">
-                    <button type="submit" class="btn btn-default">
+                    <button type="submit" class="btn btn-default loadingPagina">
                       <i class="fas fa-search"></i>
                     </button>
                   </div>
@@ -312,7 +312,7 @@
               </div>
               <p class="branco mb-1">
                 <strong>E-mail:</strong>
-                <br />atendimento@core-sp.org.br
+                <br />atendimento.sede@core-sp.org.br
               </p>
               <p class="branco">
                 <strong>Telefone:</strong>
@@ -391,7 +391,7 @@
                   <div class="form-group">
                     <input type="text"
                       name="celularNl"
-                      class="form-control celularInput {{ $errors->has('celularNl') ? 'is-invalid' : '' }}"
+                      class="form-control telefoneInput {{ $errors->has('celularNl') ? 'is-invalid' : '' }}"
                       value="{{ old('celularNl') }}"
                       placeholder="Celular *"
                       required
@@ -420,7 +420,7 @@
                     @endif
                   </div>
                   <div class="form-group">
-                    <button type="submit" class="btn btn-default">Inscrever-se</button>
+                    <button type="submit" class="btn btn-default loadingPagina">Inscrever-se</button>
                   </div>
                 </form>
               </div>
@@ -435,24 +435,41 @@
 
       <div class="container">
         <div class="row d-flex justify-content-center">
-          <div class="box-cookies hide">
+          <div class="border border-primary rounded box-cookies hide">
             <p class="msg-cookies">
               Coletamos dados e informações sobre a sessão exclusivamente para atendimento das atividades finais desta autarquia, por legítimo interesse do controlador, e para funcionamento de serviços de interesse do usuário de acordo com a nossa 
               <strong><u><a href="/politica-de-privacidade">Política de Privacidade</a></u></strong> 
               e, ao continuar navegando, você concorda com estas condições.
             </p>
-            <button class="btn-cookies btn btn-default">CONCORDO</button>
+            <button class="btn-cookies btn btn-sm btn-primary">CONCORDO</button>
           </div>     
         </div>    
       </div>     
 
-      <script type="text/javascript" src="{{ asset('/js/app.js') }}"></script>
-      <script type="text/javascript" src="{{ asset('/js/jquery-ui.min.js') }}"></script>
-      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js"></script>
-      <script type="text/javascript" src="{{ asset('/js/jquery.mask.js') }}"></script>
+      <!-- The Modal -->
+      <div class="modal" id="msgGeral">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title"></h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body"></div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer"></div>
+
+          </div>
+        </div>
+      </div>
+
+      @component('components.scriptsExternoJS')
+      @endcomponent
       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.js"></script>
       <script type="text/javascript" src='https://www.google.com/recaptcha/api.js?hl=pt-BR'></script>
-      <script type="text/javascript" src="{{ asset('/js/site.js?'.time()) }}"></script>
-      <script type="text/javascript" src="{{ asset('/js/acessibilidade.js') }}"></script>
     </body>
 </html>
