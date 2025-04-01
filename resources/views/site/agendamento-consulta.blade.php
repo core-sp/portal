@@ -73,7 +73,7 @@
                   @endif
                 </div> 
                 <div class="float-left mt-3">
-                  <button type="submit" class="btn btn-primary">Consultar</button>
+                  <button type="submit" class="btn btn-primary loadingPagina">Consultar</button>
                 </div>
               </div>
             </div>
@@ -123,7 +123,7 @@
             @endif
           </div>
           <div class="float-left mt-3">
-            <button type="submit" class="btn btn-danger">Cancelar</button>
+            <button type="submit" class="btn btn-danger loadingPagina">Cancelar</button>
           </div>
         </form>
       </div>

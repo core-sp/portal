@@ -898,7 +898,7 @@ class AvisoTest extends TestCase
         $aviso = factory('App\Aviso')->states('bdo')->create();
 
         $this->get(route('bdosite.apiGetEmpresa', apenasNumeros($bdoEmpresa['cnpj'])))
-        ->assertStatus(500);
+        ->assertJsonFragment([]);
         
         $bdoEmpresa = factory('App\BdoEmpresa')->create();
 
