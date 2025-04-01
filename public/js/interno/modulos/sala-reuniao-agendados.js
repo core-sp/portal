@@ -67,7 +67,7 @@ function caseSalaReuniaoId(response){
         for (let i = 1; i < response.total_participantes; i++)
             $('#area_participantes').append($('.participante:last').clone());
 
-        $('.participante :input[name="participantes_cpf[]"]').val('').unmask().mask('999.999.999-99');
+        $('.participante input[name="participantes_cpf[]"]')[0].dispatchEvent(new CustomEvent("MASK"));
         $('.participante :input[name="participantes_nome[]"]').val('');
         $('#area_participantes').show();
     }

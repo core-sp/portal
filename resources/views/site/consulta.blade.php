@@ -111,7 +111,7 @@
           <div class="alert alert-warning consulta-alert" role="alert">
             <h6>IMPORTANTE:</h6>
             <p class="mt-1 mb-1">O teor desta consulta é meramente informativo, não valendo como certidão.</p>
-            <p>Caso seja constatada qualquer divergência de dados, solicitamos a gentileza de entrar em contato conosco através do email atendimento@core-sp.org.br ou pelo telefone (11) 3243-5500.</p>
+            <p>Caso seja constatada qualquer divergência de dados, solicitamos a gentileza de entrar em contato conosco através do email atendimento.sede@core-sp.org.br ou pelo telefone (11) 3243-5500.</p>
           </div>
         </div>
       </div>

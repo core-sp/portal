@@ -10,6 +10,7 @@ use App\Http\Requests\BdoEmpresaRequest;
 use App\Repositories\BdoEmpresaRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 use App\Contracts\MediadorServiceInterface;
+use App\Rules\Cnpj;
 
 class BdoEmpresaController extends Controller
 {
@@ -165,6 +166,14 @@ class BdoEmpresaController extends Controller
                 'message' => 'Não é possível verificar no momento se a empresa está cadastrada.',
                 'class' => 'alert-warning'
             ];
+
+        request()->request->set('cnpj', apenasNumeros($cnpj));
+        $this->validate(request(), [
+            'cnpj' => ['required', new Cnpj],
+        ], [
+            'cnpj.required' => 'Informe o CNPJ',
+        ]);
+
         $cnpj = formataCpfCnpj($cnpj);
 
         $empresa = $this->bdoEmpresaRepository->getToApi($cnpj);
@@ -188,10 +197,9 @@ class BdoEmpresaController extends Controller
                 'message' => $message,
                 'class' => $class
             ];
-        } 
-        else {
-            abort(500);
         }
+        
+        return [];
     }
 
     public function tabelaCompleta($query)

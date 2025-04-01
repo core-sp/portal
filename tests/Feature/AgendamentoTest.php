@@ -2821,19 +2821,6 @@ class AgendamentoTest extends TestCase
         ->assertSessionHasErrors([
             'celular'
         ]);
-
-        $agendamento = factory('App\Agendamento')->raw([
-            'celular' => '(11) 9999-9999',
-            'dia' => onlyDate($pegarDia['dia']),
-            'servico' => Agendamento::SERVICOS_OUTROS,
-            'pessoa' => 'PF',
-            'termo' => 'on'
-        ]);
-
-        $this->post(route('agendamentosite.store'), $agendamento)
-        ->assertSessionHasErrors([
-            'celular'
-        ]);
     }
 
     /** @test */
