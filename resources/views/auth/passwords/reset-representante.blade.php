@@ -97,7 +97,7 @@
               </div>
 
               <div class="form-group mt-3">
-                <button type="submit" class="btn btn-primary">Alterar senha</button>
+                <button type="submit" class="btn btn-primary loadingPagina">Alterar senha</button>
               </div>
             </form>
           </div>
@@ -108,7 +108,6 @@
     </div>
 </section>
 
-<script type="text/javascript" src="{{ asset('/js/zxcvbn.js?'.time()) }}"></script>
-<script type="text/javascript" src="{{ asset('/js/security.js?'.time()) }}"></script>
+<script type="module" src="{{ asset('/js/modulos/security.js?'.hashScriptJs()) }}" id="modulo-security" class="modulo-visualizar"></script>
 
 @endsection

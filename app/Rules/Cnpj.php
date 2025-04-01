@@ -29,6 +29,12 @@ class Cnpj implements Rule
         // Valida tamanho
         if (strlen($cnpj) != 14)
             return false;
+
+        for($num = 0; $num <= 9; $num++){
+            if(str_repeat($num, 14) == $cnpj)
+                return false;
+        }
+            
         // Valida primeiro dígito verificador
         for ($i = 0, $j = 5, $soma = 0; $i < 12; $i++)
         {
