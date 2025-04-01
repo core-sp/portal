@@ -143,6 +143,19 @@ body {
 	color: #FFFFFF !important;
 }
 
+.contraste-fundo-link {
+	background-color: #000 !important;
+	text-decoration: underline !important;
+}
+
+.contraste-fundo-branco {
+	background-color: #FFF !important;
+}
+
+.contraste-btn-acessibilidade {
+	background-color: #FF6161 !important;
+}
+
 img {
 	max-width: 100%;
 	height: auto;
@@ -745,7 +758,7 @@ figure.align-left {
 	position: absolute;
 	z-index: 5;
 	right: 8px;
-	top: 8px;
+	top: 4px;
 	padding-left: .6rem;
 	padding-right: .3rem;
 	color: #444444;
@@ -786,7 +799,7 @@ figure.align-left {
 
 /* ESPAÇO DO REPRESENTANTE */
 #espaco-representante {
-	padding-bottom: 8rem;
+	padding-bottom: 3rem;
 	padding-top: 3rem;
 	background-color: #eaeaea;
 }
@@ -1104,7 +1117,7 @@ input[type=file]::-webkit-file-upload-button {
 /* E-OUV */
 #eouv-calendario {
 	background-color: #eaeaea;
-	padding-top: 7rem;
+	padding-top: 3rem;
 }
 
 .eouv-imgs img {
@@ -1558,7 +1571,7 @@ footer p {
 	line-height: 1.5;
 }
 
-.bdo-info {
+.saiba-mais-info {
 	display: none;
 }
 
@@ -2373,6 +2386,14 @@ h5 {
 	.pagina-titulo-img h6 {
 		bottom: 7.5px;
 	}
+
+	.btn-beneficios {
+		margin-bottom: 0.65rem;
+	}
+
+	#computer {
+		margin-top: -0.5rem;
+	}
 }
 
 
@@ -2822,7 +2843,7 @@ h5 {
 
 	#espaco-representante {
 		padding-top: 2.5rem;
-		padding-bottom: 7rem;
+		padding-bottom: 3.5rem;
 	}
 
 	#novo-core {
@@ -2911,6 +2932,14 @@ h5 {
 
 	.representante-content .quinze {
 		width: 25%;
+	}
+
+	#prender {
+		margin-left: 0px;
+	}
+
+	#prender img {
+		max-width: 70%;
 	}
 }
 
@@ -3051,11 +3080,11 @@ h5 {
 		line-height: 1;
 	}
 
-	.bdo-info .row {
+	.saiba-mais-info .row {
 		display: block !important;
 	}
 
-	.bdo-info .col {
+	.saiba-mais-info .col {
 		margin-top: 10px;
 	}
 
@@ -3065,6 +3094,12 @@ h5 {
 
 	#popup-campanha video {
 		height: 100%;
+	}
+}
+
+@media screen and (max-width: 465px) {
+	.btn-beneficios {
+		margin-bottom: 0.25rem;
 	}
 }
 
@@ -3092,15 +3127,6 @@ h5 {
 	padding: 10px;
 	color: #000;
 	font-size: 14px;
-}
-  
-.btn-cookies {
-	font-size: 12px;
-	text-align: center;
-	background: #007bff;
-	cursor: pointer;
-	align-self: normal;
-	color: #fff;
 }
   
 @media screen and (max-width: 900px) {

@@ -62,7 +62,7 @@ class SimuladorControllerHelper extends Controller
             </ol>
             <p>OBS. Se o registro for requerido através de terceiros será necessário apresentar procuração especifica para realizar o registro no CORE-SP, dando poderes para representá-lo, e cópia do documento do procurador;</p>
             <strong>Conselho Regional dos Representantes Comerciais no Estado de São Paulo</strong>
-            <p>Av. Brigadeiro Luis Antonio, 613 - CEP 01317-000 - São Paulo<br />SARC: (11) 3243-5519 - Fone: (11) 3243-5500<br />Atendimento de 2ª à 6ª feiras - das 9h às 18h<br />Horário de registro - das 9h às 15h30<br />Email: atendimento@core-sp.org.br</p>
+            <p>Av. Brigadeiro Luis Antonio, 613 - CEP 01317-000 - São Paulo<br />SARC: (11) 3243-5519 - Fone: (11) 3243-5500<br />Atendimento de 2ª à 6ª feiras - das 9h às 18h<br />Horário de registro - das 9h às 15h30<br />Email: atendimento.sede@core-sp.org.br</p>
         ';
     }
 
@@ -84,7 +84,7 @@ class SimuladorControllerHelper extends Controller
             </ol>
             <p>OBS. Se o registro for requerido através de terceiros será necessário apresentar procuração especifica para realizar o registro no CORE-SP, dando poderes para representá-lo, e cópia do documento do procurador;</p>
             <strong>Conselho Regional dos Representantes Comerciais no Estado de São Paulo</strong>
-            <p>Av. Brigadeiro Luis Antonio, 613 - CEP 01317-000 - São Paulo<br />SARC: (11) 3243-5519 - Fone: (11) 3243-5500<br />Atendimento de 2ª à 6ª feiras - das 9h às 18h<br />Horário de registro - das 9h às 15h30<br />Email: atendimento@core-sp.org.br</p>
+            <p>Av. Brigadeiro Luis Antonio, 613 - CEP 01317-000 - São Paulo<br />SARC: (11) 3243-5519 - Fone: (11) 3243-5500<br />Atendimento de 2ª à 6ª feiras - das 9h às 18h<br />Horário de registro - das 9h às 15h30<br />Email: atendimento.sede@core-sp.org.br</p>
         ';
     }
 
@@ -114,7 +114,7 @@ class SimuladorControllerHelper extends Controller
             </ol>
             <p>OBS. Se o registro for requerido através de terceiros será necessário apresentar procuração especifica para realizar o registro no CORE-SP, dando poderes para representá-lo, e cópia do documento do procurador;</p>
             <strong>Conselho Regional dos Representantes Comerciais no Estado de São Paulo</strong>
-            <p>Av. Brigadeiro Luis Antonio, 613 - CEP 01317-000 - São Paulo<br />SARC: (11) 3243-5519 - Fone: (11) 3243-5500<br />Atendimento de 2ª à 6ª feiras - das 9h às 18h<br />Horário de registro - das 9h às 15h30<br />Email: atendimento@core-sp.org.br</p>
+            <p>Av. Brigadeiro Luis Antonio, 613 - CEP 01317-000 - São Paulo<br />SARC: (11) 3243-5519 - Fone: (11) 3243-5500<br />Atendimento de 2ª à 6ª feiras - das 9h às 18h<br />Horário de registro - das 9h às 15h30<br />Email: atendimento.sede@core-sp.org.br</p>
         ';
     }
 
@@ -133,7 +133,7 @@ class SimuladorControllerHelper extends Controller
             </ol>
             <p>OBS. Se o registro for requerido através de terceiros será necessário apresentar procuração especifica para realizar o registro no CORE-SP, dando poderes para representá-lo, e cópia do documento do procurador;</p>
             <strong>Conselho Regional dos Representantes Comerciais no Estado de São Paulo</strong>
-            <p>Av. Brigadeiro Luis Antonio, 613 - CEP 01317-000 - São Paulo<br />SARC: (11) 3243-5519 - Fone: (11) 3243-5500<br />Atendimento de 2ª à 6ª feiras - das 9h às 18h<br />Horário de registro - das 9h às 15h30<br />Email: atendimento@core-sp.org.br</p>
+            <p>Av. Brigadeiro Luis Antonio, 613 - CEP 01317-000 - São Paulo<br />SARC: (11) 3243-5519 - Fone: (11) 3243-5500<br />Atendimento de 2ª à 6ª feiras - das 9h às 18h<br />Horário de registro - das 9h às 15h30<br />Email: atendimento.sede@core-sp.org.br</p>
         ';
     }
 }

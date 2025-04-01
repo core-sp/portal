@@ -221,4 +221,6 @@
   </div>
 </section>
 
+<script type="module" src="{{ asset('/js/externo/modulos/fiscalizacao.js?'.hashScriptJs()) }}" id="modulo-fiscalizacao" class="modulo-visualizar"></script>
+
 @endsection
