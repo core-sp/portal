@@ -117,6 +117,7 @@
             </tbody>
         </table>
 
+        <script type="module" src="{{ asset('/js/modulos/refis.js?'.hashScriptJs()) }}" id="modulo-refis" class="modulo-visualizar"></script>
         @else
         <p>Não é possível simular valores Refis para quitar anuidades em aberto devido a situação do representante comercial. Em caso de dúvidas, por favor contactar o CORE-SP.</p>
         @endif
