@@ -1,7 +1,7 @@
 @extends('site.layout.app', ['title' => 'Agenda Institucional'])
 
 @section('description')
-  <meta name="description" content="Agenda Institucional ooficial contendo a agenda do CORE-SP." />
+  <meta name="description" content="Agenda Institucional Oficial contendo a agenda do CORE-SP." />
 @endsection
 
 @section('content')
@@ -40,7 +40,7 @@ use \App\BdoOportunidade;
                 &nbsp;&nbsp;&nbsp;
                 <i class="fas fa-map-marker-alt"></i>&nbsp; {{ $compromisso->local }}
               </h6>
-              <div class="bdo-info">
+              <div class="saiba-mais-info">
                 <div class="row mt-3 bot-lg">
                   <div class="col d-flex">
                     <div class="flex-one">
@@ -54,11 +54,13 @@ use \App\BdoOportunidade;
           </div>
           @endforeach
         @else
-        <p style="text-align: center;">Sem compromisso oficial</p>
+        <p class="text-center">Sem compromisso oficial</p>
         @endif
       </div>
     </div>
   </div>  
 </section>
+
+<script type="module" src="{{ asset('/js/externo/modulos/agenda-institucional.js?'.hashScriptJs()) }}" id="modulo-agenda-institucional" class="modulo-visualizar"></script>
 
 @endsection
