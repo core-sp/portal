@@ -161,7 +161,7 @@
                 @endif
             </div>
             <div class="form-group mt-4">
-                <button type="submit" class="btn btn-primary">Cadastrar</button>
+                <button type="submit" class="btn btn-primary loadingPagina">Cadastrar</button>
             </div>
         </form>
     </div>

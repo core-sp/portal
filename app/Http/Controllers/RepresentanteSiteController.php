@@ -137,7 +137,7 @@ class RepresentanteSiteController extends Controller
             'min' => 'Quantidade inválida de caracteres',
             'email' => 'Email inválido',
             'password.confirmed' => 'A senha e a confirmação devem ser idênticas',
-            'accepted' => '- Você deve concordar com os Termos de Uso'
+            'accepted' => 'Você deve concordar com os Termos de Uso'
         ]);
     }
 
@@ -417,10 +417,11 @@ class RepresentanteSiteController extends Controller
     {
         $retorno = Auth::guard('representante')->user()->estaHomologado($this->gerentiRepository, 'certidao');
         if(gettype($retorno) == "string")
-            return redirect()->route('representante.dashboard')->with([
-                'message' => $retorno,
-                'class' => 'alert-danger'
-            ]);
+            return response()->json(['titulo' => 'Atenção!', 'mensagem' => $retorno]);
+            // return redirect()->route('representante.dashboard')->with([
+            //     'message' => $retorno,
+            //     'class' => 'alert-danger'
+            // ]);
 
         try {
             $responseGerentiJson = $this->gerentiApiRepository->gerentiGenerateCertidao(Auth::guard('representante')->user()->ass_id);
@@ -437,7 +438,8 @@ class RepresentanteSiteController extends Controller
             $mensagem = 'Não foi possível emitir a certidão. Por favor entre em contato com o CORE-SP para mais informações.';
             $emitir = false;
 
-            return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
+            // return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
+            return response()->json(['titulo' => $titulo, 'mensagem' => $mensagem, 'emitir' => $emitir]);
         }
         catch (Exception $e) {
             Log::error($e->getTraceAsString());
@@ -475,10 +477,11 @@ class RepresentanteSiteController extends Controller
     {
         $retorno = Auth::guard('representante')->user()->estaHomologado($this->gerentiRepository, 'certidao');
         if(gettype($retorno) == "string")
-            return redirect()->route('representante.dashboard')->with([
-                'message' => $retorno,
-                'class' => 'alert-danger'
-            ]);
+            return response()->json(['titulo' => 'Atenção!', 'mensagem' => $retorno]);
+            // return redirect()->route('representante.dashboard')->with([
+            //     'message' => $retorno,
+            //     'class' => 'alert-danger'
+            // ]);
 
         $responseGerentiJson = $this->gerentiApiRepository->gerentiGetCertidao(Auth::guard('representante')->user()->ass_id);
 
@@ -510,7 +513,8 @@ class RepresentanteSiteController extends Controller
             $mensagem = 'Não foi possível baixar a certidão.';
             $emitir = false;
 
-            return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
+            // return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
+            return response()->json(['titulo' => $titulo, 'mensagem' => $mensagem, 'emitir' => $emitir]);
         }
     }
 

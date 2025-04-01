@@ -47,52 +47,52 @@
           </div>
           <div id="mobile-menu-representante" class="hide-992">
             <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.dashboard' ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.dashboard') }}" onclick="showLoading()">
+              <a href="{{ route('representante.dashboard') }}" class="showLoading">
                 <h6 class="brancar"><i class="fas fa-home"></i>&nbsp;&nbsp;Home</h6>
               </a>
             </div>
             <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.dados-gerais' ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.dados-gerais') }}" onclick="showLoading()">
+              <a href="{{ route('representante.dados-gerais') }}" class="showLoading">
                 <h6 class="brancar"><i class="fas fa-table"></i>&nbsp;&nbsp;Dados gerais</h6>
               </a>
             </div>
             <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.contatos.view' ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.contatos.view') }}" onclick="showLoading()">
+              <a href="{{ route('representante.contatos.view') }}" class="showLoading">
                 <h6 class="brancar"><i class="fas fa-phone"></i>&nbsp;&nbsp;Contatos</h6>
               </a>
             </div>
             <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.enderecos.view' ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.enderecos.view') }}" onclick="showLoading()">
+              <a href="{{ route('representante.enderecos.view') }}" class="showLoading">
                 <h6 class="brancar"><i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;End. de Correspondência</h6>
               </a>
             </div>
             <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.lista-cobrancas' ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.lista-cobrancas') }}" onclick="showLoading()">
+              <a href="{{ route('representante.lista-cobrancas') }}" class="showLoading">
                 <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Situação Financeira</h6>
               </a>
             </div>
 
             <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.emitirCertidaoView')  ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.emitirCertidaoView') }}" onclick="showLoading()">
+              <a href="{{ route('representante.emitirCertidaoView') }}" class="showLoading">
                 <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Emitir Certidão</h6>
               </a>
             </div>
 
             <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.bdo')  ? 'mr-item-selected' : '' }}">  
-              <a href="{{ route('representante.bdo') }}" onclick="showLoading()">
+              <a href="{{ route('representante.bdo') }}" class="showLoading">
                 <h6 class="brancar"><i class="fas fa-briefcase"></i>&nbsp;&nbsp;Oportunidades&nbsp;&nbsp;&nbsp;</h6>
               </a>
             </div>
 
             {{-- SIMULADOR_REFIS --}}
             {{-- <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.simuladorRefis')  ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.simuladorRefis') }}" onclick="showLoading()">
+              <a href="{{ route('representante.simuladorRefis') }}" class="showLoading">
                 <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Simulador Refis</h6>
               </a>
             </div> --}}
 
             <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.solicitarCedulaView')  ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.solicitarCedulaView') }}" onclick="showLoading()">
+              <a href="{{ route('representante.solicitarCedulaView') }}" class="showLoading">
                 <h6 class="brancar">
                   <i class="fas fa-id-card"></i>&nbsp;&nbsp;Solicitação de Cédula&nbsp;&nbsp;&nbsp;
                 </h6>
@@ -100,7 +100,7 @@
             </div>
 
             <div class="mr-item bt-unset {{ Route::is('representante.agendar.*') ? 'mr-item-selected' : '' }}">  
-              <a href="{{ route('representante.agendar.inserir.view') }}" onclick="showLoading()">
+              <a href="{{ route('representante.agendar.inserir.view') }}" class="showLoading">
                 <h6 class="brancar">
                   <i class="fas fa-business-time"></i>&nbsp;&nbsp;Agendar Salas&nbsp;&nbsp;&nbsp;
                   <!-- <span class="badge badge-warning">NOVO <span class="spinner-grow spinner-grow-sm align-middle"></span>
@@ -110,7 +110,7 @@
             </div>
 
             <div class="mr-item bt-unset {{ Route::is('representante.cursos')  ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.cursos') }}" onclick="showLoading()">
+              <a href="{{ route('representante.cursos') }}" class="showLoading">
                 <h6 class="brancar">
                   <i class="nav-icon fas fa-graduation-cap"></i>&nbsp;&nbsp;Cursos&nbsp;&nbsp;&nbsp;
                 </h6>

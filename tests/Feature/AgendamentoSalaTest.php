@@ -3346,7 +3346,7 @@ class AgendamentoSalaTest extends TestCase
         $this->get(route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]))
         ->assertOk()
         ->assertSeeInOrder($itens)
-        ->assertSee('<button type="submit" class="btn btn-danger">');
+        ->assertSee('<button type="submit" class="btn btn-danger loadingPagina">');
 
         $this->put(route('representante.agendar.inserir.put', [
             'acao' => 'cancelar',
@@ -3378,7 +3378,7 @@ class AgendamentoSalaTest extends TestCase
         $this->get(route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]))
         ->assertOk()
         ->assertSeeInOrder($itens)
-        ->assertSee('<button type="submit" class="btn btn-danger">');
+        ->assertSee('<button type="submit" class="btn btn-danger loadingPagina">');
 
         $this->put(route('representante.agendar.inserir.put', [
             'acao' => 'cancelar',
@@ -3889,7 +3889,7 @@ class AgendamentoSalaTest extends TestCase
 
         $this->get(route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]))
         ->assertOk()
-        ->assertSee('<button type="submit" class="btn btn-danger">');
+        ->assertSee('<button type="submit" class="btn btn-danger loadingPagina">');
 
         $this->put(route('representante.agendar.inserir.put', [
             'acao' => 'cancelar',
