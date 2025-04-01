@@ -102,7 +102,7 @@
               </div>
               <div class="form-group mt-2">
                 <button type="submit"
-                  class="btn btn-primary"
+                  class="btn btn-primary loadingPagina"
                 >Enviar</button>
               </div>
             </form>
