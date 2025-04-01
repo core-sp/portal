@@ -67,8 +67,8 @@
                         @endcomponent
                     </div>
                     <div class="form-group mt-2">
-                        <input id="email_system" type="text" class="form-control" name="email_system" value="" tabindex="-1">
-                        <button type="submit" class="btn btn-primary">Entrar</button>
+                        {{--<input id="email_system" type="text" class="form-control" name="email_system" value="" tabindex="-1">--}}
+                        <button type="submit" class="btn btn-primary loadingPagina">Entrar</button>
                     </div>
                     <div class="form-group mt-2">
                         <label>
@@ -91,7 +91,6 @@
     </div>
 </section>
 
-<script type="text/javascript" src="{{ asset('/js/zxcvbn.js?'.time()) }}"></script>
-<script type="text/javascript" src="{{ asset('/js/security.js?'.time()) }}"></script>
+<script type="module" src="{{ asset('/js/modulos/security.js?'.hashScriptJs()) }}" id="modulo-security" class="modulo-visualizar"></script>
 
 @endsection

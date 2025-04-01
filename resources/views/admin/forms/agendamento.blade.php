@@ -63,7 +63,7 @@
             <div class="col">
                 <label for="celular">Celular</label>
                 <input type="text"
-                    class="form-control {{ $errors->has('celular') ? 'is-invalid' : '' }}"
+                    class="form-control telefoneInput {{ $errors->has('celular') ? 'is-invalid' : '' }}"
                     placeholder="Celular"
                     name="celular"
                     value="{{ old('celular') ? old('celular') : $resultado->celular }}"

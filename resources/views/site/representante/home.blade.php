@@ -26,7 +26,7 @@
         @if(isset($nrBoleto))
             <p class="pb-0">
                 <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ $nrBoleto }}">
-                    <button class="btn btn-success btn-lg" onclick="clickBoleto({{ 'Anuidade ' . $ano . ' (Parcela Única)' }})">
+                    <button class="btn btn-success btn-lg" data-descricao="{{ 'Anuidade ' . $ano . ' (Parcela Única)' }}">
                         <i class="fas fa-download"></i>&nbsp;&nbsp;BAIXAR BOLETO
                     </button>
                 </a>
