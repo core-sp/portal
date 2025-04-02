@@ -683,6 +683,10 @@ class SuporteTest extends TestCase
         $this->get(route('suporte.log.externo.busca', ['data' => $data, 'tipo' => 'interno']))
         ->assertSee('<a class="btn btn-primary btn-sm ml-3" href="' . route('suporte.log.externo.integridade', ['data' => $data, 'tipo' => 'interno']) . '">')
         ->assertSee('Verificar integridade');
+
+        $this->get(route('suporte.log.externo.busca', ['ano' => '2022', 'tipo' => 'interno', 'texto' => '2022']))
+        ->assertSee('<a class="btn btn-primary btn-sm ml-3" href="' . route('suporte.log.externo.integridade', ['data' => $data, 'tipo' => 'interno']) . '">')
+        ->assertSee('Verificar integridade');
     }
 
     /** @test */

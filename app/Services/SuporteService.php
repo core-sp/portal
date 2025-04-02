@@ -18,6 +18,8 @@ class SuporteService implements SuporteServiceInterface {
     private $variaveisErros;
     private $nomeFileErros;
 
+    const INTEGRO = "/.hash.json";
+
     public function __construct()
     {
         $this->variaveisLog = [
@@ -127,6 +129,9 @@ class SuporteService implements SuporteServiceInterface {
 
             foreach($all as $key => $file)
             {
+                if($file == ($diretorio . self::INTEGRO))
+                    continue;
+
                 $total = 0;
                 $size = Storage::disk('log_'.$request['tipo'])->size($file);
                 $size = number_format($size / 1024, 2, ',', '.') . ' KB';
@@ -215,7 +220,7 @@ class SuporteService implements SuporteServiceInterface {
     {
         $log = Storage::disk('log_'.$tipo)->path($this->getPathLogFile($data, $tipo));
         $data = Carbon::createFromFormat('Y-m-d', $data);
-        $hash_file = $data->year . '/hash.json';
+        $hash_file = $data->year . self::INTEGRO;
 
         if(Storage::disk('log_' . $tipo)->exists($hash_file))
             $json = json_decode(Storage::disk('log_'.$tipo)->get($hash_file), true);
