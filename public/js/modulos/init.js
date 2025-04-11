@@ -11,7 +11,9 @@ function tinyInit(){
         tiny.setAttribute("type", "text/javascript");
         tiny.setAttribute("src", link + 'interno/tinymce.js?' + hash);
         document.body.appendChild(tiny);
-        console.log('Editor TinyMCE carregado.');
+
+        if(typeof tinymce === "object")
+            console.log('Editor TinyMCE carregado.');
     }
 }
 
@@ -20,7 +22,8 @@ function securityInit(){
     if($('#modulo-security').length > 0){
         const _lib = document.createElement('script');
         _lib.setAttribute("type", "text/javascript");
-        _lib.setAttribute("src", link + 'zxcvbn.js?' + hash);
+        _lib.setAttribute("src", link + 'zxcvbn.js?2017'); // zxcvbn.js?[ano da última atualização]
+        _lib.setAttribute("async", true);
         document.body.appendChild(_lib);
     }
 }
@@ -43,33 +46,40 @@ function criarScriptParaImportar(modulo_atual, obj_modulos = {modulo:[], local:[
     });
 }
 
-export default function (local = 'interno', subarea = null){
-
-    const locais = new Map([
-        ["interno", ['utils', 'filemanager']],
-        ["externo", ['acessibilidade', 'utils', 'modal-geral']],
-    ]);
-    const subareas = new Map([
-        ["restrita-rc", ['utils']],
-    ]);
-    let modulos_principais = ['mascaras'].concat(locais.get(local));
-    const pasta_modulos = 'modulos/';
-    const caminho_modulos = local + '/' + pasta_modulos;
-    const caminho_modulos_subarea = typeof subarea == "string" ? subarea + '/' + pasta_modulos : '';
+function opcionais(){
     
-    const pastas_locais = new Map([
-        ["interno", [caminho_modulos, caminho_modulos]],
-        ["externo", [pasta_modulos, caminho_modulos, pasta_modulos]],
-    ]);
-    const pastas_subareas = new Map([
-        ["restrita-rc", [caminho_modulos_subarea]],
-    ]);
-    let pastas_principais = [pasta_modulos].concat(pastas_locais.get(local));
+    tinyInit();
+    securityInit();
 
-    if(typeof subarea == "string"){
-        modulos_principais = modulos_principais.concat(subareas.get(subarea));
-        pastas_principais = pastas_principais.concat(pastas_subareas.get(subarea));
-    }
+    const opcionais = $('[type="module"][class^="' + inicio + '"]');
+  
+    if(opcionais.length == 0)
+        return false;
+
+    opcionais.each(function(){
+
+        let funcao = $(this).attr('class').replace(inicio, '');
+        let modulo = $(this).attr('id').replace(inicio, '');
+        
+        import($(this).attr('src'))
+        .then((module) => {
+            console.log('[MÓDULOS] # Módulo de "' + funcao + ' ' + modulo + '" carregado.');
+            console.log('[MÓDULOS] # Local do módulo: ' + $(this).attr('src').replace(link, 'js/'));
+
+            if('scripts_para_importar' in module)
+                criarScriptParaImportar(this, module.scripts_para_importar);
+
+            module.executar(funcao);
+        })
+        .catch((err) => {
+            console.log(err);
+            alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
+        });
+    
+    });
+}
+
+function criarImportarModulos(local, modulos_principais, pastas_principais){
 
     modulos_principais.forEach((element, index) => {
         const script = document.createElement('script');
@@ -95,38 +105,45 @@ export default function (local = 'interno', subarea = null){
             alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
         });
     });
-};
 
-export function opcionais(){
+    opcionais();
+}
+
+function getObjModulos(){
+
+    return {
+        principal: ['mascaras'],
+        interno: ['utils', 'filemanager'],
+        externo: ['acessibilidade', 'utils', 'modal-geral'],
+        "restrita-rc": ['utils'],
+    };
+}
+
+function getObjPastas(local, subarea){
+
+    const pasta_modulos = 'modulos/';
+    const caminho_modulos = local + '/' + pasta_modulos;
+    const caminho_modulos_subarea = typeof subarea == "string" ? subarea + '/' + pasta_modulos : '';
     
-    tinyInit();
-    securityInit();
+    return {
+        principal: [pasta_modulos],
+        interno: [caminho_modulos, caminho_modulos],
+        externo: [pasta_modulos, caminho_modulos, pasta_modulos],
+        "restrita-rc": [caminho_modulos_subarea],
+    };
+}
 
-    const opcionais = $('[type="module"][class^="' + inicio + '"]');
-  
-    if(opcionais.length == 0)
-        return false;
+export default function (local = 'interno', subarea = null){
 
-    console.log('[MÓDULOS] # Total de módulos opcionais carregados na atual página: ' + opcionais.length);
-    opcionais.each(function(){
+    const executar = {
+        ok: function(local, subarea) {            
+            let sub = typeof subarea == "string" ? this[subarea] : [];
+            return this.principal.concat(this[local]).concat(sub);
+        },
+    };
 
-        let funcao = $(this).attr('class').replace(inicio, '');
-        let modulo = $(this).attr('id').replace(inicio, '');
-        
-        import($(this).attr('src'))
-        .then((module) => {
-            console.log('[MÓDULOS] # Módulo de "' + funcao + ' ' + modulo + '" carregado.');
-            console.log('[MÓDULOS] # Local do módulo: ' + $(this).attr('src').replace(link, 'js/'));
+    const modulos_ = getObjModulos();
+    const pastas_ = getObjPastas(local, subarea);
 
-            if('scripts_para_importar' in module)
-                criarScriptParaImportar(this, module.scripts_para_importar);
-
-            module.executar(funcao);
-        })
-        .catch((err) => {
-            console.log(err);
-            alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
-        });
-    
-    });
+    criarImportarModulos(local, executar.ok.call(modulos_, local, subarea), executar.ok.call(pastas_, local, subarea));
 };
