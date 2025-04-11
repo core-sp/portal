@@ -110,7 +110,7 @@ function mascarasGerais(){
     if(($(".rgInput").length > 0) && ($(".rgInput").val().length > 3))
         $(".rgInput").val(mascaraRG($(".rgInput").val()));
 
-    $(".rgInput").on('keyup', function() {
+    $(".rgInput").on('input', function() {
         let texto = $(this).val();
     
         if(texto.length > 3)

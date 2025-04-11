@@ -7,7 +7,6 @@ $(document).ready(function(){
     import(elemento_init.attr('src'))
     .then((init) => {
         init.default();
-        init.opcionais();
         console.log('[MÓDULOS] # Versão dos scripts: ' + elemento_init.attr('class'));
     })
     .catch((err) => {

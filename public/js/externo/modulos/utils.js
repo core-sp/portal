@@ -47,7 +47,9 @@ function cookies(){
     $('.btn-cookies').on('click', function(){
         $('.box-cookies').addClass('hide');
         localStorage.setItem("pureJavaScriptCookies", "accept");
-        window.clarity('consent');
+
+        if(typeof window.clarity === 'function')
+            window.clarity('consent');
 	});
 }
 
@@ -174,14 +176,14 @@ export function executar(local = 'externo'){
     });
 
     // Texto do link com quantidade de caracteres que ultrapassam a largura do conteúdo
-    $('.conteudo-txt a').each(function(){
+    $('.conteudo-txt').find('a').each(function(){
         if($('.conteudo-txt').width() < $(this).width())
             $(this).addClass('text-break');
     });
         
     $(".custom-file-input").on("change", function(e) {
-        let fileName = e.target.files[0].name;
-        $(this).next('.custom-file-label').html(fileName);
+        let fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
     });
 
     if($("#cep").length > 0){

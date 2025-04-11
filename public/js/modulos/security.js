@@ -26,7 +26,7 @@ function isGood(passed) {
 
 function visualizar(){
 
-    $('#password').on("keyup", function(){
+    $('#password').on("input", function(){
         let login = $('#login');
         let cpfCnpj = $('#cpfCnpj');
         let userEntrada = login.length > 0 ? login.val() : cpfCnpj.val();

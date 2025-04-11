@@ -64,8 +64,8 @@ export function executar(local = 'interno'){
     logout();
 
     $(".custom-file-input").on("change", function(e) {
-        let fileName = e.target.files[0].name;
-        $(this).next('.custom-file-label').html(fileName);
+        let fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
     });
 
     $('.toast').toast({delay: 2000});
