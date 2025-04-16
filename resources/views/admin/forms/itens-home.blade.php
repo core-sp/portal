@@ -640,25 +640,4 @@
     </div>
 </form>
 
-<!-- The Modal -->
-<div class="modal" id="confirmDelete">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <!-- Modal Header -->
-            <div class="modal-header bg-warning">
-                <h4 class="modal-title"><i class="fas fa-trash"></i> Excluir arquivo</h4>
-            </div>
-            <!-- Modal body -->
-            <div class="modal-body">
-                Tem certeza que deseja excluir o arquivo "<strong><span class="font-italic" id="confirmFile"></span></strong>" da pasta?
-            </div>
-            <!-- Modal footer -->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" id="deleteFileStorage" value="">Sim</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Não</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script type="module" src="{{ asset('/js/interno/modulos/home-imagem-itens.js?'.hashScriptJs()) }}" id="modulo-home-imagem-itens" class="modulo-editar"></script>

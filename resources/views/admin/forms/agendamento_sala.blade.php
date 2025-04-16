@@ -56,8 +56,9 @@
                     class="form-control {{ $errors->has('tipo_sala') ? 'is-invalid' : '' }}"
                     required
                 >
+                    <option value="">Selecione tipo de sala...</option>
                     @foreach(['reuniao' => 'Reunião', 'coworking' => 'Coworking'] as $chave => $tipo)
-                    <option value="{{ $chave }}" {{ $chave == 'reuniao' ? 'selected' : '' }}>{{ $tipo }}</option>
+                    <option value="{{ $chave }}">{{ $tipo }}</option>
                     @endforeach
                 </select>
                 @if($errors->has('tipo_sala'))
@@ -200,39 +201,5 @@
         </div>
     </div>
 </form>
-
-<!-- The Modal -->
-<div class="modal fade" id="modal-criar_agenda">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <!-- Modal Header -->
-            <div class="modal-header">
-                <h4 class="modal-title">Atenção!</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <!-- Modal body -->
-            <div class="modal-body"></div>
-            <!-- Modal footer -->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Não</button>
-                <button type="button" class="btn btn-success" id="enviarCriarAgenda">Sim</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- The Modal -->
-<div class="modal" id="modal-load-criar_agenda">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <!-- Modal body -->
-            <div class="modal-body text-center">
-                <div class="spinner-border text-primary"></div>
-                <br>
-                Buscando informações no Gerenti...
-            </div>
-        </div>
-    </div>
-</div>
 
 <script type="module" src="{{ asset('/js/interno/modulos/sala-reuniao-agendados.js?'.hashScriptJs()) }}" id="modulo-sala-reuniao-agendados" class="modulo-criar"></script>

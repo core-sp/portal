@@ -97,7 +97,12 @@ function receberArquivos(id, pasta = null){
             lazyLoadImg();
         },
         error: function() {
-            alert('Erro ao carregar os arquivos. Recarregue a página.');
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_CONT_TITULO", {
+                detail: {
+                    titulo: '<i class="fas fa-times text-danger"></i> Erro!', 
+                    texto: '<span class="text-danger">Erro ao carregar os arquivos. Recarregue a página.</span>'
+                }
+            }));
         }
     });
 }
@@ -142,7 +147,7 @@ function ajaxRemoveArquivo(arquivo){
         url: pasta_img_opcional + "/delete-file/" + arquivo,
         success: function(response) {
             let txt = 'Arquivo <strong><i>"' + arquivo + '"</i></strong> ';
-            let sucesso = response != 'Não foi removido.' ? true : false;
+            let sucesso = response != 'Não foi removido.';
 
             response != 'Não foi removido.' ? $('.deleteFileStorage[value="' + arquivo + '"]').parents('.card.storageFile').remove() : txt += 'NÃO ';
             msgGerenciarArquivo(txt + 'foi removido da pasta!', sucesso);
@@ -225,10 +230,10 @@ function editar(){
         });
     });
 
-    $('#deleteFileStorage').on('click', function(){
+    $('.modal-footer').on('click', '#deleteFileStorage', function(){
         let arquivo = this.value;
     
-        $('#confirmDelete').modal('hide');
+        document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
         ajaxRemoveArquivo(arquivo);
     });
 
@@ -244,9 +249,16 @@ function editar(){
             return;
         
         $('.deleteFileStorage').on('click', function(){
-            $('#confirmDelete #confirmFile').text(this.value);
-            $('#confirmDelete #deleteFileStorage').val(this.value);
-            $('#confirmDelete').modal({backdrop: 'static', keyboard: false, show: true});
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_VARIOS_BTN_ACAO", {
+                detail: {
+                    layout: {header: 'bg-warning'},
+                    titulo: '<i class="fas fa-trash"></i> Excluir arquivo', 
+                    texto: 'Tem certeza que deseja excluir o arquivo "<b><span class="font-italic">' + this.value + '</span></b>" da pasta?',
+                    botao: ['<button type="button" class="btn btn-danger" id="deleteFileStorage" value="' + this.value + '">Sim</button>', 
+                        '<button type="button" class="btn btn-secondary" data-dismiss="modal">Não</button>']
+                }
+            }));
+
         });
     });
 };

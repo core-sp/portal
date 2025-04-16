@@ -44,11 +44,18 @@ function caseCpfCnpj(response){
     }
 }
 
-function controlarModal(texto = '', footerHide = true){
+function controlarModal(txt = '', footerHide = true){
 
-    $('#modal-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
-    footerHide ? $('.modal-footer').hide() : $('.modal-footer').show();
-    $('#modal-criar_agenda .modal-body').html(texto);
+    let acao = footerHide ? "MSG_GERAL_CONT_TITULO" : "MSG_GERAL_VARIOS_BTN_ACAO";
+
+    document.dispatchEvent(new CustomEvent(acao, {
+        detail: {
+            titulo: 'Atenção!', 
+            texto: txt,
+            botao: footerHide ? null : ['<button type="button" class="btn btn-secondary" data-dismiss="modal">Não</button>', 
+                '<button type="button" class="btn btn-success" id="enviarCriarAgenda">Sim</button>']
+        }
+    }));
 }
 
 function caseSalaReuniaoId(response){
@@ -95,13 +102,14 @@ function verificarDadosCriarAgendaSala(nome_campo){
         data: json,
         beforeSend: function(){
             if(nome_campo == "cpf_cnpj")
-                $('#modal-load-criar_agenda').modal({backdrop: 'static', keyboard: false, show: true});
-        },
-        complete: function(){
-            $('#modal-load-criar_agenda').modal('hide');
+                document.dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR_CONTEUDO", {
+                    detail: {
+                        texto: '<span class="ml-2">Buscando informações no Gerenti...</span>',
+                    }
+                }));
         },
         success: function(response) {
-            $('#modal-load-criar_agenda').modal('hide');
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
 
             switch(nome_campo) {
             case "cpf_cnpj":
@@ -115,6 +123,8 @@ function verificarDadosCriarAgendaSala(nome_campo){
             }
         },
         error: function() {
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
+            
             let texto = '<span class="text-danger">Deu erro! Recarregue a página.</span>';
             controlarModal(texto);
         }
@@ -138,13 +148,18 @@ function criar(){
     });
     
     $('select[name="sala_reuniao_id"]').change(function(){
-        if(this.value == "")
+        if(this.value == ""){
             $(".participante:gt(0)").remove();
+            return;
+        }
 
         verificarDadosCriarAgendaSala("sala_reuniao_id");
     });
   
     $('select[name="tipo_sala"]').change(function(){
+        if(($('select[name="sala_reuniao_id"]').val() == '') || ($(this).val() == ''))
+            return;
+
         if(this.value != 'reuniao')
             $('#area_participantes').hide();
 
@@ -167,8 +182,9 @@ function criar(){
 
         $('select[name="periodo_saida"] option:eq(' + indice + ')').prop('selected', true);
     });
-  
-    $('#enviarCriarAgenda').click(function(){
+
+    $('.modal-footer').on('click', '#enviarCriarAgenda', function(){
+        document.dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR"));
         $('#criarAgendaSala').submit();
     });
 
