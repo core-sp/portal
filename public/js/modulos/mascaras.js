@@ -137,7 +137,12 @@ function mascarasInternas(){
             let horaTermino = $('#horaTermino').val();
 
             if(horaInicio && (horaTermino <= horaInicio)) {
-                alert('O horário de término não pode ser menor ou igual ao horário de início.');
+                document.dispatchEvent(new CustomEvent("MSG_GERAL_CONT_TITULO", {
+                    detail: {
+                        titulo: '<i class="fas fa-times text-danger"></i> Erro!', 
+                        texto: '<span class="text-danger">O horário de término não pode ser menor ou igual ao horário de início.</span>'
+                    }
+                }));
                 $('#horaTermino').val('');
             }
         }
@@ -149,7 +154,12 @@ function mascarasInternas(){
             let horaTermino = $('#horaTermino').val();
 
             if(horaTermino && (horaInicio > horaTermino)) {
-                alert('O horário de início não pode ser maior que o horário de término.');
+                document.dispatchEvent(new CustomEvent("MSG_GERAL_CONT_TITULO", {
+                    detail: {
+                        titulo: '<i class="fas fa-times text-danger"></i> Erro!', 
+                        texto: '<span class="text-danger">O horário de início não pode ser maior que o horário de término.</span>'
+                    }
+                }));
                 $('#horaInicio').val('');
             }
         }

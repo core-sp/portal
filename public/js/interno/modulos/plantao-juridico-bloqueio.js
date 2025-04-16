@@ -53,7 +53,12 @@ function ajaxPlantaoJuridico(valor, e)
             setCampoHorarios(plantao);
         },
         error: function() {
-            alert('Erro ao carregar as datas e/ou os horários. Recarregue a página.');
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_CONT_TITULO", {
+                detail: {
+                    titulo: '<i class="fas fa-times text-danger"></i> Erro!', 
+                    texto: '<span class="text-danger">Erro ao carregar as datas e/ou os horários. Recarregue a página.</span>'
+                }
+            }));
         }
     });
 }

@@ -52,7 +52,12 @@ function ajaxHorariosViewSala(id){
             $('#' + id + '_rep').html(response);
         },
         error: function() {
-            alert('Erro ao carregar os horários formatados. Recarregue a página.');
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_CONT_TITULO", {
+                detail: {
+                    titulo: '<i class="fas fa-times text-danger"></i> Erro!', 
+                    texto: '<span class="text-danger">Erro ao carregar os horários formatados. Recarregue a página.</span>'
+                }
+            }));
         }
     });
 }
