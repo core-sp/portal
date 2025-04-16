@@ -4,7 +4,7 @@ function visualizar(){
 
     $(document).on('keydown', function(e) {
         if((e.keyCode == 27) && (window.location.href.indexOf(url_logs))){
-            $("#modalSuporte").modal('hide');
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
         }
     });
 

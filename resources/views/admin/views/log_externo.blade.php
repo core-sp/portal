@@ -170,7 +170,7 @@
                         </div>
                     </div>
 
-                    <button class="btn btn-secondary btn-sm mt-2 float-right" type="submit" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">Gerar</button>
+                    <button class="btn btn-secondary loadingPagina btn-sm mt-2 float-right">Gerar</button>
                 </form>
             </fieldset>
         </div>
@@ -210,7 +210,7 @@
                         </div>
                         @endif
                         
-                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">Buscar</button>
+                        <button class="btn btn-secondary loadingPagina btn-sm mb-2 mr-sm-3" type="submit">Buscar</button>
                     </div>
                 </form>
             </fieldset>
@@ -329,7 +329,7 @@
                             </label>
                         </div>
 
-                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">Buscar</button>
+                        <button class="btn btn-secondary loadingPagina btn-sm mb-2 mr-sm-3" type="submit">Buscar</button>
                     </div>
                 </form>
             </fieldset>
@@ -404,7 +404,7 @@
                 <em>{{ $resultado->total() > 1 ? 'Foram encontrados ' . $resultado->total() . ' logs' : 'Foi encontrado 1 log' }}</em>
             </div>
             <br>
-            <div class="d-flex justify-content-start" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">
+            <div class="d-flex justify-content-start loadingPagina">
                 {{ $resultado->appends(request()->input())->links() }}
             </div>
             @endif
@@ -415,20 +415,6 @@
         </div>
     </div>
     @endif
-
-    <!-- The Modal -->
-    <div class="modal" id="modalSuporte">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-
-            <!-- Modal body -->
-            <div class="modal-body d-flex justify-content-center">
-                <div class="spinner-border text-primary"></div>&nbsp;&nbsp;Aguarde...
-            </div>
-
-            </div>
-        </div>
-    </div>
 
 </div>
 

@@ -51,7 +51,12 @@ function filtrar(){
         let maxDataFiltro = $('#datemax').val();
         let minDataFiltro = $('#datemin').val();
         if(new Date(minDataFiltro) > new Date(maxDataFiltro)) {
-            alert('Data inválida. A data inicial deve ser menor ou igual a data de término.');
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_CONT_TITULO", {
+                detail: {
+                    titulo: '<i class="fas fa-times text-danger"></i> Data inválida!', 
+                    texto: '<span class="text-danger">A data inicial deve ser menor ou igual a data de término.</span>'
+                }
+            }));
             $('#datemin').focus();
             e.preventDefault();
         }
@@ -78,4 +83,13 @@ export function executar(local = 'interno'){
     
     sortable();
     filtrar();
+
+    $('.loadingPagina').on('click', function(){
+		document.dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR"));
+	});
+
+    if($('.loadingPagina').length > 0)
+        $('input, select, textarea').on("invalid", function(e){
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
+        });
 };
