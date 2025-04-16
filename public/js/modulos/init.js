@@ -112,9 +112,9 @@ function criarImportarModulos(local, modulos_principais, pastas_principais){
 function getObjModulos(){
 
     return {
-        principal: ['mascaras'],
+        principal: ['mascaras', 'modal-geral'],
         interno: ['utils', 'filemanager'],
-        externo: ['acessibilidade', 'utils', 'modal-geral'],
+        externo: ['acessibilidade', 'utils'],
         "restrita-rc": ['utils'],
     };
 }
@@ -126,9 +126,9 @@ function getObjPastas(local, subarea){
     const caminho_modulos_subarea = typeof subarea == "string" ? subarea + '/' + pasta_modulos : '';
     
     return {
-        principal: [pasta_modulos],
+        principal: [pasta_modulos, pasta_modulos],
         interno: [caminho_modulos, caminho_modulos],
-        externo: [pasta_modulos, caminho_modulos, pasta_modulos],
+        externo: [pasta_modulos, caminho_modulos],
         "restrita-rc": [caminho_modulos_subarea],
     };
 }

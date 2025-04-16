@@ -99,6 +99,9 @@
         </div>
         <!-- ./wrapper -->
 
+      @component('components.modal-geral')
+      @endcomponent
+
       @if(config('app.env') == 'local')
       <script type="text/javascript" src="{{ asset('/js/tinymce/tinymce.min.js') }}"></script>
       @else
