@@ -141,10 +141,6 @@
                             </div>
                         @endif
                     </div>
-                    <!-- <div class="modal" id="modal-termo-de-uso">
-                        {{--@component('components.termo-de-uso')--}}
-                        {{--@endcomponent--}}
-                    </div> -->
                     <div class="form-group mt-3">
                         <button
                             type="submit"
