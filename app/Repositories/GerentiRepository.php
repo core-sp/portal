@@ -337,7 +337,7 @@ class GerentiRepository implements GerentiRepositoryInterface
 
         // Adicionando 3 parâmetros finais (com valor 0) simbolizando respectivamente: SMS, WHATSAPP, TELEGRAM.
         // TODO: permitir informar esses valores na interface gráfica (uso apenas para celulares).
-        $run = $this->gerentiConnection->prepare("execute procedure ".$nameProc."(:ass_id, :id, 0, 210, CAST('NOW' AS DATE), :conteudo, :tipo, '', 1, 0, 0, 0)");
+        $run = $this->gerentiConnection->prepare("execute procedure ".$nameProc."(:ass_id, :id, 0, 210, CAST('NOW' AS DATE), :conteudo, :tipo, '', 1, 0, 0, 0, 0)");
         $run->execute([
             'ass_id' => $ass_id,
             'id' => $id,
