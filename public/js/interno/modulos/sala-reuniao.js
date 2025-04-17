@@ -66,39 +66,43 @@ function editar(){
 
     $("#itens_reuniao, #itens_coworking").on('dblclick', 'option', function(){
 
-        let texto = this.text;
+        let txt = this.text;
         let valor = this.value;
-        let numero = texto.replace(/[^0-9_,]/ig, '');
+        let numero = txt.replace(/[^0-9_,]/ig, '');
     
-        if(numero.trim().length > 0){
-            $('#sala_reuniao_itens').modal({backdrop: 'static', keyboard: false, show: true});
-            $('#sala_reuniao_itens')
-                .removeClass('itens_reuniao')
-                .removeClass('itens_coworking')
-                .addClass($(this).parent().attr('id'));
-            $('#sala_reuniao_itens .modal-body')
-                .html(texto.substr(0, texto.search(numero)) + ' <input type="text" id="'+ valor +'">' + texto.substr(texto.search(numero) + numero.length, texto.length));
-        }
-    
+        if(numero.trim().length <= 0)
+            return;
+
+        document.dispatchEvent(new CustomEvent("MSG_GERAL_VARIOS_BTN_ACAO", {
+            detail: {
+                layout: {sem_txt_center: true, fade: true},
+                titulo: 'Editar unidade do item<span class="ml-2 mt-2 font-italic" style="font-size:0.6em">(usar vírgula para decimal)</span>', 
+                texto: txt.substr(0, txt.search(numero)) + ' <input type="text" id="'+ valor +'">' + 
+                    txt.substr(txt.search(numero) + numero.length, txt.length),
+                botao: ['<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>', 
+                    '<button type="button" class="btn btn-success ' + $(this).parent().attr('id') + '" id="editar_item">Inserir</button>']
+            }
+        }));
     });
 
-    $('#editar_item').click(function(){
+    $('.modal-footer').on('click', '#editar_item', function(){
 
-        let tipo = $('#sala_reuniao_itens').hasClass('itens_reuniao') ? 'itens_reuniao' : 'itens_coworking';
-        let id = $('#sala_reuniao_itens .modal-body input').attr('id');
-        let valor = $('#sala_reuniao_itens .modal-body input').val();
+        let tipo = $(this).hasClass('itens_reuniao') ? 'itens_reuniao' : 'itens_coworking';
+        let body = $(this).parents('.modal-content').find('.modal-body input');
+        let id = body.attr('id');
+        let valor = body.val();
         let texto = $('#' + tipo + ' option[value="' + id + '"]').text();
         let numero = texto.replace(/[^0-9_,]/ig, '');
     
         if((valor.trim().length == 0) || (valor.replace(/[0-9,]/ig, '').length > 0)){
-            $('#sala_reuniao_itens').modal('hide');
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
             return;
         }
 
         texto = texto.replace(numero, valor);
-        $('#sala_reuniao_itens .modal-body input').remove();
+        body.remove();
         $('#' + tipo + ' option[value="' + id + '"]').val(texto).text(texto);
-        $('#sala_reuniao_itens').modal('hide');
+        document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
     });
     
     $('button.addItem, button.removeItem').click(function(){

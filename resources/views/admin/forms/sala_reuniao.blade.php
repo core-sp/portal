@@ -323,26 +323,4 @@
     </div>
 </form>
 
-<!-- The Modal -->
-<div class="modal fade" id="sala_reuniao_itens">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <!-- Modal Header -->
-        <div class="modal-header">
-          <h4 class="modal-title">Editar unidade do item</h4>
-          <span class="ml-2 mt-2"><i><small>(usar vírgula para decimal)</small></i></span>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <!-- Modal body -->
-        <div class="modal-body">
-        </div>
-         <!-- Modal footer -->
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-          <button type="button" class="btn btn-success" id="editar_item">Inserir</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script type="module" src="{{ asset('/js/interno/modulos/sala-reuniao.js?'.hashScriptJs()) }}" id="modulo-sala-reuniao" class="modulo-editar"></script>
+<script type="module" src="{{ asset('/js/interno/modulos/sala-reuniao.js?'.hashScriptJs()) }}" id="modulo-sala-reuniao" class="modulo-editar"></script>
