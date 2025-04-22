@@ -27,8 +27,6 @@ function montarAjax(acao, valor){
 
 function crudGerarTexto(acao, valor){
 
-    $('#avisoTextos').modal('hide');
-
     let objeto = montarAjax(acao, valor);
   
     $.ajax({
@@ -37,11 +35,12 @@ function crudGerarTexto(acao, valor){
         dataType: "json",
         data: objeto.dados,
         beforeSend: function(){
-            $('#loadingIndice').modal({backdrop: 'static', keyboard: false, show: true});
-            $('#loadingIndice .modal-body').html('<div class="spinner-border text-primary"></div>&nbsp;&nbsp;' + objeto.textoLoading);
-        },
-        complete: function(){
-            $('#loadingIndice').modal('hide');
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR_CONTEUDO", {
+                detail: {
+                    layout: {load_cor: 3},
+                    texto: '&nbsp;&nbsp;' + objeto.textoLoading,
+                }
+            }));
         },
         success: function(response) {
             atualizarViewTexto(acao, valor, response);
@@ -70,9 +69,9 @@ function textoAoCarregar(resultado, titulo = true){
 
     try {
         tinymce.activeEditor.setContent(conteudo);
+        document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
     } catch (error) {
         console.log(error);
-        $('#loadingIndice').modal('hide');
         gerarTextoAvisosCrud('erro', '<strong>Clique novamente no texto.</strong>');
     } finally{
         hideShowOptions(resultado.nivel);
@@ -137,25 +136,28 @@ function msgExcluir(response, valor, title = '', texto = ''){
     valor_final.forEach(function(id, i){
         textos_ids += '<strong>Texto: </strong><i>' + $('button[value="' + id + '"]').text() + '</i><br>';
     });
-  
-    $('#avisoTextos').modal({backdrop: 'static', keyboard: false, show: true});
-    $('#avisoTextos .modal-title').html('<i class="fas fa-trash" style="color: #dc0909;"></i> Excluir');
-    $('#avisoTextos .modal-body').html(textos_ids + 'Tem certeza que deseja excluir ' + text + '?<br>Esta ação não é reversível!');
-    $('#avisoTextos .modal-footer #excluirTexto').val(valor_final);
-    $('#avisoTextos .modal-footer').show();
+
+    document.dispatchEvent(new CustomEvent("MSG_GERAL_VARIOS_BTN_ACAO", {
+        detail: {
+            layout: {sem_txt_center: true},
+            titulo: '<i class="fas fa-trash" style="color: #dc0909;"></i> Excluir', 
+            texto: textos_ids + 'Tem certeza que deseja excluir ' + text + '?<br>Esta ação não é reversível!',
+            botao: ['<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>', 
+                '<button type="button" class="btn btn-danger" id="excluirTexto" value="' + valor_final + '">Sim</button>']
+        }
+    }));
 }
   
-function msgRetorno(acao, title, texto){
+function msgRetorno(acao, title, txt){
 
-    $('#avisoTextos').modal({backdrop: 'static', keyboard: false, show: true});
-    $('#avisoTextos .modal-title').html(title);
-    $('#avisoTextos .modal-body').html(texto);
-    $('#avisoTextos .modal-footer').hide();
-
-    if(acao != 'erro')
-        setTimeout(function(){
-            $('#avisoTextos').modal('hide');
-        }, 2500);
+    document.dispatchEvent(new CustomEvent("MSG_GERAL_CONT_TITULO", {
+        detail: {
+            layout: {sem_txt_center: true},
+            titulo: title, 
+            texto: txt,
+            timeout: acao != 'erro' ? 2500 : null,
+        }
+    }));
 }
 
 function gerarTextoAvisosCrud(acao, valor, response = null){
@@ -240,7 +242,7 @@ function editar(){
             gerarTextoAvisosCrud('excluir_varios', JSON.stringify([$(this).val()]));
     });
 
-    $("#excluirTexto").click(function(){
+    $('.modal-footer').on('click', '#excluirTexto', function(){
         crudGerarTexto('excluir_varios', $(this).val());
     });
 
@@ -261,8 +263,12 @@ function editar(){
     });
 
     $("#updateIndice").click(function(){
-        $('#loadingIndice').modal({backdrop: 'static', keyboard: false, show: true});
-        $('#loadingIndice .modal-body').html('<div class="spinner-border text-primary"></div>&nbsp;&nbsp;Atualizando a índice...');
+        document.dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR_CONTEUDO", {
+            detail: {
+                layout: {load_cor: 3},
+                texto: '&nbsp;&nbsp;Atualizando a índice...',
+            }
+        }));
     });
 
     // link no sumário para abrir e ir no texto

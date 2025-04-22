@@ -1,3 +1,11 @@
+function limpar(msg){
+    
+    msg.find('.modal-body, .modal-title, .modal-footer').html('').attr('style', "");
+    msg.attr('class', "modal");
+    msg.find('.modal-header').attr('class', "modal-header");
+    msg.find('.modal-body').attr('class', "modal-body");
+}
+
 function addTextCenter(){
 
     let temp = $("#msgGeral .modal-body");
@@ -6,11 +14,23 @@ function addTextCenter(){
         temp.addClass('text-center');
 }
 
+function addTimeout(timeout){
+
+    if(typeof timeout !== "number")
+        return;
+
+    timeout = parseInt(timeout);
+
+    setTimeout(function(){
+        $("#msgGeral").modal('hide');
+    }, timeout);
+}
+
 function carregar(texto = ''){
 
     let temp = $("#msgGeral .modal-body");
 
-    if(!temp.find('.mg-spinner'))
+    if(temp.find('.mg-spinner').length == 0)
         temp.append('<div class="spinner-border text-info"></div>');
 
     temp.addClass('text-center').append(texto);
@@ -18,14 +38,10 @@ function carregar(texto = ''){
     $("#msgGeral").modal({backdrop: "static", keyboard: false, show: true});
 }
 
-function msgSomenteConteudo(conteudo, timeout){
+function msgSomenteConteudo(conteudo){
 
     if(typeof conteudo !== "string")
         conteudo = '';
-
-    if((timeout === undefined) || (timeout === null))
-        timeout = 2250;
-    timeout = parseInt(timeout);
 
     $("#msgGeral .modal-header, #msgGeral .modal-footer").hide();
 
@@ -33,10 +49,6 @@ function msgSomenteConteudo(conteudo, timeout){
     
     $("#msgGeral .modal-body").html(conteudo);
     $("#msgGeral").modal({backdrop: "static", keyboard: false, show: true});
-
-    setTimeout(function(){
-        $("#msgGeral").modal('hide');
-    }, timeout);
 }
 
 function msgConteudoTitulo(titulo, conteudo, botao = ''){
@@ -85,39 +97,44 @@ export function executar(local){
     });
 
     $(document).on('MSG_GERAL_CARREGAR', function(e){
+        limpar($("#msgGeral"));
         layout(e.detail);
         carregar(e.detail);
     });
 
     $(document).on('MSG_GERAL_CARREGAR_CONTEUDO', function(e){
+        limpar($("#msgGeral"));
         layout(e.detail);
         carregar(e.detail.texto);
     });
 
     $(document).on('MSG_GERAL_CONTEUDO', function(e){
+        limpar($("#msgGeral"));
         layout(e.detail);
-        msgSomenteConteudo(e.detail.texto, e.detail.timeout);
+        msgSomenteConteudo(e.detail.texto);
+        typeof e.detail.timeout !== "number" ? addTimeout(2250) : addTimeout(e.detail.timeout);
     });
 
     $(document).on('MSG_GERAL_CONT_TITULO', function(e){
+        limpar($("#msgGeral"));
         layout(e.detail);
         msgConteudoTitulo(e.detail.titulo, e.detail.texto);
+        addTimeout(e.detail.timeout);
     });
 
     $(document).on('MSG_GERAL_BTN_ACAO', function(e){
+        limpar($("#msgGeral"));
         layout(e.detail);
         msgConteudoTitulo(e.detail.titulo, e.detail.texto, e.detail.botao);
     });
 
     $(document).on('MSG_GERAL_VARIOS_BTN_ACAO', function(e){
+        limpar($("#msgGeral"));
         layout(e.detail);
         msgConteudoTitulo(e.detail.titulo, e.detail.texto, e.detail.botao.join(''));
     });
 
     $("#msgGeral").on('hide.bs.modal', function(){
-        $(this).find('.modal-body, .modal-title, .modal-footer').html('').attr('style', "");
-        $(this).attr('class', "modal");
-        $(this).find('.modal-header').attr('class', "modal-header");
-        $(this).find('.modal-body').attr('class', "modal-body");
+        limpar($(this));
     });
 };
