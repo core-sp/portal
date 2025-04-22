@@ -10,7 +10,7 @@ function carregar(texto = ''){
 
     let temp = $("#msgGeral .modal-body");
 
-    if(!temp.hasClass('.mg-spinner'))
+    if(!temp.find('.mg-spinner'))
         temp.append('<div class="spinner-border text-info"></div>');
 
     temp.addClass('text-center').append(texto);
