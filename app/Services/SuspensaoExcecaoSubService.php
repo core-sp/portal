@@ -53,10 +53,11 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
             }
             if($userAdmin)
             {
-                $acoes .= '<form method="POST" action="'.route('sala.reuniao.suspensao.delete', $resultado->id).'" class="d-inline">';
+                $acoes .= '<form method="POST" action="'.route('sala.reuniao.suspensao.delete', $resultado->id).'" class="d-inline acaoTabelaAdmin">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger ml-2" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a suspensão?\')" />';
+                $acoes .= '<input type="hidden" class="cor-danger txtTabelaAdmin" value="Tem certeza que deseja excluir a suspensão do CPF / CNPJ <i>' . $resultado->getCpfCnpj() . '</i>?" />';
+                $acoes .= '<button type="button" class="btn btn-sm btn-danger ml-2" value="' . $resultado->id . '">Apagar</button>';
                 $acoes .= '</form>';
             }
             $conteudo = [

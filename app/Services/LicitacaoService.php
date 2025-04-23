@@ -48,10 +48,11 @@ class LicitacaoService implements LicitacaoServiceInterface {
                 $acoes .= '<a href="'.route('licitacoes.edit', $resultado->idlicitacao).'" class="btn btn-sm btn-primary">Editar</a> ';
             if($userPodeExcluir)
             {
-                $acoes .= '<form method="POST" action="'.route('licitacoes.destroy', $resultado->idlicitacao).'" class="d-inline">';
+                $acoes .= '<form method="POST" action="'.route('licitacoes.destroy', $resultado->idlicitacao).'" class="d-inline acaoTabelaAdmin">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a licitação?\')" />';
+                $acoes .= '<input type="hidden" class="cor-danger txtTabelaAdmin" value="Tem certeza que deseja excluir a licitação <i>' . $resultado->nrlicitacao . '</i>?" />';
+                $acoes .= '<button type="button" class="btn btn-sm btn-danger" value="' . $resultado->idlicitacao . '">Apagar</button>';
                 $acoes .= '</form>';
             }
             $conteudo = [

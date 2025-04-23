@@ -63,6 +63,30 @@ function filtrar(){
     });
 }
 
+function btnAcaoTabelaAdmin(){
+
+    $('.acaoTabelaAdmin').click(function(){
+        let conteudo = $(this).find('.txtTabelaAdmin');
+        let cor = conteudo[0].classList[0].replace('cor-', '');
+
+        document.dispatchEvent(new CustomEvent("MSG_GERAL_VARIOS_BTN_ACAO", {
+            detail: {
+                layout: {fade: true, header: 'bg-' + cor},
+                titulo: $(this).find('button').text(), 
+                texto: conteudo.val(),
+                botao: ['<button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Não</button>', 
+                    '<button type="button" class="btn btn-' + cor + '" id="simTabelaAdmin" value="' + $(this).find('button').val() + '">Sim</button>']
+            }
+        }));
+    });
+
+    $('.modal-footer').on('click', '#simTabelaAdmin', function(){
+        document.dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR"));
+        let form = $('.acaoTabelaAdmin button[value="' + this.value + '"]').parents('.acaoTabelaAdmin');
+        form.submit();
+    });
+}
+
 export function executar(local = 'interno'){
 
     menuAtivoDinamico();
@@ -92,4 +116,6 @@ export function executar(local = 'interno'){
         $('input, select, textarea').on("invalid", function(e){
             document.dispatchEvent(new CustomEvent("MSG_GERAL_FECHAR"));
         });
+    
+    btnAcaoTabelaAdmin();
 };

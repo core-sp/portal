@@ -50,10 +50,11 @@ class CursoSubService implements CursoSubServiceInterface {
             if($userPodeEdit)
                 $acoes .= ' <a href="'.route('inscritos.edit', $resultado->idcursoinscrito).'" class="btn btn-sm btn-default">Editar</a> ';
             if($userPodeDestroy && $podeCancelar) {
-                $acoes .= '<form method="POST" action="'.route('inscritos.destroy', $resultado->idcursoinscrito).'" class="d-inline">';
+                $acoes .= '<form method="POST" action="'.route('inscritos.destroy', $resultado->idcursoinscrito).'" class="d-inline acaoTabelaAdmin">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar Inscrição" onclick="return confirm(\'Tem certeza que deseja cancelar a inscrição?\')" />';
+                $acoes .= '<input type="hidden" class="cor-danger txtTabelaAdmin" value="Tem certeza que deseja cancelar a inscrição do(a) <i>' . $resultado->nome . '</i>?" />';
+                $acoes .= '<button type="button" class="btn btn-sm btn-danger" value="' . $resultado->idcursoinscrito . '">Cancelar Inscrição</button>';
                 $acoes .= '</form>';
             }elseif(!$resultado->possuiPresenca()){
                 $acoes .= '<form method="POST" action="'.route('inscritos.update.presenca', $resultado->idcursoinscrito).'" class="d-inline">';

@@ -250,10 +250,11 @@ class ChamadoController extends Controller
             $acoes = '<a href="/admin/chamados/ver/'.$resultado->idchamado.'" class="btn btn-sm btn-default">Ver</a> ';
             
             if($tipoDisplay == "lista") {
-                $acoes .= '<form method="POST" action="/admin/chamados/apagar/'.$resultado->idchamado.'" class="d-inline">';
+                $acoes .= '<form method="POST" action="/admin/chamados/apagar/'.$resultado->idchamado.'" class="d-inline acaoTabelaAdmin">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-success" value="Dar baixa" onclick="return confirm(\'Tem certeza que deseja dar baixa no chamado?\')" />';
+                $acoes .= '<input type="hidden" class="cor-success txtTabelaAdmin" value="Tem certeza que deseja dar baixa no chamado com ID <i>' . $resultado->idchamado . '</i>?" />';
+                $acoes .= '<button type="button" class="btn btn-sm btn-success" value="' . $resultado->idchamado . '">Dar baixa</button>';
                 $acoes .= '</form>';
 
                 if(isset($resultado->resposta)) {

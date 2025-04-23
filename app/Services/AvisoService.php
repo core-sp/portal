@@ -39,15 +39,15 @@ class AvisoService implements AvisoServiceInterface {
         foreach($resultados as $resultado) 
         {
             $statusDesejado = $resultado->isAtivado() ? 'Desativar' : 'Ativar';
-            $botao = $resultado->isAtivado() ? 'btn btn-sm btn-danger' : 'btn btn-sm btn-success';
+            $botao = $resultado->isAtivado() ? 'danger' : 'success';
 
             $acoes = ' <a href="' .route('avisos.show', $resultado->id). '" class="btn btn-sm btn-default">Ver</a> ';
             $acoes .= '<a href="' .route('avisos.editar.view', $resultado->id). '" class="btn btn-sm btn-primary">Editar</a> ';
-            $acoes .= '<form method="POST" action="' .route('avisos.editar.status', $resultado->id). '" class="d-inline">';
+            $acoes .= '<form method="POST" action="' .route('avisos.editar.status', $resultado->id). '" class="d-inline acaoTabelaAdmin">';
             $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
             $acoes .= '<input type="hidden" name="_method" value="put" />';
-            $acoes .= '<input type="submit" class="' .$botao. '" value="' .$statusDesejado. '" 
-            onclick="return confirm(\'Tem certeza que deseja ' .$statusDesejado. ' o aviso?\')" />';
+            $acoes .= '<input type="hidden" class="cor-' . $botao . ' txtTabelaAdmin" value="Tem certeza que deseja ' .$statusDesejado. ' o aviso da área <i>' . $resultado->area . '</i>?" />';
+            $acoes .= '<button type="button" class="btn btn-sm btn-' .$botao. '" value="' .$resultado->id. '">' .$statusDesejado. '</button>';
             $acoes .= '</form>';
 
             $user = isset($resultado->user) ? $resultado->user->nome : '------------';

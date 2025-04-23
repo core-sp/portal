@@ -62,10 +62,11 @@ class UserController extends Controller
         foreach($resultados as $resultado) {
             if(auth()->user()->can('onlyAdmin', auth()->user())) {
                 $acoes = '<a href="/admin/usuarios/editar/'.$resultado->idusuario.'" class="btn btn-sm btn-primary">Editar</a> ';
-                $acoes .= '<form method="POST" action="/admin/usuarios/apagar/'.$resultado->idusuario.'" class="d-inline">';
+                $acoes .= '<form method="POST" action="/admin/usuarios/apagar/'.$resultado->idusuario.'" class="d-inline acaoTabelaAdmin">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir o usuário?\')" />';
+                $acoes .= '<input type="hidden" class="cor-danger txtTabelaAdmin" value="Tem certeza que deseja excluir o usuário <i>' . $resultado->nome . '</i>?" />';
+                $acoes .= '<button type="button" class="btn btn-sm btn-danger" value="' . $resultado->idusuario . '">Apagar</button>';
                 $acoes .= '</form>';
             } else {
                 $acoes = '<i class="fas fa-lock text-muted"></i>';

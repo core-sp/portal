@@ -296,10 +296,11 @@ class AgendamentoService implements AgendamentoServiceInterface {
             if($userPodeEditar) 
                 $acoes .= '<a href="'.route('agendamentobloqueios.edit', $resultado->idagendamentobloqueio).'" class="btn btn-sm btn-primary">Editar</a> ';
             if($userPodeExcluir) {
-                $acoes .= '<form method="POST" action="'.route('agendamentobloqueios.delete', $resultado->idagendamentobloqueio).'" class="d-inline-block">';
+                $acoes .= '<form method="POST" action="'.route('agendamentobloqueios.delete', $resultado->idagendamentobloqueio).'" class="d-inline-block acaoTabelaAdmin">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o bloqueio?\')" />';
+                $acoes .= '<input type="hidden" class="cor-danger txtTabelaAdmin" value="Tem certeza que deseja cancelar o bloqueio com ID <i>' . $resultado->idagendamentobloqueio . '</i>?" />';
+                $acoes .= '<button type="button" class="btn btn-sm btn-danger" value="' . $resultado->idagendamentobloqueio . '">Cancelar</button>';
                 $acoes .= '</form>';
             }
             $conteudo = [

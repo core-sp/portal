@@ -40,10 +40,11 @@
       </div>
       @if(!isset($resultado->deleted_at))
       <hr>
-      <form method="POST" action="/admin/chamados/apagar/{{ $resultado->idchamado }}" class="d-inline">
+      <form method="POST" action="/admin/chamados/apagar/{{ $resultado->idchamado }}" class="d-inline acaoTabelaAdmin">
         @csrf
         <input type="hidden" name="_method" value="delete" />
-        <input type="submit" class="btn btn-sm btn-success" value="Dar baixa" onclick="return confirm('Tem certeza que deseja dar baixa no chamado?')" />
+        <input type="hidden" class="cor-success txtTabelaAdmin" value="Tem certeza que deseja dar baixa no chamado com ID <i>{{ $resultado->idchamado }}</i>?" />
+        <button type="button" class="btn btn-sm btn-success" value="{{ $resultado->idchamado }}">Dar baixa</button>
       </form>
       @else
       <hr>

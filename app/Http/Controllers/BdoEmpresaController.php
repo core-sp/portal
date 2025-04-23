@@ -224,10 +224,11 @@ class BdoEmpresaController extends Controller
             }
                 
             if(auth()->user()->can('delete', auth()->user())) {
-                $acoes .= '<form method="POST" action="/admin/bdo/empresas/apagar/'.$row->idempresa.'" class="d-inline">';
+                $acoes .= '<form method="POST" action="/admin/bdo/empresas/apagar/'.$row->idempresa.'" class="d-inline acaoTabelaAdmin">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a empresa?\')" />';
+                $acoes .= '<input type="hidden" class="cor-danger txtTabelaAdmin" value="Tem certeza que deseja excluir a empresa <i>' . $row->razaosocial . '</i>?" />';
+                $acoes .= '<button type="button" class="btn btn-sm btn-danger" value="' . $row->idempresa . '">Apagar</button>';
                 $acoes .= '</form>';
             }
 

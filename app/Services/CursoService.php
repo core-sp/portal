@@ -52,10 +52,11 @@ class CursoService implements CursoServiceInterface {
             if($userPodeEdit)
                 $acoes .= '<a href="'.route('cursos.edit', $resultado->idcurso).'" class="btn btn-sm btn-primary">Editar</a> ';
             if($userPodeDestroy) {
-                $acoes .= '<form method="POST" action="'.route('cursos.destroy', $resultado->idcurso).'" class="d-inline">';
+                $acoes .= '<form method="POST" action="'.route('cursos.destroy', $resultado->idcurso).'" class="d-inline acaoTabelaAdmin">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o curso?\')" />';
+                $acoes .= '<input type="hidden" class="cor-danger txtTabelaAdmin" value="Tem certeza que deseja cancelar o curso <i>' . $resultado->tema . '</i>?" />';
+                $acoes .= '<button type="button" class="btn btn-sm btn-danger" value="' . $resultado->idcurso . '">Cancelar</button>';
                 $acoes .= '</form>';
             }
             $publicado = $resultado->publicado() ? 'Publicado' : 'Rascunho';

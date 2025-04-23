@@ -44,10 +44,11 @@ class Perfil extends Model
     {
         return $query->map(function($row){
             $acoes = '<a href="/admin/usuarios/perfis/editar/'.$row->idperfil.'" class="btn btn-sm btn-primary">Editar Permissões</a> ';
-            $acoes .= '<form method="POST" action="/admin/usuarios/perfis/apagar/'.$row->idperfil.'" class="d-inline">';
+            $acoes .= '<form method="POST" action="/admin/usuarios/perfis/apagar/'.$row->idperfil.'" class="d-inline acaoTabelaAdmin">';
             $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
             $acoes .= '<input type="hidden" name="_method" value="delete" />';
-            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'CUIDADO! Isto pode influenciar diretamente no funcionamento do Portal. Tem certeza que deseja excluir o perfil?\')" />';
+            $acoes .= '<input type="hidden" class="cor-danger txtTabelaAdmin" value="<b>CUIDADO!</b> <br>Isto pode influenciar diretamente no funcionamento do Portal.<br>Tem certeza que deseja excluir o perfil <i>' . $row->nome . '</i>?" />';
+            $acoes .= '<button type="button" class="btn btn-sm btn-danger" value="' . $row->idperfil . '">Apagar</button>';
             $acoes .= '</form>';
             
             return [

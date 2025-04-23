@@ -45,10 +45,11 @@ class Pagina extends Model
             if(auth()->user()->can('updateOther', auth()->user()))
                 $acoes .= '<a href="'.route('paginas.edit', $row->idpagina).'" class="btn btn-sm btn-primary">Editar</a> ';
             if(auth()->user()->can('delete', auth()->user())) {
-                $acoes .= '<form method="POST" action="'.route('paginas.destroy', $row->idpagina).'" class="d-inline">';
+                $acoes .= '<form method="POST" action="'.route('paginas.destroy', $row->idpagina).'" class="d-inline acaoTabelaAdmin">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a página?\')" />';
+                $acoes .= '<input type="hidden" class="cor-danger txtTabelaAdmin" value="Tem certeza que deseja excluir a página <i>' . $row->titulo . '</i>?" />';
+                $acoes .= '<button type="button" class="btn btn-sm btn-danger" value="' . $row->idpagina . '">Apagar</button>';
                 $acoes .= '</form>';
             }
             if(isset($row->paginacategoria->nome))

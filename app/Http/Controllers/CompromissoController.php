@@ -201,10 +201,11 @@ class CompromissoController extends Controller
         foreach($resultados as $resultado) {
             $acoes = '<a href="/admin/compromissos/edit/'.$resultado->id.'" class="btn btn-sm btn-default">Editar</a> ';
             
-            $acoes .= '<form method="POST" action="' . route('compromisso.destroy', $resultado->id) . '" class="d-inline">';
+            $acoes .= '<form method="POST" action="' . route('compromisso.destroy', $resultado->id) . '" class="d-inline acaoTabelaAdmin">';
             $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
             $acoes .= '<input type="hidden" name="_method" value="delete" />';
-            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir o compromisso?\')" />';
+            $acoes .= '<input type="hidden" class="cor-danger txtTabelaAdmin" value="Tem certeza que deseja excluir o compromisso <i>' . $resultado->titulo . '</i>?" />';
+            $acoes .= '<button type="button" class="btn btn-sm btn-danger" value="' . $resultado->id . '">Apagar</button>';
             $acoes .= '</form>';
             
             
@@ -223,8 +224,7 @@ class CompromissoController extends Controller
         // Classes da tabela
         $classes = [
             'table',
-            'table-bordered',
-            'table-striped'
+            'table-hover',
         ];
         $tabela = $this->montaTabela($headers, $contents, $classes);
         

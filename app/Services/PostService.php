@@ -44,10 +44,11 @@ class PostService implements PostServiceInterface {
                 $acoes .= '<a href="'.route('posts.edit', $resultado->id).'" class="btn btn-sm btn-primary">Editar</a> ';
             if($userPodeExcluir)
             {
-                $acoes .= '<form method="POST" action="'.route('posts.destroy', $resultado->id).'" class="d-inline">';
+                $acoes .= '<form method="POST" action="'.route('posts.destroy', $resultado->id).'" class="d-inline acaoTabelaAdmin">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir o post?\')" />';
+                $acoes .= '<input type="hidden" class="cor-danger txtTabelaAdmin" value="Tem certeza que deseja excluir o post <i>' . $resultado->titulo . '</i>?" />';
+                $acoes .= '<button type="button" class="btn btn-sm btn-danger" value="' . $resultado->id . '">Apagar</button>';
                 $acoes .= '</form>';
             }
             $autor = isset($resultado->user) ? $resultado->user->nome : 'Usuário Deletado';
