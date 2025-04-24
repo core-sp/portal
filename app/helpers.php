@@ -463,7 +463,7 @@ function secondLine($situacao, $vencimento = null, $link = null, $descricao = nu
         $str = '<strong class="text-success">PAGO</strong>';
     } elseif($situacao === 'Pago em Parcelamento') {
         $str = '<strong class="text-success">PAGO EM PARCELAMENTO</strong>';
-    } elseif($situacao === 'Isenção de Pagto') {
+    } elseif($situacao === 'Isento') {
         $str = '<strong class="text-success">ISENÇÃO DE PAGAMENTO</strong>';
     } elseif($situacao === 'Proc. Adm.'){
         if($boleto !== null)
