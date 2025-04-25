@@ -6,12 +6,15 @@ $(document).ready(function(){
 
     import(elemento_init.attr('src'))
     .then((init) => {
-        init.default();
-        console.log('[MÓDULOS] # Versão dos scripts: ' + elemento_init.attr('class'));
+        init.default('interno');
+        document.dispatchEvent(new CustomEvent("LOG_SUCCESS_INIT", {
+            detail: {tipo: 0, situacao: 1, nome: 'init', url: elemento_init.attr('src')}
+        }));
     })
     .catch((err) => {
-        console.log(err);
-        alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
+        document.dispatchEvent(new CustomEvent("LOG_ERROR_INIT", {
+            detail: {error: err}
+        }));
     });
 
 });

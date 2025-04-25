@@ -8,15 +8,17 @@ function lazyLoadImg(){
 
     import(link)
     .then((module) => {
-        console.log('[MÓDULOS] # Módulo lazy-load-img importado por opcional e carregado.');
-        console.log('[MÓDULOS] # Local do módulo: ' + link);
+        document.dispatchEvent(new CustomEvent("LOG_SUCCESS_INIT", {
+            detail: {tipo: 0, situacao: 4, nome: 'lazy-load-img', url: link}
+        }));
 
         let root = document.querySelector('#armazenamento .modal-dialog .modal-content');
         module.default(root);
     })
     .catch((err) => {
-        console.log(err);
-        alert('Erro na página! Módulo com erro! Tente novamente mais tarde!');
+        document.dispatchEvent(new CustomEvent("LOG_ERROR_INIT", {
+            detail: {error: err}
+        }));
     });
 }
 
@@ -26,12 +28,14 @@ async function validarArquivo(arquivo, mimeTypes = []){
 
     try {
         const module = await import(link);
-        console.log('[MÓDULOS] # Módulo validar-arquivos importado por opcional e carregado.');
-        console.log('[MÓDULOS] # Local do módulo: ' + link);
+        document.dispatchEvent(new CustomEvent("LOG_SUCCESS_INIT", {
+            detail: {tipo: 0, situacao: 4, nome: 'validar-arquivos', url: link}
+        }));
         return module.validarUmArquivo(arquivo, mimeTypes);
     } catch (err) {
-        console.log(err);
-        alert('Erro na página! Módulo com erro! Tente novamente mais tarde!');
+        document.dispatchEvent(new CustomEvent("LOG_ERROR_INIT", {
+            detail: {error: err}
+        }));
     }
 }
 

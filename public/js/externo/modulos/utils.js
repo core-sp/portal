@@ -58,13 +58,15 @@ function importLazyLoadImg(elemento){
 
     import(link)
     .then((module) => {
-        console.log('Módulo lazy-load-img importado por principal e carregado.');
-        console.log('Local do módulo: ' + link);
+        document.dispatchEvent(new CustomEvent("LOG_SUCCESS_INIT", {
+            detail: {tipo: 0, situacao: 4, nome: 'lazy-load-img', url: link}
+        }));
         module.default(null, '0px', 0, elemento);
     })
     .catch((err) => {
-        console.log(err);
-        alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
+        document.dispatchEvent(new CustomEvent("LOG_ERROR_INIT", {
+            detail: {error: err}
+        }));
     });
 }
 
@@ -96,13 +98,15 @@ function importCep(){
 
     import(link)
     .then((module) => {
-        console.log('Módulo cep importado por principal e carregado.');
-        console.log('Local do módulo: ' + link);
+        document.dispatchEvent(new CustomEvent("LOG_SUCCESS_INIT", {
+            detail: {tipo: 0, situacao: 3, nome: 'cep', url: link}
+        }));
         module.getCep();
     })
     .catch((err) => {
-        console.log(err);
-        alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
+        document.dispatchEvent(new CustomEvent("LOG_ERROR_INIT", {
+            detail: {error: err}
+        }));
     });
 }
 

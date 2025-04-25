@@ -2,31 +2,7 @@ const link = location.protocol + '//' + location.hostname + '/js/';
 const inicio = "modulo-";
 const temp = $('#' + inicio + 'init').attr('src');
 const hash = temp.substring(temp.search(/\?/) + 1, temp.length);
-
-function tinyInit(){
-    
-    if($('.my-editor').length > 0){
-    
-        const tiny = document.createElement('script');
-        tiny.setAttribute("type", "text/javascript");
-        tiny.setAttribute("src", link + 'interno/tinymce.js?' + hash);
-        document.body.appendChild(tiny);
-
-        if(typeof tinymce === "object")
-            console.log('Editor TinyMCE carregado.');
-    }
-}
-
-function securityInit(){
-
-    if($('#modulo-security').length > 0){
-        const _lib = document.createElement('script');
-        _lib.setAttribute("type", "text/javascript");
-        _lib.setAttribute("src", link + 'zxcvbn.js?2017'); // zxcvbn.js?[ano da última atualização]
-        _lib.setAttribute("async", true);
-        document.body.appendChild(_lib);
-    }
-}
+const versao = $('#' + inicio + 'init').attr('class');
 
 function criarScriptParaImportar(modulo_atual, obj_modulos = {modulo:[], local:[]}){
 
@@ -47,9 +23,6 @@ function criarScriptParaImportar(modulo_atual, obj_modulos = {modulo:[], local:[
 }
 
 function opcionais(){
-    
-    tinyInit();
-    securityInit();
 
     const opcionais = $('[type="module"][class^="' + inicio + '"]');
   
@@ -63,8 +36,9 @@ function opcionais(){
         
         import($(this).attr('src'))
         .then((module) => {
-            console.log('[MÓDULOS] # Módulo de "' + funcao + ' ' + modulo + '" carregado.');
-            console.log('[MÓDULOS] # Local do módulo: ' + $(this).attr('src').replace(link, 'js/'));
+            document.dispatchEvent(new CustomEvent("LOG_SUCCESS_INIT", {
+                detail: {tipo: 0, situacao: 2, nome: funcao + ' ' + modulo, url: $(this).attr('src')}
+            }));
 
             if('scripts_para_importar' in module)
                 criarScriptParaImportar(this, module.scripts_para_importar);
@@ -72,8 +46,9 @@ function opcionais(){
             module.executar(funcao);
         })
         .catch((err) => {
-            console.log(err);
-            alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
+            document.dispatchEvent(new CustomEvent("LOG_ERROR_INIT", {
+                detail: {error: err}
+            }));
         });
     
     });
@@ -93,57 +68,72 @@ function criarImportarModulos(local, modulos_principais, pastas_principais){
 
         import(modulo_criado.attr('src'))
         .then((module) => {
-            console.log('[MÓDULOS] # Módulo principal "' + element + '" carregado, localizado em: ' + modulo_criado.attr('src') + '.');
+            document.dispatchEvent(new CustomEvent("LOG_SUCCESS_INIT", {
+                detail: {tipo: 0, situacao: 1, nome: element, url: modulo_criado.attr('src')}
+            }));
 
             if('scripts_para_importar' in module)
                 criarScriptParaImportar(modulo_criado, module.scripts_para_importar);
             
             module.executar(local);
+
+            if(element.startsWith('init-'))
+                document.dispatchEvent(new CustomEvent(element.toUpperCase(), {
+                    detail: {link: link, hash: hash}
+                }));
         })
         .catch((err) => {
-            console.log(err);
-            alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
+            document.dispatchEvent(new CustomEvent("LOG_ERROR_INIT", {
+                detail: {error: err}
+            }));
         });
     });
 
     opcionais();
 }
 
-function getObjModulos(){
+function gerarLogs(){
 
-    return {
-        principal: ['mascaras', 'modal-geral'],
-        interno: ['utils', 'filemanager'],
-        externo: ['acessibilidade', 'utils'],
-        "restrita-rc": ['utils'],
-    };
+    console.log('[MÓDULOS / SCRIPTS] # Versão dos módulos / scripts: ' + versao);
+
+    document.addEventListener("LOG_SUCCESS_INIT", (e) => {
+        // tipo = chave do array
+        // situacao = chave do array
+        // nome = string
+        // url = modulo.src ou script.src
+
+        const tipos = ['MÓDULOS', 'SCRIPTS'];
+        const tipos_min = ['Módulo', 'Script'];
+        const situacoes = ['', 'principal', 'opcional', 'importado por principal', 'importado por opcional', 'carregado'];
+        const primeiro = '[' + tipos[e.detail.tipo].toUpperCase() + '] # ' + tipos_min[e.detail.tipo] + ' ';
+        const segundo = ' ' + situacoes[e.detail.situacao] + ', localizado em: ';
+
+        console.log(primeiro + '"' + e.detail.nome + '"' + segundo + e.detail.url);
+    });
+
+    document.addEventListener("LOG_ERROR_INIT", (e) => {
+        console.log(e.detail.error);
+        alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
+    });
 }
 
-function getObjPastas(local, subarea){
-
-    const pasta_modulos = 'modulos/';
-    const caminho_modulos = local + '/' + pasta_modulos;
-    const caminho_modulos_subarea = typeof subarea == "string" ? subarea + '/' + pasta_modulos : '';
+export default function (local, subarea){
     
-    return {
-        principal: [pasta_modulos, pasta_modulos],
-        interno: [caminho_modulos, caminho_modulos],
-        externo: [pasta_modulos, caminho_modulos],
-        "restrita-rc": [caminho_modulos_subarea],
-    };
-}
-
-export default function (local = 'interno', subarea = null){
-
     const executar = {
-        ok: function(local, subarea) {            
+        ok: function(local, subarea) {
             let sub = typeof subarea == "string" ? this[subarea] : [];
             return this.principal.concat(this[local]).concat(sub);
         },
     };
 
-    const modulos_ = getObjModulos();
-    const pastas_ = getObjPastas(local, subarea);
+    document.dispatchEvent(new CustomEvent('PRE-INIT', {
+        detail: {local: local, subarea: subarea}
+    }));
+    
+    const modulos_ = PORTAL_MODULOS.getObjModulos_;
+    const pastas_ = PORTAL_MODULOS.getObjPastas_;
 
     criarImportarModulos(local, executar.ok.call(modulos_, local, subarea), executar.ok.call(pastas_, local, subarea));
+
+    gerarLogs();
 };

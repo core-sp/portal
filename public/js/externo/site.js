@@ -9,11 +9,14 @@ $(document).ready(function(){
         let subarea = window.location.pathname.search('/representante/') > -1 ? 'restrita-rc' : null;
 
         init.default('externo', subarea);
-        console.log('[MÓDULOS] # Versão dos scripts: ' + elemento_init.attr('class'));
+        document.dispatchEvent(new CustomEvent("LOG_SUCCESS_INIT", {
+            detail: {tipo: 0, situacao: 1, nome: 'init', url: elemento_init.attr('src')}
+        }));
     })
     .catch((err) => {
-        console.log(err);
-        alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
+        document.dispatchEvent(new CustomEvent("LOG_ERROR_INIT", {
+            detail: {error: err}
+        }));
     });
 
 });

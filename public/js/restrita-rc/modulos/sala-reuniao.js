@@ -88,13 +88,15 @@ function importAgendamento(){
 
     import(link)
     .then((module) => {
-        console.log('Módulo utils-agendamento importado por opcional e carregado.');
-        console.log('Local do módulo: ' + link);
+        document.dispatchEvent(new CustomEvent("LOG_SUCCESS_INIT", {
+            detail: {tipo: 0, situacao: 4, nome: 'utils-agendamento', url: link}
+        }));
         module.inicializa();
     })
     .catch((err) => {
-        console.log(err);
-        alert('Erro na página! Módulo não carregado! Tente novamente mais tarde!');
+        document.dispatchEvent(new CustomEvent("LOG_ERROR_INIT", {
+            detail: {error: err}
+        }));
     });
 }
 
