@@ -16,6 +16,7 @@ $factory->define(Representante::class, function (Faker $faker) {
         'verify_token' => null, 
         'aceite' => 1, 
         'ativo' => 1,
+        'ultimo_acesso' => now()->subDay()->subHour()->subMinute()->format('Y-m-d h:i:s'),
         'created_at' => now(),
         'updated_at' => now()
     ];
