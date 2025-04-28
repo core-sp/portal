@@ -1,10 +1,10 @@
 // Definir configurações de constantes para a inicialização
 
-const PORTAL_MODULOS = new Object({
-    getLink_: location.protocol + '//' + location.hostname + '/js/',
-    getHash_: $('#pre-init').attr('src').replace(this.getLink_ + 'pre-init.js?', ''),
-    getVersao_: $('#pre-init').attr('class'),
-});
+const PORTAL_MODULOS = new Object();
+
+PORTAL_MODULOS.getLink_ = location.protocol + '//' + location.hostname + '/js/';
+PORTAL_MODULOS.getHash_ = $('#pre-init').attr('src').replace(PORTAL_MODULOS.getLink_ + 'pre-init.js?', '');
+PORTAL_MODULOS.getVersao_ = $('#pre-init').attr('class');
 
 // Evento para receber o local e a subarea antes de inicializar os módulos / scripts
 
