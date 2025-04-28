@@ -835,4 +835,32 @@ class RepresentanteTest extends TestCase
         ->assertSessionHas('class', 'alert-danger')
         ->assertRedirect(route('representante.dashboard'));
     }
+
+    /** @test */
+    public function can_view_last_login()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->get(route('representante.dashboard'))
+        ->assertSee('<span class="font-italic w-auto float-right mt-2 mr-1">')
+        ->assertSee('<b>Último acesso: </b>')
+        ->assertSee(formataData($representante->ultimoAcesso()));
+    }
+
+    /** @test */
+    public function can_save_last_login()
+    {
+        $representante = factory('App\Representante')->create([
+            'updated_at' => '2020-02-21 22:25:33'
+        ]);
+
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->assertDatabaseHas('representantes', [
+            'updated_at' => now(),
+            'ultimo_acesso' => '2020-02-21 22:25:33',
+        ]);
+    }
 }

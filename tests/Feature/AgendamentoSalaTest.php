@@ -3271,6 +3271,8 @@ class AgendamentoSalaTest extends TestCase
     /** @test */
     public function get_liberado_periodo_reuniao_coworking_different_rc()
     {
+        $this->withoutMiddleware(\Illuminate\Session\Middleware\AuthenticateSession::class);
+
         // RC 1 REUNIAO E COWORKING
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
@@ -3430,6 +3432,8 @@ class AgendamentoSalaTest extends TestCase
     /** @test */
     public function get_liberado_periodo_reuniao_coworking_different_rc_empty()
     {
+        $this->withoutMiddleware(\Illuminate\Session\Middleware\AuthenticateSession::class);
+        
         // RC 1 REUNIAO E COWORKING
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');

@@ -72,25 +72,25 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
         return $resultado;
     }
 
-    /**
-     * Método para formatar os dados de endereço do GERENTI para emissão de Certidão
-     */
-    public function gerentiEnderecoFormatado($ass_id) 
-    {
-        $enderecoGerenti = $this->gerentiEnderecos($ass_id);
+    // /**
+    //  * Método para formatar os dados de endereço do GERENTI para emissão de Certidão
+    //  */
+    // public function gerentiEnderecoFormatado($ass_id) 
+    // {
+    //     $enderecoGerenti = $this->gerentiEnderecos($ass_id);
 
-        $enderecoFormatado = $enderecoGerenti["Logradouro"];
+    //     $enderecoFormatado = $enderecoGerenti["Logradouro"];
         
-        if(!empty($enderecoGerenti["Complemento"])) {
-            $enderecoFormatado .= ", " . $enderecoGerenti["Complemento"];
-        }
+    //     if(!empty($enderecoGerenti["Complemento"])) {
+    //         $enderecoFormatado .= ", " . $enderecoGerenti["Complemento"];
+    //     }
 
-        $enderecoFormatado .= ", " . $enderecoGerenti["Bairro"];
-        $enderecoFormatado .= " - " . $enderecoGerenti["Cidade"] . "/" . $enderecoGerenti["UF"];
-        $enderecoFormatado .= " - CEP: " . $enderecoGerenti["CEP"];
+    //     $enderecoFormatado .= ", " . $enderecoGerenti["Bairro"];
+    //     $enderecoFormatado .= " - " . $enderecoGerenti["Cidade"] . "/" . $enderecoGerenti["UF"];
+    //     $enderecoFormatado .= " - CEP: " . $enderecoGerenti["CEP"];
 
-        return $enderecoFormatado;
-    }
+    //     return $enderecoFormatado;
+    // }
 
     public function gerentiDadosGerais($tipoPessoa, $ass_id)
     {
@@ -196,14 +196,14 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
      */
     public function gerentiInserirEndereco($ass_id, $infos) {}
 
-    /**
-     * Método não é chamado em nenhum lugar.
-     * TODO - verificar sia exclusão.
-     */
-    public function gerentiEnderecoInfos($ass_id, $sequencia)
-    {
-        abort(500, "Ambiente não integrado");
-    }
+    // /**
+    //  * Método não é chamado em nenhum lugar.
+    //  * TODO - verificar sia exclusão.
+    //  */
+    // public function gerentiEnderecoInfos($ass_id, $sequencia)
+    // {
+    //     abort(500, "Ambiente não integrado");
+    // }
 
     public function gerentiContatos($ass_id)
     {
@@ -442,72 +442,72 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
         return $resultado;
     }
 
-    /**
-     * Verifica no GERENTI se é possível emitir uma certidão para o Representante Comercial de acordo com o ASS_ID. Em caso negativo, uma flag com o valor "0" será retornada.
-     * Em caso positivo, uma flag com o valor "1" será retornada juntamente com informações da certidão (número, código, data e hora da emissão)
-     * 
-     * Adicionar três parametros (web user, tericero parametro nulo e o tipo) na chamada da procedure original
-     */
-    public function gerentiEmitirCertidao($ass_id) 
-    {
-        return [
-            'EMISSAO' => 1,
-            'NUMERO' => 2,
-            'CODVALIDACAO' => 'abcde',
-            'DATAEMISSAO' => '01/01/2021',
-            'HORA' => '00:00:00',
-            'DATAVALIDADE' => '01/01/2022',
-            'NOME' => 'RC Teste 1', 
-            'CPFCNPJ' => '86294373085', 
-            'REGISTRO' => '0000000001', 
-            'DATAREGISTRO' => '01/01/1999',
-            'TIPOEMPRESA' => 'Empresa Teste', 
-            'RESPTECNICOS' => 'Nome do RT', 
-            'REGISTROSRTS' => 'Registro do RT',
-            'ENDERECOCOMPLETO' => 'Rua Teste'
-        ];
-    }
+    // /**
+    //  * Verifica no GERENTI se é possível emitir uma certidão para o Representante Comercial de acordo com o ASS_ID. Em caso negativo, uma flag com o valor "0" será retornada.
+    //  * Em caso positivo, uma flag com o valor "1" será retornada juntamente com informações da certidão (número, código, data e hora da emissão)
+    //  * 
+    //  * Adicionar três parametros (web user, tericero parametro nulo e o tipo) na chamada da procedure original
+    //  */
+    // public function gerentiEmitirCertidao($ass_id) 
+    // {
+    //     return [
+    //         'EMISSAO' => 1,
+    //         'NUMERO' => 2,
+    //         'CODVALIDACAO' => 'abcde',
+    //         'DATAEMISSAO' => '01/01/2021',
+    //         'HORA' => '00:00:00',
+    //         'DATAVALIDADE' => '01/01/2022',
+    //         'NOME' => 'RC Teste 1', 
+    //         'CPFCNPJ' => '86294373085', 
+    //         'REGISTRO' => '0000000001', 
+    //         'DATAREGISTRO' => '01/01/1999',
+    //         'TIPOEMPRESA' => 'Empresa Teste', 
+    //         'RESPTECNICOS' => 'Nome do RT', 
+    //         'REGISTROSRTS' => 'Registro do RT',
+    //         'ENDERECOCOMPLETO' => 'Rua Teste'
+    //     ];
+    // }
 
-    /**
-     * Recupera no GERENTI as certidões que foram emitidas para o Representante Comercial de acordo com o ASS_ID.
-     * 
-     * 11 - Regularidade?
-     * 12 - Parcelamento?
-     */
-    public function gerentiListarCertidoes($ass_id, $tipo) 
-    {
-        $resultado[0] = [
-            'NUMERO' => '1',
-            'SITUACAO' => 'Ativa',
-            'CODVALIDACAO' => '123456789',
-            'DATAEMISSAO' => '01/01/2021',
-            'HORAEMISSAO' => '00:00:00',
-            'VALIDADE' => '01/01/2022',
-        ];
+    // /**
+    //  * Recupera no GERENTI as certidões que foram emitidas para o Representante Comercial de acordo com o ASS_ID.
+    //  * 
+    //  * 11 - Regularidade?
+    //  * 12 - Parcelamento?
+    //  */
+    // public function gerentiListarCertidoes($ass_id, $tipo) 
+    // {
+    //     $resultado[0] = [
+    //         'NUMERO' => '1',
+    //         'SITUACAO' => 'Ativa',
+    //         'CODVALIDACAO' => '123456789',
+    //         'DATAEMISSAO' => '01/01/2021',
+    //         'HORAEMISSAO' => '00:00:00',
+    //         'VALIDADE' => '01/01/2022',
+    //     ];
 
-        $resultado[1] = [
-            'NUMERO' => '2',
-            'SITUACAO' => 'Suspensa',
-            'CODVALIDACAO' => '987654321',
-            'DATAEMISSAO' => '02/02/2021',
-            'HORAEMISSAO' => '00:00',
-            'VALIDADE' => '02/02/2022',
-        ];
+    //     $resultado[1] = [
+    //         'NUMERO' => '2',
+    //         'SITUACAO' => 'Suspensa',
+    //         'CODVALIDACAO' => '987654321',
+    //         'DATAEMISSAO' => '02/02/2021',
+    //         'HORAEMISSAO' => '00:00',
+    //         'VALIDADE' => '02/02/2022',
+    //     ];
 
-        return $resultado;
-    }
+    //     return $resultado;
+    // }
 
-    /**
-     * Verifica no GERENTI a autenticidade e validade de uma certidão. Retorna uma flag que indica as seguintes situações: "0" (inexistente), "1" (válida), "2" (suspensa), "3" (vencida).
-     * Caso a flag indique que certidão está válida, informações sobre o Representante Comercial serão retornadas (Nome, Registro, CPF_CNPJ, data de validade da certidão). 
-     */
-    public function gerentiAutenticaCertidao($numero, $codigo, $data, $hora) 
-    {
-        return [
-            'SITUACAO' => 'Válida',
-            'DATAVALIDADE' => '02/02/2022'
-        ];
-    }
+    // /**
+    //  * Verifica no GERENTI a autenticidade e validade de uma certidão. Retorna uma flag que indica as seguintes situações: "0" (inexistente), "1" (válida), "2" (suspensa), "3" (vencida).
+    //  * Caso a flag indique que certidão está válida, informações sobre o Representante Comercial serão retornadas (Nome, Registro, CPF_CNPJ, data de validade da certidão). 
+    //  */
+    // public function gerentiAutenticaCertidao($numero, $codigo, $data, $hora) 
+    // {
+    //     return [
+    //         'SITUACAO' => 'Válida',
+    //         'DATAVALIDADE' => '02/02/2022'
+    //     ];
+    // }
 
     public function gerentiGetSegmentosByAssId($ass_id) 
     {

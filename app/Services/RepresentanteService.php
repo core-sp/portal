@@ -81,4 +81,10 @@ class RepresentanteService implements RepresentanteServiceInterface {
             'user_rep' => $rep,
         ];
     }
+
+    public function registrarUltimoAcesso($cpfCnpj)
+    {
+        $cpfCnpj = apenasNumeros($cpfCnpj);
+        return Representante::where('cpf_cnpj', $cpfCnpj)->first()->registrarUltimoAcesso();
+    }
 }
