@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\SuporteIp;
 use App\Services\SuporteService;
+use Illuminate\Support\Facades\Storage;
 
 class SuporteTest extends TestCase
 {
@@ -244,5 +245,30 @@ class SuporteTest extends TestCase
         $ip = factory('App\SuporteIp')->states('bloqueado')->create()->ip;
 
         $this->assertTrue($service->liberarIp($ip, $user));
+    }
+
+    /** @test */
+    public function verifica_hash_log()
+    {
+        $data = '2022-09-25';
+
+        if(Storage::disk('log_interno')->exists('2022/09/laravel-'.$data.'.log')){
+            Storage::disk('log_interno')->delete('2022/09/laravel-'.$data.'.log');
+            $conteudo = '[2022-09-30 11:34:04] testing.INFO: [IP: 127.0.0.1] - Usuário (usuário 1) editou *plantão juridico* (id: 1)';
+            Storage::disk('log_interno')->put('2022/09/laravel-'.$data.'.log', $conteudo);
+        }
+
+        $service = new SuporteService;
+
+        $user = $this->signInAsAdmin();
+
+        exec('bash /home/vagrant/Workspace/hash_logs_todos.sh');
+
+        $this->assertEquals($service->verificaHashLog('2022-09-26', 'interno'), 'Hash ainda não foi criado!');
+        $this->assertTrue($service->verificaHashLog($data, 'interno'));
+
+        Storage::disk('log_interno')->put('2022/09/laravel-'.$data.'.log', 'a');
+
+        $this->assertFalse($service->verificaHashLog($data, 'interno'));
     }
 }

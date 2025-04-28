@@ -659,6 +659,66 @@ class SuporteTest extends TestCase
         ->assertSessionHasErrors('texto');
     }
 
+    // Verificar integridade dos logs
+
+    /** @test */
+    public function admin_can_view_button_verify_hash_log()
+    {
+        $data = '2022-09-25';
+
+        if(Storage::disk('log_interno')->exists('2022/09/laravel-'.$data.'.log')){
+            Storage::disk('log_interno')->delete('2022/09/laravel-'.$data.'.log');
+            $conteudo = '[2022-09-30 11:34:04] testing.INFO: [IP: 127.0.0.1] - Usuário (usuário 1) editou *plantão juridico* (id: 1)';
+            Storage::disk('log_interno')->put('2022/09/laravel-'.$data.'.log', $conteudo);
+        }
+
+        $user = $this->signInAsAdmin();
+
+        exec('bash /home/vagrant/Workspace/hash_logs_todos.sh');
+
+        $this->get(route('suporte.log.externo.busca', ['ano' => '2022', 'tipo' => 'interno', 'texto' => 'IP:']))
+        ->assertSee('<a class="btn btn-primary btn-sm ml-3" href="' . route('suporte.log.externo.integridade', ['data' => $data, 'tipo' => 'interno']) . '">')
+        ->assertSee('Verificar integridade');
+
+        $this->get(route('suporte.log.externo.busca', ['data' => $data, 'tipo' => 'interno']))
+        ->assertSee('<a class="btn btn-primary btn-sm ml-3" href="' . route('suporte.log.externo.integridade', ['data' => $data, 'tipo' => 'interno']) . '">')
+        ->assertSee('Verificar integridade');
+
+        $this->get(route('suporte.log.externo.busca', ['ano' => '2022', 'tipo' => 'interno', 'texto' => '2022']))
+        ->assertSee('<a class="btn btn-primary btn-sm ml-3" href="' . route('suporte.log.externo.integridade', ['data' => $data, 'tipo' => 'interno']) . '">')
+        ->assertSee('Verificar integridade');
+    }
+
+    /** @test */
+    public function admin_can_verify_hash_log()
+    {
+        $data = '2022-09-25';
+
+        if(Storage::disk('log_interno')->exists('2022/09/laravel-'.$data.'.log')){
+            Storage::disk('log_interno')->delete('2022/09/laravel-'.$data.'.log');
+            $conteudo = '[2022-09-30 11:34:04] testing.INFO: [IP: 127.0.0.1] - Usuário (usuário 1) editou *plantão juridico* (id: 1)';
+            Storage::disk('log_interno')->put('2022/09/laravel-'.$data.'.log', $conteudo);
+        }
+
+        $user = $this->signInAsAdmin();
+
+        exec('bash /home/vagrant/Workspace/hash_logs_todos.sh');
+
+        $this->get(route('suporte.log.externo.integridade', ['data' => $data, 'tipo' => 'interno']))
+        ->assertSessionHas('message', 'Log do tipo interno e da data ' . onlyDate($data) . ': <b>está íntegro!</b>')
+        ->assertSessionHas('class', 'alert-success');
+
+        $this->get(route('suporte.log.externo.integridade', ['data' => '2022-09-26', 'tipo' => 'interno']))
+        ->assertSessionHas('message', 'Log do tipo interno e da data ' . onlyDate('2022-09-26') . ': <b>Hash ainda não foi criado!</b>')
+        ->assertSessionHas('class', 'alert-warning');
+
+        Storage::disk('log_interno')->put('2022/09/laravel-'.$data.'.log', 'a');
+
+        $this->get(route('suporte.log.externo.integridade', ['data' => $data, 'tipo' => 'interno']))
+        ->assertSessionHas('message', 'Log do tipo interno e da data ' . onlyDate($data) . ': <b>não está íntegro!</b>')
+        ->assertSessionHas('class', 'alert-danger');
+    }
+
     /** 
      * =======================================================================================================
      * TESTES RELATÓRIOS
