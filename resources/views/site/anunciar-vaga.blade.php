@@ -51,7 +51,7 @@
 
                 <p>Preencha o formulário abaixo para solicitar a inclusão de sua(s) vaga(s) no <strong>Balcão de Oportunidades</strong> do <strong>Core-SP.</strong></p>
                 <p>A(s) vaga(s) será(ão) disponibilizada(s) após análise, que ocorrerá em até 10 (dez) dias corridos após recebimento da vaga, e permanecerá pelo prazo de até 90 (noventa) dias - após este período o status da(s) vaga(s) passará de "Em andamento" para "Concluído".</p>
-                <p>Para mais esclarecimentos, entre em contato conosco através do email <strong>assessoria.presidencia@core-sp.org.br</strong>.</p>
+                <p>Para mais esclarecimentos, entre em contato conosco através do email <strong>comunicacao@core-sp.org.br</strong>.</p>
                 <h4>Informações da Empresa</h4>
                 <form method="POST" class="w-100 simulador">
                     @csrf
@@ -73,7 +73,7 @@
                             </div>
                         @endif
                     </div>
-                    <div id="avLoading"><img src="{{ asset('img/ajax-loader.gif') }}" class="pt-0 mb-2" alt="Loading"></div>
+                    <!-- <div id="avLoading"><img src="{{-- asset('img/ajax-loader.gif') --}}" class="pt-0 mb-2" alt="Loading"></div> -->
                     <div id="avAlert" class="alert" role="alert"></div>
                     <div class="form-row mt-2 avHidden">
                         <div class="col-sm mb-2-576">
@@ -142,6 +142,13 @@
                     <div class="form-row mt-2 avHidden">
                         <div class="col-sm mb-2-576">
                             <label for="endereco">Endereço</label>  <i class="fas fa-question-circle d-inline azul" id="endereco-da-empresa"></i>
+                            <div class="input-group input-group-sm mb-1">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Buscar pelo CEP</span>
+                                </div>
+                                <input type="text" class="form-control cep" id="cep" placeholder="CEP">
+                            </div>
+                            <input type="hidden" id="rua"><input type="hidden" id="bairro"><input type="hidden" id="cidade"><input type="hidden" id="uf">
                             <input
                                 type="text"
                                 name="endereco"
@@ -250,13 +257,13 @@
                         </div>
                     </div>
                     @php
-                        old('regiaoAtuacao') !== null ? $oldRA = old('regiaoAtuacao') : $oldRA = []
+                        $oldRA = !empty(old('regiaoAtuacao')) ? old('regiaoAtuacao') : [];
                     @endphp
                     <div class="form-group mt-2">
                         <label for="regiaoAtuacao">Região de Atuação</label>
                         <select name="regiaoAtuacao[]" class="form-control {{ $errors->has('regiaoAtuacao') ? 'is-invalid' : '' }}" multiple>
                             @foreach ($regionais as $regional)
-                                <option value="{{ $regional->idregional }}" {{ in_array($regional->regional, $oldRA) ? 'selected' : '' }}>{{ $regional->regional }}</option>
+                                <option value="{{ $regional->idregional }}" {{ in_array($regional->idregional, $oldRA) ? 'selected' : '' }}>{{ $regional->regional }}</option>
                             @endforeach
                         </select>
                         @if($errors->has('regiaoAtuacao'))
@@ -349,7 +356,7 @@
                     <div class="form-group mt-3">
                         <button
                             type="{{ isset($aviso) ? 'button' : 'submit' }}"
-                            class="btn btn-primary"
+                            class="btn btn-primary {{ isset($aviso) ? '' : 'loadingPagina' }}"
                         >
                             Enviar
                         </button>
@@ -362,5 +369,7 @@
         </div>
     </div>
 </section>
+
+<script type="module" src="{{ asset('/js/externo/modulos/balcao-oportunidades.js?'.hashScriptJs()) }}" id="modulo-balcao-oportunidades" class="modulo-editar"></script>
 
 @endsection

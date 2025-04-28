@@ -66,7 +66,7 @@ class SolicitaCedulaRequest extends FormRequest
             "numero" => "sometimes|required|max:15",
             "complemento" => "max:100",
             "estado" => "sometimes|required|in:" . implode(',', array_keys(estados())),
-            "municipio" => "sometimes|required|min:4|max:100",
+            "municipio" => "sometimes|required|min:3|max:100",
             'tipo' => "sometimes|required|in:" . implode(',', $this->tiposAceitos),
             'justificativa' => 'sometimes|required_if:status,' . $this->statusAceitos[2] . '|nullable|min:5|max:600',
             'status' => 'sometimes|required|in:' . implode(',', $this->statusAceitos),

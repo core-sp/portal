@@ -14,7 +14,7 @@ $factory->define(SolicitaCedula::class, function (Faker $faker) {
         'cep' => '01112-000',
         'bairro' => $faker->streetAddress,
         'logradouro' => $faker->streetName,
-        'numero' => $faker->numberBetween(1, 10000),
+        'numero' => $faker->numberBetween(1, 10000) . 'A',
         'complemento' => $faker->word,
         'estado' => 'SP',
         'municipio' => $faker->city,

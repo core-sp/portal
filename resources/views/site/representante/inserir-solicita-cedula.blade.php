@@ -138,7 +138,7 @@
                     <input
                         type="text"
                         name="numero"
-                        class="form-control numero {{ $errors->has('numero') ? 'is-invalid' : '' }}"
+                        class="form-control {{ $errors->has('numero') ? 'is-invalid' : '' }}"
                         id="numero"
                         placeholder="Número"
                         value="{{ old('numero') }}"
@@ -193,7 +193,7 @@
                         class="form-control {{ $errors->has('municipio') ? 'is-invalid' : '' }}"
                         placeholder="Município"
                         value="{{ old('municipio') }}"
-                        minlength="4"
+                        minlength="3"
                         maxlength="100"
                         required
                     >
@@ -224,10 +224,12 @@
                 </div>
             </div>
             <div class="form-group mt-4">
-                <button type="submit" class="btn btn-primary">Enviar</button>
+                <button type="submit" class="btn btn-primary loadingPagina">Enviar</button>
             </div>
         </form>
     </div>
 </div>
+
+<script type="module" src="{{ asset('/js/restrita-rc/modulos/cedula.js?'.hashScriptJs()) }}" id="modulo-cedula" class="modulo-editar"></script>
 
 @endsection

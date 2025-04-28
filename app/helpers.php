@@ -456,18 +456,20 @@ function secondLine($situacao, $vencimento = null, $link = null, $descricao = nu
     if($situacao === 'Em aberto' && $vencimento === null) {
         $str = '<strong class="text-warning">EM ABERTO</strong> &sdot; <span class="normal text-danger">BOLETO EXPIRADO</span>';
     } elseif($situacao === 'Em aberto' && $link !== null) {
-        $str = '<strong class="text-warning">EM ABERTO</strong> ⋅ <a href="' . $link . '" class="normal text-info" onclick="clickBoleto(\''. $descricao .'\')">BAIXAR BOLETO</a>';
+        $str = '<strong class="text-warning">EM ABERTO</strong> ⋅ <a href="' . $link . '" class="normal text-info" data-descricao="'. $descricao .'">BAIXAR BOLETO</a>';
     } elseif($situacao === 'Em aberto' && $boleto !== null) {
-        $str = '<strong class="text-warning">EM ABERTO</strong> ⋅ <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/' . $boleto . '" class="normal text-info" onclick="clickBoleto(\''. $descricao .'\')">BAIXAR BOLETO</a>';
+        $str = '<strong class="text-warning">EM ABERTO</strong> ⋅ <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/' . $boleto . '" class="normal text-info" data-descricao="'. $descricao .'">BAIXAR BOLETO</a>';
     } elseif($situacao === 'Pago') {
         $str = '<strong class="text-success">PAGO</strong>';
     } elseif($situacao === 'Pago em Parcelamento') {
         $str = '<strong class="text-success">PAGO EM PARCELAMENTO</strong>';
+    } elseif($situacao === 'Isento') {
+        $str = '<strong class="text-success">ISENÇÃO DE PAGAMENTO</strong>';
     } elseif($situacao === 'Proc. Adm.'){
         if($boleto !== null)
-            $str = '<strong class="text-info">PROC. ADM.</strong> ⋅ <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/' . $boleto . '" class="normal text-info" onclick="clickBoleto(\''. $descricao .'\')">BAIXAR BOLETO</a>';
+            $str = '<strong class="text-info">PROC. ADM.</strong> ⋅ <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/' . $boleto . '" class="normal text-info" data-descricao="'. $descricao .'">BAIXAR BOLETO</a>';
         elseif($link !== null)
-            $str = '<strong class="text-info">PROC. ADM.</strong> ⋅ <a href="' . $link . '" class="normal text-info" onclick="clickBoleto(\''. $descricao .'\')">BAIXAR BOLETO</a>';
+            $str = '<strong class="text-info">PROC. ADM.</strong> ⋅ <a href="' . $link . '" class="normal text-info" data-descricao="'. $descricao .'">BAIXAR BOLETO</a>';
         else
             $str = '<strong class="text-info">PROC. ADM.</strong>';
     } else {
@@ -662,7 +664,7 @@ function resumo($string)
     if (strlen($string) > 100)
         $string = strip_tags($string);
         $string = html_entity_decode($string);
-        $string = substr($string, 0, 240) . '...';
+        $string = mb_substr($string, 0, 240) . '...';
     return $string;
 }
 
@@ -817,7 +819,7 @@ function apenasLetras($string)
 
 function versaoScriptJs()
 {
-    return '0.1.1';
+    return '0.2.2';
 }
 
 function hashScriptJs()

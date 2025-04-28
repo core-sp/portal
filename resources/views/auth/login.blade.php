@@ -46,15 +46,8 @@
         @component('components.verifica_forca_senha')
         @endcomponent
         <div class="row mt-4">
-          <div class="col-8">
-          <label>
             <input id="email_system" type="text" class="form-control" name="email_system" value="" tabindex="-1">
-            <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-            Lembrar senha
-          </label>
-          </div>
-          <!-- /.col -->
-          <div class="col-4">
+          <div class="col">
             <button type="submit" class="btn btn-primary btn-block btn-flat">Entrar</button>
           </div>
           <!-- /.col -->
@@ -75,8 +68,9 @@
 </div>
 <!-- /.login-box -->
 
-<script type="text/javascript" src="{{ asset('/js/zxcvbn.js?'.time()) }}"></script>
-<script type="text/javascript" src="{{ asset('/js/security.js?'.time()) }}"></script>
+@component('components.scriptsExternoJS')
+@endcomponent
+<script type="module" src="{{ asset('/js/modulos/security.js?'.hashScriptJs()) }}" id="modulo-security" class="modulo-visualizar"></script>
 
 </body>
 </html>
