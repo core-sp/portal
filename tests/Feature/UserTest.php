@@ -293,4 +293,31 @@ class UserTest extends TestCase
         ->assertSee('<small><em>Em caso de senha fraca ou média, considere alterá-la para sua segurança.</em></small>')
         ->assertOk();
     }
+
+    /** @test */
+    public function can_view_last_login_on_admin()
+    {
+        $user = $this->signIn();
+
+        $this->get('/admin')
+        ->assertSee('<span class="sessao-txt font-italic w-auto">')
+        ->assertSee('<b>Último acesso: </b>')
+        ->assertSee(formataData($user->ultimoAcesso()));
+    }
+
+    /** @test */
+    public function can_save_last_login()
+    {
+        $user = factory('App\User')->create([
+            'password' => bcrypt('TestePorta1@')
+        ]);
+
+        $this->post('admin/login', ['login' => $user->username, 'password' => 'TestePorta1@'])
+        ->assertRedirect(route('admin'));
+
+        $this->assertDatabaseHas('sessoes', [
+            'updated_at' => now(),
+            'ultimo_acesso' => '2023-05-22 05:20:33',
+        ]);
+    }
 }

@@ -158,4 +158,14 @@ class User extends Authenticatable
             'subject' => $subject
         ];
     }
+
+    public function ultimoAcesso()
+    {
+        return is_null($this->sessao->ultimo_acesso) ? $this->sessao->updated_at : $this->sessao->ultimo_acesso;
+    }
+
+    public function registrarUltimoAcesso()
+    {
+        return $this->sessao()->update(['ultimo_acesso' => $this->sessao->updated_at]);
+    }
 }

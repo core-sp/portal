@@ -20,3 +20,10 @@ $factory->define(User::class, function (Faker $faker) {
         'updated_at' => now()
     ];
 });
+
+$factory->afterCreating(User::class, function ($user, $faker) {
+    factory('App\Sessao')->create([
+        'idusuario' => $user->idusuario,
+        'updated_at' => '2023-05-22 05:20:33'
+    ]);
+});
