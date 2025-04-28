@@ -175,6 +175,10 @@ img {
   direction: ltr;
 }
 
+.sessao-txt {
+  color: #C2C7D0;
+}
+
 .sortable-placeholder {
   background-color: #ffc107;
   border-radius: 3%;

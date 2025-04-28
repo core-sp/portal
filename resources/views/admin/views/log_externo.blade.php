@@ -366,6 +366,9 @@
                 <a class="btn btn-warning ml-3" href="{{ route('suporte.log.externo.download', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}">
                     <i class="fas fa-download"></i>
                 </a>
+                <a class="btn btn-primary btn-sm ml-3" href="{{ route('suporte.log.externo.integridade', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}">
+                    Verificar integridade
+                </a>
             </p>
             @else
             <div class="table-responsive">
@@ -393,6 +396,9 @@
                                 </a>
                                 <a class="btn btn-warning ml-3" href="{{ route('suporte.log.externo.download', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}">
                                     <i class="fas fa-download"></i>
+                                </a>
+                                <a class="btn btn-primary btn-sm ml-3" href="{{ route('suporte.log.externo.integridade', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}">
+                                    Verificar integridade
                                 </a>
                             </td>
                         </tr>
