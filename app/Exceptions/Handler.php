@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Log;
 
 class Handler extends ExceptionHandler
@@ -37,7 +38,8 @@ class Handler extends ExceptionHandler
                     return redirect(route('externo.login'));
                 break;
                 default:
-                    return redirect(route('login'));
+                    return Str::endsWith($exception->getFile(), 'AuthenticateSession.php') ? 
+                        redirect(route('site.home')) : redirect(route('login'));
                 break;
             }
         }

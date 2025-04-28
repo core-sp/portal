@@ -141,18 +141,18 @@ trait GerentiProcedures
         return $run->fetchAll()[0]['sequencia'];
     }
 
-    public function gerentiEnderecoInfos($ass_id, $sequencia)
-    {
-        $this->connect();
+    // public function gerentiEnderecoInfos($ass_id, $sequencia)
+    // {
+    //     $this->connect();
 
-        $run = $this->gerentiConnection->prepare('select first 1 * from ENDERECOS where ASS_ID = :ass_id and END_SEQUENCIA = :sequencia');
+    //     $run = $this->gerentiConnection->prepare('select first 1 * from ENDERECOS where ASS_ID = :ass_id and END_SEQUENCIA = :sequencia');
 
-        $run->execute([
-            'ass_id' => $ass_id,
-            'sequencia' => $sequencia
-        ]);
-        return $run->fetchAll();
-    }
+    //     $run->execute([
+    //         'ass_id' => $ass_id,
+    //         'sequencia' => $sequencia
+    //     ]);
+    //     return $run->fetchAll();
+    // }
 
     public function gerentiContatos($ass_id)
     {
