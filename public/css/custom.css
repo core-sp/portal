@@ -165,3 +165,7 @@ img {
   text-overflow: ellipsis;
   direction: ltr;
 }
+
+.sessao-txt {
+  color: #C2C7D0;
+}

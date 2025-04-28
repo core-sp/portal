@@ -462,6 +462,8 @@ function secondLine($situacao, $vencimento = null, $link = null, $descricao = nu
         $str = '<strong class="text-success">PAGO</strong>';
     } elseif($situacao === 'Pago em Parcelamento') {
         $str = '<strong class="text-success">PAGO EM PARCELAMENTO</strong>';
+    } elseif($situacao === 'Isento') {
+        $str = '<strong class="text-success">ISENÇÃO DE PAGAMENTO</strong>';
     } elseif($situacao === 'Proc. Adm.'){
         if($boleto !== null)
             $str = '<strong class="text-info">PROC. ADM.</strong> ⋅ <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/' . $boleto . '" class="normal text-info" data-descricao="'. $descricao .'">BAIXAR BOLETO</a>';
