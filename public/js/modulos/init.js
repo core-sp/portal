@@ -1,8 +1,7 @@
-const link = location.protocol + '//' + location.hostname + '/js/';
 const inicio = "modulo-";
-const temp = $('#' + inicio + 'init').attr('src');
-const hash = temp.substring(temp.search(/\?/) + 1, temp.length);
-const versao = $('#' + inicio + 'init').attr('class');
+const link = PORTAL_MODULOS.getLink_;
+const hash = PORTAL_MODULOS.getHash_;
+const versao = PORTAL_MODULOS.getVersao_;
 
 function criarScriptParaImportar(modulo_atual, obj_modulos = {modulo:[], local:[]}){
 

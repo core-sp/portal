@@ -1,6 +1,12 @@
-// Definir os módulos e o caminho dos módulos
+// Definir configurações de constantes para a inicialização
 
-const PORTAL_MODULOS = new Object();
+const PORTAL_MODULOS = new Object({
+    getLink_: location.protocol + '//' + location.hostname + '/js/',
+    getHash_: $('#pre-init').attr('src').replace(this.getLink_ + 'pre-init.js?', ''),
+    getVersao_: $('#pre-init').attr('class'),
+});
+
+// Evento para receber o local e a subarea antes de inicializar os módulos / scripts
 
 document.addEventListener("PRE-INIT", (e) => {
 
@@ -31,17 +37,12 @@ document.addEventListener("PRE-INIT", (e) => {
 
 function criarInit(){
 
-    const pre = 'pre-init';
-    let comeco = location.protocol + '//' + location.hostname + '/js/';
-    let hash_ = $('#' + pre).attr('src').replace(comeco + pre + '.js?', '');
-
     const script = document.createElement('script');
     script.setAttribute('type', "module");
-    script.setAttribute('src', comeco + 'modulos/init.js?' + hash_);
+    script.setAttribute('src', PORTAL_MODULOS.getLink_ + 'modulos/init.js?' + PORTAL_MODULOS.getHash_);
     script.setAttribute('id', 'modulo-init');
-    script.setAttribute('class', $('#' + pre).attr('class'));
 
-    $('#' + pre).after(script);
+    $('#pre-init').after(script);
 }
 
 criarInit();
