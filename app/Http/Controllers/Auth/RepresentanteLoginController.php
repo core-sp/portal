@@ -45,8 +45,10 @@ class RepresentanteLoginController extends Controller
 
         $this->verificou = $this->service->getService('Representante')->verificaAtivoAndGerenti($request->cpf_cnpj, $this->gerentiRepository);
 
-        if($this->attemptLogin($request))
+        if($this->attemptLogin($request)){
+            $this->service->getService('Representante')->registrarUltimoAcesso($request->input('cpf_cnpj'));
             return $this->sendLoginResponse($request);
+        }
         
         // If the login attempt was unsuccessful we will increment the number of attempts
         // to login and redirect the user back to the login form. Of course, when this
@@ -77,7 +79,7 @@ class RepresentanteLoginController extends Controller
 
         $cpfCnpj = apenasNumeros($request->cpf_cnpj);
         $request->request->set('cpf_cnpj', $cpfCnpj);
-
+        $request->offsetUnset('remember');
         $this->validate($request, [
             'cpf_cnpj' => ['required', new CpfCnpj],
             'password' => 'required'
@@ -125,6 +127,7 @@ class RepresentanteLoginController extends Controller
     protected function authenticated(Request $request, $user)
     {
         $this->service->getService('Suporte')->liberarIp($request->ip());
+        $this->guard()->logoutOtherDevices($request->input('password'));
     }
 
     public function decayMinutes()
