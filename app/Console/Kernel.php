@@ -5,15 +5,12 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Mail\InternoAgendamentoMail;
-use App\Mail\ConexaoGerentiMail;
 use Illuminate\Support\Facades\Mail;
 use App\User;
 use App\Agendamento;
 use App\BdoOportunidade;
 use App\Representante;
 use Carbon\Carbon;
-use PDO;
-use PDOException;
 use App\SolicitaCedula;
 use App\Mail\InternoSolicitaCedulaMail;
 use App\Pagamento;
@@ -99,25 +96,6 @@ class Kernel extends ConsoleKernel
                 ->where('ativo', '=', 0)
                 ->delete();
         })->hourly();
-        
-        // Verifica conexão com o gerenti a cada hora, caso não consiga se conectar, envia emails
-        // $schedule->call(function(){
-        //     $user = User::where('idusuario', 68)->first();
-        //     $body = '<h3><i>(Mensagem Programada)</i></h3>';
-        //     $body .= '<p><strong>Erro!</strong> Não foi possível estabelecer uma conexão com o sistema Gerenti no dia de hoje: <strong>'.Carbon::now()->format('d/m/Y, \à\s H:i').'</strong></p>';
-        //     try {
-        //         $host = env('GERENTI_HOST');
-        //         $dbname = env('GERENTI_DATABASE');
-        //         $username = env('GERENTI_USERNAME');
-        //         $password = env('GERENTI_PASSWORD');
-        //         $conexao = new PDO('firebird:dbname='.$host.':'.$dbname.';charset=UTF8',$username,$password);
-        //         Mail::to($user->email)->send(new ConexaoGerentiMail($body .= 'LOGADO'));
-        //     } catch (PDOException $e) {
-        //         Mail::to($user->email)->send(new ConexaoGerentiMail($body .= $e->getMessage()));
-        //     } finally{
-        //         $conexao = null;
-        //     }
-        // })->hourly();
 
         // Rotina para envio de relatório de solicitações de cédula feitas no dia anterior
         $schedule->call(function() {

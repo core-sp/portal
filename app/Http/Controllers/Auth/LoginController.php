@@ -57,6 +57,8 @@ class LoginController extends Controller
         }
 
         if ($this->attemptLogin($request)) {
+            $temp = $this->findUsername($request);
+            \App\User::where($temp, $request->input($temp))->first()->registrarUltimoAcesso();
             return $this->sendLoginResponse($request);
         }
 
@@ -88,6 +90,7 @@ class LoginController extends Controller
         }
 
         $this->username = $this->findUsername($request);
+        $request->offsetUnset('remember');
         $this->validate($request, [
             'login' => 'required',
             'password' => 'required'
@@ -105,6 +108,7 @@ class LoginController extends Controller
     {
         $this->saveSession($request, $user);
         $this->service->getService('Suporte')->liberarIp($request->ip());
+        \Auth::logoutOtherDevices($request->input('password'));
     }
 
     public function decayMinutes()
