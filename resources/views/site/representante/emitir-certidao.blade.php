@@ -2,7 +2,7 @@
 
 @section('content-representante')
 
-<div class="representante-content">
+<div class="representante-content w-100">
     <div class="conteudo-txt-mini light">
         <h4 class="pt-1 pb-1">{!! $titulo !!}</h4>
         <div class="linha-lg-mini mb-3"></div>

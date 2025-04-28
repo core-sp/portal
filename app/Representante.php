@@ -18,7 +18,7 @@ class Representante extends Authenticable
     private $gerentiRepository;
 
     protected $guard = 'representante';
-    protected $fillable = ['cpf_cnpj', 'registro_core', 'ass_id', 'nome', 'email', 'password', 'verify_token', 'aceite', 'ativo'];
+    protected $fillable = ['cpf_cnpj', 'registro_core', 'ass_id', 'nome', 'email', 'password', 'verify_token', 'aceite', 'ativo', 'ultimo_acesso'];
     protected $hidden = ['password', 'remember_token'];
 
     // Tipos de pessoa.
@@ -198,5 +198,15 @@ class Representante extends Authenticable
             return $servicoSolicitado_array[$servicoSolicitado] . $texto_erro;
 
         return $resposta;
+    }
+
+    public function ultimoAcesso()
+    {
+        return is_null($this->ultimo_acesso) ? $this->updated_at : $this->ultimo_acesso;
+    }
+
+    public function registrarUltimoAcesso()
+    {
+        return $this->update(['ultimo_acesso' => $this->updated_at]);
     }
 }
