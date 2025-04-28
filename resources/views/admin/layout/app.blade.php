@@ -64,19 +64,27 @@
             <!-- Sidebar -->
             <div class="sidebar">
               <!-- Sidebar user (optional) -->
-              <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                <div class="image align-self-center">
-                  <a href="#">
-                    <strong>C-</strong>SP
-                  </a>
+              <div class="user-panel mt-3 pb-3 mb-3 text-center">
+                <div class="d-flex">
+                  <div class="image align-self-center">
+                    <a href="#">
+                      <strong>C-</strong>SP
+                    </a>
+                  </div>
+                  <div class="info">
+                    <a href="/admin/perfil" class="d-block">
+                      @if(Auth::check())
+                      |&nbsp;&nbsp;{{ Auth::user()->nome }}
+                      @endif
+                    </a>
+                  </div>
                 </div>
-                <div class="info">
-                  <a href="/admin/perfil" class="d-block">
-                    @if(Auth::check())
-                    |&nbsp;&nbsp;{{ Auth::user()->nome }}
-                    @endif
-                  </a>
-                </div>
+                <span class="sessao-txt font-italic w-auto">
+                  <small>
+                    <b>Último acesso: </b>
+                    {{ formataData(Auth::user()->ultimoAcesso()) }}
+                  </small>
+                </span>
               </div>
                
               @include('admin.layout.menu')

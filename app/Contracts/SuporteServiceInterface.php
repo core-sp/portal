@@ -12,6 +12,8 @@ interface SuporteServiceInterface {
 
     public function logPorData($data, $tipo);
 
+    public function verificaHashLog($data, $tipo);
+
     public function relatorios($dados, $acao = null);
 
     public function relatorioFinal();

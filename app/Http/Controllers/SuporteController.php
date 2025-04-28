@@ -130,6 +130,24 @@ class SuporteController extends Controller
         ]);
     }
 
+    public function verificaIntegridade($data, $tipo)
+    {
+        $this->authorize('onlyAdmin', auth()->user());
+
+        try{
+            $verificacao = $this->service->getService('Suporte')->verificaHashLog($data, $tipo);
+            $message = 'Log do tipo ' . $tipo . ' e da data ' . onlyDate($data) . ': ';
+            $final = gettype($verificacao) === "string" ? 
+                ['message' => $message . '<b>' . $verificacao . '</b>', 'class' => 'alert-warning'] : 
+                ['message' => !$verificacao ? $message . '<b>não está íntegro!</b>' : $message . '<b>está íntegro!</b>', 'class' => !$verificacao ? 'alert-danger' : 'alert-success'];
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao verificar integridade do log " . $tipo . " do dia " .onlyDate($data). ".");
+        }
+
+        return redirect()->back()->with($final);
+    }
+
     public function relatorios(SuporteRequest $request)
     {
         try{
