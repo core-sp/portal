@@ -103,7 +103,7 @@
                     class="form-check-input"
                     {{ Request::input('filialCheck') == 'on' ? 'checked' : '' }}
                   />
-                  <label for="form-check-label" for="filialCheck">Filial</label>
+                  <label for="filialCheck">Filial</label>
                 </div>
                 <select name="filial" id="filial" class="form-control" {{ Request::input('filialCheck') == 'on' ? '' : 'disabled' }}>
                   <option value="50" {{ Request::input('filial') == 50 ? 'selected' : '' }}></option>
@@ -121,7 +121,7 @@
                     class="form-check-input"
                     {{ Request::input('empresaIndividual') == 'on' ? 'checked' : '' }}
                   />
-                  <label for="form-check-label" for="empresaIndividual">Empresa Individual</label>
+                  <label for="empresaIndividual">Empresa Individual</label>
                 </div>
               </div>
             </div>
@@ -129,7 +129,7 @@
               <div class="col">
                 <button
                   type="submit"
-                  class="btn btn-primary btn-sm"
+                  class="btn btn-primary btn-sm loadingPagina"
                   id="submitSimulador"
                   onClick="gtag('event', 'calcular', {
                     'event_category': 'simulador',
@@ -139,9 +139,8 @@
                   Simular {{ Request::input('dataInicio') ? ' novamente' : '' }}
                 </button>
                 @if(Request::input('dataInicio'))
-                <button class="btn btn-sm btn-secondary ml-3" id="btnPrintSimulador">Imprimir</button>
+                <button class="btn btn-sm btn-secondary ml-3 btnPrintSimulador">Imprimir</button>
                 @endif
-                <div id="loadingSimulador"><img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading"></div>
               </div>
             </div>
           </form>
@@ -209,7 +208,7 @@
               <h4 class="mt-2"><span class="light">Total geral:</span> R$ {{ $totalGeral  }}</h4>
             @endif
           </div>
-          <hr>
+          <hr id="separadorAviso">
           <div class="row nomargin">
             <small><i>* Os valores calculados são de acordo com as informações preenchidas</i></small>
           </div>
@@ -242,7 +241,7 @@
         </div>
 
         @if(Request::input('dataInicio'))
-        <button class="btn btn-sm btn-secondary float-right" id="btnPrintSimulador">Imprimir</button>
+        <button class="btn btn-sm btn-secondary float-right btnPrintSimulador">Imprimir</button>
         @endif
 
       </div>
@@ -251,6 +250,13 @@
       </div>
     </div>
   </div>
+  
+  <span>
+    <img src="{{ asset('img/LOGO-VERDE002.png') }}" class="invisible logo_print" />
+    <button type="button" class="invisible btn_print" value="Imprimir">Imprimir</button>
+  </span>
 </section>
+
+<script type="module" src="{{ asset('/js/externo/modulos/simulador.js?'.hashScriptJs()) }}" id="modulo-simulador" class="modulo-visualizar"></script>
 
 @endsection

@@ -81,7 +81,7 @@
                 />
           	</div>
             <div class="col-md-4 align-self-end pesquisaLicitacao-btn">
-              <button type="submit" class="btn-buscaavancada"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
+              <button type="submit" class="btn-buscaavancada loadingPagina"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
               <a href="/concursos" class="btn btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</a>
             </div>
           </div>
@@ -102,9 +102,9 @@
           <div class="licitacao-grid">
             <a href="{{ route('concursos.show', $concurso->idconcurso) }}}">
               <div class="licitacao-grid-main">
-                <h5 class="marrom">{{ $concurso->titulo }}</h5>
+                <h5 class="marrom text-break">{{ $concurso->titulo }}</h5>
                 <div class="linha-lg-mini"></div>
-                <p>{!! resumo($concurso->objeto) !!}</p>
+                <p class="text-break">{!! resumo($concurso->objeto) !!}</p>
                 <div class="mt-3 row bot-lg">
                   <div class="col-sm-4 d-flex">
                     <div class="mr-2">

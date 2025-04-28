@@ -101,7 +101,7 @@
             <div class="col">
                 <label for="cep">CEP</label>
                 <input type="text"
-                    class="form-control cepInput {{ $errors->has('cep') ? 'is-invalid' : '' }}"
+                    class="form-control cep {{ $errors->has('cep') ? 'is-invalid' : '' }}"
                     placeholder="CEP"
                     name="cep"
                     value="{{ empty(old('cep')) && isset($resultado->cep) ? $resultado->cep : old('cep') }}"

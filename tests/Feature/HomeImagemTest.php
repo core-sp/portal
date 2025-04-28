@@ -415,7 +415,7 @@ class HomeImagemTest extends TestCase
         ->assertSee('<header id="header-principal" style="background-image: url(/'.HomeImagem::padrao()['header_fundo_default'].')">')
         ->assertSeeInOrder([
             '<a href="/calendario-oficial-core-sp">',
-            '<img class="lazy" data-src="'.asset(HomeImagem::padrao()['calendario_default']).'" alt="Calendário | Core-SP" />',
+            '<img class="lazy-loaded-image lazy" data-src="'.asset(HomeImagem::padrao()['calendario_default']).'" alt="Calendário | Core-SP" />',
             '</a>'
         ])
         ->assertSee('<div class="box text-center " style="background-color:'.HomeImagem::padrao()['cards_1_default'].'">')
@@ -689,7 +689,7 @@ class HomeImagemTest extends TestCase
         ->assertOk()
         ->assertSeeInOrder([
             '<a href="/calendario-oficial-core-sp">',
-            '<img class="lazy" data-src="'.asset('imagens/itens_home/teste.png').'" alt="Calendário | Core-SP" />',
+            '<img class="lazy-loaded-image lazy" data-src="'.asset('imagens/itens_home/teste.png').'" alt="Calendário | Core-SP" />',
             '</a>'
         ]);
 

@@ -92,7 +92,7 @@
                     <input
                         type="text"
                         name="telefone"
-                        class="form-control telefone2Input {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
+                        class="form-control telefoneInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
                         id="telefone"
                         value="{{ empty(old('telefone')) && isset($resultado->telefone) ? $resultado->telefone : old('telefone') }}"
                         placeholder="(99) 99999-9999"
@@ -194,8 +194,7 @@
 </div>
 
 @if(isset($alterarSenha))
-<script type="text/javascript" src="{{ asset('/js/zxcvbn.js?'.time()) }}"></script>
-<script type="text/javascript" src="{{ asset('/js/security.js?'.time()) }}"></script>
+<script type="module" src="{{ asset('/js/modulos/security.js?'.hashScriptJs()) }}" id="modulo-security" class="modulo-visualizar"></script>
 @endif
 
 @endsection

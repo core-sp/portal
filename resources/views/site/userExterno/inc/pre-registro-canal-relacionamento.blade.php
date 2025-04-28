@@ -27,7 +27,7 @@
             <label>Telefone</label>
             <input
                 type="text"
-                class="form-control telefone2Input"
+                class="form-control telefoneInput"
                 value="{{ isset($resultado->contabil->telefone) ? $resultado->contabil->telefone : '' }}"
                 placeholder="Obrigatório inserir um telefone"
                 id="telefone-contabil-canal"
@@ -103,7 +103,7 @@
     <div class="col-sm mb-2-576">
         <label for="telefone">{{ $nome_campos['telefone'] }} - Nº de telefone <span class="text-danger">*</span></label>
         <input type="text"
-            class="{{ $classe }} form-control telefone2Input {{ $errors->has('telefone') ? 'is-invalid' : '' }} obrigatorio"
+            class="{{ $classe }} form-control telefoneInput {{ $errors->has('telefone') ? 'is-invalid' : '' }} obrigatorio"
             name="telefone"
             id="telefone"
             value="{{ empty(old('telefone')) && isset($resultado->getTelefone()[0]) ? $resultado->getTelefone()[0] : old('telefone') }}"
@@ -178,7 +178,7 @@
     <div class="col-sm mb-2-576">
         <label for="telefone_1">{{ $nome_campos['telefone_1'] }} <small class="bold">(opcional)</small> - Nº de telefone </span></label>
         <input type="text"
-            class="{{ $classe }} form-control telefone2Input {{ $errors->has('telefone_1') ? 'is-invalid' : '' }}"
+            class="{{ $classe }} form-control telefoneInput {{ $errors->has('telefone_1') ? 'is-invalid' : '' }}"
             name="telefone_1"
             id="telefone_1"
             value="{{ empty(old('telefone_1')) && isset($resultado->getTelefone()[1]) ? $resultado->getTelefone()[1] : old('telefone_1') }}"
