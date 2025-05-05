@@ -21,41 +21,18 @@ function criarScriptParaImportar(modulo_atual, obj_modulos = {modulo:[], local:[
     });
 }
 
-function opcionais(){
+function opcionais(all){
 
-    const opcionais = $('[type="module"][class^="' + inicio + '"]');
-  
-    if(opcionais.length == 0)
-        return false;
-
-    opcionais.each(function(){
-
-        let funcao = $(this).attr('class').replace(inicio, '');
-        let modulo = $(this).attr('id').replace(inicio, '');
-        
-        import($(this).attr('src'))
-        .then((module) => {
-            document.dispatchEvent(new CustomEvent("LOG_SUCCESS_INIT", {
-                detail: {tipo: 0, situacao: 2, nome: funcao + ' ' + modulo, url: $(this).attr('src')}
-            }));
-
-            if('scripts_para_importar' in module)
-                criarScriptParaImportar(this, module.scripts_para_importar);
-
-            module.executar(funcao);
-        })
-        .catch((err) => {
-            document.dispatchEvent(new CustomEvent("LOG_ERROR_INIT", {
-                detail: {error: err}
-            }));
-        });
-    
+    $('[type="module"][class^="' + inicio + '"]').each(function(){
+        all.push($(this));
     });
+
+    return all;
 }
 
-function criarImportarModulos(local, modulos_principais, pastas_principais){
+function criarModulos(modulos_principais, pastas_principais){
 
-    modulos_principais.forEach((element, index) => {
+    return opcionais(modulos_principais.map((element, index) => {
         const script = document.createElement('script');
         script.type = "module";
         script.src = link + pastas_principais[index] + element + '.js?' + hash;
@@ -63,32 +40,38 @@ function criarImportarModulos(local, modulos_principais, pastas_principais){
         
         document.getElementById(inicio + "init").after(script);
 
-        let modulo_criado = $('#' + script.id);
+        return $('#' + script.id);
+    }));
+}
 
-        import(modulo_criado.attr('src'))
-        .then((module) => {
+async function importarModulos(local, all){
+
+    Promise.all(all.map((e) => import(e.attr('src'))))
+    .then((modulos) => {
+        modulos.forEach((modulo, index) => {
+            let temp = all[index].attr('class');
+            let e_opcional = (temp !== undefined) && (temp.length > 0);
+
+            if('scripts_para_importar' in modulo)
+                criarScriptParaImportar(all[index], modulo.scripts_para_importar);
+
             document.dispatchEvent(new CustomEvent("LOG_SUCCESS_INIT", {
-                detail: {tipo: 0, situacao: 1, nome: element, url: modulo_criado.attr('src')}
+                detail: {
+                    tipo: 0, 
+                    situacao: e_opcional ? 2 : 1, 
+                    nome: all[index].attr('id').replace(inicio, ''), 
+                    url: all[index].attr('src')
+                }
             }));
 
-            if('scripts_para_importar' in module)
-                criarScriptParaImportar(modulo_criado, module.scripts_para_importar);
-            
-            module.executar(local);
-
-            if(element.startsWith('init-'))
-                document.dispatchEvent(new CustomEvent(element.toUpperCase(), {
-                    detail: {link: link, hash: hash}
-                }));
-        })
-        .catch((err) => {
-            document.dispatchEvent(new CustomEvent("LOG_ERROR_INIT", {
-                detail: {error: err}
-            }));
+            e_opcional ? modulo.executar(temp.replace(inicio, '')) : modulo.executar(local);
         });
+    })
+    .catch((err) => {
+        document.dispatchEvent(new CustomEvent("LOG_ERROR_INIT", {
+            detail: {error: err}
+        }));
     });
-
-    opcionais();
 }
 
 function gerarLogs(){
@@ -132,7 +115,9 @@ export default function (local, subarea){
     const modulos_ = PORTAL_MODULOS.getObjModulos_;
     const pastas_ = PORTAL_MODULOS.getObjPastas_;
 
-    criarImportarModulos(local, executar.ok.call(modulos_, local, subarea), executar.ok.call(pastas_, local, subarea));
-
     gerarLogs();
+
+    importarModulos(local, 
+        criarModulos(executar.ok.call(modulos_, local, subarea), executar.ok.call(pastas_, local, subarea))
+    );
 };

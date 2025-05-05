@@ -6,11 +6,6 @@ function tinyInit(link, hash){
         tiny.setAttribute("type", "text/javascript");
         tiny.setAttribute("src", link + 'interno/tinymce.js?' + hash);
         document.body.appendChild(tiny);
-
-        if(typeof tinymce === "object")
-            document.dispatchEvent(new CustomEvent("LOG_SUCCESS_INIT", {
-                detail: {tipo: 1, situacao: 5, nome: 'TinyMCE Editor', url: tiny.src}
-            }));
     }
 }
 
@@ -44,11 +39,9 @@ function recaptcha(){
     }
 }
 
-export function executar(funcao){
+export function executar(link, hash){
     
-	$(document).on('INIT-LIBS', function(e){
-        recaptcha();
-        tinyInit(e.detail.link, e.detail.hash);
-		securityInit(e.detail.link);
-    });
+    recaptcha();
+    tinyInit(link, hash);
+	securityInit(link);
 }
