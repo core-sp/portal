@@ -817,6 +817,13 @@ function apenasLetras($string)
     return preg_replace('/[^a-zA-Z]/', '', $string);
 }
 
+function ambiente()
+{
+    $ambiente = ['local' => 'Local', 'production' => 'Produção'];
+
+    return ($ambiente[config('app.env')] !== 'local') && config('app.debug') ? 'Homologação' : $ambiente[config('app.env')];
+}
+
 function versaoScriptJs()
 {
     return '0.2.2';

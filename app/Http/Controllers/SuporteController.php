@@ -275,6 +275,20 @@ class SuporteController extends Controller
         ]);
     }
 
+    public function sobreStorage()
+    {
+        $this->authorize('onlyAdmin', auth()->user());
+
+        try{
+            $storage = $this->service->getService('Suporte')->sobreStorage();
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao verificar Storage.");
+        }
+    
+        return response()->json($storage);
+    }
+
     /**
      * The attributes that are mass assignable.
      *

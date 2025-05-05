@@ -39,8 +39,19 @@ function recaptcha(){
     }
 }
 
+function graficos(){
+
+    if($('canvas[class^="grafico-"]').length > 0){
+        const _lib = document.createElement('script');
+
+        _lib.setAttribute("src", 'https://cdn.jsdelivr.net/npm/chart.js');
+        document.body.prepend(_lib);
+    }
+}
+
 export function executar(link, hash){
     
+    graficos();
     recaptcha();
     tinyInit(link, hash);
 	securityInit(link);

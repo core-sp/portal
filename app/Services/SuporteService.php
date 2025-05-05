@@ -378,4 +378,32 @@ class SuporteService implements SuporteServiceInterface {
         
         return false;
     }
+
+    public function sobreStorage()
+    {
+        return [
+            'label' => 'Storage',
+            'labels' => [
+                'Arquivos e Imagens',
+                'Arquivos dos Representantes',
+                'Logs',
+                'Termos',
+                'Espaço Disponível',
+            ],
+            'dados' => [
+                250,
+                500,
+                100,
+                20,
+                1150,
+            ],
+            'cores' => [
+                'rgb(255, 99, 132)',
+                'rgb(54, 162, 235)',
+                'rgb(255, 205, 86)',
+                'rgb(115, 209, 78)',
+                'rgb(126, 115, 226)'
+            ],
+        ];
+    }
 }

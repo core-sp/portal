@@ -1,5 +1,44 @@
 const url_logs = '/admin/suporte/logs';
 
+async function sobreStorage(){
+
+    const spinner = 'spinner-grow spinner-grow-sm text-primary';
+    const chart_ = $('.grafico-storage');
+    const dados = await fetch('/admin/suporte/sobre-storage', {
+        method: 'GET', 
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8',
+        }
+    });
+
+    if(!dados.ok){
+        let msg = '<i class="fas fa-exclamation-triangle text-danger"></i><br>' + 
+            '<span class="text-danger mt-2">' + dados.status + ", <b>Mensagem:</b> " + dados.statusText + 
+            '</span><br><b>Atualize a página e tente novamente!</b>';
+        chart_.removeClass(spinner);
+        chart_.parents('.card-body').html(msg);
+
+        return false;
+    }
+
+    const json = await dados.json();
+
+    chart_.removeClass(spinner);
+
+    new Chart(chart_[0], {
+        type: 'doughnut',
+        data: {
+            labels: json.labels,
+            datasets: [{
+                label: json.label,
+                data: json.dados,
+                backgroundColor: json.cores,
+                hoverOffset: 4
+            }]
+        }
+    });
+}
+
 function visualizar(){
 
     $(document).on('keydown', function(e) {
@@ -33,6 +72,10 @@ function visualizar(){
         }
     });
 
+    // Storage
+    if($('.grafico-storage').length > 0){
+        sobreStorage();
+    }
 };
 
 export function executar(funcao){

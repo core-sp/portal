@@ -89,6 +89,21 @@
 <section class="content">
   <div class="container-fluid">
   	<div class="row">
+
+	  	@if(auth()->user()->isAdmin())
+		<div class="col">
+			<div class="card card-info">
+				<div class="card-header">
+					<h3 class="card-title">Storage em {{ ambiente() }}</h3>
+				</div>
+				<div class="card-body text-center">
+					<canvas class="grafico-storage spinner-grow spinner-grow-sm text-primary"></canvas>
+				</div>
+			</div>
+			<script type="module" src="{{ asset('/js/interno/modulos/suporte.js?'.hashScriptJs()) }}" id="modulo-suporte" class="modulo-visualizar"></script>
+		</div>
+		@endif
+
   	  <div class="col">
   	  	<div class="card card-info">
   	  	  <div class="card-header">
