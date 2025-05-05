@@ -1,3 +1,5 @@
+"use strict";
+
 // Definir configurações de constantes para a inicialização
 
 const PORTAL_MODULOS = new Object();
