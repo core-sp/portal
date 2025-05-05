@@ -821,7 +821,7 @@ function ambiente()
 {
     $ambiente = ['local' => 'Local', 'production' => 'Produção'];
 
-    return ($ambiente[config('app.env')] !== 'local') && config('app.debug') ? 'Homologação' : $ambiente[config('app.env')];
+    return (config('app.env') !== 'local') && config('app.debug') ? 'Homologação' : $ambiente[config('app.env')];
 }
 
 function versaoScriptJs()
