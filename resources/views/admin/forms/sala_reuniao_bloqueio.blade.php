@@ -107,4 +107,4 @@
     </div>
 </form>
 
-<script type="module" src="{{ asset('/js/interno/modulos/sala-reuniao-bloqueio.js?'.hashScriptJs()) }}" id="modulo-sala-reuniao-bloqueio" class="modulo-editar"></script>
+<script type="module" src="{{ asset('/js/interno/modulos/sala-reuniao-bloqueio.js?'.hashScriptJs()) }}" data-modulo-id="sala-reuniao-bloqueio" data-modulo-acao="editar"></script>

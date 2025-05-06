@@ -146,6 +146,6 @@
   </div>
 </section>
 
-<script type="module" src="{{ asset('/js/externo/modulos/carta-servicos.js?'.hashScriptJs()) }}" id="modulo-carta-servicos" class="modulo-visualizar"></script>
+<script type="module" src="{{ asset('/js/externo/modulos/carta-servicos.js?'.hashScriptJs()) }}" data-modulo-id="carta-servicos" data-modulo-acao="visualizar"></script>
 
 @endsection

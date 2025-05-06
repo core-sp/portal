@@ -62,7 +62,7 @@
 </div>
 <!-- /.login-box -->
 
-<script type="module" src="{{ asset('/js/modulos/security.js?'.hashScriptJs()) }}" id="modulo-security" class="modulo-visualizar"></script>
+<script type="module" src="{{ asset('/js/modulos/security.js?'.hashScriptJs()) }}" data-modulo-id="security" data-modulo-acao="visualizar"></script>
 
 </body>
 </html>

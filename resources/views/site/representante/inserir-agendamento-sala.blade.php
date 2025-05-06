@@ -347,6 +347,6 @@
 
 </section>
 
-<script type="module" src="{{ asset('/js/restrita-rc/modulos/sala-reuniao.js?'.hashScriptJs()) }}" id="modulo-sala-reuniao" class="modulo-editar"></script>
+<script type="module" src="{{ asset('/js/restrita-rc/modulos/sala-reuniao.js?'.hashScriptJs()) }}" data-modulo-id="sala-reuniao" data-modulo-acao="editar"></script>
 
 @endsection

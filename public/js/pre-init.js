@@ -2,11 +2,12 @@
 
 // Definir configurações de constantes para a inicialização
 
+const pre = $('#pre-init');
 const PORTAL_MODULOS = new Object();
 
 PORTAL_MODULOS.getLink_ = location.protocol + '//' + location.hostname + '/js/';
-PORTAL_MODULOS.getHash_ = $('#pre-init').attr('src').replace(PORTAL_MODULOS.getLink_ + 'pre-init.js?', '');
-PORTAL_MODULOS.getVersao_ = $('#pre-init').attr('class');
+PORTAL_MODULOS.getHash_ = pre.attr('src').replace(PORTAL_MODULOS.getLink_ + 'pre-init.js?', '');
+PORTAL_MODULOS.getVersao_ = pre.attr('data-modulo-versao');
 PORTAL_MODULOS.linkInitLibs = PORTAL_MODULOS.getLink_ + 'modulos/init-libs.js?' + PORTAL_MODULOS.getHash_;
 
 // Evento para receber o local e a subarea antes de inicializar os módulos / scripts
@@ -45,7 +46,7 @@ async function initLibs(){
         script.setAttribute('type', "module");
         script.setAttribute('src', PORTAL_MODULOS.linkInitLibs);
 
-        $('#pre-init').after(script);
+        pre.after(script);
 
         try {
             let module = await import(script.src);
@@ -66,4 +67,4 @@ script.setAttribute('type', "module");
 script.setAttribute('src', PORTAL_MODULOS.getLink_ + 'modulos/init.js?' + PORTAL_MODULOS.getHash_);
 script.setAttribute('id', 'modulo-init');
 
-$('#pre-init').after(script);
+pre.after(script);

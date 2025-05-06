@@ -83,7 +83,7 @@ function final(retorno){
 }
 
 function importAgendamento(){
-    const link = $('#modulo-utils-agendamento').attr('src');
+    const link = $('[data-modulo-id="utils-agendamento"]').attr('src');
 
     import(link)
     .then((module) => {

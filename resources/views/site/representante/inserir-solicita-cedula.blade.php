@@ -230,6 +230,6 @@
     </div>
 </div>
 
-<script type="module" src="{{ asset('/js/restrita-rc/modulos/cedula.js?'.hashScriptJs()) }}" id="modulo-cedula" class="modulo-editar"></script>
+<script type="module" src="{{ asset('/js/restrita-rc/modulos/cedula.js?'.hashScriptJs()) }}" data-modulo-id="cedula" data-modulo-acao="editar"></script>
 
 @endsection

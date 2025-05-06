@@ -192,4 +192,4 @@
     </div>
 </form>
 
-<script type="module" src="{{ asset('/js/interno/modulos/gerar-texto.js?'.hashScriptJs()) }}" id="modulo-gerar-texto" class="modulo-editar"></script>
+<script type="module" src="{{ asset('/js/interno/modulos/gerar-texto.js?'.hashScriptJs()) }}" data-modulo-id="gerar-texto" data-modulo-acao="editar"></script>

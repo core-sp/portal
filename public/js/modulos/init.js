@@ -1,4 +1,5 @@
-const inicio = "modulo-";
+const attr_id = 'data-modulo-id';
+const attr_acao = 'data-modulo-acao';
 const link = PORTAL_MODULOS.getLink_;
 const hash = PORTAL_MODULOS.getHash_;
 const versao = PORTAL_MODULOS.getVersao_;
@@ -15,7 +16,7 @@ function criarScriptParaImportar(modulo_atual, obj_modulos = {modulo:[], local:[
         const script = document.createElement('script');
         script.type = "module";
         script.src = link + obj_modulos.local[index] + element + '.js?' + hash;
-        script.id = inicio + element;
+        script.setAttribute(attr_id, element);
 
         modulo_atual.after(script);
     });
@@ -23,7 +24,7 @@ function criarScriptParaImportar(modulo_atual, obj_modulos = {modulo:[], local:[
 
 function opcionais(all){
 
-    $('[type="module"][class^="' + inicio + '"]').each(function(){
+    $('[type="module"][' + attr_acao + ']').each(function(){
         all.push($(this));
     });
 
@@ -36,11 +37,11 @@ function criarModulos(modulos_principais, pastas_principais){
         const script = document.createElement('script');
         script.type = "module";
         script.src = link + pastas_principais[index] + element + '.js?' + hash;
-        script.id = inicio + element;
+        script.setAttribute(attr_id, element);
         
-        document.getElementById(inicio + "init").after(script);
+        document.getElementById("modulo-init").after(script);
 
-        return $('#' + script.id);
+        return $('[' + attr_id + '="' + script.getAttribute(attr_id) + '"]');
     }));
 }
 
@@ -49,8 +50,9 @@ async function importarModulos(local, all){
     Promise.all(all.map((e) => import(e.attr('src'))))
     .then((modulos) => {
         modulos.forEach((modulo, index) => {
-            let temp = all[index].attr('class');
+            let temp = all[index].attr(attr_acao);
             let e_opcional = (temp !== undefined) && (temp.length > 0);
+            let msg_acao = e_opcional ? ' --> ' + temp : '';
 
             if('scripts_para_importar' in modulo)
                 criarScriptParaImportar(all[index], modulo.scripts_para_importar);
@@ -59,12 +61,12 @@ async function importarModulos(local, all){
                 detail: {
                     tipo: 0, 
                     situacao: e_opcional ? 2 : 1, 
-                    nome: all[index].attr('id').replace(inicio, ''), 
+                    nome: all[index].attr(attr_id) + msg_acao, 
                     url: all[index].attr('src')
                 }
             }));
 
-            e_opcional ? modulo.executar(temp.replace(inicio, '')) : modulo.executar(local);
+            e_opcional ? modulo.executar(temp) : modulo.executar(local);
         });
     })
     .catch((err) => {

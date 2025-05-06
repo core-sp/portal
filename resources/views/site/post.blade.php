@@ -103,6 +103,6 @@
   </div>
 </section>
 
-<script type="module" src="{{ asset('/js/externo/modulos/posts.js?'.hashScriptJs()) }}" id="modulo-posts" class="modulo-visualizar"></script>
+<script type="module" src="{{ asset('/js/externo/modulos/posts.js?'.hashScriptJs()) }}" data-modulo-id="posts" data-modulo-acao="visualizar"></script>
 
 @endsection
