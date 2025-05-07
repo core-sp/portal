@@ -59,6 +59,6 @@
     </div>
 </div>
 
-<script type="module" src="{{ asset('/js/restrita-rc/modulos/certidao.js?'.hashScriptJs()) }}" id="modulo-certidao" class="modulo-visualizar"></script>
+<script type="module" src="{{ asset('/js/restrita-rc/modulos/certidao.js?'.hashScriptJs()) }}" data-modulo-id="certidao" data-modulo-acao="visualizar"></script>
 
 @endsection

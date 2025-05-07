@@ -1,7 +1,12 @@
-const inicio = "modulo-";
+const attr_id = 'data-modulo-id';
+const attr_acao = 'data-modulo-acao';
 const link = PORTAL_MODULOS.getLink_;
 const hash = PORTAL_MODULOS.getHash_;
 const versao = PORTAL_MODULOS.getVersao_;
+
+function chaveMap(script){
+    return script.src + '|' + script.dataset.moduloId + '|' + script.dataset.moduloAcao;
+}
 
 function criarScriptParaImportar(modulo_atual, obj_modulos = {modulo:[], local:[]}){
 
@@ -15,16 +20,17 @@ function criarScriptParaImportar(modulo_atual, obj_modulos = {modulo:[], local:[
         const script = document.createElement('script');
         script.type = "module";
         script.src = link + obj_modulos.local[index] + element + '.js?' + hash;
-        script.id = inicio + element;
+        script.setAttribute(attr_id, element);
 
-        modulo_atual.after(script);
+        if($('script[src="' + script.src + '"]').length == 0)
+            modulo_atual.after(script);
     });
 }
 
 function opcionais(all){
 
-    $('[type="module"][class^="' + inicio + '"]').each(function(){
-        all.push($(this));
+    $('[type="module"][' + attr_acao + ']').each(function(){
+        all.set(chaveMap(this), this);
     });
 
     return all;
@@ -32,25 +38,30 @@ function opcionais(all){
 
 function criarModulos(modulos_principais, pastas_principais){
 
-    return opcionais(modulos_principais.map((element, index) => {
-        const script = document.createElement('script');
-        script.type = "module";
-        script.src = link + pastas_principais[index] + element + '.js?' + hash;
-        script.id = inicio + element;
-        
-        document.getElementById(inicio + "init").after(script);
+    return Array.from(
+        opcionais(new Map(
+            modulos_principais.map((element, index) => {
+                const script = document.createElement('script');
+                script.type = "module";
+                script.src = link + pastas_principais[index] + element + '.js?' + hash;
+                script.setAttribute(attr_id, element);
+                
+                document.getElementById("modulo-init").after(script);
 
-        return $('#' + script.id);
-    }));
+                return [chaveMap(script), script];
+            })
+        ))
+    .values());
 }
 
 async function importarModulos(local, all){
 
-    Promise.all(all.map((e) => import(e.attr('src'))))
+    Promise.all(all.map(e => import(e.src)))
     .then((modulos) => {
         modulos.forEach((modulo, index) => {
-            let temp = all[index].attr('class');
+            let temp = all[index].dataset.moduloAcao;
             let e_opcional = (temp !== undefined) && (temp.length > 0);
+            let msg_acao = e_opcional ? ' --> ' + temp : '';
 
             if('scripts_para_importar' in modulo)
                 criarScriptParaImportar(all[index], modulo.scripts_para_importar);
@@ -59,18 +70,25 @@ async function importarModulos(local, all){
                 detail: {
                     tipo: 0, 
                     situacao: e_opcional ? 2 : 1, 
-                    nome: all[index].attr('id').replace(inicio, ''), 
-                    url: all[index].attr('src')
+                    nome: all[index].dataset.moduloId + msg_acao, 
+                    url: all[index].src
                 }
             }));
 
-            e_opcional ? modulo.executar(temp.replace(inicio, '')) : modulo.executar(local);
+            e_opcional ? modulo.executar(temp) : modulo.executar(local);
         });
     })
     .catch((err) => {
         document.dispatchEvent(new CustomEvent("LOG_ERROR_INIT", {
             detail: {error: err}
         }));
+    })
+    .finally(() => { 
+        all = undefined;
+        ["getObjModulos_", "getObjPastas_"].forEach(
+            obj => Object.keys(PORTAL_MODULOS[obj])
+            .forEach(chaves => PORTAL_MODULOS[obj][chaves] = undefined)
+        );
     });
 }
 
@@ -112,12 +130,12 @@ export default function (local, subarea){
         detail: {local: local, subarea: subarea}
     }));
     
-    const modulos_ = PORTAL_MODULOS.getObjModulos_;
-    const pastas_ = PORTAL_MODULOS.getObjPastas_;
-
     gerarLogs();
 
     importarModulos(local, 
-        criarModulos(executar.ok.call(modulos_, local, subarea), executar.ok.call(pastas_, local, subarea))
+        criarModulos(
+            executar.ok.call(PORTAL_MODULOS.getObjModulos_, local, subarea), 
+            executar.ok.call(PORTAL_MODULOS.getObjPastas_, local, subarea)
+        )
     );
 };

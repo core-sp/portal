@@ -424,4 +424,4 @@
 
 </div>
 
-<script type="module" src="{{ asset('/js/interno/modulos/suporte.js?'.hashScriptJs()) }}" id="modulo-suporte" class="modulo-visualizar"></script>
+<script type="module" src="{{ asset('/js/interno/modulos/suporte.js?'.hashScriptJs()) }}" data-modulo-id="suporte" data-modulo-acao="visualizar"></script>

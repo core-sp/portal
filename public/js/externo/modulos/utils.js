@@ -54,7 +54,7 @@ function cookies(){
 }
 
 function importLazyLoadImg(elemento){
-    const link = $('#modulo-lazy-load-img').attr('src');
+    const link = $('[data-modulo-id="lazy-load-img"]').attr('src');
 
     import(link)
     .then((module) => {
@@ -94,7 +94,7 @@ function lazyLoad(resize = false){
 }
 
 function importCep(){
-    const link = $('#modulo-cep').attr('src');
+    const link = $('[data-modulo-id="cep"]').attr('src');
 
     import(link)
     .then((module) => {

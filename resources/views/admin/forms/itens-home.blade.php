@@ -640,4 +640,4 @@
     </div>
 </form>
 
-<script type="module" src="{{ asset('/js/interno/modulos/home-imagem-itens.js?'.hashScriptJs()) }}" id="modulo-home-imagem-itens" class="modulo-editar"></script>
+<script type="module" src="{{ asset('/js/interno/modulos/home-imagem-itens.js?'.hashScriptJs()) }}" data-modulo-id="home-imagem-itens" data-modulo-acao="editar"></script>

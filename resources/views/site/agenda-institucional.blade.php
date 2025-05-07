@@ -61,6 +61,6 @@ use \App\BdoOportunidade;
   </div>  
 </section>
 
-<script type="module" src="{{ asset('/js/externo/modulos/agenda-institucional.js?'.hashScriptJs()) }}" id="modulo-agenda-institucional" class="modulo-visualizar"></script>
+<script type="module" src="{{ asset('/js/externo/modulos/agenda-institucional.js?'.hashScriptJs()) }}" data-modulo-id="agenda-institucional" data-modulo-acao="visualizar"></script>
 
 @endsection

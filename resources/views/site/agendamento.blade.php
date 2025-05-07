@@ -265,6 +265,6 @@
   </div>
 </section>
 
-<script type="module" src="{{ asset('/js/externo/modulos/agendamento.js?'.hashScriptJs()) }}" id="modulo-agendamento" class="modulo-editar"></script>
+<script type="module" src="{{ asset('/js/externo/modulos/agendamento.js?'.hashScriptJs()) }}" data-modulo-id="agendamento" data-modulo-acao="editar"></script>
 
 @endsection

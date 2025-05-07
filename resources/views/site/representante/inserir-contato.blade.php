@@ -45,6 +45,6 @@
     </div>
 </div>
 
-<script type="module" src="{{ asset('/js/restrita-rc/modulos/contato.js?'.hashScriptJs()) }}" id="modulo-contato" class="modulo-editar"></script>
+<script type="module" src="{{ asset('/js/restrita-rc/modulos/contato.js?'.hashScriptJs()) }}" data-modulo-id="contato" data-modulo-acao="editar"></script>
 
 @endsection

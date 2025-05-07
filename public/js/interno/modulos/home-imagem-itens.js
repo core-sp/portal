@@ -4,7 +4,7 @@ let openStorage_id = '';
 
 function lazyLoadImg(){
 
-    const link = $('#modulo-lazy-load-img').attr('src');
+    const link = $('[data-modulo-id="lazy-load-img"]').attr('src');
 
     import(link)
     .then((module) => {
@@ -24,7 +24,7 @@ function lazyLoadImg(){
 
 async function validarArquivo(arquivo, mimeTypes = []){
 
-    const link = $('#modulo-validar-arquivos').attr('src');
+    const link = $('[data-modulo-id="validar-arquivos"]').attr('src');
 
     try {
         const module = await import(link);

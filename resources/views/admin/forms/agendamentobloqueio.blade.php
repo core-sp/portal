@@ -138,4 +138,4 @@
     </div>
 </form>
 
-<script type="module" src="{{ asset('/js/interno/modulos/agenda-bloqueio.js?'.hashScriptJs()) }}" id="modulo-agenda-bloqueio" class="modulo-editar"></script>
+<script type="module" src="{{ asset('/js/interno/modulos/agenda-bloqueio.js?'.hashScriptJs()) }}" data-modulo-id="agenda-bloqueio" data-modulo-acao="editar"></script>

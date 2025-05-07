@@ -257,6 +257,6 @@
   </span>
 </section>
 
-<script type="module" src="{{ asset('/js/externo/modulos/simulador.js?'.hashScriptJs()) }}" id="modulo-simulador" class="modulo-visualizar"></script>
+<script type="module" src="{{ asset('/js/externo/modulos/simulador.js?'.hashScriptJs()) }}" data-modulo-id="simulador" data-modulo-acao="visualizar"></script>
 
 @endsection

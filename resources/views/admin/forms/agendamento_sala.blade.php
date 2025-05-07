@@ -202,4 +202,4 @@
     </div>
 </form>
 
-<script type="module" src="{{ asset('/js/interno/modulos/sala-reuniao-agendados.js?'.hashScriptJs()) }}" id="modulo-sala-reuniao-agendados" class="modulo-criar"></script>
+<script type="module" src="{{ asset('/js/interno/modulos/sala-reuniao-agendados.js?'.hashScriptJs()) }}" data-modulo-id="sala-reuniao-agendados" data-modulo-acao="criar"></script>
