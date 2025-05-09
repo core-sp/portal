@@ -3,7 +3,8 @@ const url_logs = '/admin/suporte/logs';
 async function sobreStorage(){
 
     const spinner = 'spinner-grow spinner-grow-sm text-primary';
-    const chart_ = $('.grafico-storage');
+    const chart_ = $('canvas.grafico-storage');
+
     const dados = await fetch('/admin/suporte/sobre-storage', {
         method: 'GET', 
         headers: {
@@ -11,35 +12,40 @@ async function sobreStorage(){
         }
     });
 
+    const json = await dados.json();
+
     if(!dados.ok){
         let msg = '<i class="fas fa-exclamation-triangle text-danger"></i><br>' + 
-            '<span class="text-danger mt-2">' + dados.status + ", <b>Mensagem:</b> " + dados.statusText + 
-            '</span><br><b>Atualize a página e tente novamente!</b>';
+            '<span class="text-danger mt-2"><b>Código: </b></span>' + dados.status + 
+            '<br><span class="text-danger"><b>Mensagem: </b></span> ' + 
+            json.message.replace('{', '<span class="text-danger"><code>').replace('}', '</code></span>');
+
         chart_.removeClass(spinner);
         chart_.parents('.card-body').html(msg);
-
+        
         return false;
     }
 
-    const json = await dados.json();
-
     chart_.removeClass(spinner);
+    $('#total_storage').html('<i>Capacidade total - ' + json.total + ' MB</i>');
 
     new Chart(chart_[0], {
-        type: 'doughnut',
+        type: 'pie',
         data: {
             labels: json.labels,
             datasets: [{
                 label: json.label,
                 data: json.dados,
                 backgroundColor: json.cores,
-                hoverOffset: 4
+                hoverOffset: 5,
             }]
-        }
+        },
     });
 }
 
 function visualizar(){
+
+    $('[data-toggle="popover"]').popover();
 
     $(document).on('keydown', function(e) {
         if((e.keyCode == 27) && (window.location.href.indexOf(url_logs))){

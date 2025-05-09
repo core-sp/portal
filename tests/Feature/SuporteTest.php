@@ -64,6 +64,7 @@ class SuporteTest extends TestCase
         $this->get(route('suporte.erros.file.get'))->assertForbidden();
         $this->get(route('suporte.ips.view'))->assertForbidden();
         $this->delete(route('suporte.ips.excluir', request()->ip()))->assertForbidden();
+        $this->get(route('suporte.sobre-storage'))->assertForbidden();
     }
 
     /** 
@@ -1920,4 +1921,42 @@ class SuporteTest extends TestCase
         $this->get(route('representante.dashboard'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
         $this->get(route('login'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
     }
+
+    /** 
+     * =======================================================================================================
+     * TESTES SOBRE STORAGE
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function view_storage()
+    {
+        $this->signInAsAdmin();
+
+        $service = resolve('App\Contracts\MediadorServiceInterface');
+
+        $this->get(route('suporte.sobre-storage'))
+        ->assertJson($service->getService('Suporte')->sobreStorage());
+    }
+
+    /** @test */
+    public function exception_storage()
+    {
+        $rollback = 'mv ' . \Storage::disk('public')->path('termo') . ' ' . \Storage::disk('public')->path('termos');
+
+        if(\Storage::disk('public')->exists('termo'))
+            shell_exec($rollback);
+
+        $this->signInAsAdmin();
+
+        shell_exec('mv ' . \Storage::disk('public')->path('termos') . ' ' . \Storage::disk('public')->path('termo'));
+
+        $this->get(route('suporte.sobre-storage'))
+        ->assertStatus(500)
+        ->assertJson(['message' => 'Erro ao verificar o storage com o comando { du -s ' . \Storage::disk('public')->path('termos') . ' }.']);
+
+        if(\Storage::disk('public')->exists('termo'))
+            shell_exec($rollback);
+    }
+    
 }

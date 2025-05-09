@@ -94,13 +94,22 @@
 		<div class="col">
 			<div class="card card-info">
 				<div class="card-header">
-					<h3 class="card-title">Storage em {{ ambiente() }}</h3>
+					<h3 class="card-title">
+						<i class="fas fa-hdd mr-1"></i> Storage em {{ ambiente() }}
+						<small>
+							<i class="fas fa-info-circle float-right mt-1" 
+							data-toggle="popover" data-placement="top" data-trigger="hover click" data-html="true" 
+							data-content="<b>Clique nos nomes da legenda para filtrar</b>">
+							</i>
+						</small>
+					</h3>
+					<p class="mb-0"><span id="total_storage"></span></p>
 				</div>
 				<div class="card-body text-center">
 					<canvas class="grafico-storage spinner-grow spinner-grow-sm text-primary"></canvas>
 				</div>
 			</div>
-			<script type="module" src="{{ asset('/js/interno/modulos/suporte.js?'.hashScriptJs()) }}" id="modulo-suporte" class="modulo-visualizar"></script>
+			<script type="module" src="{{ asset('/js/interno/modulos/suporte.js?'.hashScriptJs()) }}" data-modulo-id="suporte" data-modulo-acao="visualizar"></script>
 		</div>
 		@endif
 

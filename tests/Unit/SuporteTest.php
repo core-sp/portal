@@ -271,4 +271,35 @@ class SuporteTest extends TestCase
 
         $this->assertFalse($service->verificaHashLog($data, 'interno'));
     }
+
+    /** @test */
+    public function erro_sobre_storage()
+    {
+        $rollback = 'mv ' . \Storage::disk('public')->path('termo') . ' ' . \Storage::disk('public')->path('termos');
+
+        if(\Storage::disk('public')->exists('termo'))
+            shell_exec($rollback);
+
+        shell_exec('mv ' . \Storage::disk('public')->path('termos') . ' ' . \Storage::disk('public')->path('termo'));
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Erro ao verificar o storage com o comando { du -s ' . \Storage::disk('public')->path('termos') . ' }.');
+
+        $service = new SuporteService;
+        $service->sobreStorage();
+
+        if(\Storage::disk('public')->exists('termo'))
+            shell_exec($rollback);
+    }
+
+    /** @test */
+    public function sobre_storage()
+    {
+        if(\Storage::disk('public')->exists('termo'))
+            shell_exec('mv ' . \Storage::disk('public')->path('termo') . ' ' . \Storage::disk('public')->path('termos'));
+
+        $service = new SuporteService;
+
+        $this->assertEquals(array_keys($service->sobreStorage()), ['total', 'label', 'labels', 'dados', 'cores']);
+    }
 }
