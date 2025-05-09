@@ -11,7 +11,7 @@ function tinyInit(link, hash){
 
 function securityInit(link){
 
-    if($('#modulo-security').length > 0){
+    if($('[data-modulo-id="security"]').length > 0){
         const _lib = document.createElement('script');
 
         _lib.setAttribute("type", "text/javascript");
