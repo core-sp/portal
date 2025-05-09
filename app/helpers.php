@@ -819,7 +819,7 @@ function apenasLetras($string)
 
 function versaoScriptJs()
 {
-    return '0.2.2';
+    return '1.2.2';
 }
 
 function hashScriptJs()
