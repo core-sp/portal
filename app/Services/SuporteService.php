@@ -408,7 +408,7 @@ class SuporteService implements SuporteServiceInterface {
         }
 
         return [
-            'total' => str_replace('.', ',', (string) $comandos['hd']),
+            'total' => (string) number_format($comandos['hd'], 2, ',', '.'),
             'label' => 'em MB',
             'labels' => ['Arquivos e Imagens', 'Arquivos dos Representantes', 'Logs', 'Termos', 'Espaço Disponível'],
             'dados' => [$comandos['arq'] + $comandos['img'], $comandos['arq_rep'], $comandos['logs'], $comandos['termos'], $comandos['disponivel']],
