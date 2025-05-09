@@ -283,7 +283,7 @@ class SuporteController extends Controller
             $storage = $this->service->getService('Suporte')->sobreStorage();
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], $e->getCode());
         }
     
         return response()->json($storage);
