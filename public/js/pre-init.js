@@ -8,7 +8,7 @@ const PORTAL_MODULOS = new Object();
 PORTAL_MODULOS.getLink_ = location.protocol + '//' + location.hostname + '/js/';
 PORTAL_MODULOS.getHash_ = pre.attr('src').replace(PORTAL_MODULOS.getLink_ + 'pre-init.js?', '');
 PORTAL_MODULOS.getVersao_ = pre.attr('data-modulo-versao');
-PORTAL_MODULOS.linkInitLibs = PORTAL_MODULOS.getLink_ + 'modulos/init-libs.js?' + PORTAL_MODULOS.getHash_;
+PORTAL_MODULOS.initLibs = 'init-libs';
 
 // Evento para receber o local e a subarea antes de inicializar os módulos / scripts
 
@@ -41,10 +41,11 @@ document.addEventListener("PRE-INIT", (e) => {
 
 async function initLibs(){
 
-    if(PORTAL_MODULOS.linkInitLibs.length > 0){
+    if(PORTAL_MODULOS.initLibs.length > 0){
         const script = document.createElement('script');
         script.setAttribute('type', "module");
-        script.setAttribute('src', PORTAL_MODULOS.linkInitLibs);
+        script.setAttribute('data-modulo-id', PORTAL_MODULOS.initLibs);
+        script.setAttribute('src', PORTAL_MODULOS.getLink_ + 'modulos/' + PORTAL_MODULOS.initLibs + '.js?' + PORTAL_MODULOS.getHash_);
 
         pre.after(script);
 
