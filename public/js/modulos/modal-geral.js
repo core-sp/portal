@@ -137,6 +137,9 @@ export function executar(local){
     });
 
     $("#msgGeral").on('hide.bs.modal', function(){
+        if(this.contains(document.activeElement))
+            document.activeElement.blur();
+
         if(timeout_id !== null)
             clearTimeout(timeout_id);
         limpar($(this));
