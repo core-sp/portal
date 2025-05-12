@@ -3159,3 +3159,8 @@ h5 {
 	width: 0;
 	z-index: -1;
 }
+
+.custom-file-label {
+    overflow: hidden;
+    white-space: nowrap;
+}
