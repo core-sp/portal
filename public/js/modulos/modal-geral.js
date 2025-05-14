@@ -1,3 +1,5 @@
+let timeout_id = null;
+
 function limpar(msg){
     
     msg.find('.modal-body, .modal-title, .modal-footer').html('').attr('style', "");
@@ -21,7 +23,7 @@ function addTimeout(timeout){
 
     timeout = parseInt(timeout);
 
-    setTimeout(function(){
+    timeout_id = setTimeout(function(){
         $("#msgGeral").modal('hide');
     }, timeout);
 }
@@ -135,6 +137,11 @@ export function executar(local){
     });
 
     $("#msgGeral").on('hide.bs.modal', function(){
+        if(this.contains(document.activeElement))
+            document.activeElement.blur();
+
+        if(timeout_id !== null)
+            clearTimeout(timeout_id);
         limpar($(this));
     });
 };

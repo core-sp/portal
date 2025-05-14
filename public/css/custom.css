@@ -178,3 +178,8 @@ img {
 .sessao-txt {
   color: #C2C7D0;
 }
+
+.custom-file-label {
+  overflow: hidden;
+  white-space: nowrap;
+}

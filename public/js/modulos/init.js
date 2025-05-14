@@ -132,6 +132,16 @@ export default function (local, subarea){
     
     gerarLogs();
 
+    if(PORTAL_MODULOS.initLibs.length > 0)
+        document.dispatchEvent(new CustomEvent("LOG_SUCCESS_INIT", {
+            detail: {
+                tipo: 0, 
+                situacao: 0, 
+                nome: PORTAL_MODULOS.initLibs,
+                url: $('[data-modulo-id="' + PORTAL_MODULOS.initLibs + '"]')[0].src
+            }
+        }));
+
     importarModulos(local, 
         criarModulos(
             executar.ok.call(PORTAL_MODULOS.getObjModulos_, local, subarea), 
