@@ -41,11 +41,17 @@ function recaptcha(){
 
 function graficos(){
 
-    if($('canvas[class^="grafico-"]').length > 0){
+    if($('[class^="grafico-"]').length > 0){
+        // Gerar PDF do gráfico
         const _lib = document.createElement('script');
 
-        _lib.setAttribute("src", 'https://cdn.jsdelivr.net/npm/chart.js');
-        document.body.prepend(_lib);
+        _lib.setAttribute("src", 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.0/jspdf.umd.min.js');
+        document.head.appendChild(_lib);
+
+        const _lib2 = document.createElement('script');
+
+        _lib2.setAttribute("src", 'https://cdn.jsdelivr.net/npm/apexcharts');
+        document.head.appendChild(_lib2);
     }
 }
 

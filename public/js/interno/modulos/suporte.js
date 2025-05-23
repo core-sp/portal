@@ -1,9 +1,165 @@
 const url_logs = '/admin/suporte/logs';
+const grafico = '.grafico-storage';
 
-async function sobreStorage(){
+function exportarPDF(chart) {
 
+    $(grafico).on('click', '.exportCustomPDF', function (e) {
+        if (typeof window.jspdf !== 'object') {
+            document.dispatchEvent(new CustomEvent("MSG_GERAL_CONT_TITULO", {
+                detail: {
+                    titulo: '<i class="fas fa-times text-danger"></i> Erro!',
+                    texto: '<span class="text-danger">Não é possível exportar como PDF no momento!</span>'
+                }
+            }));
+            return false;
+        }
+
+        // Exemplo ApexChart
+        let dataURL = chart.dataURI()
+            .then(({ imgURI, blob }) => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF();
+
+                pdf.addImage(imgURI, 'PNG', 10, 10);
+                pdf.save("pdf-chart.pdf");
+            });
+    });
+}
+
+function optionsChart(chart_, json){
+
+    const exportPDF = '<div class="apexcharts-menu-item exportCustomPDF" title="Download PDF">Download PDF</div>';
+    const opt_chart = {
+        type: 'pie',
+        height: '350px',
+        toolbar: {
+            show: true,
+            tools: {
+                download: '<i class="fas fa-download text-info"></i>',
+                customIcons: [{
+                    icon: '<i class="fas fa-sync btn-refresh-storage text-primary ml-2"></i>',
+                    title: 'Atualizar',
+                    class: 'custom-icon',
+                    click: function (chart, options, e) {
+                        $(grafico)[0].dispatchEvent(new CustomEvent("CHART_REFRESH", {
+                            detail: chart
+                        }));
+                    }
+                }]
+            },
+        },
+        events: {
+            legendClick: function (chartContext, seriesIndex, opts) {
+                let cores = chartContext.w.config.legend.markers.fillColors == undefined ?
+                    chartContext.w.globals.markers.colors : chartContext.w.config.legend.markers.fillColors;
+                let temp = chartContext.w.globals.series;
+
+                temp[seriesIndex] = chartContext.w.globals.series[seriesIndex] == 0 ? json.dados[seriesIndex] : 0;
+                cores[seriesIndex] = temp[seriesIndex] == 0 ? 'rgb(255, 255, 255)' : json.cores[seriesIndex];
+
+                chartContext.updateOptions({
+                    legend: {
+                        markers: {
+                            fillColors: cores
+                        }
+                    }
+                }, true);
+                chartContext.updateSeries(temp, true);
+            },
+            updated: function (chartContext, config) {
+                $('.apexcharts-menu').append(exportPDF);
+            },
+            mounted: function (chartContext, config) {
+                $('.apexcharts-menu').append(exportPDF);
+            },
+        }
+    };
+    const opt_title = {
+        text: 'Storage em ' + chart_.attr('id').replace('ambiente_', ''),
+        align: 'center',
+        floating: false,
+        style: {
+            fontSize: '16px',
+            fontWeight: 'bolder',
+            fontFamily: 'Arial, sans-serif',
+            color: '#004587'
+        }
+    };
+    const opt_subtitle = {
+        text: 'Capacidade total - ' + json.total + ' MB',
+        align: 'center',
+        floating: false,
+        offsetY: 22,
+        style: {
+            fontWeight: 'bold',
+            fontFamily: 'Arial'
+        }
+    };
+    const opt_dataLabels = {
+        enabled: true,
+        formatter: function (value, { seriesIndex, dataPointIndex, w }) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2
+            }).format(w.config.series[seriesIndex]) + ' MB';
+        },
+        style: {
+            fontSize: '13px',
+            colors: ['#000']
+        },
+        dropShadow: {
+            enabled: false,
+        }
+    };
+    const opt_legend = {
+        horizontalAlign: 'left',
+        position: 'top',
+    };
+    const opt_tooltip = {
+        enabled: false,
+    };
+    const opt_states = {
+        hover: {
+            filter: {
+                type: 'none',
+            }
+        },
+        active: {
+            allowMultipleDataPointsSelection: false,
+            filter: {
+                type: 'none',
+            }
+        },
+    };
+    const opt_noData = {
+        text: 'Sem dados',
+    };
+
+    return {
+        elemento: chart_[0],
+        opcoes: {
+            series: json.dados, colors: json.cores, labels: json.labels,
+            chart: opt_chart, title: opt_title, subtitle: opt_subtitle, dataLabels: opt_dataLabels, 
+            legend: opt_legend, tooltip: opt_tooltip, states: opt_states, noData: opt_noData,
+        }
+    };
+}
+
+function graficoApex(obj) {
+
+    let chart = new ApexCharts(obj.elemento, obj.opcoes);
+
+    chart.render();
+    exportarPDF(chart);
+    $('.apexcharts-menu-icon').attr('title', 'Exportar');
+}
+
+async function sobreStorage() {
+
+    const chart_ = $('div' + grafico);
     const spinner = 'spinner-grow spinner-grow-sm text-primary';
-    const chart_ = $('canvas.grafico-storage');
+
+    if (!chart_.hasClass('spinner-grow'))
+        chart_.addClass(spinner);
 
     const dados = await fetch('/admin/suporte/sobre-storage', {
         method: 'GET', 
@@ -22,25 +178,12 @@ async function sobreStorage(){
 
         chart_.removeClass(spinner);
         chart_.parents('.card-body').html(msg);
-        
+
         return false;
     }
 
     chart_.removeClass(spinner);
-    $('#total_storage').html('<i>Capacidade total - ' + json.total + ' MB</i>');
-
-    new Chart(chart_[0], {
-        type: 'pie',
-        data: {
-            labels: json.labels,
-            datasets: [{
-                label: json.label,
-                data: json.dados,
-                backgroundColor: json.cores,
-                hoverOffset: 5,
-            }]
-        },
-    });
+    graficoApex(optionsChart(chart_, json));
 }
 
 function visualizar(){
@@ -79,9 +222,14 @@ function visualizar(){
     });
 
     // Storage
-    if($('.grafico-storage').length > 0){
+    if($(grafico).length > 0){
         sobreStorage();
     }
+
+    $(grafico).on('CHART_REFRESH', function (e) {
+        e.detail.destroy();
+        sobreStorage();
+    });
 };
 
 export function executar(funcao){

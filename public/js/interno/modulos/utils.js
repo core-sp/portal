@@ -118,4 +118,10 @@ export function executar(local = 'interno'){
         });
     
     btnAcaoTabelaAdmin();
+
+    // tabela atendimentos na home
+    $('.btnShowCard').click(function(){
+        $('.hideCard').slideToggle();
+        $(this).children().toggleClass('fa-chevron-down').toggleClass('fa-chevron-up');
+    });
 };

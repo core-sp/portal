@@ -74,7 +74,7 @@
 						<i class="fas fa-newspaper"></i>
 					</span>
 					<div class="info-box-content">
-						<span class="info-box-text inherit">E-mails de aceite do Termo de Consentimento</span>
+						<span class="inherit">E-mails de aceite do Termo de Consentimento</span>
 						<!-- <span class="info-box-number inherit d-inline">{{ $totalNewsletter }}</span> -->
 						&nbsp;<span class="linkDownload d-inline">(Baixar CSV)</span>
 					</div>
@@ -88,31 +88,7 @@
 
 <section class="content">
   <div class="container-fluid">
-  	<div class="row">
-
-	  	@if(auth()->user()->isAdmin())
-		<div class="col">
-			<div class="card card-info">
-				<div class="card-header">
-					<h3 class="card-title">
-						<i class="fas fa-hdd mr-1"></i> Storage em {{ ambiente() }}
-						<small>
-							<i class="fas fa-info-circle float-right mt-1" 
-							data-toggle="popover" data-placement="top" data-trigger="hover click" data-html="true" 
-							data-content="<b>Clique nos nomes da legenda para filtrar</b>">
-							</i>
-						</small>
-					</h3>
-					<p class="mb-0"><span id="total_storage"></span></p>
-				</div>
-				<div class="card-body text-center">
-					<canvas class="grafico-storage spinner-grow spinner-grow-sm text-primary"></canvas>
-				</div>
-			</div>
-			<script type="module" src="{{ asset('/js/interno/modulos/suporte.js?'.hashScriptJs()) }}" data-modulo-id="suporte" data-modulo-acao="visualizar"></script>
-		</div>
-		@endif
-
+	<div class="row">
   	  <div class="col">
   	  	<div class="card card-info">
   	  	  <div class="card-header">
@@ -145,9 +121,13 @@
 	  <div class="col">
 		<div class="card card-info">
 		  <div class="card-header">
-		  	<h3 class="card-title">Atendimentos realizados em <strong>{{ auth()->user()->regional->regional }}</strong></h3>
+		  	<h3 class="card-title">Atendimentos realizados em <strong>{{ auth()->user()->regional->regional }}</strong>
+				<button type="button" class="btn btn-info px-1 py-0 btnShowCard">
+					<i class="fas fa-chevron-up"></i>
+				</button>
+			</h3>
 		  </div>
-		  <div class="card-body">
+		  <div class="card-body hideCard" style="display: none;">
 		  	<div class="row">
 			  <div class="col">
 				{!! $contagem !!}
@@ -161,6 +141,21 @@
 	  @if($chamados->count())
 		@include('admin.inc.chamadohome')
 	  @endif
+
+	@if(auth()->user()->isAdmin())
+	<div class="row">
+	  <div class="col col-lg-6 col-xl-4">
+		<div class="card">
+			<div class="card-body pb-0 text-center">
+				<div class="grafico-storage spinner-grow spinner-grow-sm text-primary" id="ambiente_{{ ambiente() }}"></div>
+			</div>	
+		</div>
+	  </div>
+	</div>
+
+	<script type="module" src="{{ asset('/js/interno/modulos/suporte.js?'.hashScriptJs()) }}" data-modulo-id="suporte" data-modulo-acao="visualizar"></script>
+	@endif
+
   </div>	
 </section>
 
