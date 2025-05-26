@@ -152,7 +152,7 @@
 						<i class="fas fa-sync btn-refresh-storage text-primary"></i>
 					</button>
 					<div class="btn-group">
-						<button type="button" class="btn btn-link pl-0" data-toggle="dropdown">
+						<button type="button" class="btn btn-link px-0" data-toggle="dropdown">
 							<i class="fas fa-download text-info"></i>
 						</button>
 						<div class="dropdown-menu text-center p-0">
