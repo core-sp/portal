@@ -146,7 +146,31 @@
 	<div class="row">
 	  <div class="col col-lg-6 col-xl-4">
 		<div class="card">
-			<div class="card-body pb-0 text-center">
+			<div class="card-title pt-2 text-center">
+				<div class="btn-group">
+					<button type="button" class="btn btn-link pl-0">
+						<i class="fas fa-sync btn-refresh-storage text-primary"></i>
+					</button>
+					<div class="btn-group">
+						<button type="button" class="btn btn-link pl-0" data-toggle="dropdown">
+							<i class="fas fa-download text-info"></i>
+						</button>
+						<div class="dropdown-menu text-center p-0">
+							<button type="button" class="btn btn-link export" value="png">
+								Download PNG
+							</button>
+							<button type="button" class="btn btn-link export" value="jpeg">
+								Download JPEG
+							</button>
+							<button type="button" class="btn btn-link export" value="pdf">
+								Download PDF
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<hr />
+			<div class="card-body pt-0 text-center">
 				<div class="grafico-storage spinner-grow spinner-grow-sm text-primary" id="ambiente_{{ ambiente() }}"></div>
 			</div>	
 		</div>

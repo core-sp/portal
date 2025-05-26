@@ -1,156 +1,89 @@
 const url_logs = '/admin/suporte/logs';
 const grafico = '.grafico-storage';
 
-function exportarPDF(chart) {
+function exportarPDF(dataUrl) {
 
-    $(grafico).on('click', '.exportCustomPDF', function (e) {
-        if (typeof window.jspdf !== 'object') {
-            document.dispatchEvent(new CustomEvent("MSG_GERAL_CONT_TITULO", {
-                detail: {
-                    titulo: '<i class="fas fa-times text-danger"></i> Erro!',
-                    texto: '<span class="text-danger">Não é possível exportar como PDF no momento!</span>'
-                }
-            }));
-            return false;
-        }
+    if (typeof window.jspdf !== 'object') {
+        document.dispatchEvent(new CustomEvent("MSG_GERAL_CONT_TITULO", {
+            detail: {
+                titulo: '<i class="fas fa-times text-danger"></i> Erro!',
+                texto: '<span class="text-danger">Não é possível exportar como PDF no momento!</span>'
+            }
+        }));
+        return false;
+    }
 
-        // Exemplo ApexChart
-        let dataURL = chart.dataURI()
-            .then(({ imgURI, blob }) => {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF();
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
 
-                pdf.addImage(imgURI, 'PNG', 10, 10);
-                pdf.save("pdf-chart.pdf");
-            });
+    pdf.addImage(dataUrl, 'PNG', 10, 10);
+    pdf.save("pdf-grafico.pdf");
+}
+
+function options(json){
+
+    return bb.generate({
+        bindto: grafico,
+        data: {
+            type: 'pie',
+            columns: json.labels.map((val, index) => [val, json.dados[index]]),
+        },
+        title: {
+            text: 'Storage em ' + $(grafico).attr('id').replace('ambiente_', '') + 
+                '\n\nCapacidade total - ' + json.total + ' MB',
+            position: 'center',
+            padding: {
+                right: 10,
+                bottom: 40,
+                left: 10
+            },
+        },
+        tooltip: {
+            show: false
+        },
+        pie: {
+            expand: false,
+            label: {
+                format: function(value, ratio, id) {
+                    return d3.formatLocale({thousands: ".", decimal: ","}).format(".2f")(value) + ' MB';
+                },
+                ratio: 1.35
+            }
+        },
+        svg: {
+            classname: "billboard_svg_class"
+        },
     });
 }
 
-function optionsChart(chart_, json){
+function graficoBillboard(chart){
 
-    const exportPDF = '<div class="apexcharts-menu-item exportCustomPDF" title="Download PDF">Download PDF</div>';
-    const opt_chart = {
-        type: 'pie',
-        height: '350px',
-        toolbar: {
-            show: true,
-            tools: {
-                download: '<i class="fas fa-download text-info"></i>',
-                customIcons: [{
-                    icon: '<i class="fas fa-sync btn-refresh-storage text-primary ml-2"></i>',
-                    title: 'Atualizar',
-                    class: 'custom-icon',
-                    click: function (chart, options, e) {
-                        $(grafico)[0].dispatchEvent(new CustomEvent("CHART_REFRESH", {
-                            detail: chart
-                        }));
-                    }
-                }]
-            },
-        },
-        events: {
-            legendClick: function (chartContext, seriesIndex, opts) {
-                let cores = chartContext.w.config.legend.markers.fillColors == undefined ?
-                    chartContext.w.globals.markers.colors : chartContext.w.config.legend.markers.fillColors;
-                let temp = chartContext.w.globals.series;
+    $('.bb-title').addClass('font-weight-bold');
 
-                temp[seriesIndex] = chartContext.w.globals.series[seriesIndex] == 0 ? json.dados[seriesIndex] : 0;
-                cores[seriesIndex] = temp[seriesIndex] == 0 ? 'rgb(255, 255, 255)' : json.cores[seriesIndex];
+    $('.export').click(function(){
+        let extensao = this.value;
+        let obj_mime = extensao == 'pdf' ? {} : {mimeType: "image/" + extensao};
 
-                chartContext.updateOptions({
-                    legend: {
-                        markers: {
-                            fillColors: cores
-                        }
-                    }
-                }, true);
-                chartContext.updateSeries(temp, true);
-            },
-            updated: function (chartContext, config) {
-                $('.apexcharts-menu').append(exportPDF);
-            },
-            mounted: function (chartContext, config) {
-                $('.apexcharts-menu').append(exportPDF);
-            },
-        }
-    };
-    const opt_title = {
-        text: 'Storage em ' + chart_.attr('id').replace('ambiente_', ''),
-        align: 'center',
-        floating: false,
-        style: {
-            fontSize: '16px',
-            fontWeight: 'bolder',
-            fontFamily: 'Arial, sans-serif',
-            color: '#004587'
-        }
-    };
-    const opt_subtitle = {
-        text: 'Capacidade total - ' + json.total + ' MB',
-        align: 'center',
-        floating: false,
-        offsetY: 22,
-        style: {
-            fontWeight: 'bold',
-            fontFamily: 'Arial'
-        }
-    };
-    const opt_dataLabels = {
-        enabled: true,
-        formatter: function (value, { seriesIndex, dataPointIndex, w }) {
-            return new Intl.NumberFormat('pt-BR', {
-                style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2
-            }).format(w.config.series[seriesIndex]) + ' MB';
-        },
-        style: {
-            fontSize: '13px',
-            colors: ['#000']
-        },
-        dropShadow: {
-            enabled: false,
-        }
-    };
-    const opt_legend = {
-        horizontalAlign: 'left',
-        position: 'top',
-    };
-    const opt_tooltip = {
-        enabled: false,
-    };
-    const opt_states = {
-        hover: {
-            filter: {
-                type: 'none',
+        chart.export(obj_mime, function(dataUrl) {
+            if(extensao == 'pdf'){
+                exportarPDF(dataUrl);
+                return;
             }
-        },
-        active: {
-            allowMultipleDataPointsSelection: false,
-            filter: {
-                type: 'none',
-            }
-        },
-    };
-    const opt_noData = {
-        text: 'Sem dados',
-    };
 
-    return {
-        elemento: chart_[0],
-        opcoes: {
-            series: json.dados, colors: json.cores, labels: json.labels,
-            chart: opt_chart, title: opt_title, subtitle: opt_subtitle, dataLabels: opt_dataLabels, 
-            legend: opt_legend, tooltip: opt_tooltip, states: opt_states, noData: opt_noData,
-        }
-    };
-}
+            let link = document.createElement("a");
+            link.download = 'grafico.' + extensao;
+            link.href = dataUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    });
 
-function graficoApex(obj) {
-
-    let chart = new ApexCharts(obj.elemento, obj.opcoes);
-
-    chart.render();
-    exportarPDF(chart);
-    $('.apexcharts-menu-icon').attr('title', 'Exportar');
+    $('.btn-refresh-storage').click(function () {
+        if(chart !== undefined)
+            chart.destroy();
+        sobreStorage();
+    });
 }
 
 async function sobreStorage() {
@@ -183,12 +116,10 @@ async function sobreStorage() {
     }
 
     chart_.removeClass(spinner);
-    graficoApex(optionsChart(chart_, json));
+    graficoBillboard(options(json));
 }
 
 function visualizar(){
-
-    $('[data-toggle="popover"]').popover();
 
     $(document).on('keydown', function(e) {
         if((e.keyCode == 27) && (window.location.href.indexOf(url_logs))){
@@ -225,11 +156,6 @@ function visualizar(){
     if($(grafico).length > 0){
         sobreStorage();
     }
-
-    $(grafico).on('CHART_REFRESH', function (e) {
-        e.detail.destroy();
-        sobreStorage();
-    });
 };
 
 export function executar(funcao){
