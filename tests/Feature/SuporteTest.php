@@ -41,6 +41,7 @@ class SuporteTest extends TestCase
         $this->get(route('suporte.erros.file.get'))->assertRedirect(route('login'));
         $this->get(route('suporte.ips.view'))->assertRedirect(route('login'));
         $this->delete(route('suporte.ips.excluir', request()->ip()))->assertRedirect(route('login'));
+        $this->get(route('suporte.sobre-storage'))->assertRedirect(route('login'));
     }
 
     /** @test */

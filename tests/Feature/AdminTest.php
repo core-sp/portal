@@ -310,8 +310,7 @@ class AdminTest extends TestCase
         $this->signInAsAdmin();
 
         $this->get('/admin')
-        ->assertSee('<i class="fas fa-hdd mr-1"></i> Storage em '. ambiente())
-        ->assertSee('<canvas class="grafico-storage spinner-grow spinner-grow-sm text-primary"></canvas>');
+        ->assertSee('<div class="grafico-storage spinner-grow spinner-grow-sm text-primary" id="ambiente_' . ambiente() . '"></div>');
     }
 
     /** @test */
@@ -320,7 +319,6 @@ class AdminTest extends TestCase
         $this->signIn();
 
         $this->get('/admin')
-        ->assertDontSee('<i class="fas fa-hdd mr-1"></i> Storage em '. ambiente())
-        ->assertDontSee('<canvas class="grafico-storage spinner-grow spinner-grow-sm text-primary"></canvas>');
+        ->assertDontSee('<div class="grafico-storage spinner-grow spinner-grow-sm text-primary" id="ambiente_' . ambiente() . '"></div>');
     }
 }
