@@ -4,6 +4,8 @@ const spinner = 'spinner-grow spinner-grow-sm text-primary';
 
 function erro(chart_, msg){
 
+    msg = '<i class="fas fa-exclamation-triangle text-danger"></i><br>' + 
+        '<span class="text-danger mr-1"><b>Mensagem: </b></span>' + msg;
     chart_.removeClass(spinner);
     chart_.parents('.card-body').html(msg);
 }
@@ -109,10 +111,7 @@ async function sobreStorage() {
     });
 
     if(dados.url.indexOf(link) == -1){
-        let msg = '<i class="fas fa-exclamation-triangle text-danger"></i><br>' + 
-            '<span class="text-danger mr-1"><b>Mensagem: </b></span>Usuário não está logado!<br>Atualize a página, por favor.';
-
-        erro(chart_, msg);
+        erro(chart_, 'Usuário não está logado!<br>Atualize a página, por favor.');
 
         return false;
     }
@@ -120,10 +119,8 @@ async function sobreStorage() {
     const json = await dados.json();
 
     if(!dados.ok){
-        let msg = '<i class="fas fa-exclamation-triangle text-danger"></i><br>' + 
-            '<span class="text-danger mt-2"><b>Código: </b></span>' + dados.status + 
-            '<br><span class="text-danger"><b>Mensagem: </b></span> ' + 
-            json.message.replace('{', '<span class="text-danger"><code>').replace('}', '</code></span>');
+        let msg = json.message.replace('{', '<span class="text-danger"><code>').replace('}', '</code></span>') + 
+            '<br><span class="text-danger mt-2"><b>Código: </b></span>' + dados.status;
 
         erro(chart_, msg);
 
@@ -135,11 +132,8 @@ async function sobreStorage() {
     try {
         graficoBillboard(options(json));
     } catch (error) {
-        let msg = '<i class="fas fa-exclamation-triangle text-danger"></i><br>' + 
-            '<span class="text-danger mr-1"><b>Mensagem: </b></span>Erro da biblioteca ao gerar o gráfico!<br>Atualize a página, por favor.';
-
         console.log(error);
-        erro(chart_, msg);
+        erro(chart_, 'Erro da biblioteca ao gerar o gráfico!<br>Atualize a página, por favor.');
     }
 }
 
