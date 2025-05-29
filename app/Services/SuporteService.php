@@ -401,15 +401,14 @@ class SuporteService implements SuporteServiceInterface {
             $reg = $chave == 'hd' ? '/[\s]+/' : '/\t/';
             $valor = preg_split($reg, $shell_txt);
             $num = $chave == 'hd' ? 1 : 0;
-            $comandos[$chave] = round((int) $valor[$num] / 1024, 2);
+            $comandos[$chave] = $valor[$num];
 
             if($chave == 'hd')
-                $comandos['disponivel'] = round((int) $valor[3] / 1024, 2);
+                $comandos['disponivel'] = $valor[3];
         }
 
         return [
-            'total' => (string) number_format($comandos['hd'], 2, ',', '.'),
-            'label' => 'em MB',
+            'total' => $comandos['hd'],
             'labels' => ['Arquivos e Imagens', 'Arquivos dos Representantes', 'Logs', 'Termos', 'Espaço Disponível'],
             'dados' => [$comandos['arq'] + $comandos['img'], $comandos['arq_rep'], $comandos['logs'], $comandos['termos'], $comandos['disponivel']],
             'cores' => ['rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)', 'rgb(115, 209, 78)', 'rgb(126, 115, 226)'],

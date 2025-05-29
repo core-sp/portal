@@ -29,6 +29,13 @@ function exportarPDF(dataUrl) {
     pdf.save("pdf-grafico.pdf");
 }
 
+function d3EspacoSI(value){
+
+    let valor = d3.formatLocale({thousands: ".", decimal: ","}).format("~s")(value) + 'B';
+    let si = valor.replaceAll(/[\d,\.]/g, '');
+    return valor.replace(si, ' ' + si);
+}
+
 function options(json){
 
     return bb.generate({
@@ -39,7 +46,7 @@ function options(json){
         },
         title: {
             text: 'Storage em ' + $(grafico).attr('id').replace('ambiente_', '') + 
-                '\n\nCapacidade total - ' + json.total + ' MB',
+                '\n\nCapacidade total - ' + d3EspacoSI(json.total),
             position: 'center',
             padding: {
                 right: 10,
@@ -54,7 +61,7 @@ function options(json){
             expand: false,
             label: {
                 format: function(value, ratio, id) {
-                    return d3.formatLocale({thousands: ".", decimal: ","}).format(".2f")(value) + ' MB';
+                    return d3EspacoSI(value);
                 },
                 ratio: 1.35
             }
