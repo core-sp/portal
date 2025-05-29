@@ -31,7 +31,7 @@ function exportarPDF(dataUrl) {
 
 function d3EspacoSI(value){
 
-    let valor = d3.formatLocale({thousands: ".", decimal: ","}).format(".3s")(value + "e3") + 'B';
+    let valor = d3.formatLocale({thousands: ".", decimal: ","}).format("~s")(value + "e3") + 'B';
     let si = valor.replaceAll(/[\d,\.]/g, '');
     return valor.replace(si, ' ' + si);
 }
