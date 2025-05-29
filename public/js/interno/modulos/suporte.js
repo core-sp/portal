@@ -88,18 +88,29 @@ function graficoBillboard(chart){
 
 async function sobreStorage() {
 
+    const link = '/admin/suporte/sobre-storage';
     const chart_ = $('div' + grafico);
     const spinner = 'spinner-grow spinner-grow-sm text-primary';
 
     if (!chart_.hasClass('spinner-grow'))
         chart_.addClass(spinner);
 
-    const dados = await fetch('/admin/suporte/sobre-storage', {
+    const dados = await fetch(link, {
         method: 'GET', 
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
         }
     });
+
+    if(dados.url.indexOf(link) == -1){
+        let msg = '<i class="fas fa-exclamation-triangle text-danger"></i><br>' + 
+            '<span class="text-danger mr-1"><b>Mensagem: </b></span>Usuário não está logado!<br>Atualize a página, por favor.';
+
+        chart_.removeClass(spinner);
+        chart_.parents('.card-body').html(msg);
+
+        return false;
+    }
 
     const json = await dados.json();
 
