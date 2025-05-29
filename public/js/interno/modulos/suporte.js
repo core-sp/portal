@@ -1,5 +1,12 @@
 const url_logs = '/admin/suporte/logs';
 const grafico = '.grafico-storage';
+const spinner = 'spinner-grow spinner-grow-sm text-primary';
+
+function erro(chart_, msg){
+
+    chart_.removeClass(spinner);
+    chart_.parents('.card-body').html(msg);
+}
 
 function exportarPDF(dataUrl) {
 
@@ -90,7 +97,6 @@ async function sobreStorage() {
 
     const link = '/admin/suporte/sobre-storage';
     const chart_ = $('div' + grafico);
-    const spinner = 'spinner-grow spinner-grow-sm text-primary';
 
     if (!chart_.hasClass('spinner-grow'))
         chart_.addClass(spinner);
@@ -106,8 +112,7 @@ async function sobreStorage() {
         let msg = '<i class="fas fa-exclamation-triangle text-danger"></i><br>' + 
             '<span class="text-danger mr-1"><b>Mensagem: </b></span>Usuário não está logado!<br>Atualize a página, por favor.';
 
-        chart_.removeClass(spinner);
-        chart_.parents('.card-body').html(msg);
+        erro(chart_, msg);
 
         return false;
     }
@@ -120,14 +125,22 @@ async function sobreStorage() {
             '<br><span class="text-danger"><b>Mensagem: </b></span> ' + 
             json.message.replace('{', '<span class="text-danger"><code>').replace('}', '</code></span>');
 
-        chart_.removeClass(spinner);
-        chart_.parents('.card-body').html(msg);
+        erro(chart_, msg);
 
         return false;
     }
 
     chart_.removeClass(spinner);
-    graficoBillboard(options(json));
+
+    try {
+        graficoBillboard(options(json));
+    } catch (error) {
+        let msg = '<i class="fas fa-exclamation-triangle text-danger"></i><br>' + 
+            '<span class="text-danger mr-1"><b>Mensagem: </b></span>Erro da biblioteca ao gerar o gráfico!<br>Atualize a página, por favor.';
+
+        console.log(error);
+        erro(chart_, msg);
+    }
 }
 
 function visualizar(){
