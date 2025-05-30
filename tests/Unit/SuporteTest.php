@@ -300,6 +300,6 @@ class SuporteTest extends TestCase
 
         $service = new SuporteService;
 
-        $this->assertEquals(array_keys($service->sobreStorage()), ['total', 'label', 'labels', 'dados', 'cores']);
+        $this->assertEquals(array_keys($service->sobreStorage()), ['total', 'labels', 'dados', 'cores']);
     }
 }
