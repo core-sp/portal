@@ -2580,7 +2580,8 @@ class AgendamentoSalaTest extends TestCase
         $this->actingAs($representante, 'representante');
 
         $agendas = factory('App\AgendamentoSala', 4)->create([
-            'status' => AgendamentoSala::STATUS_COMPARECEU
+            'status' => AgendamentoSala::STATUS_COMPARECEU,
+            'dia' => now()->format('Y-m-d')
         ]);
 
         $dia = Carbon::parse($agendas->get(0)->dia)->addMonth();
