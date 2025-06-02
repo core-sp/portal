@@ -119,7 +119,7 @@ class AgendamentoSala extends Model
 
         $seguinte = false;
         // Evitar que pule mês. Ex: janeiro para fevereiro.
-        $dataSeguinte = Carbon::parse($dia->format('Y-m') . '-01')->addMonth();
+        $dataSeguinte = Carbon::parse(now()->format('Y-m') . '-01')->addMonth();
         $mesSeguinte = $dataSeguinte->month;
         $anoSeguinte = $dataSeguinte->year;
         
