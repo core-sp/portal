@@ -124,16 +124,28 @@ export function executar(local){
         addTimeout(e.detail.timeout);
     });
 
+    let temp_focus = null;
+
     $(document).on('MSG_GERAL_BTN_ACAO', function(e){
+        temp_focus = e.detail.focus;
         limpar($("#msgGeral"));
         layout(e.detail);
         msgConteudoTitulo(e.detail.titulo, e.detail.texto, e.detail.botao);
     });
 
     $(document).on('MSG_GERAL_VARIOS_BTN_ACAO', function(e){
+        temp_focus = e.detail.focus;
         limpar($("#msgGeral"));
         layout(e.detail);
         msgConteudoTitulo(e.detail.titulo, e.detail.texto, e.detail.botao.join(''));
+        
+    });
+
+    $("#msgGeral").on('shown.bs.modal', function(e){
+        if(typeof temp_focus === 'string')
+            $(this).find(temp_focus).focus();
+
+        temp_focus = null;
     });
 
     $("#msgGeral").on('hide.bs.modal', function(){

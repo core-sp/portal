@@ -109,7 +109,7 @@ class Curso extends Model
 
     public static function cidades()
     {
-        return self::withTrashed()->select('cidade')->whereNotNull('cidade')->distinct()->get()->pluck('cidade');
+        return self::withTrashed()->select('cidade')->whereNotNull('cidade')->distinct()->orderBy('cidade')->get()->pluck('cidade');
     }
 
     public function regional()

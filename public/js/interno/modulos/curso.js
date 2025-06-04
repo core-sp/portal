@@ -17,7 +17,8 @@ function adicionarCidade(){
                 titulo: '<i class="fas fa-map-marked-alt mr-2"></i>Adicionar nova cidade <br><small class="form-text" style="font-size: 0.8rem;"><em>* A nova cidade só será salva após confirmar a alteração / criação do curso</em></small>', 
                 texto: '<div class="form-group"><label for="nome_cidade">Nome da nova cidade: </label><input type="text" id="nome_cidade" class="form-control" /></div>',
                 botao: ['<button type="button" class="btn btn-success btn-sm" id="salvar_cidade">Salvar</button>', 
-                    '<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancelar</button>']
+                    '<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancelar</button>'],
+                focus: '#nome_cidade',
             }
         }));
     });
@@ -31,8 +32,12 @@ function adicionarCidade(){
         cidade_temp = '';
     });
     
-    $('.modal').on('input', '#nome_cidade', function(){
-        cidade_temp = this.value;
+    $('.modal').on('input keyup', '#nome_cidade', function(e){
+        if((e.type == 'keyup') && (e.keyCode == 13))
+            $('.modal-footer #salvar_cidade').click();
+
+        if(e.type == 'input')
+            cidade_temp = this.value;
     });
 }
 

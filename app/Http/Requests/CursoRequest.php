@@ -58,8 +58,10 @@ class CursoRequest extends FormRequest
             'cidade' => [
                 Rule::requiredIf(is_null($this->idregional)),
                 'nullable',
+                'unique:regionais,regional',
+                'string',
                 'min:3',
-                'max:120'
+                'max:120',
             ],
             'img' => 'nullable|max:191',
             'datarealizacao' => 'required|date_format:Y-m-d H:i|after:'.now()->format('Y-m-d 23:59'),
@@ -97,6 +99,8 @@ class CursoRequest extends FormRequest
             'required_with' => 'A data final das inscrições é obrigatória quando data inicial está preenchida',
             'boolean' => 'Campo com valor inválido',
             'campo_rotulo.required_if' => 'Campo obrigatório se for adicionar campo',
+            'cidade.unique' => 'Cidade já existe em Regionais',
+            'string' => 'Deve ser um texto',
         ];
     }
 

@@ -142,8 +142,6 @@ class RegionalService implements RegionalServiceInterface {
      */
     public function getRegionais()
     {
-        $regionaisFiscalizacao = Regional::select('idregional', 'regional', 'prefixo')->where('idregional', '<=', 13)->get();
-
-        return $regionaisFiscalizacao;
+        return Regional::select('idregional', 'regional', 'prefixo')->where('idregional', '<=', 13)->orderBy('regional')->get();
     }
 }
