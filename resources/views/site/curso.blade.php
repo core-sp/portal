@@ -51,7 +51,7 @@
             </tr>
             <tr>
               <td><h6>Onde</h6></td>
-              <td><h6 class="light">{{ $curso->regional->regional }}</h6></td>
+              <td><h6 class="light">{{ $curso->local() }}</h6></td>
             </tr>
             <tr>
               <td><h6>Início</h6></td>

@@ -4,7 +4,7 @@
       <div class="curso-grid">
         <img src="{{ asset(imgToThumb($curso->img)) }}" class="bn-img" />
         <div class="curso-grid-txt">
-          <h6 class="light cinza-claro">{{ $curso->regional->regional }} - {{ onlyDate($curso->datarealizacao) }}</h6>
+          <h6 class="light cinza-claro">{{ $curso->local() }} - {{ onlyDate($curso->datarealizacao) }}</h6>
           <h5 class="branco mt-1">{{ $curso->tipo }} - {{ $curso->tema }}</h5>
         </div>
       </div>
