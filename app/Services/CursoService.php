@@ -34,7 +34,7 @@ class CursoService implements CursoServiceInterface {
             'Tipo / Tema',
             'Onde / Quando',
             'Vagas',
-            'Regional',
+            'Regional / <span class="text-primary">Cidade</span>',
             'Acesso',
             '<span class="text-nowrap">Campo adicional?</span>',
             'Ações'
@@ -67,7 +67,7 @@ class CursoService implements CursoServiceInterface {
                 $resultado->tipo.'<br>'.$resultado->tema.'<br /><small><em>'.$publicado.'</em></small>',
                 $endereco.'<br />'.formataData($resultado->datarealizacao),
                 $resultado->cursoinscrito_count.' / '.$resultado->nrvagas,
-                $resultado->regional->regional,
+                $resultado->localHTML(),
                 $resultado->acesso,
                 $resultado->add_campo ? 'Sim<br /><small><em><span class="text-nowrap">'.$resultado->nomeRotulo().'</span><br />'.$required.'</em></small>' : 'Não',
                 $acoes
@@ -91,7 +91,7 @@ class CursoService implements CursoServiceInterface {
             'Turma', 
             'Tipo / Tema', 
             'Onde / Quando', 
-            'Regional',
+            'Regional / <span class="text-primary">Cidade</span>',
             'Cancelado em:',
             'Ações'
         ];
@@ -105,7 +105,7 @@ class CursoService implements CursoServiceInterface {
                 $resultado->idcurso,
                 $resultado->tipo.'<br>'.$resultado->tema,
                 $endereco.'<br />'.formataData($resultado->datarealizacao),
-                $resultado->regional->regional,
+                $resultado->localHTML(),
                 formataData($resultado->deleted_at),
                 $acoes
             ];
@@ -169,6 +169,7 @@ class CursoService implements CursoServiceInterface {
             'tipos' => Curso::tipos(),
             'acessos' => Curso::acessos(),
             'rotulos' => Curso::rotulos(),
+            'cidades' => Curso::cidades(),
         ];
     }
 

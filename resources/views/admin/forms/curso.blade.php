@@ -1,4 +1,4 @@
-<form role="form" method="POST" action="{{ !isset($resultado) ? route('cursos.store') : route('cursos.update', $resultado->idcurso) }}">
+<form role="form" method="POST" action="{{ !isset($resultado) ? route('cursos.store') : route('cursos.update', $resultado->idcurso) }}" id="curso_adm">
     @csrf
     @if(isset($resultado))
         @method('PATCH')
@@ -56,8 +56,13 @@
         </div>
         <div class="form-row mt-2">
             <div class="col-sm-3">
-                <label for="idregional">Regional</label>
-                <select name="idregional" class="form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }}" id="idregional" required>
+                <label for="idregional">Regional / <span class="text-primary">Cidade</span></label>
+                <div class="float-right">
+                    <button type="button" id="nova_cidade" class="btn btn-link text-success font-weight-bolder font-italic px-0 pt-0">
+                        <i class="fas fa-plus"></i> Cidade
+                    </button>
+                </div>
+                <select name="idregional" class="form-control {{ $errors->has('idregional') || $errors->has('cidade') ? 'is-invalid' : '' }}" id="idregional" required>
                 @foreach($regionais as $regional)
                     @if(old('idregional'))
                     <option value="{{ $regional->idregional }}" {{ old('idregional') == $regional->idregional ? 'selected' : '' }}>{{ $regional->regional }}</option>
@@ -65,7 +70,18 @@
                     <option value="{{ $regional->idregional }}" {{ isset($resultado->idregional) && ($resultado->idregional == $regional->idregional) ? 'selected' : '' }}>{{ $regional->regional }}</option>
                     @endif
                 @endforeach
+
+                    <hr />
+
+                @foreach($cidades as $cidade)
+                    <option class="text-primary" value="{{ $cidade }}" {{ (old('cidade') == $cidade) || (isset($resultado->cidade) && ($resultado->cidade == $cidade)) ? 'selected' : '' }}>{{ $cidade }}</option>
+                @endforeach
                 </select>
+                @if($errors->has('idregional') || $errors->has('cidade'))
+                <div class="invalid-feedback">
+                {{ $errors->has('idregional') ? $errors->first('idregional') : $errors->first('cidade') }}
+                </div>
+                @endif
             </div>
             <div class="col">
                 <label for="endereco">Endereço</label>

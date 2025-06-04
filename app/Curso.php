@@ -107,6 +107,11 @@ class Curso extends Model
         ];
     }
 
+    public static function cidades()
+    {
+        return self::withTrashed()->select('cidade')->whereNotNull('cidade')->distinct()->get()->pluck('cidade');
+    }
+
     public function regional()
     {
     	return $this->belongsTo('App\Regional', 'idregional');
@@ -249,5 +254,15 @@ class Curso extends Model
     public function getFormatCampoAdicional($valor)
     {
         return $this->nomeRotulo() . ': ' . $valor;
+    }
+
+    public function local()
+    {
+        return isset($this->idregional) ? $this->regional->regional : $this->cidade;
+    }
+
+    public function localHTML()
+    {
+        return isset($this->idregional) ? $this->regional->regional : '<span class="text-primary">' . $this->cidade . '</span>';
     }
 }

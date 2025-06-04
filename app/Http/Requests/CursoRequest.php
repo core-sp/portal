@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Contracts\MediadorServiceInterface;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class CursoRequest extends FormRequest
 {
@@ -40,6 +41,8 @@ class CursoRequest extends FormRequest
 
         if($this->add_campo == '0')
             $this->merge(['campo_rotulo' => null, 'campo_required' => '0']);
+
+        isset($this->cidade) ? $this->merge(['idregional' => null]) : $this->merge(['cidade' => null]);
     }
 
     public function rules()
@@ -47,7 +50,17 @@ class CursoRequest extends FormRequest
         return [
             'tipo' => 'required|in:' . implode(',', $this->service->tipos()),
             'tema' => 'required|max:191',
-            'idregional' => 'required|exists:regionais',
+            'idregional' => [
+                Rule::requiredIf(is_null($this->cidade)),
+                'nullable',
+                'exists:regionais'
+            ],
+            'cidade' => [
+                Rule::requiredIf(is_null($this->idregional)),
+                'nullable',
+                'min:3',
+                'max:120'
+            ],
             'img' => 'nullable|max:191',
             'datarealizacao' => 'required|date_format:Y-m-d H:i|after:'.now()->format('Y-m-d 23:59'),
             'datatermino' => 'required|date_format:Y-m-d H:i|after_or_equal:' . $this->hora_final_real_limite,
@@ -68,9 +81,10 @@ class CursoRequest extends FormRequest
     public function messages()
     {
         return [
-            'required' => 'O :attribute é obrigatório',
-            'numeric' => 'O :attribute aceita apenas números',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido',
+            'required' => 'O campo :attribute é obrigatório',
+            'numeric' => 'O campo :attribute aceita apenas números',
+            'max' => 'O campo :attribute excedeu o limite de :max caracteres permitido',
+            'min' => 'O campo :attribute deve ter :min ou mais caracteres',
             'in' => 'Valor inválido',
             'exists' => 'Regional não existe',
             'date_format' => 'Formato de data inválido',
