@@ -278,6 +278,12 @@ class CursoService implements CursoServiceInterface {
         ->paginate(9);
     }
 
+    public function cidadeUpdate($validated)
+    {
+        Curso::withTrashed()->where('cidade', $validated['cidade'])->update(['cidade' => $validated['alterar_cidade']]);
+        event(new CrudEvent('cidade ' . $validated['cidade'] . ' para ' . $validated['alterar_cidade'] . ' em cursos', 'editou', '---'));
+    }
+
     public function inscritos(Curso $curso = null)
     {
         return resolve('App\Contracts\CursoSubServiceInterface');

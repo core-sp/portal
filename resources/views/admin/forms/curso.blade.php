@@ -57,11 +57,13 @@
         <div class="form-row mt-2">
             <div class="col-sm-3">
                 <label for="idregional">Regional / <span class="text-primary">Cidade</span></label>
-                <div class="float-right">
-                    <button type="button" id="nova_cidade" class="btn btn-link text-success font-weight-bolder font-italic px-0 pt-0">
-                        <i class="fas fa-plus"></i> Cidade
-                    </button>
-                </div>
+                <button type="button" id="nova_cidade" class="btn btn-link text-success font-weight-bolder pl-1 pr-1 pt-0">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button type="button" id="editar_cidade" class="btn btn-link text-info font-weight-bolder pl-1 pr-1 pt-0" {{ isset($resultado->cidade) ? '' : 'disabled' }}>
+                    <i class="far fa-edit"></i>
+                </button>
+                <i class="fas fa-question-circle float-right text-primary mt-1 mr-1" data-toggle="popover"></i>
                 <select name="idregional" class="form-control {{ $errors->has('idregional') || $errors->has('cidade') ? 'is-invalid' : '' }}" id="idregional" required>
                 @foreach($regionais as $regional)
                     @if(old('idregional'))
@@ -74,8 +76,16 @@
                     <hr />
 
                 @foreach($cidades as $cidade)
-                    <option class="text-primary" value="{{ $cidade }}" {{ (old('cidade') == $cidade) || (isset($resultado->cidade) && ($resultado->cidade == $cidade)) ? 'selected' : '' }}>{{ $cidade }}</option>
+                    @if(old('cidade'))
+                    <option class="text-primary" value="{{ $cidade }}" {{ old('cidade') == $cidade && empty(old('idregional')) ? 'selected' : '' }}>{{ $cidade }}</option>
+                    @else
+                    <option class="text-primary" value="{{ $cidade }}" {{ empty(old('idregional')) && isset($resultado->cidade) && ($resultado->cidade == $cidade) ? 'selected' : '' }}>{{ $cidade }}</option>
+                    @endif
                 @endforeach
+
+                @if(old('cidade') && !$errors->has('cidade') && ($cidades->search(old('cidade')) === false))
+                    <option class="text-success" value="{{ old('cidade') }}" selected>{{ old('cidade') }}</option>
+                @endif
                 </select>
                 @if($errors->has('idregional') || $errors->has('cidade'))
                 <div class="invalid-feedback">
@@ -104,7 +114,7 @@
                 <label for="add_campo">Adicionar campo para inscrição?</label>
                 <select name="add_campo" class="form-control {{ $errors->has('add_campo') ? 'is-invalid' : '' }}" required>
                     <option value="1" {{ (old('add_campo') == '1') || (isset($resultado) && ($resultado->add_campo == '1')) ? 'selected' : '' }}>Sim</option>
-                    <option value="0" {{ (old('add_campo') == '0') || (isset($resultado) && ($resultado->add_campo == '0')) ? 'selected' : '' }}>Não</option>
+                    <option value="0" {{ (old('add_campo') == '0') || (isset($resultado) && ($resultado->add_campo == '0')) ? 'selected' : '' }} selected>Não</option>
                 </select>
                 @if($errors->has('add_campo'))
                 <div class="invalid-feedback">

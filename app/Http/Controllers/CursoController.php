@@ -202,4 +202,19 @@ class CursoController extends Controller
             ->view('site.cursos-anteriores', compact('cursos'))
             ->header('Cache-Control','no-cache');
     }
+
+    public function cidadeUpdate(CursoRequest $request)
+    {
+        $this->authorize('updateOther', auth()->user());
+
+        try{
+            $validated = $request->validated();
+            $this->service->getService('Curso')->cidadeUpdate($validated);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao atualizar a cidade.");
+        }
+
+        return response()->json($validated);
+    }
 }

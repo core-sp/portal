@@ -84,6 +84,7 @@ Route::middleware(['block_ip'])->group(function () {
       Route::delete('/{id}', 'CursoController@destroy')->name('cursos.destroy');
       Route::get('/lixeira', 'CursoController@lixeira')->name('cursos.lixeira');
       Route::get('/{id}/restore', 'CursoController@restore')->name('cursos.restore');
+      Route::patch('/cidade/edit', 'CursoController@cidadeUpdate')->name('cursos.cidade.update');
       // Lida com a parte de inscritos
       Route::get('/inscritos/{idcurso}', 'CursoInscritoController@index')->name('inscritos.index');
       Route::get('/inscritos/{idcurso}/busca', 'CursoInscritoController@busca')->name('inscritos.busca');

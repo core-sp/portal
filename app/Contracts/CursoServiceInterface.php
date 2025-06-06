@@ -36,5 +36,7 @@ interface CursoServiceInterface {
 
     public function cursosAnteriores();
 
+    public function cidadeUpdate($validated);
+
     public function inscritos();
 }

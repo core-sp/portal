@@ -22,6 +22,9 @@ class CursoRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+        if(\Route::is('cursos.cidade.update'))
+            return;
+
         foreach ($this->all() as $key => $value) {
             if(in_array($key, ['datarealizacao', 'datatermino', 'inicio_inscricao', 'termino_inscricao']))
                 $this->merge([$key => str_replace('T', ' ', $this->input($key))]);
@@ -47,6 +50,16 @@ class CursoRequest extends FormRequest
 
     public function rules()
     {
+        if(\Route::is('cursos.cidade.update'))
+            return [
+                'cidade' => [
+                    'required',
+                    Rule::exists('cursos', 'cidade'),
+                    'unique:regionais,regional',
+                ],
+                'alterar_cidade' => 'required|unique:regionais,regional|string|min:3|max:120'
+            ];
+
         return [
             'tipo' => 'required|in:' . implode(',', $this->service->tipos()),
             'tema' => 'required|max:191',
@@ -84,11 +97,12 @@ class CursoRequest extends FormRequest
     {
         return [
             'required' => 'O campo :attribute é obrigatório',
+            'required_if' => 'O campo :attribute é obrigatório',
             'numeric' => 'O campo :attribute aceita apenas números',
             'max' => 'O campo :attribute excedeu o limite de :max caracteres permitido',
             'min' => 'O campo :attribute deve ter :min ou mais caracteres',
             'in' => 'Valor inválido',
-            'exists' => 'Regional não existe',
+            'idregional.exists' => 'Regional não existe',
             'date_format' => 'Formato de data inválido',
             'datarealizacao.after' => 'O curso deve iniciar após o dia de hoje',
             'datatermino.after_or_equal' => 'O curso deve terminar pelo menos 1h após a data de realização',
@@ -100,6 +114,8 @@ class CursoRequest extends FormRequest
             'boolean' => 'Campo com valor inválido',
             'campo_rotulo.required_if' => 'Campo obrigatório se for adicionar campo',
             'cidade.unique' => 'Cidade já existe em Regionais',
+            'cidade.exists' => 'Cidade não foi criada',
+            'alterar_cidade.unique' => 'Cidade já existe em Regionais',
             'string' => 'Deve ser um texto',
         ];
     }
