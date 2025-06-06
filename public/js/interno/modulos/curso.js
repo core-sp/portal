@@ -78,12 +78,10 @@ function gerenciarCidade(){
                 label: 'Nome da nova cidade: ',
             }
         }));
-        acao = adicionarCidade;
     });
 
     $('#editar_cidade').click(function(){
         let opcao = $('#idregional option:selected').val();
-        acao = null;
 
         if(opcao.match(/\D/g) === null)
             return false;
@@ -95,19 +93,21 @@ function gerenciarCidade(){
                 label: 'Alterar nome da cidade <span class="text-primary font-italic" id="cidade_selecionada">' + opcao + '</span>: ',
             }
         }));
-        acao = editarCidade;
     });
 
     $('#nova_cidade').on('CURSO_ADD_CIDADE', function(e){
         abrirModalCidade(e.detail);
+        acao = adicionarCidade;
     });
 
     $('#editar_cidade').on('CURSO_EDIT_CIDADE', function(e){
         abrirModalCidade(e.detail);
+        acao = editarCidade;
     });
 
     $('.modal-footer').on('click', '#salvar_cidade', function(){
         acao();
+        acao = null;
     });
     
     $('#idregional').change(function(){
