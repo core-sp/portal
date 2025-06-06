@@ -378,4 +378,40 @@ class SuporteService implements SuporteServiceInterface {
         
         return false;
     }
+
+    public function sobreStorage()
+    {
+        $comando_dir = 'du -s ';
+        $comandos = [
+            'img' => $comando_dir . public_path('imagens'),
+            'arq' => $comando_dir . public_path('arquivos'),
+            'arq_rep' => $comando_dir . \Storage::disk('local')->path('representantes'),
+            'logs' => $comando_dir . storage_path('logs'),
+            'termos' => $comando_dir . \Storage::disk('public')->path('termos'),
+            'hd' => 'df | grep ^/dev/sda1',
+        ];
+
+        foreach($comandos as $chave => $comando)
+        {
+            $shell = shell_exec($comando);
+            if(is_null($shell) || ($shell === false))
+                throw new \Exception('Erro ao verificar o storage com o comando { ' . $comando . ' }.', 500);
+
+            $shell_txt = explode(PHP_EOL, $shell, 1)[0];
+            $reg = $chave == 'hd' ? '/[\s]+/' : '/\t/';
+            $valor = preg_split($reg, $shell_txt);
+            $num = $chave == 'hd' ? 1 : 0;
+            $comandos[$chave] = $valor[$num];
+
+            if($chave == 'hd')
+                $comandos['disponivel'] = $valor[3];
+        }
+
+        return [
+            'total' => $comandos['hd'],
+            'labels' => ['Arquivos e Imagens', 'Arquivos dos Representantes', 'Logs', 'Termos', 'Espaço Disponível'],
+            'dados' => [$comandos['arq'] + $comandos['img'], $comandos['arq_rep'], $comandos['logs'], $comandos['termos'], $comandos['disponivel']],
+            'cores' => ['rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)', 'rgb(115, 209, 78)', 'rgb(126, 115, 226)'],
+        ];
+    }
 }

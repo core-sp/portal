@@ -183,3 +183,7 @@ img {
   overflow: hidden;
   white-space: nowrap;
 }
+
+.billboard_svg_class {
+  background-color: #ffffff;
+}

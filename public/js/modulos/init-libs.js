@@ -39,8 +39,42 @@ function recaptcha(){
     }
 }
 
+function graficos(){
+
+    if($('[class^="grafico-"]').length > 0){
+        // Gerar PDF do gráfico
+        const _lib = document.createElement('script');
+
+        _lib.setAttribute("src", 'https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js');
+        document.head.appendChild(_lib);
+
+        const _lib1 = document.createElement('script');
+
+        _lib1.setAttribute("src", 'https://d3js.org/d3.v6.min.js');
+        document.head.appendChild(_lib1);
+
+        const _lib2 = document.createElement('script');
+
+        _lib2.setAttribute("src", 'https://cdnjs.cloudflare.com/ajax/libs/billboard.js/3.14.3/billboard.pkgd.min.js');
+        _lib2.setAttribute("integrity", 'sha512-1VwrVSqZ+HSX8ZyO3Z+vKTlMM9BiUXbSnQL2JAnLdGL2DVoG+XJTXJEvtZGMt37ymAsP/DZXQStBRIep81mSQA==');
+        _lib2.setAttribute("crossorigin", 'anonymous');
+        _lib2.setAttribute("referrerpolicy", 'no-referrer');
+        document.head.appendChild(_lib2);
+
+        const _lib3 = document.createElement('link');
+
+        _lib3.setAttribute("rel", 'stylesheet');
+        _lib3.setAttribute("href", 'https://cdnjs.cloudflare.com/ajax/libs/billboard.js/3.14.3/billboard.min.css');
+        _lib3.setAttribute("integrity", 'sha512-+iioEOUqup3ddDw5CE3m87DWYtXSJrYphQzP5sYHdJCcvMULwEelaPgWBV4TFu+XQmL9ZEhfPUvgFWgbQ0hocQ==');
+        _lib3.setAttribute("crossorigin", 'anonymous');
+        _lib3.setAttribute("referrerpolicy", 'no-referrer');
+        document.head.appendChild(_lib3);
+    }
+}
+
 export function executar(link, hash){
     
+    graficos();
     recaptcha();
     tinyInit(link, hash);
 	securityInit(link);

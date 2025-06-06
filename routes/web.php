@@ -254,6 +254,7 @@ Route::middleware(['block_ip'])->group(function () {
       // Desbloqueio de IP
       Route::get('/ips', 'SuporteController@ipsView')->name('suporte.ips.view');
       Route::delete('/ips/excluir/{ip}', 'SuporteController@ipsExcluir')->name('suporte.ips.excluir');
+      Route::get('/sobre-storage', 'SuporteController@sobreStorage')->name('suporte.sobre-storage');
     });
 
     // Plantão Jurídico

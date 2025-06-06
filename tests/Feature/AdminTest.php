@@ -303,4 +303,22 @@ class AdminTest extends TestCase
         $this->get('/admin')
         ->assertSeeText('Para alterar sua senha, clique em seu nome de usuário no menu da esquerda e depois selecione "Alterar Senha";');
     }
+
+    /** @test */
+    public function authorized_users_can_view_storage()
+    {
+        $this->signInAsAdmin();
+
+        $this->get('/admin')
+        ->assertSee('<div class="grafico-storage spinner-grow spinner-grow-sm text-primary" id="ambiente_' . ambiente() . '"></div>');
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_view_storage()
+    {
+        $this->signIn();
+
+        $this->get('/admin')
+        ->assertDontSee('<div class="grafico-storage spinner-grow spinner-grow-sm text-primary" id="ambiente_' . ambiente() . '"></div>');
+    }
 }

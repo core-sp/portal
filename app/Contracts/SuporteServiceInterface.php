@@ -31,4 +31,6 @@ interface SuporteServiceInterface {
     public function bloquearIp($ip);
 
     public function liberarIp($ip, $user = null);
+
+    public function sobreStorage();
 }
