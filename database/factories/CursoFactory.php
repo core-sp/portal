@@ -18,6 +18,7 @@ $factory->define(Curso::class, function (Faker $faker) {
         'inicio_inscricao' => now()->format('Y-m-d H:i'),
         'termino_inscricao' => now()->addDay()->addHour()->format('Y-m-d H:i'),
         'endereco' => $faker->address,
+        'cidade' => null,
         'nrvagas' => $faker->numberBetween(10, 9999),
         'descricao' => $faker->text,
         'resumo' => $faker->sentence,
@@ -49,5 +50,12 @@ $factory->state(Curso::class, 'campo_adicional', function (Faker $faker) {
     return [
         'add_campo' => 1,
         'campo_rotulo' => array_keys(Curso::rotulos())[0],
+    ];
+});
+
+$factory->state(Curso::class, 'cidade', function (Faker $faker) {
+    return [
+        'cidade' => $faker->city,
+        'idregional' => null,
     ];
 });

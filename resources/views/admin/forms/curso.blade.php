@@ -69,7 +69,7 @@
                     @if(old('idregional'))
                     <option value="{{ $regional->idregional }}" {{ old('idregional') == $regional->idregional ? 'selected' : '' }}>{{ $regional->regional }}</option>
                     @else
-                    <option value="{{ $regional->idregional }}" {{ isset($resultado->idregional) && ($resultado->idregional == $regional->idregional) ? 'selected' : '' }}>{{ $regional->regional }}</option>
+                    <option value="{{ $regional->idregional }}" {{ empty(old('cidade')) && isset($resultado->idregional) && ($resultado->idregional == $regional->idregional) ? 'selected' : '' }}>{{ $regional->regional }}</option>
                     @endif
                 @endforeach
 
@@ -83,7 +83,7 @@
                     @endif
                 @endforeach
 
-                @if(old('cidade') && !$errors->has('cidade') && ($cidades->search(old('cidade')) === false))
+                @if(old('cidade') && !$errors->has('cidade') && ($cidades->search(old('cidade')) === false) && empty(old('idregional')))
                     <option class="text-success" value="{{ old('cidade') }}" selected>{{ old('cidade') }}</option>
                 @endif
                 </select>

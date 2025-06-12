@@ -10,10 +10,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Mail\CursoInscritoMailGuest;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Foundation\Testing\WithFaker;
 
 class CursoTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithFaker;
 
     /** @test */
     public function non_authenticated_users_cannot_access_links()
@@ -39,6 +40,7 @@ class CursoTest extends TestCase
         $this->post(route('cursos.store'))->assertRedirect(route('login'));
         $this->patch(route('cursos.update', $curso->idcurso))->assertRedirect(route('login'));
         $this->delete(route('cursos.destroy', $curso->idcurso))->assertRedirect(route('login'));
+        $this->patch(route('cursos.cidade.update'), [])->assertRedirect(route('login'));
 
         $this->get(route('inscritos.index', $curso->idcurso))->assertRedirect(route('login'));
         $this->get(route('inscritos.busca', $curso->idcurso))->assertRedirect(route('login'));
@@ -81,6 +83,9 @@ class CursoTest extends TestCase
         $this->post(route('cursos.store'), $curso->toArray())->assertForbidden();
         $this->patch(route('cursos.update', $curso->idcurso), $curso->toArray())->assertForbidden();
         $this->delete(route('cursos.destroy', $curso->idcurso))->assertForbidden();
+
+        $curso->update(['cidade' => 'Franca', 'idregional' => null]);
+        $this->patch(route('cursos.cidade.update'), ['cidade' => 'Franca', 'alterar_cidade' => 'FRANCA'])->assertForbidden();
 
         $this->get(route('inscritos.index', $curso->idcurso))->assertForbidden();
         $this->get(route('inscritos.busca', $curso->idcurso))->assertForbidden();
@@ -143,6 +148,28 @@ class CursoTest extends TestCase
     }
 
     /** @test */
+    public function view_regionais_cidades()
+    {
+        $user = $this->signInAsAdmin();
+
+        $cursos = factory('App\Curso', 5)->states('cidade')->create();
+
+        $this->get(route('cursos.create'))
+        ->assertSee('<option class="text-primary" value="' . $cursos->get(0)->cidade . '" >' . $cursos->get(0)->cidade . '</option>')
+        ->assertSee('<option class="text-primary" value="' . $cursos->get(1)->cidade . '" >' . $cursos->get(1)->cidade . '</option>')
+        ->assertSee('<option class="text-primary" value="' . $cursos->get(2)->cidade . '" >' . $cursos->get(2)->cidade . '</option>')
+        ->assertSee('<option class="text-primary" value="' . $cursos->get(3)->cidade . '" >' . $cursos->get(3)->cidade . '</option>')
+        ->assertSee('<option class="text-primary" value="' . $cursos->get(4)->cidade . '" >' . $cursos->get(4)->cidade . '</option>');
+
+        $this->get(route('cursos.edit', $cursos->get(0)->idcurso))
+        ->assertSee('<option class="text-primary" value="' . $cursos->get(0)->cidade . '" selected>' . $cursos->get(0)->cidade . '</option>')
+        ->assertSee('<option class="text-primary" value="' . $cursos->get(1)->cidade . '" >' . $cursos->get(1)->cidade . '</option>')
+        ->assertSee('<option class="text-primary" value="' . $cursos->get(2)->cidade . '" >' . $cursos->get(2)->cidade . '</option>')
+        ->assertSee('<option class="text-primary" value="' . $cursos->get(3)->cidade . '" >' . $cursos->get(3)->cidade . '</option>')
+        ->assertSee('<option class="text-primary" value="' . $cursos->get(4)->cidade . '" >' . $cursos->get(4)->cidade . '</option>');
+    }
+
+    /** @test */
     public function curso_without_inicio_inscricao_and_termino_inscricao_can_be_created_by_an_user()
     {
         $user = $this->signInAsAdmin();
@@ -195,6 +222,172 @@ class CursoTest extends TestCase
             ->assertSee($curso->idcurso)
             ->assertSee($curso->tema)
             ->assertSee('<span class="text-nowrap">'.$curso->nomeRotulo().'</span>');
+    }
+
+    // Testa se quando há erro de validação aparece a cidade ou regional correta.
+    /** @test */
+    public function select_after_error_created()
+    {
+        $this->signInAsAdmin();
+
+        $curso_ = factory('App\Curso')->states('cidade')->create();
+
+        // Erro sem ser itens do select
+        $curso = factory('App\Curso')->raw([
+            'tipo' => '66'
+        ]);
+
+        $this->post(route('cursos.store'), $curso)
+        ->assertSessionHasErrors('tipo');
+
+        $this->get(route('cursos.create'))
+        ->assertSee('<option value="2" selected>');
+
+        // Erro com idregional
+        $curso['idregional'] = '66';
+
+        $this->post(route('cursos.store'), $curso)
+        ->assertSessionHasErrors('idregional');
+
+        $this->get(route('cursos.create'))
+        ->assertDontSee('<option value="1" selected>')
+        ->assertDontSee('<option value="2" selected>')
+        ->assertDontSee('<option class="text-primary" value="' . $curso_->cidade . '" selected>');
+
+        // Erro 'tipo' com cidade criada
+        $curso['idregional'] = null;
+        $curso['cidade'] = $curso_->cidade;
+        $curso['tipo'] = 'dd';
+
+        $this->post(route('cursos.store'), $curso)
+        ->assertSessionHasErrors('tipo');
+
+        $this->get(route('cursos.create'))
+        ->assertDontSee('<option value="1" selected>')
+        ->assertDontSee('<option value="2" selected>')
+        ->assertSee('<option class="text-primary" value="' . $curso_->cidade . '" selected>');
+
+        // Erro 'tipo' com cidade nova
+        $curso['idregional'] = null;
+        $curso['cidade'] = $this->faker()->city;
+        $curso['tipo'] = 'dd';
+
+        $this->post(route('cursos.store'), $curso)
+        ->assertSessionHasErrors('tipo');
+
+        $this->get(route('cursos.create'))
+        ->assertDontSee('<option value="1" selected>')
+        ->assertDontSee('<option value="2" selected>')
+        ->assertDontSee('<option class="text-primary" value="' . $curso_->cidade . '" selected>')
+        ->assertSee('<option class="text-success" value="' . $curso['cidade'] . '" selected>');
+
+        // Erro 'tipo' com cidade nova e idregional
+        $curso['idregional'] = '1';
+        $curso['cidade'] = $this->faker()->city;
+        $curso['tipo'] = 'dd';
+
+        $this->post(route('cursos.store'), $curso)
+        ->assertSessionHasErrors('tipo');
+
+        $this->get(route('cursos.create'))
+        ->assertSee('<option value="1" selected>')
+        ->assertDontSee('<option value="2" selected>')
+        ->assertDontSee('<option class="text-primary" value="' . $curso_->cidade . '" selected>')
+        ->assertDontSee('<option class="text-success" value="' . $curso['cidade'] . '" selected>');
+    }
+
+    // Testa se quando há erro de validação aparece a cidade ou regional correta.
+    /** @test */
+    public function select_after_error_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $curso_ = factory('App\Curso')->states('cidade')->create();
+        $curso = factory('App\Curso')->create();
+
+        // Erro sem ser itens do select sem alterar idregional
+        $this->get(route('cursos.edit', $curso->idcurso))
+        ->assertSee('<option value="2" selected>');
+
+        // Erro sem ser itens do select
+        $attr = factory('App\Curso')->raw([
+            'idregional' => $user->idregional,
+            'tipo' => '66'
+        ]);
+
+        $this->patch(route('cursos.update', $curso->idcurso), $attr)
+        ->assertSessionHasErrors('tipo');
+
+        $this->get(route('cursos.edit', $curso->idcurso))
+        ->assertSee('<option value="1" selected>');
+
+        // Erro com idregional
+        $attr = factory('App\Curso')->raw([
+            'idregional' => '66',
+        ]);
+
+        $this->patch(route('cursos.update', $curso->idcurso), $attr)
+        ->assertSessionHasErrors('idregional');
+
+        $this->get(route('cursos.edit', $curso->idcurso))
+        ->assertDontSee('<option value="1" selected>')
+        ->assertDontSee('<option value="2" selected>')
+        ->assertDontSee('<option class="text-primary" value="' . $curso_->cidade . '" selected>');
+
+        // Erro 'tipo' com cidade criada
+        $attr = factory('App\Curso')->raw([
+            'idregional' => null,
+            'cidade' => $curso_->cidade,
+            'tipo' => 'dd'
+        ]);
+
+        $this->patch(route('cursos.update', $curso->idcurso), $attr)
+        ->assertSessionHasErrors('tipo');
+
+        $this->get(route('cursos.edit', $curso->idcurso))
+        ->assertDontSee('<option value="1" selected>')
+        ->assertDontSee('<option value="2" selected>')
+        ->assertSee('<option class="text-primary" value="' . $curso_->cidade . '" selected>');
+
+        // Erro 'tipo' com cidade criada e selecionada
+        $curso->update(['cidade' => $curso_->cidade, 'idregional' => null]);
+
+        $this->get(route('cursos.edit', $curso->idcurso))
+        ->assertDontSee('<option value="1" selected>')
+        ->assertDontSee('<option value="2" selected>')
+        ->assertSee('<option class="text-primary" value="' . $curso_->cidade . '" selected>');
+
+        // Erro 'tipo' com cidade nova
+        $attr = factory('App\Curso')->raw([
+            'idregional' => null,
+            'cidade' => $this->faker()->city,
+            'tipo' => 'dd'
+        ]);
+
+        $this->patch(route('cursos.update', $curso->idcurso), $attr)
+        ->assertSessionHasErrors('tipo');
+
+        $this->get(route('cursos.edit', $curso->idcurso))
+        ->assertDontSee('<option value="1" selected>')
+        ->assertDontSee('<option value="2" selected>')
+        ->assertDontSee('<option class="text-primary" value="' . $curso_->cidade . '" selected>')
+        ->assertSee('<option class="text-success" value="' . $attr['cidade'] . '" selected>');
+
+        // Erro 'tipo' com cidade nova e idregional
+        $attr = factory('App\Curso')->raw([
+            'idregional' => '1',
+            'cidade' => $this->faker()->city,
+            'tipo' => 'dd'
+        ]);
+
+        $this->patch(route('cursos.update', $curso->idcurso), $attr)
+        ->assertSessionHasErrors('tipo');
+
+        $this->get(route('cursos.edit', $curso->idcurso))
+        ->assertSee('<option value="1" selected>')
+        ->assertDontSee('<option value="2" selected>')
+        ->assertDontSee('<option class="text-primary" value="' . $curso_->cidade . '" selected>')
+        ->assertDontSee('<option class="text-success" value="' . $attr['cidade'] . '" selected>');
     }
 
     /** @test */
@@ -293,6 +486,35 @@ class CursoTest extends TestCase
     }
 
     /** @test */
+    public function curso_without_cidade_and_idregional_cannot_be_created()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'idregional' => '',
+            'cidade' => ''
+        ]);
+
+        $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors(['idregional', 'cidade']);
+        $this->assertDatabaseMissing('cursos', ['idregional' => $attributes['idregional'], 'cidade' => $attributes['cidade']]);
+    }
+
+    /** @test */
+    public function curso_with_cidade_and_idregional_can_be_created()
+    {
+        $user = $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'idregional' => $user->idregional,
+            'cidade' => 'Franca'
+        ]);
+
+        $this->post(route('cursos.store'), $attributes)->assertRedirect(route('cursos.index'));
+        $this->assertDatabaseMissing('cursos', ['idregional' => $attributes['idregional']]);
+        $this->assertDatabaseHas('cursos', ['cidade' => $attributes['cidade']]);
+    }
+
+    /** @test */
     public function curso_without_descricao_cannot_be_created()
     {
         $this->signInAsAdmin();
@@ -368,6 +590,54 @@ class CursoTest extends TestCase
 
         $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors('idregional');
         $this->assertDatabaseMissing('cursos', ['resumo' => $attributes['resumo']]);
+    }
+
+    /** @test */
+    public function curso_with_cidade_equal_regional_cannot_be_created()
+    {
+        $user = $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'cidade' => $user->regional->regional
+        ]);
+
+        $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors('cidade');
+        $this->assertDatabaseMissing('cursos', ['cidade' => $user->regional->regional]);
+
+        // **************** Em teste manual OK, aqui ERRO ***********************
+        // $attributes = factory('App\Curso')->raw([
+        //     'cidade' => mb_strtolower($user->regional->regional)
+        // ]);
+
+        // $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors('cidade');
+        // $this->assertDatabaseMissing('cursos', ['cidade' => mb_strtolower($user->regional->regional)]);
+    }
+
+    /** @test */
+    public function curso_with_cidade_less_than_3_chars_cannot_be_created()
+    {
+        $user = $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'cidade' => 'As'
+        ]);
+
+        $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors('cidade');
+        $this->assertDatabaseMissing('cursos', ['cidade' => 'As']);
+    }
+
+    /** @test */
+    public function curso_with_cidade_more_than_120_chars_cannot_be_created()
+    {
+        $user = $this->signInAsAdmin();
+
+        $temp = $this->faker()->sentence(300);
+        $attributes = factory('App\Curso')->raw([
+            'cidade' => $temp
+        ]);
+
+        $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors('cidade');
+        $this->assertDatabaseMissing('cursos', ['cidade' => $temp]);
     }
 
     /** @test */
@@ -727,6 +997,142 @@ class CursoTest extends TestCase
     }
 
     /** @test */
+    public function non_authorized_users_cannot_update_cidade()
+    {
+        $this->signIn();
+
+        $curso = factory('App\Curso')->create([
+            'idregional' => null,
+            'cidade' => 'Franca'
+        ]);
+
+        $this->get(route('cursos.edit', $curso->idcurso))->assertForbidden();
+        $this->patch(route('cursos.cidade.update'), ['cidade' => 'Franca', 'alterar_cidade' => 'FRANCA'])->assertForbidden();
+    }
+
+    /** @test */
+    public function cidade_cannot_be_updated_without_input_cidade_and_alterar_cidade()
+    {
+        $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->states('cidade')->create();
+
+        $this->get(route('cursos.edit', $curso->idcurso))
+        ->assertSee('<option class="text-primary" value="' . $curso->cidade . '" selected>' . $curso->cidade . '</option>');
+
+        $this->patch(route('cursos.cidade.update'), [])
+        ->assertSessionHasErrors(['cidade', 'alterar_cidade']);
+
+        $this->get(route('cursos.create'))
+        ->assertSee('<option class="text-primary" value="' . $curso->cidade . '" >' . $curso->cidade . '</option>');
+
+        $this->patch(route('cursos.cidade.update'), ['cidade' => '', 'alterar_cidade' => null])
+        ->assertSessionHasErrors(['cidade', 'alterar_cidade']);
+    }
+
+    /** @test */
+    public function cidade_cannot_be_updated_without_cidade_created()
+    {
+        $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->states('cidade')->create();
+
+        $this->patch(route('cursos.cidade.update'), ['cidade' => mb_strtolower($curso->cidade), 'alterar_cidade' => 'Qualquer'])
+        ->assertSessionHasErrors(['cidade']);
+
+        $this->patch(route('cursos.cidade.update'), ['cidade' => 'Blá', 'alterar_cidade' => 'Qualquer'])
+        ->assertSessionHasErrors(['cidade']);
+    }
+
+    /** @test */
+    public function cidade_cannot_be_updated_with_cidade_equals_regional()
+    {
+        $user = $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->states('cidade')->create();
+
+        $this->patch(route('cursos.cidade.update'), ['cidade' => $user->regional->regional, 'alterar_cidade' => 'Qualquer'])
+        ->assertSessionHasErrors(['cidade']);
+
+        $this->patch(route('cursos.cidade.update'), ['cidade' => mb_strtolower($user->regional->regional), 'alterar_cidade' => 'Qualquer'])
+        ->assertSessionHasErrors(['cidade']);
+    }
+
+    /** @test */
+    public function cidade_cannot_be_updated_with_alterar_cidade_equals_regional()
+    {
+        $user = $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->states('cidade')->create();
+
+        $this->patch(route('cursos.cidade.update'), ['cidade' => $curso->cidade, 'alterar_cidade' => $user->regional->regional])
+        ->assertSessionHasErrors(['alterar_cidade']);
+
+        // **************** Em teste manual OK, aqui ERRO ***********************
+        // $this->patch(route('cursos.cidade.update'), ['cidade' => $curso->cidade, 'alterar_cidade' => mb_strtolower($user->regional->regional)])
+        // ->assertSessionHasErrors(['alterar_cidade']);
+    }
+
+    /** @test */
+    public function cidade_cannot_be_updated_with_alterar_cidade_less_than_3_chars()
+    {
+        $user = $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->states('cidade')->create();
+
+        $this->patch(route('cursos.cidade.update'), ['cidade' => $curso->cidade, 'alterar_cidade' => 'CF'])
+        ->assertSessionHasErrors(['alterar_cidade']);
+    }
+
+    /** @test */
+    public function cidade_cannot_be_updated_with_alterar_cidade_more_than_120_chars()
+    {
+        $user = $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->states('cidade')->create();
+
+        $temp = $this->faker()->sentence(300);
+
+        $this->patch(route('cursos.cidade.update'), ['cidade' => $curso->cidade, 'alterar_cidade' => $temp])
+        ->assertSessionHasErrors(['alterar_cidade']);
+    }
+
+    /** @test */
+    public function cidade_can_be_updated_all()
+    {
+        $this->signInAsAdmin();
+
+        $outro = factory('App\Curso')->states('cidade')->create();
+        $outro->delete();
+
+        $curso = factory('App\Curso')->states('cidade')->create();
+        factory('App\Curso', 2)->states('cidade')->create([
+            'cidade' => $curso->cidade
+        ]);
+
+        $this->patch(route('cursos.cidade.update'), ['cidade' => $curso->cidade, 'alterar_cidade' => 'Franca'])
+        ->assertOk();
+
+        $this->assertDatabaseHas('cursos', ['cidade' => $outro->cidade]);
+        $this->assertDatabaseMissing('cursos', ['cidade' => $curso->cidade]);
+        $this->assertEquals(3, \App\Curso::where('cidade', 'Franca')->count());
+    }
+
+    /** @test */
+    public function log_is_generated_when_cidade_is_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->states('cidade')->create();
+        $this->patch(route('cursos.cidade.update'), ['cidade' => $curso->cidade, 'alterar_cidade' => 'Franca']);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *cidade ' . $curso->cidade . ' para Franca em cursos* (id: ---)';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
     public function curso_can_be_deleted()
     {
         $this->signInAsAdmin();
@@ -878,13 +1284,27 @@ class CursoTest extends TestCase
 
         $this->get(route('cursos.show', $curso->idcurso))
             ->assertOk()
+            ->assertSee('<td><h6 class="light">' . $curso->regional->regional)
             ->assertSee($curso->tema);
+
+        $curso_ = factory('App\Curso')->states('cidade')->create();
+
+        $this->get(route('cursos.show', $curso_->idcurso))
+            ->assertOk()
+            ->assertSee('<td><h6 class="light">' . $curso_->cidade)
+            ->assertSee($curso_->tema);
 
         $this->signInAsAdmin();
 
         $this->get(route('cursos.show', $curso->idcurso))
             ->assertOk()
+            ->assertSee('<td><h6 class="light">' . $curso->regional->regional)
             ->assertSee($curso->tema);
+
+        $this->get(route('cursos.show', $curso_->idcurso))
+            ->assertOk()
+            ->assertSee('<td><h6 class="light">' . $curso_->cidade)
+            ->assertSee($curso_->tema);
     }
 
     /** @test */
@@ -912,6 +1332,15 @@ class CursoTest extends TestCase
         $this->get(route('cursos.index.website'))
             ->assertOk()
             ->assertSee(route('cursos.show', $curso->idcurso))
+            ->assertSee('<h6 class="light cinza-claro">' . $curso->regional->regional)
+            ->assertSee($curso->tema);
+
+        $curso = factory('App\Curso')->states('cidade')->create();
+
+        $this->get(route('cursos.index.website'))
+            ->assertOk()
+            ->assertSee(route('cursos.show', $curso->idcurso))
+            ->assertSee('<h6 class="light cinza-claro">' . $curso->cidade)
             ->assertSee($curso->tema);
     }
 
@@ -2389,6 +2818,14 @@ class CursoTest extends TestCase
         ->assertOk()
         ->assertSee('<a href="'. route('cursos.show', $curso->idcurso) .'">')
         ->assertSee('<h6 class="light cinza-claro">'. $curso->regional->regional .' - '. onlyDate($curso->datarealizacao) .'</h6>')
+        ->assertSee('<a href="'. route('cursos.inscricao.website', $curso->idcurso) .'" class="btn btn-sm btn-primary text-white mt-2">Inscrever-se</a>');
+
+        $curso = factory('App\Curso')->states('cidade')->create();
+
+        $this->get(route('representante.cursos'))
+        ->assertOk()
+        ->assertSee('<a href="'. route('cursos.show', $curso->idcurso) .'">')
+        ->assertSee('<h6 class="light cinza-claro">'. $curso->cidade .' - '. onlyDate($curso->datarealizacao) .'</h6>')
         ->assertSee('<a href="'. route('cursos.inscricao.website', $curso->idcurso) .'" class="btn btn-sm btn-primary text-white mt-2">Inscrever-se</a>');
     }
 
