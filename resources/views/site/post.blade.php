@@ -58,9 +58,9 @@
             <h4 class="post-subtitle mb-3">{{ $post->subtitulo }}</h4>
             <p><small class="light">Por: {{ $post->user->perfil->nome === 'Editor' ? 'Setor de comunicação' : $post->user->nome }} | {{ formataData($post->created_at) }}</small></p>
           </div>
-          <div class="d-block mb-4">
+          <div class="post-img mb-4">
             @if(isset($post->img))
-              <img src="{{asset($post->img)}}" />
+              <img class="lazy-loaded-image lazy" src="{{ asset($post->imgBlur()) }}" data-src="{{ asset($post->img) }}" />
             @else
               <img src="{{asset('img/news-generica-2.png')}}" />
             @endif

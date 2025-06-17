@@ -22,7 +22,7 @@
 <section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     @if(isset($pagina->img))
-    <img src="{{asset($pagina->img)}}" />
+    <img class="lazy-loaded-image lazy" src="{{ asset($pagina->imgBlur()) }}" data-src="{{ asset($pagina->img) }}" />
     @else
     <img src="{{asset('img/institucional.png')}}" alt="CORE-SP">
     @endif

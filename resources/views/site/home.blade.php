@@ -22,8 +22,8 @@
           @foreach($imagens as $img)
             <div class="carousel-item h-100 {{ $loop->first ? 'active' : '' }}">
               <a href="{{ $img->link }}" target="{{ $img->target }}">
-                <img class="w-100 hide-576 lazy-loaded-image" data-src="{{ asset($img->url) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
-                <img class="w-100 show-576 lazy-loaded-image" data-src="{{ asset($img->url_mobile) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
+                <img class="w-100 hide-576 lazy-loaded-image" src="{{ asset($img->imgBlur()) }}" data-src="{{ asset($img->url) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
+                <img class="w-100 show-576 lazy-loaded-image" src="{{ asset($img->imgBlurMobile()) }}" data-src="{{ asset($img->url_mobile) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
               </a>
             </div>
           @endforeach

@@ -97,7 +97,7 @@
       </div>
       <div class="col-lg-8 mt-2-992">
         <div class="curso-img">
-          <img src="{{ asset($curso->img) }}" class="bn-img" />
+          <img class="lazy-loaded-image lazy bn-img" src="{{ asset($curso->imgBlur()) }}" data-src="{{ asset($curso->img) }}" />
         </div>
         <div class="edital-download mt-3 conteudo-txt-mini">
           <h4 class="stronger">Descrição</h4>

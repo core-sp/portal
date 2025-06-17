@@ -17,7 +17,7 @@
                 <div class="h-100 d-flex flex-column">
                     <a href="{{ route('cursos.show', $curso->idcurso) }}">
                         <div class="curso-grid">
-                            <img src="{{ asset(imgToThumb($curso->img)) }}" class="bn-img" />
+                            <img class="lazy-loaded-image lazy bn-img" src="{{ asset($curso->imgBlur()) }}" data-src="{{ asset(imgToThumb($curso->img)) }}" />
                             <div class="curso-grid-txt">
                                 <h6 class="light cinza-claro">{{ $curso->regional->regional }} - {{ onlyDate($curso->datarealizacao) }}</h6>
                                 <h5 class="branco mt-1">{{ $curso->tipo }} - {{ $curso->tema }}</h5>
