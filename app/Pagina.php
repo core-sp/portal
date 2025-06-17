@@ -5,10 +5,11 @@ namespace App;
 use App\Traits\TabelaAdmin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\ImagensLazyLoad;
 
 class Pagina extends Model
 {
-    use SoftDeletes, TabelaAdmin;
+    use SoftDeletes, TabelaAdmin, ImagensLazyLoad;
     
     protected $primaryKey = 'idpagina';
     protected $fillable = ['titulo', 'subtitulo', 'slug', 'img',
@@ -94,5 +95,10 @@ class Pagina extends Model
             $contents,
             [ 'table', 'table-hover' ]
         );
+    }
+
+    public function imgBlur()
+    {
+        return $this->localPreImagemLFM($this->img);
     }
 }

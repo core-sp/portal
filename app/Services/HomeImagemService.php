@@ -10,8 +10,11 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use App\Traits\ImagensLazyLoad;
 
 class HomeImagemService implements HomeImagemServiceInterface {
+
+    use ImagensLazyLoad;
 
     public function carrossel($array = null)
     {
@@ -43,6 +46,10 @@ class HomeImagemService implements HomeImagemServiceInterface {
                     'link' => $chunk[$indice][2],
                     'target' => $chunk[$indice][3]
                 ]);
+
+                $this->gerarPreImagemLFM($chunk[$indice][0]);
+                $this->gerarPreImagemLFM($chunk[$indice][1]);
+
                 event(new CrudEvent('banner principal', 'editou', $banner->idimagem));
             }
         }

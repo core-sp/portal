@@ -6,8 +6,11 @@ use App\Post;
 use App\Contracts\PostServiceInterface;
 use App\Events\CrudEvent;
 use Illuminate\Support\Str;
+use App\Traits\ImagensLazyLoad;
 
 class PostService implements PostServiceInterface {
+
+    use ImagensLazyLoad;
 
     private $variaveis;
 
@@ -106,6 +109,8 @@ class PostService implements PostServiceInterface {
             Post::findOrFail($id)->update($request);
         else  
             $id = Post::create($request)->id;
+
+        $this->gerarPreImagemLFM($request['img']);
             
         event(new CrudEvent('post', $txt, $id));
     }

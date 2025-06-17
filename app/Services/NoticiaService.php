@@ -8,8 +8,11 @@ use App\Events\CrudEvent;
 use Illuminate\Support\Str;
 use App\Contracts\MediadorServiceInterface;
 use Exception;
+use App\Traits\ImagensLazyLoad;
 
 class NoticiaService implements NoticiaServiceInterface {
+
+    use ImagensLazyLoad;
 
     private $variaveis;
 
@@ -155,6 +158,8 @@ class NoticiaService implements NoticiaServiceInterface {
         else  
             $id = Noticia::create($request)->idnoticia;
             
+        $this->gerarPreImagemLFM($request['img']);
+
         event(new CrudEvent('notícia', $txt, $id));
     }
 

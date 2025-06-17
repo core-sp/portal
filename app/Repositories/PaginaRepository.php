@@ -3,8 +3,12 @@
 namespace App\Repositories;
 
 use App\Pagina;
+use App\Traits\ImagensLazyLoad;
 
 class PaginaRepository {
+
+    use ImagensLazyLoad;
+
     public function getToTable()
     {
         return Pagina::orderBy('idpagina','DESC')->paginate(10);
@@ -46,6 +50,8 @@ class PaginaRepository {
 
     public function store($request, $slug)
     {
+        $this->gerarPreImagemLFM($request->img);
+
         return Pagina::create([
             'titulo' => $request->titulo,
             'subtitulo' => $request->subtitulo,
@@ -59,6 +65,8 @@ class PaginaRepository {
 
     public function update($id, $request, $slug)
     {
+        $this->gerarPreImagemLFM($request->img);
+        
         return Pagina::findOrFail($id)->update([
             'titulo' => $request->titulo,
             'subtitulo' => $request->subtitulo,

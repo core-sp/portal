@@ -4,9 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use App\Traits\ImagensLazyLoad;
 
 class HomeImagem extends Model
 {
+    use ImagensLazyLoad;
+
     protected $table = 'home_imagens';
     protected $primaryKey = 'idimagem';
     protected $guarded = [];
@@ -169,5 +172,15 @@ class HomeImagem extends Model
         $url = '/' . $this->url;
 
         return strpos('/', $this->url) !== 0 ? $url : $this->url;
+    }
+
+    public function imgBlur()
+    {
+        return $this->localPreImagemLFM($this->url);
+    }
+
+    public function imgBlurMobile()
+    {        
+        return $this->localPreImagemLFM($this->url_mobile);
     }
 }

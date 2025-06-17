@@ -4,10 +4,11 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\ImagensLazyLoad;
 
 class Curso extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, ImagensLazyLoad;
 
     protected $primaryKey = 'idcurso';
     protected $table = 'cursos';
@@ -249,5 +250,10 @@ class Curso extends Model
     public function getFormatCampoAdicional($valor)
     {
         return $this->nomeRotulo() . ': ' . $valor;
+    }
+
+    public function imgBlur()
+    {
+        return $this->localPreImagemLFM($this->img);
     }
 }

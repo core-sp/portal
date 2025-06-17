@@ -6,9 +6,12 @@ use App\Curso;
 use App\Events\CrudEvent;
 use App\Contracts\CursoServiceInterface;
 use Carbon\Carbon;
+use App\Traits\ImagensLazyLoad;
 
 class CursoService implements CursoServiceInterface {
 
+    use ImagensLazyLoad;
+    
     private $variaveis;
 
     public function __construct()
@@ -187,6 +190,8 @@ class CursoService implements CursoServiceInterface {
             $id = Curso::create($validated)->idcurso;
         else
             Curso::findOrFail($id)->update($validated);
+
+        $this->gerarPreImagemLFM($validated['img']);
         
         event(new CrudEvent('curso', $acao, $id));
     }
