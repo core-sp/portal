@@ -161,9 +161,9 @@ img {
 	height: auto;
 }
 
-img.lazy {
+/* img.lazy {
 	display: block;
-}
+} */
 
 a {
 	color: inherit;
@@ -716,7 +716,7 @@ figure.align-left {
 }
 
 .carousel-item img,
-.noticia-img img {
+.noticia-img img, .post-img img {
 	object-fit: cover;
 	object-position: center;
 	height: 100%;
@@ -1057,7 +1057,7 @@ input[type=file]::-webkit-file-upload-button {
 	border-radius: 5px;
 }
 
-.noticia-img img {
+.noticia-img img, .post-img img {
 	border-radius: 5px;
 }
 

@@ -133,12 +133,26 @@ function resizePagination(){
 }
 
 export function executar(local = 'externo'){
+
+    lazyLoad();
+    resizePagination();
+    
+    $(window).resize(function(){
+        lazyLoad(true);
+        resizePagination();
+    });
+    
     menuResponsivo();
     cookies();
 
     // vídeo popup
     if($('#popup-campanha').length > 0)
         $('#popup-campanha').modal('show');
+
+    $("#popup-campanha").on('hide.bs.modal', function(){
+        if(this.contains(document.activeElement))
+            document.activeElement.blur();
+    });
 
     // Menu principal fixo
 	$(document).on('scroll', function(){
@@ -169,14 +183,6 @@ export function executar(local = 'externo'){
 
         $('body').append(form);
         $(form).submit();
-    });
-    
-    lazyLoad();
-    resizePagination();
-    
-    $(window).resize(function(){
-        lazyLoad(true);
-        resizePagination();
     });
 
     // Texto do link com quantidade de caracteres que ultrapassam a largura do conteúdo
