@@ -29,7 +29,8 @@ trait ImagensLazyLoad
             if(!file_exists($caminho))
                 mkdir($caminho, 0755);
         } catch (\Throwable $th) {
-            \Log::error('[Erro: '.$th->getMessage().'], [Código: '.$th->getCode().'], [Arquivo: '.$th->getFile().'], [Linha: '.$th->getLine().']');
+            $msg = '[Portal: erro ao criar a pasta "' . self::pastaSaveImg() . '" com o caminho "' . $caminho. '"], ';
+            \Log::error($msg . '[Erro: '.$th->getMessage().'], [Código: '.$th->getCode().'], [Arquivo: '.$th->getFile().'], [Linha: '.$th->getLine().']');
         }
 
         if(file_exists($caminho))
