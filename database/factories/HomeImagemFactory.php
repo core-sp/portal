@@ -7,8 +7,8 @@ $factory->define(HomeImagem::class, function (Faker $faker) {
     return [
         'funcao' => 'bannerprincipal',
         'ordem' => 1,
-        'url' => '/imagens/fake/'.date('Y-m').'/desktop_'.$faker->word. $faker->ean8 . '.png',
-        'url_mobile' => '/imagens/fake/'.date('Y-m').'/mobile_'.$faker->word. $faker->ean8 . '.png',
+        'url' => '/imagens/fake/'.date('Y-m').'/desktop_'.$faker->word. ' úç ãÌ()Ë ' .$faker->ean8 . '.png',
+        'url_mobile' => '/imagens/fake/'.date('Y-m').'/mobile_'.$faker->word. ' úç ãÌ()Ë ' .$faker->ean8 . '.png',
         'link' => $faker->url,
         'target' => '_blank'
     ];

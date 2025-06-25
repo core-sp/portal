@@ -37,7 +37,7 @@ trait ImagensLazyLoad
         }
 
         if(file_exists($caminho))
-            return exec('ffmpeg -y -i ' . $principal_img . ' -vf scale=20:-1 ' . $nova_img);
+            return exec('ffmpeg -y -i "' . $principal_img . '" -vf scale=20:-1 "' . $nova_img . '"');
 
         return false;
     }
