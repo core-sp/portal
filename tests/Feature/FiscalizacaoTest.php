@@ -224,6 +224,7 @@ class FiscalizacaoTest extends TestCase
         unset($acoes['Registros Convertidos<span class="invisible">F</span>']);
         unset($acoes['Dispensa de Registro (de ofício)']);
         unset($acoes['Orientações aos representantes']);
+        unset($acoes['Auto de Constatação']);
 
         foreach($dadoFiscalizacao as $val)
         {
@@ -237,7 +238,7 @@ class FiscalizacaoTest extends TestCase
             $acoes['Orientações às representadas'] += $val->orientacaorepresentada;
             // $acoes['Orientações aos representantes'] += $val->orientacaorepresentante;
             $acoes['Diligências externas'] += $val->cooperacaoinstitucional;
-            $acoes['Auto de Constatação'] += $val->autoconstatacao;
+            // $acoes['Auto de Constatação'] += $val->autoconstatacao;
             $acoes['Autos de Infração'] += $val->autosdeinfracao;
             $acoes['Multa Administrativa'] += $val->multaadministrativa;
             $acoes['Orientação às contabilidades'] += $val->orientacaocontabil;
@@ -1671,7 +1672,7 @@ class FiscalizacaoTest extends TestCase
             ->assertSeeText($dados->orientacaorepresentada)
             ->assertDontSeeText($dados->orientacaorepresentante)
             ->assertSeeText($dados->cooperacaoinstitucional)
-            ->assertSeeText($dados->autoconstatacao)
+            ->assertDontSeeText($dados->autoconstatacao)
             ->assertSeeText($dados->autosdeinfracao)
             ->assertSeeText($dados->multaadministrativa)
             ->assertSeeText($dados->notificacandidatoeleicao)
@@ -1695,11 +1696,11 @@ class FiscalizacaoTest extends TestCase
 
         factory("App\DadoFiscalizacao")->create([
             "idperiodo" => $periodo2020->id,
-            "autoconstatacao" => 11111
+            "notificacandidatoeleicao" => 11111
         ]);
         factory("App\DadoFiscalizacao")->create([
             "idperiodo" => $periodo2021->id,
-            "autoconstatacao" => 22222
+            "notificacandidatoeleicao" => 22222
         ]);
 
         $this->get(route("fiscalizacao.mapaperiodo", $periodo2020->id))
