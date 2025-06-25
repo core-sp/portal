@@ -13,7 +13,7 @@ $factory->define(Post::class, function (Faker $faker) {
         'titulo' => $titulo,
         'slug' => Str::slug($titulo, '-'),
         'subtitulo' => $faker->sentence,
-        'img' => $faker->url,
+        'img' => '/imagens/fake/'.date('Y-m').'/desktop_'.$faker->word. $faker->ean8 . '.png',
         'conteudo' => $conteudo,
         'conteudoBusca' => converterParaTextoCru($conteudo),
         'idusuario' => factory('App\User'),

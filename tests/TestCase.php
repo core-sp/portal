@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use PermissoesTableSeeder;
+use Illuminate\Http\UploadedFile;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -16,6 +17,7 @@ abstract class TestCase extends BaseTestCase
         $app = require __DIR__.'/../bootstrap/app.php';
         $app->make(Kernel::class)->bootstrap();
         $this->clearCache();
+        $this->gerenciarPastasLazyLoad();
         return $app;
     }
 
@@ -73,5 +75,24 @@ abstract class TestCase extends BaseTestCase
         ->withoutMiddleware(\Illuminate\Session\Middleware\AuthenticateSession::class);
 
         return $user;
+    }
+
+    protected function gerenciarPastasLazyLoad($img = null)
+    {
+        $raiz = public_path('/imagens/fake');
+
+        if(is_null($img))
+            return \File::exists($raiz) ? exec('rm -R ' . $raiz) : null;
+
+        $raiz_img = $raiz . '/' . date('Y-m') . '/';
+        $path = $raiz_img . '.blur';
+
+        if(!\File::exists($path) || (!\File::exists($path) && ($img == '')))
+            mkdir($path, 0755, true);
+
+        if(strlen($img) > 3){
+            $file = UploadedFile::fake()->image($img, 600, 400);
+            \File::put($raiz_img . $file->getClientOriginalName(), $file->get());
+        }
     }
 }

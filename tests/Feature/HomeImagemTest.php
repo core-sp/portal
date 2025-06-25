@@ -93,7 +93,7 @@ class HomeImagemTest extends TestCase
         $dados['target-1'] = '_self';
         $dados['target-5'] = '_self';
 
-        $this->put(route('imagens.banner.put', $dados))
+        $this->put(route('imagens.banner.put'), $dados)
         ->assertRedirect(route('admin'));
 
         $this->assertDatabaseHas("home_imagens", [
@@ -121,13 +121,93 @@ class HomeImagemTest extends TestCase
                 $dados[$key . $cont] = $banner[$val];
         }
 
-        $this->put(route('imagens.banner.put', $dados))
+        $this->put(route('imagens.banner.put'), $dados)
         ->assertRedirect(route('admin'));
 
         $log = tailCustom(storage_path($this->pathLogInterno()), HomeImagem::TOTAL);
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
         $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *banner principal* (id: ';
         $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function banner_updated_not_created_img_blur()
+    {
+        $this->authorized_users_can_update_banner();
+
+        $banners = HomeImagem::all();
+
+        foreach($banners as $b)
+        {
+            if(isset($b->url_mobile))
+                $this->assertFalse(\File::exists(public_path($b->url_mobile)));
+            $this->assertFalse(\File::exists(public_path($b->url)));
+        }
+
+        // Com pasta criada, mas sem arquivo de imagem
+        $this->gerenciarPastasLazyLoad('');
+
+        foreach($banners as $b)
+        {
+            if(isset($b->url_mobile))
+                $this->assertFalse(\File::exists(public_path($b->url_mobile)));
+            $this->assertFalse(\File::exists(public_path($b->url)));
+        }
+
+        $this->gerenciarPastasLazyLoad();
+
+        // Sem arquivo de imagem no BD
+        $campos = ['img-' => 'url', 'img-mobile-' => 'url_mobile', 'link-' => 'link', 'target-' => 'target'];
+        
+        for($cont = 1, $index = 0; $cont <= HomeImagem::TOTAL; $cont++, $index++)
+        {
+            $banner = $banners->get($index)->toArray();
+            foreach($campos as $key => $val)
+                $dados[$key . $cont] = in_array($key, ['img-', 'img-mobile-']) ? null : $banner[$val];
+        }
+
+        $this->put(route('imagens.banner.put'), $dados)
+        ->assertRedirect(route('admin'));
+
+        $this->assertFalse(\File::exists(public_path() . '/imagens/fake/' . date('Y-m')));
+        $this->assertFalse(\File::exists(public_path() . '/imagens/fake/' . date('Y-m') . '/.blur'));
+    }
+
+    /** @test */
+    public function banner_updated_can_create_img_blur()
+    {
+        $campos = ['img-' => 'url', 'img-mobile-' => 'url_mobile', 'link-' => 'link', 'target-' => 'target'];
+        $banners = factory('App\HomeImagem', HomeImagem::TOTAL)->create();
+
+        $user = $this->signInAsAdmin();
+        
+        for($cont = 1, $index = 0; $cont <= HomeImagem::TOTAL; $cont++, $index++)
+        {
+            $banner = $banners->get($index)->toArray();
+            $this->gerenciarPastasLazyLoad($banner['url']);
+            $this->gerenciarPastasLazyLoad($banner['url_mobile']);
+
+            $this->assertTrue(\File::exists(public_path($banner['url'])));
+            $this->assertTrue(\File::exists(public_path($banner['url_mobile'])));
+
+            foreach($campos as $key => $val)
+                $dados[$key . $cont] = $banner[$val];
+        }
+
+        $this->put(route('imagens.banner.put'), $dados)
+        ->assertRedirect(route('admin'));
+
+        $banners = HomeImagem::all();
+        $path = public_path() . substr($banners->get(0)->url, 0, strripos($banners->get(0)->url, '/desktop_') + 1) . '.blur/small-';
+
+        foreach($banners as $b)
+        {
+            $nome = substr($b->url, strripos($b->url, '/desktop_') + 1);
+            $this->assertTrue(\File::exists($path . $nome));
+
+            $nome = substr($b->url_mobile, strripos($b->url_mobile, '/mobile_') + 1);
+            $this->assertTrue(\File::exists($path . $nome));
+        }
     }
 
     /** @test */
@@ -202,7 +282,7 @@ class HomeImagemTest extends TestCase
         $dados['img-mobil-1'] = $dados['img-mobile-1'];
         unset($dados['img-mobile-1']);
 
-        $this->put(route('imagens.banner.put', $dados))
+        $this->put(route('imagens.banner.put'), $dados)
         ->assertRedirect(route('imagens.banner'));
 
         $this->get(route('imagens.banner'))
@@ -227,7 +307,7 @@ class HomeImagemTest extends TestCase
         $dados['img-mobile-11'] = $dados['img-mobile-1'];
         unset($dados['img-mobile-1']);
 
-        $this->put(route('imagens.banner.put', $dados))
+        $this->put(route('imagens.banner.put'), $dados)
         ->assertRedirect(route('imagens.banner'));
 
         $this->get(route('imagens.banner'))
@@ -251,7 +331,7 @@ class HomeImagemTest extends TestCase
 
         unset($dados['img-mobile-1']);
 
-        $this->put(route('imagens.banner.put', $dados))
+        $this->put(route('imagens.banner.put'), $dados)
         ->assertRedirect(route('imagens.banner'));
 
         $this->get(route('imagens.banner'))
@@ -275,7 +355,7 @@ class HomeImagemTest extends TestCase
 
         $dados['target-1'] = '_selfe';
 
-        $this->put(route('imagens.banner.put', $dados))
+        $this->put(route('imagens.banner.put'), $dados)
         ->assertRedirect(route('imagens.banner'));
 
         $this->get(route('imagens.banner'))
@@ -283,18 +363,25 @@ class HomeImagemTest extends TestCase
     }
 
     /** @test */
-    public function can_view_carrossel()
+    public function can_view_carrossel_without_img_created()
     {
         $view = array();
+        $view_img = array();
         $banners = factory('App\HomeImagem', HomeImagem::TOTAL)->create();
 
-        foreach($banners as $key => $banner)
+        foreach($banners as $key => $banner){
             $key == 0 ? array_push($view, '<li data-target="#carousel" data-slide-to="'.$key.'" class="active"></li>') : 
-            array_push($view, '<li data-target="#carousel" data-slide-to="'.$key.'" class=""></li>');
+                array_push($view, '<li data-target="#carousel" data-slide-to="'.$key.'" class=""></li>');
+            array_push($view_img, 
+                '<img class="w-100 hide-576 lazy-loaded-image" src="" data-src="'. asset($banner->url) .'" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />',
+                '<img class="w-100 show-576 lazy-loaded-image" src="" data-src="'. asset($banner->url_mobile) .'" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />',
+            );
+        }
 
         $this->get(route('site.home'))
         ->assertOk()
-        ->assertSeeInOrder($view);
+        ->assertSeeInOrder($view)
+        ->assertSeeInOrder($view_img);
 
         HomeImagem::find(1)->update(['url' => null]);
         HomeImagem::find(5)->update(['url' => null]);
@@ -303,6 +390,30 @@ class HomeImagemTest extends TestCase
         ->assertOk()
         ->assertDontSee('<a href="'. HomeImagem::find(1)->link .'" target="'. HomeImagem::find(1)->target .'">')
         ->assertDontSee('<a href="'. HomeImagem::find(5)->link .'" target="'. HomeImagem::find(5)->target .'">');
+    }
+
+    /** @test */
+    public function can_view_carrossel_with_img_created()
+    {
+        $this->banner_updated_can_create_img_blur();
+        
+        $view = array();
+        $view_img = array();
+        $banners = HomeImagem::all();
+
+        foreach($banners as $key => $banner){
+            $key == 0 ? array_push($view, '<li data-target="#carousel" data-slide-to="'.$key.'" class="active"></li>') : 
+                array_push($view, '<li data-target="#carousel" data-slide-to="'.$key.'" class=""></li>');
+            array_push($view_img, 
+                '<img class="w-100 hide-576 lazy-loaded-image" src="' . $banner->imgBlur() .'" data-src="'. asset($banner->url) .'" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />',
+                '<img class="w-100 show-576 lazy-loaded-image" src="' . $banner->imgBlurMobile() .'" data-src="'. asset($banner->url_mobile) .'" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />',
+            );
+        }
+
+        $this->get(route('site.home'))
+        ->assertOk()
+        ->assertSeeInOrder($view)
+        ->assertSeeInOrder($view_img);
     }
 
     /** @test */

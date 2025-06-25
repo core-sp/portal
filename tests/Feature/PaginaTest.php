@@ -84,6 +84,26 @@ class PaginaTest extends TestCase
     }
 
     /** @test */
+    public function pagina_can_be_created_with_img_blur()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Pagina')->raw();
+
+        $this->gerenciarPastasLazyLoad($attributes['img']);
+
+        $this->get(route('paginas.create'))->assertOk();
+        $this->post(route('paginas.store', $attributes));
+
+        $this->assertDatabaseHas('paginas', ['titulo' => $attributes['titulo']]);
+
+        $this->assertTrue(\File::exists(public_path($attributes['img'])));
+
+        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+    }
+
+    /** @test */
     public function pagina_title_is_required()
     {
         $this->signInAsAdmin();
@@ -188,6 +208,48 @@ class PaginaTest extends TestCase
     }
 
     /** @test */
+    public function created_paginas_are_shown_on_the_website_with_generic_img()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Pagina')->raw([
+            'img' => null
+        ]);
+        $this->post(route('paginas.store'), $attributes);
+        
+        $this->get(route('paginas.site', $attributes['slug']))
+            ->assertSee($attributes['titulo'])
+            ->assertSee($attributes['conteudo'])
+            ->assertSee('<img src="' . asset('img/institucional.png') .'" alt="CORE-SP">');
+    }
+
+    /** @test */
+    public function created_paginas_are_shown_on_the_website_without_img_created()
+    {
+        $this->pagina_can_be_created_by_user();
+
+        $pagina = Pagina::first();
+        
+        $this->get(route('paginas.site', $pagina['slug']))
+            ->assertSee($pagina['titulo'])
+            ->assertSee($pagina['conteudo'])
+            ->assertSee('<img class="lazy-loaded-image lazy" src="" data-src="'. asset($pagina->img) .'" />');
+    }
+
+    /** @test */
+    public function created_paginas_are_shown_on_the_website_with_img_created()
+    {
+        $this->pagina_can_be_created_with_img_blur();
+
+        $pagina = Pagina::first();
+        
+        $this->get(route('paginas.site', $pagina['slug']))
+            ->assertSee($pagina['titulo'])
+            ->assertSee($pagina['conteudo'])
+            ->assertSee('<img class="lazy-loaded-image lazy" src="' .$pagina->imgBlur(). '" data-src="'. asset($pagina->img) .'" />');
+    }
+
+    /** @test */
     public function pagina_can_be_updated()
     {
         $user = $this->signInAsAdmin();
@@ -203,6 +265,34 @@ class PaginaTest extends TestCase
         ]);
 
         $this->assertEquals(Pagina::find($pagina->idpagina)->titulo, $titulo);
+    }
+
+    /** @test */
+    public function pagina_can_be_updated_with_img_blur()
+    {
+        $user = $this->signInAsAdmin();
+
+        $pagina = factory('App\Pagina')->create();
+        $titulo = 'Novo titulo';
+
+        $img = factory('App\Pagina')->raw()['img'];
+
+        $this->gerenciarPastasLazyLoad($img);
+
+        $this->get(route('paginas.edit', $pagina->idpagina))->assertOk();
+        $this->patch(route('paginas.update', $pagina->idpagina), [
+            'idusuario' => $user->idusuario,
+            'titulo' => $titulo,
+            'conteudo' => $pagina->conteudo,
+            'img' => $img
+        ]);
+
+        $this->assertEquals(Pagina::find($pagina->idpagina)->titulo, $titulo);
+
+        $this->assertTrue(\File::exists(public_path($img)));
+
+        $nome = substr($img, strripos($img, '/desktop_') + 1);
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
     }
 
     /** @test */

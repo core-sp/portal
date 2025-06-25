@@ -67,6 +67,26 @@ class NoticiaTest extends TestCase
     }
 
     /** @test */
+    public function noticia_can_be_created_with_img_blur()
+    {
+        $user = $this->signInAsAdmin();
+        $attributes = factory('App\Noticia')->raw([
+            'idusuario' => $user->idusuario
+        ]);
+
+        $this->gerenciarPastasLazyLoad($attributes['img']);
+
+        $this->get(route('noticias.index'))->assertOk();
+        $this->post(route('noticias.store'), $attributes);
+        $this->assertDatabaseHas('noticias', $attributes);
+
+        $this->assertTrue(\File::exists(public_path($attributes['img'])));
+
+        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+    }
+
+    /** @test */
     public function a_noticia_without_titulo_cannot_be_created()
     {
         $this->signInAsAdmin();
@@ -257,6 +277,39 @@ class NoticiaTest extends TestCase
 
         $this->assertDatabaseHas('noticias', $attributes);
         $this->assertDatabaseMissing('noticias', $antigo);
+    }
+
+    /** @test */
+    public function noticia_can_be_updated_with_img_blur()
+    {
+        $faker = \Faker\Factory::create();
+        $user = $this->signInAsAdmin();
+
+        $noticia = factory('App\Noticia')->create();
+        $antigo = $noticia->getAttributes();
+        $attributes = $noticia->getAttributes();
+
+        $attributes['titulo'] = 'Novo titulo';
+        $attributes['slug'] = Str::slug($attributes['titulo'], '-');
+        $attributes['img'] = $noticia->img . '.jpg';
+        $attributes['idregional'] = null;
+        $attributes['idcurso'] = null;
+        $attributes['categoria'] = 'Feiras';
+        $attributes['conteudo'] = $faker->sentence(400);
+        $attributes['conteudoBusca'] = converterParaTextoCru($attributes['conteudo']);
+        $attributes['idusuario'] = $user->idusuario;
+
+        $this->gerenciarPastasLazyLoad($attributes['img']);
+
+        $this->patch(route('noticias.update', $noticia->idnoticia), $attributes);
+
+        $this->assertDatabaseHas('noticias', $attributes);
+        $this->assertDatabaseMissing('noticias', $antigo);
+
+        $this->assertTrue(\File::exists(public_path($attributes['img'])));
+
+        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
     }
 
     /** @test */
@@ -462,6 +515,58 @@ class NoticiaTest extends TestCase
         $this->get(route('noticias.show', $noticia->slug))
             ->assertOk()
             ->assertSee($noticia->titulo);
+    }
+
+    /** @test */
+    public function noticia_is_shown_on_the_website_with_generic_img()
+    {
+        $noticia = factory('App\Noticia')->create(['img' => null]);
+
+        $this->get(route('noticias.show', $noticia->slug))
+            ->assertOk()
+            ->assertSee($noticia->titulo)
+            ->assertDontSee('<img class="lazy-loaded-image lazy" src="" data-src="'. asset($noticia->img) .'" />');
+
+        $this->get(route('noticias.siteGrid'))
+            ->assertOk()
+            ->assertSee($noticia->titulo)
+            ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="' .asset('img/small-news-generica-thumb.png'). '" data-src="'. asset('img/news-generica-thumb.png') .'" />');
+    }
+
+    /** @test */
+    public function noticia_is_shown_on_the_website_without_img_created()
+    {
+        $this->noticia_can_be_created_by_an_user();
+
+        $noticia = Noticia::first();
+
+        $this->get(route('noticias.show', $noticia->slug))
+            ->assertOk()
+            ->assertSee($noticia->titulo)
+            ->assertSee('<img class="lazy-loaded-image lazy" src="" data-src="'. asset($noticia->img) .'" />');
+
+        $this->get(route('noticias.siteGrid'))
+            ->assertOk()
+            ->assertSee($noticia->titulo)
+            ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="" data-src="'. asset(imgToThumb($noticia->img)) .'" />');
+    }
+
+    /** @test */
+    public function noticia_is_shown_on_the_website_with_img_created()
+    {
+        $this->noticia_can_be_created_with_img_blur();
+
+        $noticia = Noticia::first();
+
+        $this->get(route('noticias.show', $noticia->slug))
+            ->assertOk()
+            ->assertSee($noticia->titulo)
+            ->assertSee('<img class="lazy-loaded-image lazy" src="' .$noticia->imgBlur(). '" data-src="'. asset($noticia->img) .'" />');
+
+        $this->get(route('noticias.siteGrid'))
+            ->assertOk()
+            ->assertSee($noticia->titulo)
+            ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="' .$noticia->imgBlur(). '" data-src="'. asset(imgToThumb($noticia->img)) .'" />');
     }
 
     /** @test */

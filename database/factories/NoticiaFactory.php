@@ -12,7 +12,7 @@ $factory->define(Noticia::class, function (Faker $faker) {
     return [
         'titulo' => $titulo,
         'slug' => Str::slug($titulo, '-'),
-        'img' => $faker->url,
+        'img' => '/imagens/fake/'.date('Y-m').'/desktop_'.$faker->word. $faker->ean8 . '.png',
         'conteudo' => $conteudo,
         'conteudoBusca' => converterParaTextoCru($conteudo),
         'categoria' => null,

@@ -19,6 +19,9 @@ trait ImagensLazyLoad
         if(!Str::startsWith($path_img, '/imagens/'))
             return false;
 
+        if(!file_exists(public_path($path_img)))
+            return false;
+
         $pos = strripos($path_img, '/');
         $caminho = public_path() . substr($path_img, 0, $pos + 1) . self::pastaSaveImg();
         $nome = 'small-' . substr($path_img, $pos + 1);
@@ -34,7 +37,7 @@ trait ImagensLazyLoad
         }
 
         if(file_exists($caminho))
-            return exec('ffmpeg -i ' . $principal_img . ' -vf scale=20:-1 ' . $nova_img);
+            return exec('ffmpeg -y -i ' . $principal_img . ' -vf scale=20:-1 ' . $nova_img);
 
         return false;
     }
@@ -51,6 +54,6 @@ trait ImagensLazyLoad
         if(!file_exists(public_path() . $nova_img) && ($this->gerarPreImagemLFM($principal_img) === false))
             return '';
 
-        return $nova_img;
+        return asset($nova_img);
     }
 }

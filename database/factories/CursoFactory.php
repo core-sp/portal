@@ -12,7 +12,7 @@ $factory->define(Curso::class, function (Faker $faker) {
     return [
         'tipo' => $tipos[$tiposIndex],
         'tema' => $faker->sentence,
-        'img' => '/imagens/2019-05/notícias-genérico.jpg',
+        'img' => '/imagens/fake/'.date('Y-m').'/desktop_'.$faker->word. $faker->ean8 . '.png',
         'datarealizacao' => now()->addDays(2)->format('Y-m-d H:i'),
         'datatermino' => now()->addDays(2)->addHours(2)->format('Y-m-d H:i'),
         'inicio_inscricao' => now()->format('Y-m-d H:i'),

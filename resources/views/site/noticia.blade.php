@@ -61,7 +61,7 @@
       <div class="col-lg-8 pr-4">
         @if(isset($noticia->img))
         <div class="noticia-img mb-4">
-          <img class="lazy-loaded-image lazy" src="{{ asset($noticia->imgBlur()) }}" data-src="{{ asset($noticia->img) }}" />
+          <img class="lazy-loaded-image lazy" src="{{ $noticia->imgBlur() }}" data-src="{{ asset($noticia->img) }}" />
         </div>
         @endif
         <div class="conteudo-txt">

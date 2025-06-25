@@ -2,7 +2,7 @@
   <a href="{{ route('noticias.show', $noticia->slug) }}">
     <div class="box-news">
       @if(isset($noticia->img))
-      <img class="lazy-loaded-image lazy bn-img" src="{{ asset($noticia->imgBlur()) }}" data-src="{{ asset(imgToThumb($noticia->img)) }}" />
+      <img class="lazy-loaded-image lazy bn-img" src="{{ $noticia->imgBlur() }}" data-src="{{ asset(imgToThumb($noticia->img)) }}" />
       @else
       <img class="lazy-loaded-image lazy bn-img" src="{{ asset('img/small-news-generica-thumb.png') }}" data-src="{{ asset('img/news-generica-thumb.png') }}" />
       @endif

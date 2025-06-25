@@ -60,7 +60,7 @@
           </div>
           <div class="post-img mb-4">
             @if(isset($post->img))
-              <img class="lazy-loaded-image lazy" src="{{ asset($post->imgBlur()) }}" data-src="{{ asset($post->img) }}" />
+              <img class="lazy-loaded-image lazy" src="{{ $post->imgBlur() }}" data-src="{{ asset($post->img) }}" />
             @else
               <img src="{{asset('img/news-generica-2.png')}}" />
             @endif

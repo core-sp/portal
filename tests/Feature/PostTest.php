@@ -64,6 +64,28 @@ class PostTest extends TestCase
     }
 
     /** @test */
+    public function post_can_be_created_with_img_blur()
+    {
+        $user = $this->signInAsAdmin();
+
+        $attributes = factory('App\Post')->raw([
+            'idusuario' => $user->idusuario
+        ]);
+
+        $this->gerenciarPastasLazyLoad($attributes['img']);
+
+        $this->get(route('posts.create'))->assertOk();
+        $this->post(route('posts.store'), $attributes);
+
+        $this->assertDatabaseHas('posts', $attributes);
+
+        $this->assertTrue(\File::exists(public_path($attributes['img'])));
+
+        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+    }
+
+    /** @test */
     public function post_requires_a_title()
     {
         $this->signInAsAdmin();
@@ -220,6 +242,39 @@ class PostTest extends TestCase
     }
 
     /** @test */
+    public function post_can_be_updated_with_img_blur()
+    {
+        $faker = \Faker\Factory::create();
+        $user = $this->signInAsAdmin();
+
+        $post = factory('App\Post')->create();
+
+        $antigo = $post->getAttributes();
+        $attributes = $post->getAttributes();
+
+        $attributes['titulo'] = 'Novo titulo';
+        $attributes['slug'] = Str::slug($attributes['titulo'], '-');
+        $attributes['subtitulo'] = 'Novo subtitulo';
+        $attributes['img'] = $post->img . '.jpeg';
+        $attributes['conteudo'] = $faker->sentence(400);
+        $attributes['conteudoBusca'] = converterParaTextoCru($attributes['conteudo']);
+        $attributes['idusuario'] = $user->idusuario;
+
+        $this->get(route('posts.edit', $post->id))->assertOk();
+
+        $this->gerenciarPastasLazyLoad($attributes['img']);
+
+        $this->patch(route('posts.update', $post->id), $attributes);
+        $this->assertDatabaseHas('posts', $attributes);
+        $this->assertDatabaseMissing('posts', $antigo);
+
+        $this->assertTrue(\File::exists(public_path($attributes['img'])));
+
+        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+    }
+
+    /** @test */
     public function a_post_title_can_be_updated()
     {
         $user = $this->signInAsAdmin();
@@ -354,6 +409,42 @@ class PostTest extends TestCase
         $this->get(route('site.blog'))
         ->assertOk()
         ->assertSeeTextInOrder($temp);
+    }
+
+    /** @test */
+    public function created_posts_are_shown_without_img_created()
+    {
+        $this->post_can_be_created_by_an_user();
+
+        $post = Post::first();
+
+        $this->get(route('site.blog.post', $post->slug))
+            ->assertOk()
+            ->assertSee($post->titulo)
+            ->assertSee('<img class="lazy-loaded-image lazy" src="" data-src="'. asset($post->img) .'" />');
+
+        $this->get(route('site.blog'))
+            ->assertOk()
+            ->assertSee($post->titulo)
+            ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="" data-src="'. asset(imgToThumb($post->img)) .'" />');
+    }
+
+    /** @test */
+    public function created_posts_are_shown_with_img_created()
+    {
+        $this->post_can_be_created_with_img_blur();
+
+        $post = Post::first();
+
+        $this->get(route('site.blog.post', $post->slug))
+            ->assertOk()
+            ->assertSee($post->titulo)
+            ->assertSee('<img class="lazy-loaded-image lazy" src="' .$post->imgBlur(). '" data-src="'. asset($post->img) .'" />');
+
+        $this->get(route('site.blog'))
+            ->assertOk()
+            ->assertSee($post->titulo)
+            ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="' .$post->imgBlur(). '" data-src="'. asset(imgToThumb($post->img)) .'" />');
     }
 
     /** @test */

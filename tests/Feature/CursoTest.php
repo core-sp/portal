@@ -128,6 +128,46 @@ class CursoTest extends TestCase
     }
 
     /** @test */
+    public function curso_can_be_created_with_img_blur()
+    {
+        $user = $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw();
+
+        $this->gerenciarPastasLazyLoad($attributes['img']);
+
+        $this->get(route('cursos.create'))->assertOk();
+        $this->post(route('cursos.store'), $attributes);
+        $this->assertDatabaseHas('cursos', [
+            'tema' => $attributes['tema'],
+            'idusuario' => $user->idusuario
+        ]);
+
+        $this->assertTrue(\File::exists(public_path($attributes['img'])));
+
+        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+
+        $attributes = factory('App\Curso')->raw([
+            'nrvagas' => 8899
+        ]);
+
+        $this->gerenciarPastasLazyLoad($attributes['img']);
+
+        $this->get(route('cursos.create'))->assertOk();
+        $this->post(route('cursos.store'), $attributes);
+        $this->assertDatabaseHas('cursos', [
+            'tema' => $attributes['tema'],
+            'nrvagas' => 8899
+        ]);
+
+        $this->assertTrue(\File::exists(public_path($attributes['img'])));
+
+        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+    }
+
+    /** @test */
     public function log_is_generated_when_curso_is_created()
     {
         $user = $this->signInAsAdmin();
@@ -697,6 +737,35 @@ class CursoTest extends TestCase
     }
 
     /** @test */
+    public function curso_can_be_updated_with_img_blur()
+    {
+        $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+        $attributes = factory('App\Curso')->raw();
+
+        $this->gerenciarPastasLazyLoad($attributes['img']);
+
+        $this->get(route('cursos.edit', $curso->idcurso))->assertOk();
+        $this->patch(route('cursos.update', $curso->idcurso), $attributes);
+
+        $cur = Curso::find($curso->idcurso);
+        $this->assertEquals($cur->tema, $attributes['tema']);
+        $this->assertEquals($cur->descricao, $attributes['descricao']);
+        $this->assertEquals($cur->resumo, $attributes['resumo']);
+        $this->assertDatabaseHas('cursos', [
+            'tema' => $attributes['tema'],
+            'descricao' => $attributes['descricao'],
+            'resumo' => $attributes['resumo']
+        ]);
+
+        $this->assertTrue(\File::exists(public_path($attributes['img'])));
+
+        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+    }
+
+    /** @test */
     public function log_is_generated_when_curso_is_updated()
     {
         $user = $this->signInAsAdmin();
@@ -885,6 +954,72 @@ class CursoTest extends TestCase
         $this->get(route('cursos.show', $curso->idcurso))
             ->assertOk()
             ->assertSee($curso->tema);
+    }
+
+    /** @test */
+    public function curso_published_is_shown_on_website_with_generic_img()
+    {
+        $curso = factory('App\Curso')->create(['img' => null]);
+
+        $this->get(route('cursos.show', $curso->idcurso))
+            ->assertOk()
+            ->assertSee($curso->tema)
+            ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="'.asset('img/small-news-generica-thumb.png').'" data-src="'. asset('img/news-generica-thumb.png') .'" />');
+
+        $this->get(route('cursos.index.website'))
+            ->assertOk()
+            ->assertSee($curso->tema)
+            ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="' .asset('img/small-news-generica-thumb.png'). '" data-src="'. asset('img/news-generica-thumb.png') .'" />');
+    }
+
+    /** @test */
+    public function curso_published_is_shown_on_website_without_img_created()
+    {
+        $this->curso_can_be_created_by_an_user();
+
+        $cursos = Curso::all();
+
+        $this->get(route('cursos.show', $cursos->get(0)->idcurso))
+            ->assertOk()
+            ->assertSee($cursos->get(0)->tema)
+            ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="" data-src="'. asset($cursos->get(0)->img) .'" />');
+
+        $this->get(route('cursos.show', $cursos->get(1)->idcurso))
+            ->assertOk()
+            ->assertSee($cursos->get(1)->tema)
+            ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="" data-src="'. asset($cursos->get(1)->img) .'" />');
+        
+        $this->get(route('cursos.index.website'))
+            ->assertOk()
+            ->assertSee($cursos->get(0)->tema)
+            ->assertSee($cursos->get(1)->tema)
+            ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="" data-src="'. asset($cursos->get(0)->img) .'" />')
+            ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="" data-src="'. asset($cursos->get(1)->img) .'" />');
+    }
+
+    /** @test */
+    public function curso_published_is_shown_on_website_with_img_created()
+    {
+        $this->curso_can_be_created_with_img_blur();
+
+        $cursos = Curso::all();
+
+        $this->get(route('cursos.show', $cursos->get(0)->idcurso))
+            ->assertOk()
+            ->assertSee($cursos->get(0)->tema)
+            ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="' .$cursos->get(0)->imgBlur(). '" data-src="'. asset($cursos->get(0)->img) .'" />');
+
+        $this->get(route('cursos.show', $cursos->get(1)->idcurso))
+            ->assertOk()
+            ->assertSee($cursos->get(1)->tema)
+            ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="' .$cursos->get(1)->imgBlur(). '" data-src="'. asset($cursos->get(1)->img) .'" />');
+        
+        $this->get(route('cursos.index.website'))
+            ->assertOk()
+            ->assertSee($cursos->get(0)->tema)
+            ->assertSee($cursos->get(1)->tema)
+            ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="' .$cursos->get(0)->imgBlur(). '" data-src="'. asset($cursos->get(0)->img) .'" />')
+            ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="' .$cursos->get(1)->imgBlur(). '" data-src="'. asset($cursos->get(1)->img) .'" />');
     }
 
     /** @test */
@@ -2390,6 +2525,55 @@ class CursoTest extends TestCase
         ->assertSee('<a href="'. route('cursos.show', $curso->idcurso) .'">')
         ->assertSee('<h6 class="light cinza-claro">'. $curso->regional->regional .' - '. onlyDate($curso->datarealizacao) .'</h6>')
         ->assertSee('<a href="'. route('cursos.inscricao.website', $curso->idcurso) .'" class="btn btn-sm btn-primary text-white mt-2">Inscrever-se</a>');
+    }
+
+    /** @test */
+    public function can_view_cards_with_cursos_with_generic_img()
+    {
+        $curso = factory('App\Curso')->create(['img' => null]);
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.cursos'))
+        ->assertOk()
+        ->assertSee('<a href="'. route('cursos.show', $curso->idcurso) .'">')
+        ->assertSee('<h6 class="light cinza-claro">'. $curso->regional->regional .' - '. onlyDate($curso->datarealizacao) .'</h6>')
+        ->assertSee('<a href="'. route('cursos.inscricao.website', $curso->idcurso) .'" class="btn btn-sm btn-primary text-white mt-2">Inscrever-se</a>')
+        ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="'.asset('img/small-news-generica-thumb.png').'" data-src="'. asset('img/news-generica-thumb.png') .'" />');
+    }
+
+    /** @test */
+    public function can_view_cards_with_cursos_without_img_created()
+    {
+        $this->can_view_cards_with_cursos();
+
+        $curso = Curso::first();
+
+        $this->get(route('representante.cursos'))
+        ->assertOk()
+        ->assertSee('<a href="'. route('cursos.show', $curso->idcurso) .'">')
+        ->assertSee('<h6 class="light cinza-claro">'. $curso->regional->regional .' - '. onlyDate($curso->datarealizacao) .'</h6>')
+        ->assertSee('<a href="'. route('cursos.inscricao.website', $curso->idcurso) .'" class="btn btn-sm btn-primary text-white mt-2">Inscrever-se</a>')
+        ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="" data-src="'. asset($curso->img) .'" />');
+    }
+
+    /** @test */
+    public function can_view_cards_with_cursos_with_img_created()
+    {
+        $curso = factory('App\Curso')->create();
+
+        $this->gerenciarPastasLazyLoad($curso['img']);
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.cursos'))
+        ->assertOk()
+        ->assertSee('<a href="'. route('cursos.show', $curso->idcurso) .'">')
+        ->assertSee('<h6 class="light cinza-claro">'. $curso->regional->regional .' - '. onlyDate($curso->datarealizacao) .'</h6>')
+        ->assertSee('<a href="'. route('cursos.inscricao.website', $curso->idcurso) .'" class="btn btn-sm btn-primary text-white mt-2">Inscrever-se</a>')
+        ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="' .$curso->imgBlur(). '" data-src="'. asset($curso->img) .'" />');
     }
 
     /** @test */
