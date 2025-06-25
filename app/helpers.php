@@ -826,7 +826,7 @@ function ambiente()
 
 function versaoScriptJs()
 {
-    return '1.2.3';
+    return '1.2.4';
 }
 
 function hashScriptJs()
