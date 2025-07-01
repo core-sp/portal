@@ -156,6 +156,7 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownCore">
                       <a href="/concursos" class="dropdown-item">Concursos</a>
                       <a href="/conselho" class="dropdown-item">Conselho</a>
+                      <a href="/eleicao" class="dropdown-item">Eleição Core-SP</a>
                       <a href="/institucional" class="dropdown-item">Institucional</a>
                       <a href="/legislacao" class="dropdown-item">Legislação</a>
                       <a href="/missao-visao-e-valores" class="dropdown-item">Missão, Visão e Valores</a>
