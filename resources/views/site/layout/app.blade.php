@@ -36,7 +36,7 @@
         {!! mostraChatScript() !!}
 
         <!-- *************************************************** CLARITY ******************************************************************* -->
-        @if(strpos(config('app.url'), 'homolog') !== false)
+        @if((config('app.env') == 'production') && config('app.debug'))
         <!-- Teste de uso Clarity - Microsoft -->
         <script type="text/javascript">
           (function(c,l,a,r,i,t,y){
