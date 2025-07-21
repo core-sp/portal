@@ -186,12 +186,14 @@ class CursoService implements CursoServiceInterface {
         if(!Carbon::hasFormat($validated['termino_inscricao'], 'Y-m-d H:i'))
             $validated['termino_inscricao'] = null;
 
+        $img = $this->gerarPreImagemLFM($validated['img']);
+        if($img)
+            $validated['img'] = $img;
+
         if(!isset($id))
             $id = Curso::create($validated)->idcurso;
         else
             Curso::findOrFail($id)->update($validated);
-
-        $this->gerarPreImagemLFM($validated['img']);
         
         event(new CrudEvent('curso', $acao, $id));
     }

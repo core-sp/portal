@@ -153,12 +153,14 @@ class NoticiaService implements NoticiaServiceInterface {
         $request['publicada'] = $user->perfil == 'Estagiário' ? 'Não' : 'Sim';
         $txt = isset($id) ? 'editou' : 'criou';
 
+        $img = $this->gerarPreImagemLFM($request['img']);
+        if($img)
+            $request['img'] = $img;
+
         if(isset($id))
             Noticia::findOrFail($id)->update($request);
         else  
             $id = Noticia::create($request)->idnoticia;
-            
-        $this->gerarPreImagemLFM($request['img']);
 
         event(new CrudEvent('notícia', $txt, $id));
     }

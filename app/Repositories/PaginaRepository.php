@@ -50,13 +50,13 @@ class PaginaRepository {
 
     public function store($request, $slug)
     {
-        $this->gerarPreImagemLFM($request->img);
+        $img = $this->gerarPreImagemLFM($request->img);
 
         return Pagina::create([
             'titulo' => $request->titulo,
             'subtitulo' => $request->subtitulo,
             'slug' => $slug,
-            'img' => $request->img,
+            'img' => $img ? $img : $request->img,
             'conteudo' => $request->conteudo,
             'conteudoBusca' => converterParaTextoCru($request->conteudo),
             'idusuario' => $request->idusuario
@@ -65,13 +65,13 @@ class PaginaRepository {
 
     public function update($id, $request, $slug)
     {
-        $this->gerarPreImagemLFM($request->img);
+        $img = $this->gerarPreImagemLFM($request->img);
         
         return Pagina::findOrFail($id)->update([
             'titulo' => $request->titulo,
             'subtitulo' => $request->subtitulo,
             'slug' => $slug,
-            'img' => $request->img,
+            'img' => $img ? $img : $request->img,
             'conteudo' => $request->conteudo,
             'conteudoBusca' => converterParaTextoCru($request->conteudo),
             'idusuario' => $request->idusuario

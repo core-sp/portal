@@ -40,15 +40,16 @@ class HomeImagemService implements HomeImagemServiceInterface {
             {
                 $indice = $cont - 1;
                 $banner = $resultado->where('ordem', $cont)->first();
+
+                $temp_0 = $this->gerarPreImagemLFM($chunk[$indice][0]);
+                $temp_1 = $this->gerarPreImagemLFM($chunk[$indice][1]);
+                    
                 $banner->update([
-                    'url' => $chunk[$indice][0],
-                    'url_mobile' => $chunk[$indice][1],
+                    'url' => $temp_0 ? $temp_0 : $chunk[$indice][0],
+                    'url_mobile' => $temp_1 ? $temp_1 : $chunk[$indice][1],
                     'link' => $chunk[$indice][2],
                     'target' => $chunk[$indice][3]
                 ]);
-
-                $this->gerarPreImagemLFM($chunk[$indice][0]);
-                $this->gerarPreImagemLFM($chunk[$indice][1]);
 
                 event(new CrudEvent('banner principal', 'editou', $banner->idimagem));
             }

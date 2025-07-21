@@ -105,12 +105,14 @@ class PostService implements PostServiceInterface {
         $request['idusuario'] = $user->idusuario;
         $txt = isset($id) ? 'editou' : 'criou';
 
+        $img = $this->gerarPreImagemLFM($request['img']);
+        if($img)
+            $request['img'] = $img;
+
         if(isset($id))
             Post::findOrFail($id)->update($request);
         else  
             $id = Post::create($request)->id;
-
-        $this->gerarPreImagemLFM($request['img']);
             
         event(new CrudEvent('post', $txt, $id));
     }
