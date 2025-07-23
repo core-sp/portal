@@ -16,6 +16,13 @@ export function executar(local = 'interno'){
                 //set or change the preview image src
                 let target_preview = $('#' + localStorage.getItem('target_preview'));
                 target_preview.attr('src', url).trigger('change');
+
+                // Preencher popover preview-lfm
+                let final_id = target_preview.attr('id').replace("holder", "");
+                let preview = $('#preview-lfm' + final_id);
+
+                if(preview.length > 0)
+                    preview[0].dataset.originalTitle = '<img src="' + target_preview.attr('src') + '" />';
             };
 
             return false;
@@ -31,4 +38,25 @@ export function executar(local = 'interno'){
         }
     
     $('#edital').filemanager('file');
+
+    $('[id*="preview-lfm"]').popover({
+        animated: true,
+        placement: 'top',
+        html: true,
+        trigger: "hover",
+        title: '<img src="" />',
+    });
+
+    $('[id*="preview-lfm"]').on('show.bs.popover', function(){
+        if($('[name*="img"]').val().length < 5)
+            this.dataset.originalTitle = '<img src="" />';
+    });
+
+    $('[id*="preview-lfm"]').each(function(){
+        let final_id = this.id.replace("preview-lfm", "");
+        let hol = $('#holder' + final_id);
+
+        if(hol.length > 0)
+            this.dataset.originalTitle = '<img src="' + hol.attr('src') + '" />';
+    });
 };

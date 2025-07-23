@@ -33,7 +33,7 @@
                                     <label for="lfm">Imagem para desktop (1920 x 540 px)</label>
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-prepend">
-                                            <a id="lfm-{{ $i }}" data-input="img-{{ $i }}" data-preview="holder" class="btn btn-default">
+                                            <a id="lfm-{{ $i }}" data-input="img-{{ $i }}" data-preview="holder-{{ $i }}" class="btn btn-default">
                                                 <i class="fas fa-picture-o"></i> Alterar imagem
                                             </a>
                                         </span>
@@ -43,13 +43,19 @@
                                             name="img-{{ $i }}"
                                             value="{{ $img->url }}"
                                             />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="preview-lfm-{{ $i }}" data-toggle="popover">
+                                                <i class="fas fa-eye"></i>
+                                            </span>
+                                        </div>
                                     </div>
+                                    <div id="holder-{{ $i }}" src="{{ isset($img->url) ? asset($img->url) : '' }}"></div>
                                 </div>
                                 <div class="col">
                                     <label for="lfm">Imagem para mobile (576 x 650 px)</label>
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-prepend">
-                                            <a id="lfm-m-{{ $i }}" data-input="img-m-{{ $i }}" data-preview="holder" class="btn btn-default">
+                                            <a id="lfm-m-{{ $i }}" data-input="img-m-{{ $i }}" data-preview="holder-m-{{ $i }}" class="btn btn-default">
                                                 <i class="fas fa-picture-o"></i> Alterar imagem
                                             </a>
                                         </span>
@@ -59,7 +65,13 @@
                                             name="img-mobile-{{ $i }}"
                                             value="{{ $img->url_mobile }}"
                                             />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="preview-lfm-m-{{ $i }}" data-toggle="popover">
+                                                <i class="fas fa-eye"></i>
+                                            </span>
+                                        </div>
                                     </div>
+                                    <div id="holder-m-{{ $i }}" src="{{ isset($img->url_mobile) ? asset($img->url_mobile) : '' }}"></div>
                                 </div>
                             </div>
                             <div class="form-row mb-2">

@@ -68,7 +68,13 @@
                             @endif
                         @endif
                         />
+                    <div class="input-group-append">
+                        <span class="input-group-text" id="preview-lfm" data-toggle="popover">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
                 </div>
+                <div id="holder" src="{{ isset($resultado->img) ? asset($resultado->img) : '' }}"></div>
             </div>
         </div>
         <div class="form-group mt-2">

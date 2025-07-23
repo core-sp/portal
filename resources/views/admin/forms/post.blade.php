@@ -48,12 +48,18 @@
                     name="img"
                     value="{{ empty(old('img')) && isset($post->img) ? $post->img : old('img') }}"
                 />
+                <div class="input-group-append">
+                    <span class="input-group-text" id="preview-lfm" data-toggle="popover">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
                 @if($errors->has('img'))
                 <div class="invalid-feedback">
                     {{ $errors->first('img') }}
                 </div>
                 @endif
             </div>
+            <div id="holder" src="{{ isset($post->img) ? asset($post->img) : '' }}"></div>
         </div>
         <div class="form-group mt-2">
             <label for="conteudopost">Conteúdo da página</label>

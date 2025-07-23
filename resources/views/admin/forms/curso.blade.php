@@ -192,23 +192,29 @@
             <div class="col">
                 <label for="lfm">Imagem principal</label>
                 <div class="input-group">
-                <span class="input-group-prepend">
-                    <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-default">
-                        <i class="fas fa-picture-o"></i> Inserir imagem
-                    </a>
-                </span>
-                <input id="thumbnail"
-                    class="form-control {{ $errors->has('img') ? 'is-invalid' : '' }}"
-                    type="text"
-                    name="img"
-                    value="{{ isset($resultado->img) ? $resultado->img : old('img') }}"
-                />
-                @if($errors->has('img'))
-                <div class="invalid-feedback">
-                {{ $errors->first('img') }}
+                    <span class="input-group-prepend">
+                        <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-default">
+                            <i class="fas fa-picture-o"></i> Inserir imagem
+                        </a>
+                    </span>
+                    <input id="thumbnail"
+                        class="form-control {{ $errors->has('img') ? 'is-invalid' : '' }}"
+                        type="text"
+                        name="img"
+                        value="{{ isset($resultado->img) ? $resultado->img : old('img') }}"
+                    />
+                    <div class="input-group-append">
+                        <span class="input-group-text" id="preview-lfm" data-toggle="popover">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                    @if($errors->has('img'))
+                    <div class="invalid-feedback">
+                    {{ $errors->first('img') }}
+                    </div>
+                    @endif
                 </div>
-                @endif
-                </div>
+                <div id="holder" src="{{ isset($resultado->img) ? asset($resultado->img) : '' }}"></div>
             </div>
             <div class="col-sm-2">
                 <label for="acesso">Acesso</label>
