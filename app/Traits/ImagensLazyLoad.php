@@ -35,12 +35,12 @@ trait ImagensLazyLoad
 
     public function logAcao($old, $new)
     {
-        \Log::channel('interno')->info('[Portal - Ação Blur] - Imagem "'. $old .'" renomeada para "'. $new .'".');
+        \Log::channel('interno')->info('[Portal - Ação Blur] - Imagem "'. str_replace(public_path(), '..', $old) .'" renomeada para "'. str_replace(public_path(), '..', $new) .'".');
     }
 
     public function logRollback($new, $old)
     {
-        \Log::channel('interno')->info('[Portal - Rollback Ação Blur] - Imagem "'. $new .'" renomeada de volta para "'. $old .'" por falta da pasta ".blur".');
+        \Log::channel('interno')->info('[Portal - Rollback Ação Blur] - Imagem "'. str_replace(public_path(), '..', $new) .'" renomeada de volta para "'. str_replace(public_path(), '..', $old) .'" por falta da pasta ".blur".');
     }
 
     public function inicializaLFM($img)
