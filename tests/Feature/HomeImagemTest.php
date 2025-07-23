@@ -64,7 +64,7 @@ class HomeImagemTest extends TestCase
             '<a id="lfm-'.$banner->idimagem.'" data-input="img-'.$banner->idimagem.'" data-preview="holder-'.$banner->idimagem.'" class="btn btn-default">',
             '<a id="lfm-m-'.$banner->idimagem.'" data-input="img-m-'.$banner->idimagem.'" data-preview="holder-m-'.$banner->idimagem.'" class="btn btn-default">',
             'name="link-'.$banner->idimagem.'"',
-            '<select name="target-'.$banner->idimagem.'" class="form-control form-control-sm" id="selectTarget">');
+            '<select name="target-'.$banner->idimagem.'" class="form-control form-control-sm" id="selectTarget-'.$banner->idimagem.'">');
 
         $this->signInAsAdmin();
         

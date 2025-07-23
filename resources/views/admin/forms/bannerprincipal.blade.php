@@ -30,7 +30,7 @@
                             </p>
                             <div class="form-row mb-2">
                                 <div class="col">
-                                    <label for="lfm">Imagem para desktop (1920 x 540 px)</label>
+                                    <label for="img-{{ $i }}">Imagem para desktop (1920 x 540 px)</label>
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-prepend">
                                             <a id="lfm-{{ $i }}" data-input="img-{{ $i }}" data-preview="holder-{{ $i }}" class="btn btn-default">
@@ -52,7 +52,7 @@
                                     <div id="holder-{{ $i }}" src="{{ isset($img->url) ? asset($img->url) : '' }}"></div>
                                 </div>
                                 <div class="col">
-                                    <label for="lfm">Imagem para mobile (576 x 650 px)</label>
+                                    <label for="img-m-{{ $i }}">Imagem para mobile (576 x 650 px)</label>
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-prepend">
                                             <a id="lfm-m-{{ $i }}" data-input="img-m-{{ $i }}" data-preview="holder-m-{{ $i }}" class="btn btn-default">
@@ -76,16 +76,17 @@
                             </div>
                             <div class="form-row mb-2">
                                 <div class="col">
-                                    <label for="link">Link</label>
+                                    <label for="link-{{ $i }}">Link</label>
                                     <input type="text"
                                         class="form-control form-control-sm"
                                         name="link-{{ $i }}"
                                         value="{{ $img->link }}"
+                                        id="link-{{ $i }}"
                                         />
                                 </div>
                                 <div class="col">
-                                    <label for="selectTarget">Destino</label>
-                                    <select name="target-{{ $i }}" class="form-control form-control-sm" id="selectTarget">
+                                    <label for="selectTarget-{{ $i }}">Destino</label>
+                                    <select name="target-{{ $i }}" class="form-control form-control-sm" id="selectTarget-{{ $i }}">
                                         <option value="_self" {{ !in_array($img->target, ['_self']) ? 'selected' : '' }}>Abrir na mesma aba</option>
                                         <option value="_blank" {{ $img->target === '_blank' ? 'selected' : '' }}>Abrir em outra aba</option>
                                     </select>
