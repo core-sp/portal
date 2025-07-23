@@ -48,6 +48,10 @@ export function executar(local = 'interno'){
     });
 
     $('[id*="preview-lfm"]').on('show.bs.popover', function(){
+        let largura = this.id.indexOf('-m-') > -1 ? "25%" : "45%";
+
+        $($(this).data("bs.popover").getTipElement()).css({"max-width": largura});
+
         if($('[name*="img"]').val().length < 5)
             this.dataset.originalTitle = '<img src="" />';
     });
