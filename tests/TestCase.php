@@ -91,7 +91,7 @@ abstract class TestCase extends BaseTestCase
             mkdir($path, 0755, true);
 
         if(strlen($img) > 3){
-            $file = UploadedFile::fake()->image($img, 600, 400);
+            $file = UploadedFile::fake()->image($img, rand(50, 900), rand(100, 900));
             \File::put($raiz_img . $file->getClientOriginalName(), $file->get());
 
             return hash('sha256', $file->get()) . '.' . pathinfo($file->getClientOriginalName())['extension'];

@@ -312,6 +312,16 @@ class PaginaTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_update_pagina_img_blur()
+    {
+        $this->pagina_can_be_updated_with_img_blur();
+
+        $log = tailCustom(storage_path($this->pathLogInterno()), 3);
+        $txt = '" renomeada para "..' . Pagina::first()->img . '".';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
     public function log_is_generated_when_pagina_is_updated()
     {
         $user = $this->signInAsAdmin();

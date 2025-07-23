@@ -276,6 +276,16 @@ class PostTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_update_post_img_blur()
+    {
+        $this->post_can_be_updated_with_img_blur();
+
+        $log = tailCustom(storage_path($this->pathLogInterno()), 3);
+        $txt = '" renomeada para "..' . Post::first()->img . '".';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
     public function a_post_title_can_be_updated()
     {
         $user = $this->signInAsAdmin();

@@ -210,6 +210,21 @@ class HomeImagemTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_update_banner_img_blur()
+    {
+        $this->banner_updated_can_create_img_blur();
+
+        $log = tailCustom(storage_path($this->pathLogInterno()), HomeImagem::TOTAL * 3);
+
+        foreach(HomeImagem::all() as $banner){
+            $txt = '" renomeada para "..' . $banner->url . '".';
+            $this->assertStringContainsString($txt, $log);
+            $txt = '" renomeada para "..' . $banner->url_mobile . '".';
+            $this->assertStringContainsString($txt, $log);
+        }
+    }
+
+    /** @test */
     public function admin_create_remaining_banner()
     {
         $banners = factory('App\HomeImagem', 3)->create();
