@@ -74,16 +74,17 @@ class NoticiaTest extends TestCase
             'idusuario' => $user->idusuario
         ]);
 
-        $this->gerenciarPastasLazyLoad($attributes['img']);
+        $hash = $this->gerenciarPastasLazyLoad($attributes['img']);
 
         $this->get(route('noticias.index'))->assertOk();
         $this->post(route('noticias.store'), $attributes);
+
+        $attributes['img'] = $this->trocarNomeImgLazyLoad($attributes['img'], $hash);
         $this->assertDatabaseHas('noticias', $attributes);
 
         $this->assertTrue(\File::exists(public_path($attributes['img'])));
 
-        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
-        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $hash)));
     }
 
     /** @test */
@@ -299,17 +300,17 @@ class NoticiaTest extends TestCase
         $attributes['conteudoBusca'] = converterParaTextoCru($attributes['conteudo']);
         $attributes['idusuario'] = $user->idusuario;
 
-        $this->gerenciarPastasLazyLoad($attributes['img']);
+        $hash = $this->gerenciarPastasLazyLoad($attributes['img']);
 
         $this->patch(route('noticias.update', $noticia->idnoticia), $attributes);
 
+        $attributes['img'] = $this->trocarNomeImgLazyLoad($attributes['img'], $hash);
         $this->assertDatabaseHas('noticias', $attributes);
         $this->assertDatabaseMissing('noticias', $antigo);
 
         $this->assertTrue(\File::exists(public_path($attributes['img'])));
 
-        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
-        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $hash)));
     }
 
     /** @test */

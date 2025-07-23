@@ -66,6 +66,37 @@ trait ImagensLazyLoad
         return true;
     }
 
+    public function renomear($principal_img, $old_nomeLFM)
+    {
+        rename($this->pathCompletoLFM, $principal_img);
+
+        if(file_exists($principal_img))
+            $this->logAcao($this->pathCompletoLFM, $principal_img);
+
+        if(file_exists($this->baseThumbLFM . $old_nomeLFM))
+            rename($this->baseThumbLFM . $old_nomeLFM, $this->baseThumbLFM . $this->nomeLFM);
+
+        if(file_exists($this->baseThumbLFM . $this->nomeLFM))
+            $this->logAcao($this->baseThumbLFM . $old_nomeLFM, $this->baseThumbLFM . $this->nomeLFM);
+    }
+
+    public function rollbackRenomear($principal_img, $old_nomeLFM)
+    {
+        // Rollback
+        rename($principal_img, $this->pathCompletoLFM);
+
+        if(file_exists($this->pathCompletoLFM))
+            $this->logRollback($principal_img, $this->pathCompletoLFM);
+
+        if(file_exists($this->baseThumbLFM . $this->nomeLFM))
+            rename($this->baseThumbLFM . $this->nomeLFM, $this->baseThumbLFM . $old_nomeLFM);
+
+        if(file_exists($this->baseThumbLFM . $old_nomeLFM))
+            $this->logRollback($this->baseThumbLFM . $this->nomeLFM, $this->baseThumbLFM . $old_nomeLFM);
+
+        return false;
+    }
+
     public function gerarPreImagemLFM($path_img, $update = true)
     {
         $init = $this->inicializaLFM($path_img);
@@ -84,31 +115,12 @@ trait ImagensLazyLoad
         $principal_img = $base . $this->nomeLFM;
 
         if($update && ($this->pathCompletoLFM != $principal_img))
-        {
-            rename($this->pathCompletoLFM, $principal_img);
-            if(file_exists($principal_img))
-                $this->logAcao($this->pathCompletoLFM, $principal_img);
-
-            rename($this->baseThumbLFM . $old_nomeLFM, $this->baseThumbLFM . $this->nomeLFM);
-            if(file_exists($this->baseThumbLFM . $this->nomeLFM))
-                $this->logAcao($this->baseThumbLFM . $old_nomeLFM, $this->baseThumbLFM . $this->nomeLFM);
-        }
+            $this->renomear($principal_img, $old_nomeLFM);
 
         self::criarPastaBlur($blur);
 
         if($update && !file_exists($blur))
-        {
-            // Rollback
-            rename($principal_img, $this->pathCompletoLFM);
-            if(file_exists($this->pathCompletoLFM))
-                $this->logRollback($principal_img, $this->pathCompletoLFM);
-
-            rename($this->baseThumbLFM . $this->nomeLFM, $this->baseThumbLFM . $old_nomeLFM);
-            if(file_exists($this->baseThumbLFM . $old_nomeLFM))
-                $this->logRollback($this->baseThumbLFM . $this->nomeLFM, $this->baseThumbLFM . $old_nomeLFM);
-
-            return false;
-        }
+            return $this->rollbackRenomear($principal_img, $old_nomeLFM);
 
         if(!file_exists($blur_img))
             exec('ffmpeg -y -i "' . $principal_img . '" -vf scale=20:-1 "' . $blur_img . '"');

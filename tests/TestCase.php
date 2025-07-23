@@ -93,6 +93,13 @@ abstract class TestCase extends BaseTestCase
         if(strlen($img) > 3){
             $file = UploadedFile::fake()->image($img, 600, 400);
             \File::put($raiz_img . $file->getClientOriginalName(), $file->get());
+
+            return hash('sha256', $file->get()) . '.' . pathinfo($file->getClientOriginalName())['extension'];
         }
+    }
+
+    protected function trocarNomeImgLazyLoad($img, $hash)
+    {
+        return str_replace(pathinfo($img)['basename'], $hash, $img);
     }
 }

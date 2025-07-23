@@ -84,23 +84,39 @@ class PaginaTest extends TestCase
     }
 
     /** @test */
+    public function pagina_without_img_can_be_created_by_user()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Pagina')->raw([
+            'img' => null
+        ]);
+
+        $this->get(route('paginas.create'))->assertOk();
+        $this->post(route('paginas.store', $attributes));
+
+        $this->assertDatabaseHas('paginas', ['titulo' => $attributes['titulo']]);
+        $this->assertDatabaseHas('paginas', ['img' => null]);
+    }
+
+    /** @test */
     public function pagina_can_be_created_with_img_blur()
     {
         $this->signInAsAdmin();
 
         $attributes = factory('App\Pagina')->raw();
 
-        $this->gerenciarPastasLazyLoad($attributes['img']);
+        $hash = $this->gerenciarPastasLazyLoad($attributes['img']);
 
         $this->get(route('paginas.create'))->assertOk();
         $this->post(route('paginas.store', $attributes));
 
+        $attributes['img'] = $this->trocarNomeImgLazyLoad($attributes['img'], $hash);
         $this->assertDatabaseHas('paginas', ['titulo' => $attributes['titulo']]);
 
         $this->assertTrue(\File::exists(public_path($attributes['img'])));
 
-        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
-        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $hash)));
     }
 
     /** @test */
@@ -226,14 +242,14 @@ class PaginaTest extends TestCase
     /** @test */
     public function created_paginas_are_shown_on_the_website_without_img_created()
     {
-        $this->pagina_can_be_created_by_user();
+        $this->pagina_without_img_can_be_created_by_user();
 
         $pagina = Pagina::first();
         
         $this->get(route('paginas.site', $pagina['slug']))
             ->assertSee($pagina['titulo'])
             ->assertSee($pagina['conteudo'])
-            ->assertSee('<img class="lazy-loaded-image lazy" src="" data-src="'. asset($pagina->img) .'" />');
+            ->assertDontSee('<img class="lazy-loaded-image lazy" src="" data-src="'. asset($pagina->img) .'" />');
     }
 
     /** @test */
@@ -277,7 +293,7 @@ class PaginaTest extends TestCase
 
         $img = factory('App\Pagina')->raw()['img'];
 
-        $this->gerenciarPastasLazyLoad($img);
+        $hash = $this->gerenciarPastasLazyLoad($img);
 
         $this->get(route('paginas.edit', $pagina->idpagina))->assertOk();
         $this->patch(route('paginas.update', $pagina->idpagina), [
@@ -287,12 +303,12 @@ class PaginaTest extends TestCase
             'img' => $img
         ]);
 
+        $img = $this->trocarNomeImgLazyLoad($img, $hash);
         $this->assertEquals(Pagina::find($pagina->idpagina)->titulo, $titulo);
 
         $this->assertTrue(\File::exists(public_path($img)));
 
-        $nome = substr($img, strripos($img, '/desktop_') + 1);
-        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $hash)));
     }
 
     /** @test */

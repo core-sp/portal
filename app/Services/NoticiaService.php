@@ -153,7 +153,7 @@ class NoticiaService implements NoticiaServiceInterface {
         $request['publicada'] = $user->perfil == 'Estagiário' ? 'Não' : 'Sim';
         $txt = isset($id) ? 'editou' : 'criou';
 
-        $img = $this->gerarPreImagemLFM($request['img']);
+        $img = isset($request['img']) ? $this->gerarPreImagemLFM($request['img']) : false;
         if($img)
             $request['img'] = $img;
 

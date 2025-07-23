@@ -105,7 +105,7 @@ class PostService implements PostServiceInterface {
         $request['idusuario'] = $user->idusuario;
         $txt = isset($id) ? 'editou' : 'criou';
 
-        $img = $this->gerarPreImagemLFM($request['img']);
+        $img = isset($request['img']) ? $this->gerarPreImagemLFM($request['img']) : false;
         if($img)
             $request['img'] = $img;
 

@@ -134,10 +134,12 @@ class CursoTest extends TestCase
 
         $attributes = factory('App\Curso')->raw();
 
-        $this->gerenciarPastasLazyLoad($attributes['img']);
+        $hash = $this->gerenciarPastasLazyLoad($attributes['img']);
 
         $this->get(route('cursos.create'))->assertOk();
         $this->post(route('cursos.store'), $attributes);
+
+        $attributes['img'] = $this->trocarNomeImgLazyLoad($attributes['img'], $hash);
         $this->assertDatabaseHas('cursos', [
             'tema' => $attributes['tema'],
             'idusuario' => $user->idusuario
@@ -145,17 +147,18 @@ class CursoTest extends TestCase
 
         $this->assertTrue(\File::exists(public_path($attributes['img'])));
 
-        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
-        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $hash)));
 
         $attributes = factory('App\Curso')->raw([
             'nrvagas' => 8899
         ]);
 
-        $this->gerenciarPastasLazyLoad($attributes['img']);
+        $hash = $this->gerenciarPastasLazyLoad($attributes['img']);
 
         $this->get(route('cursos.create'))->assertOk();
         $this->post(route('cursos.store'), $attributes);
+
+        $attributes['img'] = $this->trocarNomeImgLazyLoad($attributes['img'], $hash);
         $this->assertDatabaseHas('cursos', [
             'tema' => $attributes['tema'],
             'nrvagas' => 8899
@@ -163,8 +166,7 @@ class CursoTest extends TestCase
 
         $this->assertTrue(\File::exists(public_path($attributes['img'])));
 
-        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
-        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $hash)));
     }
 
     /** @test */
@@ -744,7 +746,7 @@ class CursoTest extends TestCase
         $curso = factory('App\Curso')->create();
         $attributes = factory('App\Curso')->raw();
 
-        $this->gerenciarPastasLazyLoad($attributes['img']);
+        $hash = $this->gerenciarPastasLazyLoad($attributes['img']);
 
         $this->get(route('cursos.edit', $curso->idcurso))->assertOk();
         $this->patch(route('cursos.update', $curso->idcurso), $attributes);
@@ -753,16 +755,18 @@ class CursoTest extends TestCase
         $this->assertEquals($cur->tema, $attributes['tema']);
         $this->assertEquals($cur->descricao, $attributes['descricao']);
         $this->assertEquals($cur->resumo, $attributes['resumo']);
+
+        $attributes['img'] = $this->trocarNomeImgLazyLoad($attributes['img'], $hash);
         $this->assertDatabaseHas('cursos', [
             'tema' => $attributes['tema'],
             'descricao' => $attributes['descricao'],
-            'resumo' => $attributes['resumo']
+            'resumo' => $attributes['resumo'],
+            'img' => $attributes['img']
         ]);
 
         $this->assertTrue(\File::exists(public_path($attributes['img'])));
 
-        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
-        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $hash)));
     }
 
     /** @test */

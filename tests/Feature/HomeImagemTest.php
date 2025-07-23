@@ -61,8 +61,8 @@ class HomeImagemTest extends TestCase
 
         foreach($banners as $banner)
             array_push($view, 
-            '<a id="lfm-'.$banner->idimagem.'" data-input="img-'.$banner->idimagem.'" data-preview="holder" class="btn btn-default">',
-            '<a id="lfm-m-'.$banner->idimagem.'" data-input="img-m-'.$banner->idimagem.'" data-preview="holder" class="btn btn-default">',
+            '<a id="lfm-'.$banner->idimagem.'" data-input="img-'.$banner->idimagem.'" data-preview="holder-'.$banner->idimagem.'" class="btn btn-default">',
+            '<a id="lfm-m-'.$banner->idimagem.'" data-input="img-m-'.$banner->idimagem.'" data-preview="holder-m-'.$banner->idimagem.'" class="btn btn-default">',
             'name="link-'.$banner->idimagem.'"',
             '<select name="target-'.$banner->idimagem.'" class="form-control form-control-sm" id="selectTarget">');
 
@@ -178,14 +178,16 @@ class HomeImagemTest extends TestCase
     {
         $campos = ['img-' => 'url', 'img-mobile-' => 'url_mobile', 'link-' => 'link', 'target-' => 'target'];
         $banners = factory('App\HomeImagem', HomeImagem::TOTAL)->create();
+        $hash_d = [];
+        $hash_m = [];
 
         $user = $this->signInAsAdmin();
         
         for($cont = 1, $index = 0; $cont <= HomeImagem::TOTAL; $cont++, $index++)
         {
             $banner = $banners->get($index)->toArray();
-            $this->gerenciarPastasLazyLoad($banner['url']);
-            $this->gerenciarPastasLazyLoad($banner['url_mobile']);
+            $hash_d[$index] = $this->gerenciarPastasLazyLoad($banner['url']);
+            $hash_m[$index] = $this->gerenciarPastasLazyLoad($banner['url_mobile']);
 
             $this->assertTrue(\File::exists(public_path($banner['url'])));
             $this->assertTrue(\File::exists(public_path($banner['url_mobile'])));
@@ -198,15 +200,12 @@ class HomeImagemTest extends TestCase
         ->assertRedirect(route('admin'));
 
         $banners = HomeImagem::all();
-        $path = public_path() . substr($banners->get(0)->url, 0, strripos($banners->get(0)->url, '/desktop_') + 1) . '.blur/small-';
+        $path = public_path() . pathinfo($banners->get(0)->url)['dirname'] . '/.blur/small-';
 
-        foreach($banners as $b)
+        foreach($banners as $key => $b)
         {
-            $nome = substr($b->url, strripos($b->url, '/desktop_') + 1);
-            $this->assertTrue(\File::exists($path . $nome));
-
-            $nome = substr($b->url_mobile, strripos($b->url_mobile, '/mobile_') + 1);
-            $this->assertTrue(\File::exists($path . $nome));
+            $this->assertTrue(\File::exists($path . $hash_d[$key]));
+            $this->assertTrue(\File::exists($path . $hash_m[$key]));
         }
     }
 

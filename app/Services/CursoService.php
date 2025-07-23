@@ -186,7 +186,7 @@ class CursoService implements CursoServiceInterface {
         if(!Carbon::hasFormat($validated['termino_inscricao'], 'Y-m-d H:i'))
             $validated['termino_inscricao'] = null;
 
-        $img = $this->gerarPreImagemLFM($validated['img']);
+        $img = isset($validated['img']) ? $this->gerarPreImagemLFM($validated['img']) : false;
         if($img)
             $validated['img'] = $img;
 

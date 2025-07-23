@@ -72,17 +72,17 @@ class PostTest extends TestCase
             'idusuario' => $user->idusuario
         ]);
 
-        $this->gerenciarPastasLazyLoad($attributes['img']);
+        $hash = $this->gerenciarPastasLazyLoad($attributes['img']);
 
         $this->get(route('posts.create'))->assertOk();
         $this->post(route('posts.store'), $attributes);
 
+        $attributes['img'] = $this->trocarNomeImgLazyLoad($attributes['img'], $hash);
         $this->assertDatabaseHas('posts', $attributes);
 
         $this->assertTrue(\File::exists(public_path($attributes['img'])));
 
-        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
-        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $hash)));
     }
 
     /** @test */
@@ -262,16 +262,17 @@ class PostTest extends TestCase
 
         $this->get(route('posts.edit', $post->id))->assertOk();
 
-        $this->gerenciarPastasLazyLoad($attributes['img']);
+        $hash = $this->gerenciarPastasLazyLoad($attributes['img']);
 
         $this->patch(route('posts.update', $post->id), $attributes);
+
+        $attributes['img'] = $this->trocarNomeImgLazyLoad($attributes['img'], $hash);
         $this->assertDatabaseHas('posts', $attributes);
         $this->assertDatabaseMissing('posts', $antigo);
 
         $this->assertTrue(\File::exists(public_path($attributes['img'])));
 
-        $nome = substr($attributes['img'], strripos($attributes['img'], '/desktop_') + 1);
-        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $nome)));
+        $this->assertTrue(\File::exists(public_path('/imagens/fake/' . date('Y-m') . '/.blur/small-' . $hash)));
     }
 
     /** @test */
