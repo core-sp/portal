@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => '503'])
+@extends('site.layout.app', ['title' => 'Em manutenção'])
 
 @section('content')
 
@@ -8,7 +8,7 @@
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Erro 503
+          em manutenção
         </h1>
       </div>
     </div>

@@ -55,6 +55,7 @@ class DadoFiscalizacao extends Model
             'registroconvertidopf', 
             'dispensaregistro', 
             'orientacaorepresentante',
+            "autoconstatacao",
         ];
     }
 

@@ -36,7 +36,7 @@
         {!! mostraChatScript() !!}
 
         <!-- *************************************************** CLARITY ******************************************************************* -->
-        @if(strpos(config('app.url'), 'homolog') !== false)
+        @if((config('app.env') == 'production') && config('app.debug'))
         <!-- Teste de uso Clarity - Microsoft -->
         <script type="text/javascript">
           (function(c,l,a,r,i,t,y){
@@ -156,6 +156,7 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownCore">
                       <a href="/concursos" class="dropdown-item">Concursos</a>
                       <a href="/conselho" class="dropdown-item">Conselho</a>
+                      <a href="/eleicao" class="dropdown-item">Eleições</a>
                       <a href="/institucional" class="dropdown-item">Institucional</a>
                       <a href="/legislacao" class="dropdown-item">Legislação</a>
                       <a href="/missao-visao-e-valores" class="dropdown-item">Missão, Visão e Valores</a>

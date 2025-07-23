@@ -381,6 +381,7 @@ class SuporteService implements SuporteServiceInterface {
 
     public function sobreStorage()
     {
+        $fs = config('app.env') != 'production' ? 'sda1' : 'root';
         $comando_dir = 'du -s ';
         $comandos = [
             'img' => $comando_dir . public_path('imagens'),
@@ -388,7 +389,7 @@ class SuporteService implements SuporteServiceInterface {
             'arq_rep' => $comando_dir . \Storage::disk('local')->path('representantes'),
             'logs' => $comando_dir . storage_path('logs'),
             'termos' => $comando_dir . \Storage::disk('public')->path('termos'),
-            'hd' => 'df | grep ^/dev/sda1',
+            'hd' => 'df | grep ^/dev/' . $fs,
         ];
 
         foreach($comandos as $chave => $comando)
