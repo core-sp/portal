@@ -48,12 +48,19 @@ export function executar(local = 'interno'){
     });
 
     $('[id*="preview-lfm"]').on('show.bs.popover', function(){
+        let plfm = false;
         let largura = this.id.indexOf('-m-') > -1 ? "25%" : "45%";
+        let final_id = this.id.replace("preview-lfm", "");
 
         $($(this).data("bs.popover").getTipElement()).css({"max-width": largura});
 
-        if($('[name*="img"]').val().length < 5)
-            this.dataset.originalTitle = '<img src="" />';
+        $('[name="img' + final_id + '"], #img' + final_id).each(function(){
+            if(($(this).length > 0) && ($(this).val().trim().length < 10))
+                plfm = '<img src="" />';
+        });
+
+        if(plfm)
+            this.dataset.originalTitle = plfm;
     });
 
     $('[id*="preview-lfm"]').each(function(){
