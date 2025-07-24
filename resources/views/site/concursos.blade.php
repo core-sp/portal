@@ -100,7 +100,7 @@
         @if(isset($concursos))
           @foreach($concursos as $concurso)
           <div class="licitacao-grid">
-            <a href="{{ route('concursos.show', $concurso->idconcurso) }}}">
+            <a href="{{ route('concursos.show', $concurso->idconcurso) }}">
               <div class="licitacao-grid-main">
                 <h5 class="marrom text-break">{{ $concurso->titulo }}</h5>
                 <div class="linha-lg-mini"></div>

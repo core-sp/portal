@@ -141,7 +141,7 @@ class RepresentanteSiteController extends Controller
         ]);
     }
 
-    public function saveRepresentante($ass_id, $nome, $cpfCnpj)
+    public function saveRepresentante($ass_id, $nome, $cpfCnpj, $registro)
     {
         $token = str_random(32);
 
@@ -149,7 +149,7 @@ class RepresentanteSiteController extends Controller
 
         $save = Representante::create([
             'cpf_cnpj' => $cpfCnpj,
-            'registro_core' => apenasNumeros(request('registro_core')),
+            'registro_core' => apenasNumeros($registro),
             'ass_id' => $ass_id,
             'nome' => $nome,
             'email' => request('email'),
@@ -168,7 +168,7 @@ class RepresentanteSiteController extends Controller
         Mail::to(request('email'))->queue(new CadastroRepresentanteMail($body));
     }
 
-    public function updateRepresentante($id, $ass_id, $nome, $cpfCnpj)
+    public function updateRepresentante($id, $ass_id, $nome, $cpfCnpj, $registro)
     {
         $token = str_random(32);
 
@@ -179,7 +179,7 @@ class RepresentanteSiteController extends Controller
 
         $update = $rep->update([
             'cpf_cnpj' => $cpfCnpj,
-            'registro_core' => apenasNumeros(request('registro_core')),
+            'registro_core' => apenasNumeros($registro),
             'ass_id' => $ass_id,
             'nome' => $nome,
             'email' => request('email'),
@@ -243,9 +243,9 @@ class RepresentanteSiteController extends Controller
         $checkSoftDeleted = Representante::where('cpf_cnpj', $cpfCnpj)->withTrashed()->first();
 
         if($checkSoftDeleted) {
-            $this->updateRepresentante($checkSoftDeleted->id, $checkGerenti['ASS_ID'], utf8_encode($checkGerenti['NOME']), $cpfCnpj);
+            $this->updateRepresentante($checkSoftDeleted->id, $checkGerenti['ASS_ID'], utf8_encode($checkGerenti['NOME']), $cpfCnpj, $registro);
         } else {
-            $this->saveRepresentante($checkGerenti['ASS_ID'], utf8_encode($checkGerenti['NOME']), $cpfCnpj);
+            $this->saveRepresentante($checkGerenti['ASS_ID'], utf8_encode($checkGerenti['NOME']), $cpfCnpj, $registro);
         }
 
         event(new ExternoEvent('"' . $cpfCnpjCru . '" ("' . request('email') . '") cadastrou-se na Área do Representante.'));

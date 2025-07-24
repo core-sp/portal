@@ -3,7 +3,7 @@
 @section('content')
 
 <section id="pagina-cabecalho">
-  <div class="container-fluid text-center nopadding position-relative">
+  <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     <img src="{{ asset('img/banner-interno-agendamento002.2.jpg') }}" />
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
