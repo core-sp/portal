@@ -1,3 +1,15 @@
+function calendario(){
+
+    if($('#agenda-institucional, #datepicker').length > 0){
+        const dp = document.createElement('link');
+
+        dp.setAttribute("type", "text/css");
+        dp.setAttribute("rel", "stylesheet");
+        dp.setAttribute("href", location.origin + '/css/datepicker.css');
+        document.head.appendChild(dp);
+    }
+}
+
 function tinyInit(link, hash){
     
     if($('.my-editor').length > 0){
@@ -72,8 +84,32 @@ function graficos(){
     }
 }
 
+function galeria(){
+
+    if($('[data-toggle="lightbox"]').length > 0){
+        const el = document.createElement('link');
+
+        el.setAttribute("rel", "stylesheet");
+        el.setAttribute("href", 'https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css');
+        el.setAttribute("integrity", "sha512-Velp0ebMKjcd9RiCoaHhLXkR1sFoCCWXNp6w4zj1hfMifYB5441C+sKeBl/T/Ka6NjBiRfBBQRaQq65ekYz3UQ==");
+        el.setAttribute("crossorigin", "anonymous");
+        el.setAttribute("referrerpolicy", "no-referrer");
+        document.head.appendChild(el);
+
+        const el_js = document.createElement('script');
+
+        el_js.setAttribute("src", 'https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js');
+        el_js.setAttribute("integrity", 'sha512-Y2IiVZeaBwXG1wSV7f13plqlmFOx8MdjuHyYFVoYzhyRr3nH/NMDjTBSswijzADdNzMyWNetbLMfOpIPl6Cv9g==');
+        el_js.setAttribute("crossorigin", 'anonymous');
+        el_js.setAttribute("referrerpolicy", 'no-referrer');
+        document.body.appendChild(el_js);
+    }
+}
+
 export function executar(link, hash){
     
+    calendario();
+    galeria();
     graficos();
     recaptcha();
     tinyInit(link, hash);
