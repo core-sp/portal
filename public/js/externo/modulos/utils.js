@@ -140,6 +140,11 @@ export function executar(local = 'externo'){
     if($('#popup-campanha').length > 0)
         $('#popup-campanha').modal('show');
 
+    $("#popup-campanha").on('hide.bs.modal', function(){
+        if(this.contains(document.activeElement))
+            document.activeElement.blur();
+    });
+
     // Menu principal fixo
 	$(document).on('scroll', function(){
 		if($(window).width() > 767)
@@ -155,10 +160,13 @@ export function executar(local = 'externo'){
 
     // Lightbox
     $(document).on('click', '[data-toggle="lightbox"]', function(e) {
-        if($(window).width() > 767) {
-            e.preventDefault();
-            $(this).ekkoLightbox();
-        }
+        e.preventDefault();
+        $(this).ekkoLightbox({
+            onHide: function(){
+                if((this._$modal.length > 0) && (this._$modal[0].contains(document.activeElement)))
+                    document.activeElement.blur();
+            }
+        });
     });
 
     // Logout Representante
