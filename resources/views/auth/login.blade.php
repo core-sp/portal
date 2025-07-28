@@ -8,7 +8,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
   <link href="{{ asset('/css/app.css') }}" rel="stylesheet">
-  <link type="text/css" href="{{ asset('/css/custom.css?'.time()) }}" rel="stylesheet">
+  <link type="text/css" href="{{ asset('/css/custom.css?'.hashScriptCss()) }}" rel="stylesheet">
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">

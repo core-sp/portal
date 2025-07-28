@@ -836,3 +836,21 @@ function hashScriptJs()
 
     return substr(hash('sha256', versaoScriptJs()), 0, 32);
 }
+
+function versaoScriptCss()
+{
+    return '1.0.0';
+}
+
+function hashScriptCss()
+{
+    if(config('app.env') == 'local')
+        return time();
+
+    return substr(hash('sha256', versaoScriptCss()), 0, 32);
+}
+
+function logVersaoScriptCss()
+{
+    return '[CSS] # Versão CSS estilos: ' . versaoScriptCss();
+}
