@@ -849,3 +849,8 @@ function hashScriptCss()
 
     return substr(hash('sha256', versaoScriptCss()), 0, 32);
 }
+
+function logVersaoScriptCss()
+{
+    return '[CSS] # Versão CSS estilos: ' . versaoScriptCss();
+}
