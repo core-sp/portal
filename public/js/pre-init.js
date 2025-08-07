@@ -39,27 +39,25 @@ document.addEventListener("PRE-INIT", (e) => {
 
 // Inicializa as bibliotecas de terceiros
 
-async function initLibs(){
-
-    if(PORTAL_MODULOS.initLibs.length > 0){
-        const script = document.createElement('script');
-        script.setAttribute('type', "module");
-        script.setAttribute('data-modulo-id', PORTAL_MODULOS.initLibs);
-        script.setAttribute('src', PORTAL_MODULOS.getLink_ + 'modulos/' + PORTAL_MODULOS.initLibs + '.js?' + PORTAL_MODULOS.getHash_);
-
-        pre.after(script);
-
-        try {
-            let module = await import(script.src);
-            module.executar(PORTAL_MODULOS.getLink_, PORTAL_MODULOS.getHash_);
-        } catch (error) {
-            console.log(err);
-            alert('Erro ao inicializar libs no pre-init!');
-        }
+async function initLibs(script){
+    try {
+        let module = await import(script.src);
+        module.executar(PORTAL_MODULOS.getLink_, PORTAL_MODULOS.getHash_);
+    } catch (error) {
+        console.log(error);
+        alert('Erro ao inicializar libs no pre-init!');
     }
 }
 
-initLibs();
+if(PORTAL_MODULOS.initLibs.length > 0){
+    const script = document.createElement('script');
+    script.setAttribute('type', "module");
+    script.setAttribute('data-modulo-id', PORTAL_MODULOS.initLibs);
+    script.setAttribute('src', PORTAL_MODULOS.getLink_ + 'modulos/' + PORTAL_MODULOS.initLibs + '.js?' + PORTAL_MODULOS.getHash_);
+
+    pre.after(script);
+    initLibs(script);
+}
 
 // Cria dinâmicamente a tag <script> do módulo init.js que inicializa tudo.
 

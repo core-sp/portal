@@ -16,8 +16,6 @@
         <link rel="icon" href="{{ asset('img/favicon.ico') }}" type="image/ico" />
 
         <link type="text/css" href="{{ asset('/css/app.css') }}" rel="stylesheet">
-        <!-- <link type="text/css" href="{{-- asset('/css/datepicker.css') --}}" rel="stylesheet"> -->
-        <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css" rel="stylesheet"> -->
         <link type="text/css" href="{{ asset('/css/site.css?'.hashScriptCss()) }}" rel="stylesheet">
 
         @yield('meta')
@@ -451,6 +449,5 @@
 
       @component('components.scriptsExternoJS')
       @endcomponent
-      <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.js"></script> -->
     </body>
 </html>

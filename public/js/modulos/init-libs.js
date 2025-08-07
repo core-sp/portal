@@ -1,13 +1,12 @@
-function calendario(){
+function geral(){
+    const _lib = document.createElement('link');
 
-    if($('#agenda-institucional, #datepicker').length > 0){
-        const dp = document.createElement('link');
-
-        dp.setAttribute("type", "text/css");
-        dp.setAttribute("rel", "stylesheet");
-        dp.setAttribute("href", location.origin + '/css/datepicker.css');
-        document.head.appendChild(dp);
-    }
+    _lib.setAttribute("rel", 'stylesheet');
+    _lib.setAttribute("href", 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.14.1/themes/excite-bike/jquery-ui.min.css');
+    _lib.setAttribute("integrity", 'sha512-sVXM82UNHOyjnvy5mmrUleNJeH+eemSEEjguTNNiZvaRNfJGOol7mS9shs5Ovt4sv04bDxsRWoySFkOryseE8Q==');
+    _lib.setAttribute("crossorigin", 'anonymous');
+    _lib.setAttribute("referrerpolicy", 'no-referrer');
+    $('head title').after(_lib);
 }
 
 function tinyInit(link, hash){
@@ -54,21 +53,18 @@ function recaptcha(){
 function graficos(){
 
     if($('[class^="grafico-"]').length > 0){
-        // Gerar PDF do gráfico
-        const _lib = document.createElement('script');
-
-        _lib.setAttribute("src", 'https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js');
-        document.head.appendChild(_lib);
-
         const _lib1 = document.createElement('script');
 
-        _lib1.setAttribute("src", 'https://d3js.org/d3.v6.min.js');
+        _lib1.setAttribute("src", 'https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js');
+        _lib1.setAttribute("integrity", 'sha512-vc58qvvBdrDR4etbxMdlTt4GBQk1qjvyORR2nrsPsFPyrs+/u5c3+1Ct6upOgdZoIl7eq6k3a1UPDSNAQi/32A==');
+        _lib1.setAttribute("crossorigin", 'anonymous');
+        _lib1.setAttribute("referrerpolicy", 'no-referrer');
         document.head.appendChild(_lib1);
 
         const _lib2 = document.createElement('script');
 
-        _lib2.setAttribute("src", 'https://cdnjs.cloudflare.com/ajax/libs/billboard.js/3.14.3/billboard.pkgd.min.js');
-        _lib2.setAttribute("integrity", 'sha512-1VwrVSqZ+HSX8ZyO3Z+vKTlMM9BiUXbSnQL2JAnLdGL2DVoG+XJTXJEvtZGMt37ymAsP/DZXQStBRIep81mSQA==');
+        _lib2.setAttribute("src", 'https://cdnjs.cloudflare.com/ajax/libs/billboard.js/3.16.0/billboard.pkgd.min.js');
+        _lib2.setAttribute("integrity", 'sha512-ClwsK/z1FXxUxpPcadvKKdjGIt9a3D4uSAD/hfAXUwH1+XjWesMJAnlJMSvxUwMchXms5dUygkuzgiSMfbDfzQ==');
         _lib2.setAttribute("crossorigin", 'anonymous');
         _lib2.setAttribute("referrerpolicy", 'no-referrer');
         document.head.appendChild(_lib2);
@@ -76,11 +72,17 @@ function graficos(){
         const _lib3 = document.createElement('link');
 
         _lib3.setAttribute("rel", 'stylesheet');
-        _lib3.setAttribute("href", 'https://cdnjs.cloudflare.com/ajax/libs/billboard.js/3.14.3/billboard.min.css');
-        _lib3.setAttribute("integrity", 'sha512-+iioEOUqup3ddDw5CE3m87DWYtXSJrYphQzP5sYHdJCcvMULwEelaPgWBV4TFu+XQmL9ZEhfPUvgFWgbQ0hocQ==');
+        _lib3.setAttribute("href", 'https://cdnjs.cloudflare.com/ajax/libs/billboard.js/3.16.0/billboard.min.css');
+        _lib3.setAttribute("integrity", 'sha512-njOj5MWC/MCTRlxjIsftPrGL3nuexguTsEN1qE8eLU6LZW1ZyccshJ1a2QneVxsyeDjbEqXl9TJNfCFUj8pDDg==');
         _lib3.setAttribute("crossorigin", 'anonymous');
         _lib3.setAttribute("referrerpolicy", 'no-referrer');
         document.head.appendChild(_lib3);
+
+        // Gerar PDF do gráfico
+        const _lib4 = document.createElement('script');
+
+        _lib4.setAttribute("src", 'https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js');
+        document.head.appendChild(_lib4);
     }
 }
 
@@ -108,7 +110,7 @@ function galeria(){
 
 export function executar(link, hash){
     
-    calendario();
+    geral();
     galeria();
     graficos();
     recaptcha();
