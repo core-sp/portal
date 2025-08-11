@@ -132,6 +132,16 @@ function resizePagination(){
         $(window).width() <= 576 ? $('.pagination').addClass('pagination-sm') : $('.pagination').removeClass('pagination-sm');
 }
 
+function galeriaLigthbox(obj){
+
+    $(obj).ekkoLightbox({
+        onHide: function(){
+            if((this._$modal.length > 0) && (this._$modal[0].contains(document.activeElement)))
+                document.activeElement.blur();
+        }
+    });
+}
+
 export function executar(local = 'externo'){
 
     lazyLoad();
@@ -167,16 +177,13 @@ export function executar(local = 'externo'){
         
 	});
 
-    // Lightbox
-    $(document).on('click', '[data-toggle="lightbox"]', function(e) {
-        e.preventDefault();
-        $(this).ekkoLightbox({
-            onHide: function(){
-                if((this._$modal.length > 0) && (this._$modal[0].contains(document.activeElement)))
-                    document.activeElement.blur();
-            }
+    if($('[data-toggle="lightbox"]').length > 0)
+        $(document).on('click', '[data-toggle="lightbox"]', function(e) {
+            e.preventDefault();
+            document.dispatchEvent(new CustomEvent("LIB_GALERIA", {
+                detail: {funcao: galeriaLigthbox, propriedade: this}
+            }));
         });
-    });
 
     // Logout Representante
     $("#logout-representante").click(function(){

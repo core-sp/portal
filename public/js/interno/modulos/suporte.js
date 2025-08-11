@@ -98,7 +98,9 @@ function graficoBillboard(chart){
     $('.btn-refresh-storage').click(function () {
         if(chart !== undefined)
             chart.destroy();
-        sobreStorage();
+        document.dispatchEvent(new CustomEvent("LIB_GRAFICO", {
+            detail: {funcao: sobreStorage}
+        }));
     });
 }
 
@@ -179,7 +181,9 @@ function visualizar(){
 
     // Storage
     if($(grafico).length > 0){
-        sobreStorage();
+        document.dispatchEvent(new CustomEvent("LIB_GRAFICO", {
+            detail: {funcao: sobreStorage}
+        }));
     }
 };
 
