@@ -7,8 +7,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
-  <link href="{{ asset('/css/app.css') }}" rel="stylesheet">
-  <link type="text/css" href="{{ asset('/css/custom.css?'.hashScriptCss()) }}" rel="stylesheet">
+  @component('components.estilosCss', ['local_final' => 'custom'])
+  @endcomponent
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">
@@ -68,9 +68,10 @@
 </div>
 <!-- /.login-box -->
 
-@component('components.scriptsExternoJS')
-@endcomponent
 <script type="module" src="{{ asset('/js/modulos/security.js?'.hashScriptJs()) }}" data-modulo-id="security" data-modulo-acao="visualizar"></script>
+
+@component('components.scriptsJs', ['local_final' => 'externo/site'])
+@endcomponent
 
 </body>
 </html>

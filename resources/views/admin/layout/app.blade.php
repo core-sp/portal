@@ -9,8 +9,8 @@
         <title>CORE-SP | Portal</title>
         <link rel="icon" href="{{ asset('img/favicon.ico') }}" type="image/ico" />
 
-        <link type="text/css" href="{{ asset('/css/app.css') }}" rel="stylesheet">
-        <link type="text/css" href="{{ asset('/css/custom.css?'.hashScriptCss()) }}" rel="stylesheet">
+        @component('components.estilosCss', ['local_final' => 'custom'])
+        @endcomponent
     </head>
     <body class="hold-transition sidebar-mini">
 
@@ -110,17 +110,11 @@
       @component('components.modal-geral')
       @endcomponent
 
-      @if(config('app.env') == 'local')
-      <script type="text/javascript" src="{{ asset('/js/tinymce/tinymce.min.js') }}"></script>
-      @else
-      <script referrerpolicy="origin" src="{{ 'https://cdn.tiny.cloud/1/' . env('TINY_API_KEY') . '/tinymce/5/tinymce.min.js' }}"></script>
+      @if(config('app.env') != 'local')
+      <span id="chave-tiny-{{ env('TINY_API_KEY') }}"></span>
       @endif
 
-      <script type="text/javascript" src="{{ asset('/js/app.js') }}"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.14.1/jquery-ui.min.js" integrity="sha512-MSOo1aY+3pXCOCdGAYoBZ6YGI0aragoQsg1mKKBHXCYPIWxamwOE7Drh+N5CPgGI5SA9IEKJiPjdfqWFWmZtRA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" integrity="sha512-pHVGpX7F/27yZ0ISY+VVjyULApbDlD0/X0rgGbTqCE7WFW5MezNTWG/dnhtbBuICzsd0WQPgpE4REBLv+UqChw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-      <script>console.log('{{ logVersaoScriptCss() }}');</script>
-      <script type="text/javascript" src="{{ asset('/js/pre-init.js?'.hashScriptJs()) }}" data-modulo-versao="{{ 'v=' . versaoScriptJs() }}" id="pre-init"></script>
-      <script type="text/javascript" src="{{ asset('/js/interno/custom.js?'.hashScriptJs()) }}"></script>
+      @component('components.scriptsJs', ['local_final' => 'interno/custom'])
+      @endcomponent
     </body>
 </html>

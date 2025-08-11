@@ -15,8 +15,8 @@
         <title>Core-SP — {{ $title }}</title>
         <link rel="icon" href="{{ asset('img/favicon.ico') }}" type="image/ico" />
 
-        <link type="text/css" href="{{ asset('/css/app.css') }}" rel="stylesheet">
-        <link type="text/css" href="{{ asset('/css/site.css?'.hashScriptCss()) }}" rel="stylesheet">
+        @component('components.estilosCss', ['local_final' => 'site'])
+        @endcomponent
 
         @yield('meta')
 
@@ -447,7 +447,7 @@
       @component('components.modal-geral')
       @endcomponent
 
-      @component('components.scriptsExternoJS')
+      @component('components.scriptsJs', ['local_final' => 'externo/site'])
       @endcomponent
     </body>
 </html>
