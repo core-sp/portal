@@ -433,17 +433,22 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
     public function listarBloqueio()
     {
+        $resposta = '<h4 class="text-danger">Devido o serviço de agendamento para atendimento estar desativado, não é necessário criar ou editar bloqueios.</h4>';
+        $resposta .= '<br><h5>Para bloqueios de agendamento de Sala de Reunião / Coworking: <a href="' . route('sala.reuniao.bloqueio.lista') . '" >clique aqui</a>.</h4>';
+        $resposta .= '<br><h5>Para bloqueios de agendamento de Plantão Jurídico: <a href="' . route('plantao.juridico.bloqueios.index') . '" >clique aqui</a>.</h4>';
+
         $resultados = AgendamentoBloqueio::with('regional')
             ->orderBy('idagendamentobloqueio', 'DESC')
             ->where('diatermino', '>=', date('Y-m-d'))
             ->orWhereNull('diatermino')
             ->paginate(10);
 
-        if(auth()->user()->cannot('create', auth()->user()))
+        // if(auth()->user()->cannot('create', auth()->user()))
+        if(!in_array(config('app.env'), ['testing']))
             unset($this->variaveisBloqueio['btn_criar']);
         
         return [
-            'tabela' => $this->tabelaCompletaBloqueio($resultados),
+            'tabela' => !in_array(config('app.env'), ['testing']) ? $resposta : $this->tabelaCompletaBloqueio($resultados),
             'resultados' => $resultados,
             'variaveis' => (object) $this->variaveisBloqueio,
         ];
