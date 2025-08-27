@@ -51,6 +51,11 @@
                 <h6 class="brancar"><i class="fas fa-home"></i>&nbsp;&nbsp;Home</h6>
               </a>
             </div>
+            <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.beneficios' ? 'mr-item-selected' : '' }}">
+                <a href="{{ route('representante.beneficios') }}" class="showLoading">
+                    <h6 class="brancar"><i class="fas fa-gift"></i>&nbsp;&nbsp;Benefícios</h6>
+                </a>
+            </div>
             <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.dados-gerais' ? 'mr-item-selected' : '' }}">
               <a href="{{ route('representante.dados-gerais') }}" class="showLoading">
                 <h6 class="brancar"><i class="fas fa-table"></i>&nbsp;&nbsp;Dados gerais</h6>
