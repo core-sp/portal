@@ -3,11 +3,23 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TermoConsentimento extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'termos_consentimentos';
     protected $guarded = [];
+
+    const BENE_ALLYA = 'Allya';
+
+    public static function beneficios()
+    {
+        return [
+            self::BENE_ALLYA,
+        ];
+    }
 
     public function representante()
     {
@@ -44,5 +56,21 @@ class TermoConsentimento extends Model
         $message = 'foi criado um novo registro no termo de consentimento, com a id: '.$this->id;
 
         return isset($this->email) ? 'Novo email e '.$message : $message;
+    }
+
+    public function excluirBeneficio()
+    {
+        $msg = 'RC não quer mais estar inscrito no benefício ' . $this->beneficio . '.';
+        if(!$this->trashed() && ($this->delete() == 1))
+            return $msg;
+    }
+
+    public function restaurarBeneficio()
+    {
+        if($this->trashed())
+        {
+            $this->restore();
+            return 'RC está inscrito novamente no benefício ' . $this->beneficio . '.';
+        }
     }
 }

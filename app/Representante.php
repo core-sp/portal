@@ -209,4 +209,10 @@ class Representante extends Authenticable
     {
         return $this->update(['ultimo_acesso' => $this->updated_at]);
     }
+
+    public function inscreverBeneficio($ip, $beneficio)
+    {
+        $this->termos()->create(['ip' => $ip, 'beneficio' => $beneficio]);
+        return 'RC está inscrito no benefício ' . $beneficio . '.';
+    }
 }
