@@ -55,4 +55,8 @@ Route::prefix('representante')->group(function(){
 
     // Atalho para cursos
     Route::get('/cursos', 'RepresentanteSiteController@cursos')->name('representante.cursos');
+
+    // Benefícios
+    Route::get('/beneficios', 'RepresentanteSiteController@beneficios')->name('representante.beneficios');
+    Route::post('/beneficios', 'RepresentanteSiteController@acaoBeneficios')->name('representante.beneficios.acao');
 });

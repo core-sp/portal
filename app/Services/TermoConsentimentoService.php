@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use App\Events\CrudEvent;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 
 class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
 
@@ -127,5 +128,74 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
         }
 
         return null;
+    }
+
+    public function beneficios($rep = null)
+    {
+        $beneficios = TermoConsentimento::beneficios();
+        array_unshift($beneficios, 'Todos');
+
+        if(is_null($rep))
+            return $beneficios;
+        
+        $inscricoes = $rep->termos()
+        ->select('beneficio')
+        ->whereNotNull('beneficio')
+        ->get()
+        ->pluck('beneficio');
+
+        return [
+            'beneficios' => $beneficios,
+            'inscricoes' => collect(Arr::except($beneficios, 0))->diff($inscricoes)->isEmpty() ? 
+                $inscricoes->push($beneficios[0]) : 
+                $inscricoes,
+        ];
+    }
+
+    private function registrarAcoesBeneficio($msg)
+    {
+        if(gettype($msg) != "string")
+            return false;
+
+        \Log::channel('externo')->info($msg);
+        // email
+    }
+
+    public function beneficiosInscricoes($rep, $ip, $inscricoes)
+    {
+        $inscricoes = isset($inscricoes['inscricoes']) ? collect($inscricoes['inscricoes']) : collect($inscricoes);
+        $inscrito = $rep->termos()->whereNotNull('beneficio');
+
+        // Sem inscrições
+        if($inscricoes->isEmpty())
+        {
+            $total = $inscrito->count();
+
+            $inscrito->get()->each(function ($item, $key) {
+                $msg = $item->excluirBeneficio();
+                $this->registrarAcoesBeneficio($msg);
+            });
+
+            return $total > 0 ? 'Removidas todas as inscrições!' : 'Não há inscrições a serem removidas!';
+        }
+
+        $todos = $inscricoes->contains($this->beneficios()[0]);
+        $final_colecao = $todos ? collect(Arr::except($this->beneficios(), 0)) : $inscricoes;
+
+        $final_colecao->diff($inscrito->withTrashed()
+            ->get()
+            ->each(function ($item, $key) use($todos, $inscricoes) {
+                $msg = $inscricoes->contains($item->beneficio) || $todos ? 
+                    $item->restaurarBeneficio() : 
+                    $item->excluirBeneficio();
+                $this->registrarAcoesBeneficio($msg);
+            })
+            ->pluck('beneficio'))
+            ->each(function ($item, $key) use($rep, $ip) {
+                $msg = $rep->inscreverBeneficio($ip, $item);
+                $this->registrarAcoesBeneficio($msg);
+            });
+
+        return $todos ? 'Inscrito em todos!' : 'Removido / inscrito nos benefícios selecionados!';
     }
 }

@@ -27,6 +27,7 @@ use App\Repositories\BdoOportunidadeRepository;
 use Illuminate\Support\Facades\View;
 use App\Contracts\MediadorServiceInterface;
 use App\Http\Requests\RepSalaReuniaoRequest;
+use App\Http\Requests\TermoConsentimentoRequest;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -635,6 +636,36 @@ class RepresentanteSiteController extends Controller
         event(new ExternoEvent('.', 'Cursos'));
 
         return view('site.representante.cursos', ['cursos' => $cursos]);
+    }
+
+    public function beneficios()
+    {
+        try{
+            $dados = $this->service->getService('TermoConsentimento')->beneficios(auth()->guard('representante')->user());
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os benefícios.");
+        }
+
+        event(new ExternoEvent('.', 'Benefícios'));
+
+        return view('site.representante.beneficios', $dados);
+    }
+
+    public function acaoBeneficios(TermoConsentimentoRequest $request)
+    {
+        try{
+            $validate = $request->validated();
+            $msg = $this->service->getService('TermoConsentimento')->beneficiosInscricoes(auth()->guard('representante')->user(), request()->ip(), $validate);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao salvar as inscrições.");
+        }
+
+        return redirect()->route('representante.beneficios')->with([
+            'message' => $msg,
+            'class' => 'alert-success'
+        ]);
     }
 
     public function agendamentoSala($acao = null, $id = null)
