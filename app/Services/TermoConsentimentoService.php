@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Events\CrudEvent;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BeneficiosMail;
 
 class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
 
@@ -152,31 +154,37 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
         ];
     }
 
-    private function registrarAcoesBeneficio($msg)
+    private function registrarAcoesBeneficio($msg, $inscricao)
     {
         if(gettype($msg) != "string")
             return false;
 
-        \Log::channel('externo')->info($msg);
-        // email
+        event(new ExternoEvent($inscricao->representante->nome . ' (CPF / CNPJ: ' . $inscricao->representante->cpf_cnpj . ') solicitou ' . $msg . ' no Programa de Benefícios para o benefício '. $inscricao->beneficio . ' e está registrado com a ID ' . $inscricao->id . ' o termo de consentimento.'));
+
+        Mail::to(['comunicacao@core-sp.org.br'])->queue(new BeneficiosMail($inscricao));
     }
 
     public function beneficiosInscricoes($rep, $ip, $inscricoes)
     {
+        $resposta = 'Ação realizada com sucesso e encaminhada à Comunicação!';
+        $sem_resposta = 'Não há ação a ser realizada!';
+
         $inscricoes = isset($inscricoes['inscricoes']) ? collect($inscricoes['inscricoes']) : collect($inscricoes);
         $inscrito = $rep->termos()->whereNotNull('beneficio');
+        $total = $inscrito->count();
 
         // Sem inscrições
+        if($inscricoes->isEmpty() && ($total == 0))
+            return ['message' => $sem_resposta, 'class' => 'alert-warning'];
+
         if($inscricoes->isEmpty())
         {
-            $total = $inscrito->count();
-
             $inscrito->get()->each(function ($item, $key) {
                 $msg = $item->excluirBeneficio();
-                $this->registrarAcoesBeneficio($msg);
+                $this->registrarAcoesBeneficio($msg, $item);
             });
 
-            return $total > 0 ? 'Removidas todas as inscrições!' : 'Não há inscrições a serem removidas!';
+            return ['message' => $resposta, 'class' => 'alert-success'];
         }
 
         $todos = $inscricoes->contains($this->beneficios()[0]);
@@ -188,14 +196,16 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
                 $msg = $inscricoes->contains($item->beneficio) || $todos ? 
                     $item->restaurarBeneficio() : 
                     $item->excluirBeneficio();
-                $this->registrarAcoesBeneficio($msg);
+                $this->registrarAcoesBeneficio($msg, $item);
             })
             ->pluck('beneficio'))
             ->each(function ($item, $key) use($rep, $ip) {
-                $msg = $rep->inscreverBeneficio($ip, $item);
-                $this->registrarAcoesBeneficio($msg);
+                $dados = $rep->inscreverBeneficio($ip, $item);
+                $this->registrarAcoesBeneficio($dados['msg'], $dados['inscricao']);
             });
 
-        return $todos ? 'Inscrito em todos!' : 'Removido / inscrito nos benefícios selecionados!';
+        return $total != $inscrito->count() ? 
+            ['message' => $resposta, 'class' => 'alert-success'] : 
+            ['message' => $sem_resposta, 'class' => 'alert-warning'];
     }
 }

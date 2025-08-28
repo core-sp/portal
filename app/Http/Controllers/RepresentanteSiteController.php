@@ -656,16 +656,13 @@ class RepresentanteSiteController extends Controller
     {
         try{
             $validate = $request->validated();
-            $msg = $this->service->getService('TermoConsentimento')->beneficiosInscricoes(auth()->guard('representante')->user(), request()->ip(), $validate);
+            $dados = $this->service->getService('TermoConsentimento')->beneficiosInscricoes(auth()->guard('representante')->user(), request()->ip(), $validate);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao salvar as inscrições.");
         }
 
-        return redirect()->route('representante.beneficios')->with([
-            'message' => $msg,
-            'class' => 'alert-success'
-        ]);
+        return redirect()->route('representante.beneficios')->with($dados);
     }
 
     public function agendamentoSala($acao = null, $id = null)
