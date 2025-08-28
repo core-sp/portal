@@ -14,7 +14,7 @@
         <div class="linha-lg-mini mb-1"></div>
 
         <p>
-            <em>Gerencie as inscrições dos <a href="/beneficios" target="_blank">benefícios</a>.</em>
+            <em>Gerencie as inscrições dos <a href="{{ route('paginas.site', 'beneficios') }}" target="_blank">benefícios</a>.</em>
         </p>
 
         <form class="mt-3" action="{{ route('representante.beneficios.acao') }}" method="POST">
@@ -28,9 +28,10 @@
 
             @foreach($beneficios as $beneficio)
             <div class="form-check-inline mb-2">
-                <label class="form-check-label">
+                <label for="bene-{{ $loop->index }}" class="form-check-label">
                     <input 
                         type="checkbox" 
+                        id="bene-{{ $loop->index }}"
                         class="form-check-input {{ $errors->has('inscricoes') || $errors->has('inscricoes.*') ? 'is-invalid' : '' }}" 
                         name="inscricoes[]" 
                         value="{{ $beneficio }}" 
@@ -57,5 +58,7 @@
         </form>
     </div>
 </div>
+
+<script type="module" src="{{ asset('/js/restrita-rc/modulos/beneficios.js?'.hashScriptJs()) }}" data-modulo-id="beneficios" data-modulo-acao="editar"></script>
 
 @endsection
