@@ -60,7 +60,7 @@ class TermoConsentimento extends Model
 
     public function excluirBeneficio()
     {
-        $msg = 'RC não quer mais estar inscrito no benefício ' . $this->beneficio . '.';
+        $msg = 'a remoção da inscrição';
         if(!$this->trashed() && ($this->delete() == 1))
             return $msg;
     }
@@ -70,7 +70,7 @@ class TermoConsentimento extends Model
         if($this->trashed())
         {
             $this->restore();
-            return 'RC está inscrito novamente no benefício ' . $this->beneficio . '.';
+            return 'novamente a inclusão da inscrição';
         }
     }
 }

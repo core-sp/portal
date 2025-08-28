@@ -212,7 +212,10 @@ class Representante extends Authenticable
 
     public function inscreverBeneficio($ip, $beneficio)
     {
-        $this->termos()->create(['ip' => $ip, 'beneficio' => $beneficio]);
-        return 'RC está inscrito no benefício ' . $beneficio . '.';
+        $inscrito = $this->termos()->create(['ip' => $ip, 'beneficio' => $beneficio]);
+        return [
+            'msg' => 'a inclusão da inscrição',
+            'inscricao' => $inscrito,
+        ];
     }
 }
