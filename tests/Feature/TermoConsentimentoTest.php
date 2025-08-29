@@ -7,6 +7,9 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use App\TermoConsentimento;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BeneficiosMail;
 
 class TermoConsentimentoTest extends TestCase
 {
@@ -504,5 +507,244 @@ class TermoConsentimentoTest extends TestCase
 
         $this->get(route('admin'))
         ->assertSee('Não há emails cadastrados na tabela de Termo de Consentimento.');
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES BENEFÍCIOS - ÁREA RESTRITA RC
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function can_view_options_in_route_beneficios()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->get(route('representante.beneficios'))
+        ->assertSeeInOrder([
+            'type="checkbox" ',
+            'id="bene-0"',
+            'value="Todos" ',
+            'type="checkbox" ',
+            'id="bene-1"',
+            'value="Allya" ',
+            '<button type="submit" class="btn btn-primary loadingPagina">Salvar</button>'
+        ]);
+    }
+
+    /** @test */
+    public function can_view_options_checked_in_route_beneficios()
+    {
+        $representante = factory('App\Representante')->create();
+        $beneficio = factory('App\TermoConsentimento')->states('beneficio')->create([
+            'idrepresentante' => $representante->id
+        ]);
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->get(route('representante.beneficios'))
+        ->assertSeeInOrder([
+            'type="checkbox" ',
+            'id="bene-0"',
+            'value="Todos" ',
+            'checked',
+            'type="checkbox" ',
+            'id="bene-1"',
+            'value="Allya" ',
+            'checked',
+            '<button type="submit" class="btn btn-primary loadingPagina">Salvar</button>'
+        ]);
+    }
+
+    /** @test */
+    public function can_checked_in_route_beneficios()
+    {
+        Mail::fake();
+
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->post(route('representante.beneficios.acao'), ['inscricoes' => ['Allya']])
+        ->assertSessionHas('message', 'Ação realizada com sucesso e encaminhada à Comunicação!')
+        ->assertSessionHas('class', 'alert-success')
+        ->assertRedirect(route('representante.beneficios'));
+
+        Mail::assertQueued(BeneficiosMail::class);
+
+        $this->assertDatabaseHas('termos_consentimentos', [
+            'ip' => '127.0.0.1',
+            'beneficio' => 'Allya',
+            'idrepresentante' => 1
+        ]);
+    }
+
+    /** @test */
+    public function can_checked_todos_in_route_beneficios()
+    {
+        Mail::fake();
+
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->post(route('representante.beneficios.acao'), ['inscricoes' => ['Todos']])
+        ->assertSessionHas('message', 'Ação realizada com sucesso e encaminhada à Comunicação!')
+        ->assertSessionHas('class', 'alert-success')
+        ->assertRedirect(route('representante.beneficios'));
+
+        Mail::assertQueued(BeneficiosMail::class);
+
+        $this->assertDatabaseHas('termos_consentimentos', [
+            'ip' => '127.0.0.1',
+            'beneficio' => 'Allya',
+            'idrepresentante' => 1
+        ]);
+
+        $this->assertDatabaseMissing('termos_consentimentos', [
+            'ip' => '127.0.0.1',
+            'beneficio' => 'Todos',
+            'idrepresentante' => 1
+        ]);
+    }
+
+    /** @test */
+    public function cannot_checked_in_route_beneficios_without_array()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->post(route('representante.beneficios.acao'), ['inscricoes' => 'Allya'])
+        ->assertSessionHasErrors(['inscricoes']);
+    }
+
+    /** @test */
+    public function cannot_checked_in_route_beneficios_with_invalid_type()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->post(route('representante.beneficios.acao'), ['inscricoes' => ['Allyas']])
+        ->assertSessionHasErrors(['inscricoes']);
+    }
+
+    /** @test */
+    public function cannot_checked_in_route_beneficios_with_equals()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->post(route('representante.beneficios.acao'), ['inscricoes' => ['Allya', 'Allya']])
+        ->assertSessionHasErrors(['inscricoes.*']);
+    }
+
+    /** @test */
+    public function can_remove_checked_in_route_beneficios()
+    {
+        $this->can_checked_in_route_beneficios();
+
+        $this->post(route('representante.beneficios.acao'), ['inscricoes' => []])
+        ->assertSessionHas('message', 'Ação realizada com sucesso e encaminhada à Comunicação!')
+        ->assertSessionHas('class', 'alert-success')
+        ->assertRedirect(route('representante.beneficios'));
+
+        $this->assertSoftDeleted('termos_consentimentos', [
+            'ip' => '127.0.0.1',
+            'beneficio' => 'Allya',
+            'idrepresentante' => 1
+        ]);
+    }
+
+    /** @test */
+    public function no_action_in_route_beneficios()
+    {
+        Mail::fake();
+
+        $representante = factory('App\Representante')->create();
+        $beneficio = factory('App\TermoConsentimento')->states('beneficio')->create([
+            'idrepresentante' => $representante->id
+        ]);
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->post(route('representante.beneficios.acao'), ['inscricoes' => ['Allya']])
+        ->assertSessionHas('message', 'Não há ação a ser realizada!')
+        ->assertSessionHas('class', 'alert-warning')
+        ->assertRedirect(route('representante.beneficios'));
+
+        $this->assertEquals(TermoConsentimento::count(), 1);
+
+        Mail::assertNotQueued(BeneficiosMail::class);
+
+        $representante->termos()->delete();
+
+        $this->assertEquals(TermoConsentimento::count(), 0);
+
+        $this->post(route('representante.beneficios.acao'), ['inscricoes' => []])
+        ->assertSessionHas('message', 'Não há ação a ser realizada!')
+        ->assertSessionHas('class', 'alert-warning')
+        ->assertRedirect(route('representante.beneficios'));
+
+        $this->assertEquals(TermoConsentimento::count(), 0);
+
+        Mail::assertNotQueued(BeneficiosMail::class);
+    }
+
+    /** @test */
+    public function id_termo_in_log_when_created_beneficio()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->post(route('representante.beneficios.acao'), ['inscricoes' => ['Allya']])
+        ->assertSessionHas('message', 'Ação realizada com sucesso e encaminhada à Comunicação!')
+        ->assertSessionHas('class', 'alert-success')
+        ->assertRedirect(route('representante.beneficios'));
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = $representante->nome . ' (CPF / CNPJ: ' . $representante->cpf_cnpj . ') solicitou a inclusão da inscrição no Programa de Benefícios ';
+        $texto .= 'para o benefício Allya e está registrado com a ID 1 o termo de consentimento.';
+
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test */
+    public function id_termo_in_log_when_deleted_beneficio()
+    {
+        $representante = factory('App\Representante')->create();
+        $beneficio = factory('App\TermoConsentimento')->states('beneficio')->create([
+            'idrepresentante' => $representante->id
+        ]);
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->post(route('representante.beneficios.acao'), ['inscricoes' => []])
+        ->assertSessionHas('message', 'Ação realizada com sucesso e encaminhada à Comunicação!')
+        ->assertSessionHas('class', 'alert-success')
+        ->assertRedirect(route('representante.beneficios'));
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = $representante->nome . ' (CPF / CNPJ: ' . $representante->cpf_cnpj . ') solicitou a remoção da inscrição no Programa de Benefícios ';
+        $texto .= 'para o benefício Allya e está registrado com a ID 1 o termo de consentimento.';
+
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test */
+    public function id_termo_in_log_when_restored_beneficio()
+    {
+        $representante = factory('App\Representante')->create();
+        $beneficio = factory('App\TermoConsentimento')->states('beneficio')->create([
+            'idrepresentante' => $representante->id
+        ]);
+        $beneficio->delete();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $this->post(route('representante.beneficios.acao'), ['inscricoes' => ['Allya']])
+        ->assertSessionHas('message', 'Ação realizada com sucesso e encaminhada à Comunicação!')
+        ->assertSessionHas('class', 'alert-success')
+        ->assertRedirect(route('representante.beneficios'));
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = $representante->nome . ' (CPF / CNPJ: ' . $representante->cpf_cnpj . ') solicitou novamente a inclusão da inscrição no Programa de Benefícios ';
+        $texto .= 'para o benefício Allya e está registrado com a ID 1 o termo de consentimento.';
+
+        $this->assertStringContainsString($texto, $log);
     }
 }

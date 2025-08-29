@@ -257,6 +257,47 @@ class RepresentanteTest extends TestCase
 
     /** @test 
      * 
+     * Abas da área restrita não são acessíveis sem o login.
+    */
+    public function cannot_access_tabs_on_restrict_area_without_login()
+    {
+        // exige ao acessar a aba bdo
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+
+        // Checa acesso a página principal é bloqueado e redirecionado para tela de login
+        $this->get(route('representante.dashboard'))->assertRedirect(route('representante.login'));
+
+        $this->get(route('representante.beneficios'))->assertRedirect(route('representante.login'));
+
+        // Checa acesso a aba "Dados Gerais" é bloqueado e redirecionado para tela de login
+        $this->get(route('representante.dados-gerais'))->assertRedirect(route('representante.login'));
+
+        // Checa acesso a aba "Contatos" é bloqueado e redirecionado para tela de login
+        $this->get(route('representante.contatos.view'))->assertRedirect(route('representante.login'));
+
+        // Checa acesso a aba "End. de Correspondência" é bloqueado e redirecionado para tela de login
+        $this->get(route('representante.enderecos.view'))->assertRedirect(route('representante.login'));
+
+        // Checa acesso a aba "Situação Financeira" é bloqueado e redirecionado para tela de login
+        $this->get(route('representante.lista-cobrancas'))->assertRedirect(route('representante.login'));
+        
+        // Checa acesso a aba "Oportunidades" é bloqueado e redirecionado para tela de login
+        $this->get(route('representante.bdo'))->assertRedirect(route('representante.login'));
+
+        // Checa acesso a aba "Solicitação de Cédula" é bloqueado e redirecionado para tela de login
+        $this->get(route('representante.solicitarCedulaView'))->assertRedirect(route('representante.login'));
+
+        // Checa acesso a aba "Agendar Salas" é bloqueado e redirecionado para tela de login
+        $this->get(route('representante.agendar.inserir.view'))->assertRedirect(route('representante.login'));
+
+        // Checa acesso a aba "Cursos" é bloqueado e redirecionado para tela de login
+        $this->get(route('representante.cursos'))->assertRedirect(route('representante.login'));
+    }
+
+    /** @test 
+     * 
      * Representante Comercial pode acessar todas as abas na área restrita do Portal.
     */
     public function access_tabs_on_restrict_area()
@@ -271,6 +312,9 @@ class RepresentanteTest extends TestCase
 
         // Checa acesso a página principal
         $this->get(route('representante.dashboard'))->assertOk();
+
+        // Checa acesso a aba "Benefícios"
+        $this->get(route('representante.beneficios'))->assertOk();
 
         // Checa acesso a aba "Dados Gerais"
         $this->get(route('representante.dados-gerais'))->assertOk();
@@ -313,6 +357,13 @@ class RepresentanteTest extends TestCase
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
         $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Home".';
+        $this->assertStringContainsString($texto, $log);
+
+        $this->get(route('representante.beneficios'))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário '. $representante->id . ' ("'. $representante->cpf_cnpj .'") acessou a aba "Benefícios".';
         $this->assertStringContainsString($texto, $log);
 
         $this->get(route('representante.dados-gerais'))->assertOk();
@@ -636,45 +687,6 @@ class RepresentanteTest extends TestCase
 
         // Checa se mensagem do erro foi retornada
         $this->assertEquals(session('message'), 'Login inválido.');
-    }
-
-    /** @test 
-     * 
-     * Abas da área restrita não são acessíveis sem o login.
-    */
-    public function cannot_access_tabs_on_restrict_area_without_login()
-    {
-        // exige ao acessar a aba bdo
-        factory('App\Regional')->create([
-            'regional' => 'SÃO PAULO',
-        ]);
-
-        // Checa acesso a página principal é bloqueado e redirecionado para tela de login
-        $this->get(route('representante.dashboard'))->assertRedirect(route('representante.login'));
-
-        // Checa acesso a aba "Dados Gerais" é bloqueado e redirecionado para tela de login
-        $this->get(route('representante.dados-gerais'))->assertRedirect(route('representante.login'));
-
-        // Checa acesso a aba "Contatos" é bloqueado e redirecionado para tela de login
-        $this->get(route('representante.contatos.view'))->assertRedirect(route('representante.login'));
-
-        // Checa acesso a aba "End. de Correspondência" é bloqueado e redirecionado para tela de login
-        $this->get(route('representante.enderecos.view'))->assertRedirect(route('representante.login'));
-
-        // Checa acesso a aba "Situação Financeira" é bloqueado e redirecionado para tela de login
-        $this->get(route('representante.lista-cobrancas'))->assertRedirect(route('representante.login'));
-        
-        // Checa acesso a aba "Oportunidades" é bloqueado e redirecionado para tela de login
-        $this->get(route('representante.bdo'))->assertRedirect(route('representante.login'));
-
-        // Checa acesso a aba "Solicitação de Cédula" é bloqueado e redirecionado para tela de login
-        $this->get(route('representante.solicitarCedulaView'))->assertRedirect(route('representante.login'));
-
-        // Checa acesso a aba "Agendar Salas" é bloqueado e redirecionado para tela de login
-        $this->get(route('representante.agendar.inserir.view'))->assertRedirect(route('representante.login'));
-
-        // Checa acesso a aba "Cursos" é bloqueado e redirecionado para tela de login
-        $this->get(route('representante.cursos'))->assertRedirect(route('representante.login'));
     }
 
     /** @test 

@@ -38,6 +38,7 @@ class TermoConsentimentoRequest extends FormRequest
             'email' => 'Email no formato inválido',
             'mimes' => 'Tipo de arquivo não suportado',
             'file.max' => 'Limite de até 2MB o tamanho do arquivo',
+            'inscricoes.array' => 'Benefício num formato inválido',
             'inscricoes.in' => 'Benefício inexistente',
             'inscricoes.*.distinct' => 'Benefício repetido',
         ];
