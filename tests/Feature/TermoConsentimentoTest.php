@@ -569,7 +569,9 @@ class TermoConsentimentoTest extends TestCase
         ->assertSessionHas('class', 'alert-success')
         ->assertRedirect(route('representante.beneficios'));
 
-        Mail::assertQueued(BeneficiosMail::class);
+        Mail::assertQueued(BeneficiosMail::class, function ($mail) {
+            return $mail->acao == 'inclusão';
+        });
 
         $this->assertDatabaseHas('termos_consentimentos', [
             'ip' => '127.0.0.1',
@@ -584,6 +586,13 @@ class TermoConsentimentoTest extends TestCase
         Mail::fake();
 
         $representante = factory('App\Representante')->create();
+        $beneficio = factory('App\TermoConsentimento')->states('beneficio')->create([
+            'idrepresentante' => $representante->id,
+            'ip' => '127.0.0.1',
+            'created_at' => now()->subDay()->format('Y-m-d H:i:s'),
+            'updated_at' => now()->subDay()->format('Y-m-d H:i:s')
+        ]);
+        $representante->termos()->delete();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
 
         $this->post(route('representante.beneficios.acao'), ['inscricoes' => ['Todos']])
@@ -591,7 +600,9 @@ class TermoConsentimentoTest extends TestCase
         ->assertSessionHas('class', 'alert-success')
         ->assertRedirect(route('representante.beneficios'));
 
-        Mail::assertQueued(BeneficiosMail::class);
+        Mail::assertQueued(BeneficiosMail::class, function ($mail) {
+            return $mail->acao == 'novamente a inclusão';
+        });
 
         $this->assertDatabaseHas('termos_consentimentos', [
             'ip' => '127.0.0.1',
@@ -639,12 +650,23 @@ class TermoConsentimentoTest extends TestCase
     /** @test */
     public function can_remove_checked_in_route_beneficios()
     {
-        $this->can_checked_in_route_beneficios();
+        Mail::fake();
+
+        $representante = factory('App\Representante')->create();
+        $beneficio = factory('App\TermoConsentimento')->states('beneficio')->create([
+            'idrepresentante' => $representante->id,
+            'ip' => '127.0.0.1',
+        ]);
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
 
         $this->post(route('representante.beneficios.acao'), ['inscricoes' => []])
         ->assertSessionHas('message', 'Ação realizada com sucesso e encaminhada à Comunicação!')
         ->assertSessionHas('class', 'alert-success')
         ->assertRedirect(route('representante.beneficios'));
+
+        Mail::assertQueued(BeneficiosMail::class, function ($mail) {
+            return $mail->acao == 'remoção';
+        });
 
         $this->assertSoftDeleted('termos_consentimentos', [
             'ip' => '127.0.0.1',

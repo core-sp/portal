@@ -12,12 +12,13 @@ class BeneficiosMail extends Mailable
     use Queueable, SerializesModels;
 
     public $body;
-    private $acao;
+    public $acao;
 
     public function __construct($inscricao)
     {
         $cor = $inscricao->trashed() ? 'style="color: red;"' : 'style="color: blue;"';
         $this->acao = $inscricao->trashed() ? 'remoção' : 'inclusão';
+        $this->acao = !$inscricao->trashed() && ($inscricao->created_at != $inscricao->updated_at) ? 'novamente a inclusão' : $this->acao;
 
         $this->body = 'Nova solicitação de ' . $this->acao . ' de inscrição no benefício:';
         $this->body .= '<br><br>';
