@@ -588,7 +588,6 @@ class TermoConsentimentoTest extends TestCase
         $representante = factory('App\Representante')->create();
         $beneficio = factory('App\TermoConsentimento')->states('beneficio')->create([
             'idrepresentante' => $representante->id,
-            'ip' => '127.0.0.1',
             'created_at' => now()->subDay()->format('Y-m-d H:i:s'),
             'updated_at' => now()->subDay()->format('Y-m-d H:i:s')
         ]);
@@ -655,7 +654,6 @@ class TermoConsentimentoTest extends TestCase
         $representante = factory('App\Representante')->create();
         $beneficio = factory('App\TermoConsentimento')->states('beneficio')->create([
             'idrepresentante' => $representante->id,
-            'ip' => '127.0.0.1',
         ]);
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
 

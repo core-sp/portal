@@ -58,18 +58,22 @@ class TermoConsentimento extends Model
         return isset($this->email) ? 'Novo email e '.$message : $message;
     }
 
-    public function excluirBeneficio()
+    public function excluirBeneficio($ip)
     {
         $msg = 'a remoção da inscrição';
-        if(!$this->trashed() && ($this->delete() == 1))
-            return $msg;
+        if(!$this->trashed())
+        {
+            $this->update(['ip' => $ip]);
+            return $this->delete() == 1 ? $msg : null;
+        }
     }
 
-    public function restaurarBeneficio()
+    public function restaurarBeneficio($ip)
     {
         if($this->trashed())
         {
             $this->restore();
+            $this->update(['ip' => $ip]);
             return 'novamente a inclusão da inscrição';
         }
     }

@@ -179,8 +179,8 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
 
         if($inscricoes->isEmpty())
         {
-            $inscrito->get()->each(function ($item, $key) {
-                $msg = $item->excluirBeneficio();
+            $inscrito->get()->each(function ($item, $key) use($ip) {
+                $msg = $item->excluirBeneficio($ip);
                 $this->registrarAcoesBeneficio($msg, $item);
             });
 
@@ -192,10 +192,10 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
 
         $final_colecao->diff($inscrito->withTrashed()
             ->get()
-            ->each(function ($item, $key) use($todos, $inscricoes) {
+            ->each(function ($item, $key) use($todos, $inscricoes, $ip) {
                 $msg = $inscricoes->contains($item->beneficio) || $todos ? 
-                    $item->restaurarBeneficio() : 
-                    $item->excluirBeneficio();
+                    $item->restaurarBeneficio($ip) : 
+                    $item->excluirBeneficio($ip);
                 $this->registrarAcoesBeneficio($msg, $item);
             })
             ->pluck('beneficio'))
