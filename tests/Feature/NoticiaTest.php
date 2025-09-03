@@ -597,7 +597,7 @@ class NoticiaTest extends TestCase
         $log = tailCustom(storage_path($this->pathLogErros()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.ERROR: ';
         $txt = $inicio . '[Erro: No query results for model [App\Noticia]. para o slug: '.$slug.'], [Controller: App\Http\Controllers\NoticiaController@show], ';
-        $txt .= '[Código: 0], [Arquivo: /home/vagrant/Workspace/portal/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php], [Linha: 470]';
+        $txt .= '[Código: 0], [Arquivo: /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php], [Linha: 470]';
         $this->assertStringContainsString($txt, $log);
     }
 

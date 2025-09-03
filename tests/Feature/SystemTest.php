@@ -110,7 +110,7 @@ class SystemTest extends TestCase
             $log = tailCustom(storage_path($this->pathLogErros()));
             $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.ERROR: ';
             $txt = $inicio . '[Erro: Target class [App\Contracts\ErroServiceInterface] does not exist.], [Código: 0], ';
-            $txt .= '[Arquivo: /home/vagrant/Workspace/portal/vendor/laravel/framework/src/Illuminate/Container/Container.php], [Linha: 805]';
+            $txt .= '[Arquivo: /var/www/vendor/laravel/framework/src/Illuminate/Container/Container.php], [Linha: 805]';
             $this->assertStringContainsString($txt, $log);
         }
     }
@@ -126,7 +126,7 @@ class SystemTest extends TestCase
             $log = tailCustom(storage_path($this->pathLogErros()));
             $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.ERROR: ';
             $txt = $inicio . '[Erro: Sub Service deve ser chamado pelo serviço principal], [Código: 500], ';
-            $txt  .= '[Arquivo: /home/vagrant/Workspace/portal/app/Services/MediadorService.php], [Linha: 14]';
+            $txt  .= '[Arquivo: /var/www/app/Services/MediadorService.php], [Linha: 14]';
             $this->assertStringContainsString($txt, $log);
         }
     }
