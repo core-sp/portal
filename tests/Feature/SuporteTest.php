@@ -83,7 +83,7 @@ class SuporteTest extends TestCase
         Storage::disk('log_externo')->put('2022/09/laravel-'.$data.'.log', $conteudo);
         $conteudo = '[2022-09-30 11:34:04] testing.INFO: [IP: 127.0.0.1] - Usuário (usuário 1) editou *plantão juridico* (id: 1)';
         Storage::disk('log_interno')->put('2022/09/laravel-'.$data.'.log', $conteudo);
-        $conteudo = '[2022-09-30 11:34:04] testing.ERROR: [Erro: No query results for model [App\Noticia]. para o slug: teste], [Controller: App\Http\Controllers\NoticiaController@show], [Código: 0], [Arquivo: /home/vagrant/Workspace/portal/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php], [Linha: 470]';
+        $conteudo = '[2022-09-30 11:34:04] testing.ERROR: [Erro: No query results for model [App\Noticia]. para o slug: teste], [Controller: App\Http\Controllers\NoticiaController@show], [Código: 0], [Arquivo: /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php], [Linha: 470]';
         Storage::disk('log_erros')->put('laravel-'.$data.'.log', $conteudo);
 
         $this->signInAsAdmin();
@@ -676,7 +676,7 @@ class SuporteTest extends TestCase
 
         $user = $this->signInAsAdmin();
 
-        exec('bash /home/vagrant/Workspace/hash_logs_todos.sh');
+        exec('bash /scripts/hash_logs_todos.sh');
 
         $this->get(route('suporte.log.externo.busca', ['ano' => '2022', 'tipo' => 'interno', 'texto' => 'IP:']))
         ->assertSee('<a class="btn btn-primary btn-sm ml-3" href="' . route('suporte.log.externo.integridade', ['data' => $data, 'tipo' => 'interno']) . '">')
@@ -704,7 +704,7 @@ class SuporteTest extends TestCase
 
         $user = $this->signInAsAdmin();
 
-        exec('bash /home/vagrant/Workspace/hash_logs_todos.sh');
+        exec('bash /scripts/hash_logs_todos.sh');
 
         $this->get(route('suporte.log.externo.integridade', ['data' => $data, 'tipo' => 'interno']))
         ->assertSessionHas('message', 'Log do tipo interno e da data ' . onlyDate($data) . ': <b>está íntegro!</b>')

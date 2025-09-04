@@ -83,7 +83,7 @@
             <div class="col-lg-4 col-md-6 center-768 aai hide-768">
               <div class="d-block setembro">
                 <h3><a href="/servicos-atendimento-ao-rc" class="cinza-claro">Atendimento on-line</a></h3>
-                <p class="light"><a href="/servicos-atendimento-ao-rc" class="cinza-claro"><small>Clique aqui e tenha acesso aos principais<br>serviços pelo Setor de Atendimento do Core-SP.</small></a></p>
+                <p class="light"><a href="/servicos-atendimento-ao-rc" class="cinza-claro"><small>Clique aqui e tenha acesso aos principais<br>serviços realizados pelo Setor de Atendimento do Core-SP.</small></a></p>
               </div>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
@@ -237,7 +237,7 @@
                   <div class="d-flex">
                     <div class="flex-one text-center">
                       <h5 class="d-inline-block pr-3 cinza-claro"><strong>Dúvidas frequentes</strong></h5>
-                      <p class="d-inline-block cinza-claro">Clique aqui e tenha acesso aos principais serviços <br class="show-768">pelo Setor de Atendimento do Core-SP.</p>
+                      <p class="d-inline-block cinza-claro">Clique aqui e tenha acesso aos principais serviços realizados <br class="show-768">pelo Setor de Atendimento do Core-SP.</p>
                     </div>
                   </div>
                 </div>

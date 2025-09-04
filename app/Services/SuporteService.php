@@ -381,7 +381,7 @@ class SuporteService implements SuporteServiceInterface {
 
     public function sobreStorage()
     {
-        $fs = config('app.env') != 'production' ? 'sda1' : 'root';
+        $fs = config('app.env') != 'production' ? 'sdd' : 'root';
         $comando_dir = 'du -s ';
         $comandos = [
             'img' => $comando_dir . public_path('imagens'),

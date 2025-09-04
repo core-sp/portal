@@ -293,7 +293,7 @@ class RegionalTest extends TestCase
         $log = tailCustom(storage_path($this->pathLogErros()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.ERROR: ';
         $txt = $inicio . '[Erro: No query results for model [App\Regional] '.$id.'], [Controller: App\Http\Controllers\RegionalController@show], ';
-        $txt .= '[Código: 0], [Arquivo: /home/vagrant/Workspace/portal/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php], [Linha: 387]';
+        $txt .= '[Código: 0], [Arquivo: /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php], [Linha: 387]';
         $this->assertStringContainsString($txt, $log);
     }
 

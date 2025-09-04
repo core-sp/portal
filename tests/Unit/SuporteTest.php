@@ -262,7 +262,7 @@ class SuporteTest extends TestCase
 
         $user = $this->signInAsAdmin();
 
-        exec('bash /home/vagrant/Workspace/hash_logs_todos.sh');
+        exec('bash /scripts/hash_logs_todos.sh');
 
         $this->assertEquals($service->verificaHashLog('2022-09-26', 'interno'), 'Hash ainda não foi criado!');
         $this->assertTrue($service->verificaHashLog($data, 'interno'));
