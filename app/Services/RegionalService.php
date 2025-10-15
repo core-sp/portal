@@ -34,14 +34,16 @@ class RegionalService implements RegionalServiceInterface {
         // Opções de conteúdo da tabela
         $contents = [];
         $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
+        $desabilitada = '<span class="badge badge-danger">Desativada</span><br />';
         foreach($resultados as $resultado) 
         {
+            $aviso = $resultado->idregional == 14 ? $desabilitada : '';
             $acoes = '<a href="'.route('regionais.show', $resultado->idregional).'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
             if($userPodeEditar)
                 $acoes .= '<a href="'.route('regionais.edit', $resultado->idregional).'" class="btn btn-sm btn-primary">Editar</a> ';
             $conteudo = [
                 $resultado->idregional,
-                $resultado->prefixo.' - '.$resultado->regional,
+                $aviso . $resultado->prefixo.' - '.$resultado->regional,
                 $resultado->telefone.'<br /><span style="white-space:nowrap;">'.$resultado->fax.'</span>',
                 $resultado->email,
                 $acoes
