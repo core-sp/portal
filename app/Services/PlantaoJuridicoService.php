@@ -129,6 +129,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
     public function listar()
     {
         $plantoes = PlantaoJuridico::with('regional')
+        ->where('id', '!=', 14)
         ->orderBy('qtd_advogados', 'DESC')
         ->get();
 
@@ -155,6 +156,8 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
     public function visualizar($id)
     {
+        abort_if($id == 14, 404);
+
         $plantao = PlantaoJuridico::with('regional')->findOrFail($id);
         $dataInicial = Carbon::parse($plantao->dataInicial);
         $inicial = $dataInicial->gte(Carbon::today()) ? $plantao->dataInicial : Carbon::today()->format('Y-m-d');
@@ -204,6 +207,8 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
     public function save($request, $id)
     {
+        abort_if($id == 14, 404);
+        
         PlantaoJuridico::findOrFail($id)->update([
             'qtd_advogados' => $request->qtd_advogados,
             'horarios' => isset($request->horarios) ? implode(',', $request->horarios) : null,

@@ -97,6 +97,7 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
     public function listar($user, $service)
     {
         $salas = SalaReuniao::with('regional')
+        ->where('id', '!=', 14)
         ->get()
         ->sortBy('regional.regional');
 
@@ -109,6 +110,8 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
 
     public function view($id)
     {
+        abort_if($id == 14, 404);
+
         $sala = SalaReuniao::with('regional')->findOrFail($id);
         
         return [
@@ -119,6 +122,8 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
 
     public function save($dados, $id, $user)
     {
+        abort_if($id == 14, 404);
+        
         $sala = SalaReuniao::findOrFail($id);
 
         $dados['itens_reuniao'] = isset($dados['itens_reuniao']) ? $dados['itens_reuniao'] : array();
