@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Contracts\RegionalServiceInterface;
 use App\Regional;
 use App\Events\CrudEvent;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RegionalService implements RegionalServiceInterface {
 
@@ -89,6 +90,9 @@ class RegionalService implements RegionalServiceInterface {
 
     public function viewSite($id)
     {
+        if($id == 14)
+            throw new ModelNotFoundException("No query results for model [App\Regional] " . $id);
+
         $regional = Regional::findOrFail($id);
 
         return [
@@ -133,6 +137,7 @@ class RegionalService implements RegionalServiceInterface {
     public function getByName($regional)
     {
         return Regional::where('regional','LIKE','%'.$regional.'%')
+            ->where('idregional', '!=', 14)
             ->get()
             ->first();
     }
