@@ -110,7 +110,8 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
 
     public function view($id)
     {
-        abort_if($id == 14, 404);
+        if($id == 14)
+            throw new \Exception('Sala com id ' . $id . ' não está disponível para uso.', 404);
 
         $sala = SalaReuniao::with('regional')->findOrFail($id);
         
@@ -122,7 +123,8 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
 
     public function save($dados, $id, $user)
     {
-        abort_if($id == 14, 404);
+        if($id == 14)
+            throw new \Exception('Sala com id ' . $id . ' não está disponível para uso.', 404);
         
         $sala = SalaReuniao::findOrFail($id);
 

@@ -156,7 +156,8 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
     public function visualizar($id)
     {
-        abort_if($id == 14, 404);
+        if($id == 14)
+            throw new \Exception('Plantão Jurídico com id ' . $id . ' não está disponível para uso.', 404);
 
         $plantao = PlantaoJuridico::with('regional')->findOrFail($id);
         $dataInicial = Carbon::parse($plantao->dataInicial);
@@ -207,7 +208,8 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
     public function save($request, $id)
     {
-        abort_if($id == 14, 404);
+        if($id == 14)
+            throw new \Exception('Plantão Jurídico com id ' . $id . ' não está disponível para uso.', 404);
         
         PlantaoJuridico::findOrFail($id)->update([
             'qtd_advogados' => $request->qtd_advogados,
