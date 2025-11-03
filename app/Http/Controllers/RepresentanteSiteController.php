@@ -547,6 +547,22 @@ class RepresentanteSiteController extends Controller
         return view('site.representante.bdo', compact('bdo', 'segmento', 'seccional'));
     }
 
+    public function bdoPerfil()
+    {
+        $rep = Auth::guard('representante')->user();
+        try{
+            $dados = $this->service->getService('Bdo')->viewPerfilRC($rep, $this->gerentiRepository);
+            $dados['regionais'] = $this->service->getService('Regional')->getRegionais();
+        }catch (Exception $e) {
+            Log::error($e->getMessage());
+            abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente mais tarde.');
+        }
+        
+        event(new ExternoEvent('.', 'Oportunidades-Perfil'));
+
+        return view('site.representante.bdo-perfil', $dados);
+    }
+
     public function cedulasView()
     {
         $retorno = Auth::guard('representante')->user()->estaHomologado($this->gerentiRepository, 'cedula');

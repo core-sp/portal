@@ -39,6 +39,8 @@ Route::prefix('representante')->group(function(){
 
     // Conferir as oportunidades do BDO
     Route::get('/oportunidades', 'RepresentanteSiteController@bdo')->name('representante.bdo');
+    // Perfil em BDO
+    Route::get('/oportunidades-perfil', 'RepresentanteSiteController@bdoPerfil')->name('representante.bdo.perfil');
 
     // Solicitar cédula
     Route::get('/cedulas', 'RepresentanteSiteController@cedulasView')->name('representante.solicitarCedulaView');

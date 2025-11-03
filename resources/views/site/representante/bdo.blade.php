@@ -4,6 +4,15 @@
 
 <div class="representante-content w-100">
     <div class="conteudo-txt-mini light">
+        <h4 class="pt-1 pb-1">Perfil</h4>
+        <div class="linha-lg-mini mb-1"></div>
+        <p>Agora pode publicar seu perfil de Representante no Portal!</p>
+        <a class="btn btn-primary text-white my-3" href="{{ route('representante.bdo.perfil') }}">Iniciar publicação de Perfil</a>
+    </div>
+
+    <hr class="bg-success"/>
+
+    <div class="conteudo-txt-mini light">
         <h4 class="pt-1 pb-1">Oportunidades</h4>
         <div class="linha-lg-mini mb-1"></div>
         <h5 class="mb-1">

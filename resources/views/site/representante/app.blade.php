@@ -78,7 +78,7 @@
               </a>
             </div>
 
-            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.bdo')  ? 'mr-item-selected' : '' }}">  
+            <div class="mr-item bt-unset {{ Route::is('representante.bdo') || Route::is('representante.bdo.*') ? 'mr-item-selected' : '' }}">  
               <a href="{{ route('representante.bdo') }}" class="showLoading">
                 <h6 class="brancar"><i class="fas fa-briefcase"></i>&nbsp;&nbsp;Oportunidades&nbsp;&nbsp;&nbsp;</h6>
               </a>
