@@ -120,6 +120,11 @@ class Representante extends Authenticable
         return $this->hasMany('App\SuspensaoExcecao', 'idrepresentante')->first();
     }
 
+    public function bdoPerfis()
+    {
+        return $this->hasMany('App\BdoRepresentante', 'idrepresentante');
+    }
+
     public function agendamentosAtivos()
     {
         return $this->agendamentosSalas()
