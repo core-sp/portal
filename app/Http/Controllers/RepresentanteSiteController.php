@@ -529,6 +529,8 @@ class RepresentanteSiteController extends Controller
     {
         $rep = Auth::guard('representante')->user();
         try{
+            $perfil_bdo = session()->has('perfil') ? session()->get('perfil') : $this->service->getService('Bdo')->viewPerfilRC($rep);
+
             $seccional = $this->gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"];
             $idregional = $this->service->getService('Regional')->getByName($seccional)->idregional;
             $segmentoGerenti = $this->gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
@@ -544,12 +546,17 @@ class RepresentanteSiteController extends Controller
         
         event(new ExternoEvent('.', 'Oportunidades'));
 
-        return view('site.representante.bdo', compact('bdo', 'segmento', 'seccional'));
+        return view('site.representante.bdo', compact('bdo', 'segmento', 'seccional', 'perfil_bdo'));
     }
 
     public function bdoPerfil()
     {
         $rep = Auth::guard('representante')->user();
+        if(utf8_converter($this->gerentiRepository->gerentiAtivo(apenasNumeros($rep->cpf_cnpj)))[0]['SITUACAO'] != 'Ativo')
+            return redirect()->route('representante.dashboard')->with([
+                'message' => 'Seu registro Core não está ativo.', 'class' => 'alert-warning'
+            ]);
+
         try{
             $dados = $this->service->getService('Bdo')->viewPerfilRC($rep, $this->gerentiRepository);
             $dados['regionais'] = $this->service->getService('Regional')->getRegionais();
@@ -561,6 +568,25 @@ class RepresentanteSiteController extends Controller
         event(new ExternoEvent('.', 'Oportunidades-Perfil'));
 
         return view('site.representante.bdo-perfil', $dados);
+    }
+
+    public function bdoPerfilDados(Request $request)
+    {
+        $rep = Auth::guard('representante')->user();
+        if(utf8_converter($this->gerentiRepository->gerentiAtivo(apenasNumeros($rep->cpf_cnpj)))[0]['SITUACAO'] != 'Ativo')
+            return redirect()->route('representante.dashboard')->with([
+                'message' => 'Seu registro Core não está ativo.', 'class' => 'alert-warning'
+            ]);
+
+        try{
+            $dados = $request->all();
+            $perfil = $this->service->getService('Bdo')->cadastrarPerfil($rep, $dados, $this->gerentiRepository);
+        }catch (Exception $e) {
+            Log::error($e->getMessage());
+            abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente mais tarde.');
+        }
+        
+        return redirect()->route('representante.bdo')->with(['perfil' => $perfil]);
     }
 
     public function cedulasView()

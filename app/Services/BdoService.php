@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Contracts\BdoServiceInterface;
 use App\Repositories\GerentiRepositoryInterface;
+use App\BdoRepresentante;
+use Illuminate\Support\Str;
 
 class BdoService implements BdoServiceInterface {
 
@@ -12,8 +14,15 @@ class BdoService implements BdoServiceInterface {
 
     }
 
-    public function viewPerfilRC($rep, GerentiRepositoryInterface $gerentiRepository)
+    public function viewPerfilRC($rep, GerentiRepositoryInterface $gerentiRepository = null)
     {
+        $perfil = $rep->bdoPerfis()->whereIn('status->status_final', [
+            '', BdoRepresentante::STATUS_ADMIN_COMUN, BdoRepresentante::STATUS_ACAO_ACEITO
+        ])->first();
+
+        if(isset($perfil) || is_null($gerentiRepository))
+            return $perfil;
+
         $endereco = $gerentiRepository->gerentiEnderecos($rep->ass_id);
         $end = '';
         foreach($endereco as $key => $campo)
@@ -58,7 +67,31 @@ class BdoService implements BdoServiceInterface {
             'emails' => $emails, 
             'telefones' => $telefones, 
             'segmento' => $segmento, 
-            'endereco' => $end
+            'endereco' => $end,
+            'seccional' => $gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"]
         ];
+    }
+
+    public function cadastrarPerfil($rep, $dados, GerentiRepositoryInterface $gerentiRepository)
+    {
+        $segmento = $gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
+        $dados['segmento_gerenti'] = !empty($segmento) ? mb_strtoupper($segmento[0]["SEGMENTO"]) : mb_strtoupper($segmento);
+        $dados['seccional_gerenti'] = mb_strtoupper($gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"]);
+        $dados['em_dia'] = Str::contains(trim($gerentiRepository->gerentiStatus($rep->ass_id)), 'Em dia');
+
+        $bdo_perfil = $rep->bdoPerfis()->create([
+            'descricao' => $dados['descricao'],
+            'endereco' => $dados['endereco'],
+            'email' => $dados['email'],
+            'telefone' => $dados['telefone'],
+            'segmento' => $dados['segmento'],
+            'regioes->seccional' => $dados['regioes'], 
+            'regioes->municipios' => ['teste1', 'teste2'],
+            'status' => '{}'
+        ]);
+
+        $criado = $bdo_perfil->setores($dados);
+
+        return $criado ? $bdo_perfil->fresh() : collect();
     }
 }
