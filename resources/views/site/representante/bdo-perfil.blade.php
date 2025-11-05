@@ -7,7 +7,7 @@
         <h4 class="pt-0 pb-0">Cadastrar Perfil Público</h4>
         <div class="linha-lg-mini mb-3"></div>
         <p>Preencha as informações abaixo para cadastrar seu <strong>perfil público</strong> no Portal.</p>
-        <form action="{{-- route('representante.inserirSolicitarCedula') --}}" method="POST">
+        <form action="{{ route('representante.bdo.perfil.cadastrar') }}" method="POST">
             @csrf
             
             <div class="form-row mb-2 cadastroRepresentante">
@@ -19,7 +19,6 @@
                         class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
                         value="{{ $rep->nome }}"
                         readonly
-                        required
                     >
                     @if($errors->has('nome'))
                     <div class="invalid-feedback">
@@ -36,7 +35,6 @@
                         class="form-control {{ $errors->has('core') ? 'is-invalid' : '' }}"
                         value="{{ $rep->registro_core }}"
                         readonly
-                        required
                     >
                     @if($errors->has('core'))
                     <div class="invalid-feedback">
@@ -154,19 +152,19 @@
 
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
-                    <label for="regiao">Região de atuação <em>--- ?????? ---</em></label>
-                    <select name="regiao" class="form-control {{ $errors->has('regiao') ? 'is-invalid' : '' }}" required>
+                    <label for="regioes">Regiões de atuação <em>--- ?????? ---</em></label>
+                    <select name="regioes" class="form-control {{ $errors->has('regioes') ? 'is-invalid' : '' }}" required>
                         <option value="">---------------- Seccionais ----------------</option>
                         @foreach($regionais as $regional)
-                            <option value="{{ $regional->regional }}" {{ (old('regiao') == $regional->regional) ? 'selected' : '' }}>
+                            <option value="{{ $regional->regional }}" {{ (old('regioes') == $regional->regional) || (mb_strtolower($seccional) == mb_strtolower($regional->regional)) ? 'selected' : '' }}>
                                 {{ $regional->regional }}
                             </option>
                         @endforeach
                         <option value="">---------------- Municípios ----------------</option>
                     </select>
-                    @if($errors->has('regiao'))
+                    @if($errors->has('regioes'))
                     <div class="invalid-feedback">
-                        {{ $errors->first('regiao') }}
+                        {{ $errors->first('regioes') }}
                     </div>
                     @endif
                 </div>
@@ -192,7 +190,7 @@
             </div>
 
             <div class="form-group mt-3">
-                <button type="button" class="btn btn-primary loadingPagina">Enviar</button>
+                <button type="submit" class="btn btn-primary loadingPagina">Enviar</button>
             </div>
         </form>
     </div>

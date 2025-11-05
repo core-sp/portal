@@ -6,8 +6,52 @@
     <div class="conteudo-txt-mini light">
         <h4 class="pt-1 pb-1">Perfil</h4>
         <div class="linha-lg-mini mb-1"></div>
+
+        @if(isset($perfil_bdo))
+        <div class="list-group w-100">
+            <div class="list-group-item light d-block bg-info">
+        
+                <p class="pb-0 branco">
+                    ID: <strong>{{ $perfil_bdo->id }}</strong>
+                </p>
+                <p class="pb-0 branco">
+                    Nome: <strong>{{ $perfil_bdo->representante->nome }}</strong>
+                </p>
+                <p class="pb-0 branco">
+                    Registro Core: <strong>{{ $perfil_bdo->representante->registro_core }}</strong>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    CNPJ: <strong>{{ $perfil_bdo->representante->cpf_cnpj }}</strong>
+                </p>
+                <p class="pb-0 branco">
+                    Descrição: <strong>{{ $perfil_bdo->descricao }}</strong>
+                </p>
+                <p class="pb-0 branco">
+                    Segmento: <strong>{{ $perfil_bdo->segmento }}</strong>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    Regional: <strong>{{ json_decode($perfil_bdo->regioes)->seccional }}</strong>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    Telefone: <strong>{{ $perfil_bdo->telefone }}</strong>
+                </p>
+                <p class="pb-0 branco">
+                    E-mail: <strong>{{ $perfil_bdo->email }}</strong>
+                </p>
+                <p class="pb-0 branco">
+                    Endereço: <strong>{{ $perfil_bdo->endereco }}</strong>
+                </p>
+                <p class="pb-0 branco">
+                    Regiões de atuação: <strong>{!! implode('&nbsp;&nbsp;|&nbsp;&nbsp;', json_decode($perfil_bdo->regioes)->municipios) !!}</strong>
+                </p>
+                <p class="pb-0 branco">
+                    Status: <strong>{{ $perfil_bdo->statusRC() }}</strong>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <i><small>Atualizado em: <strong>{{ formataData(json_decode($perfil_bdo->status)->data) }}</strong></small></i>
+                </p>
+            </div>
+        </div>
+        @else
         <p>Agora pode publicar seu perfil de Representante no Portal!</p>
         <a class="btn btn-primary text-white my-3" href="{{ route('representante.bdo.perfil') }}">Iniciar publicação de Perfil</a>
+        @endif
     </div>
 
     <hr class="bg-success"/>
