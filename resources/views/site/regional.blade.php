@@ -38,7 +38,7 @@
           <p class="light"><strong>Endereço:</strong> {{ $resultado->endereco }}, {{ $resultado->numero }} - {{ $resultado->complemento }}</p>
           <p class="light"><strong>Bairro: </strong>{{ $resultado->bairro }}</p>
           <p class="light"><strong>CEP: </strong>{{ $resultado->cep }}</p>
-          <p class="light"><strong>Telefone:</strong> {{ $resultado->idregional == 7 ? 'Atendimento temporariamente por e-mail ou presencial.' : $resultado->telefone }}</p>
+          <p class="light"><strong>Telefone:</strong> {{ $resultado->idregional == 7 ? 'Telefone temporariamente indisponível, contato através do e-mail ou presencial. Obrigado.' : $resultado->telefone }}</p>
           <p class="light"><strong>Email:</strong> {{ $resultado->email }}</p>
           <p class="light"><strong>Horário de funcionamento: </strong>{{ $resultado->funcionamento }}</p>
           @if(isset($resultado->responsavel))

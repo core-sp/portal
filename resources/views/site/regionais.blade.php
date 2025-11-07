@@ -41,7 +41,7 @@
           <h2 class="pb-1">{{ $regional->prefixo }} - {{ $regional->regional }}</h2>
           <p class="light"><strong>Representante Comercial</strong></p>
           <p class="light"><strong>Endereço:</strong> {{ $regional->endereco }}, {{ $regional->numero }} - {{ $regional->complemento }}</p>
-          <p class="light"><strong>Telefone:</strong> {{ $regional->idregional == 7 ? 'Atendimento temporariamente por e-mail ou presencial.' : $regional->telefone }}</p>
+          <p class="light"><strong>Telefone:</strong> {{ $regional->idregional == 7 ? 'Telefone temporariamente indisponível, contato através do e-mail ou presencial. Obrigado.' : $regional->telefone }}</p>
           <p class="light"><strong>Email:</strong> {{ $regional->email }}</p>
           <p class="light mb-2"><strong>Horário de funcionamento: </strong>{{ $regional->funcionamento }}</p>
           <a href="{{ route('regionais.show', $regional->idregional) }}" class="btn-curso-grid">Detalhes</a>
