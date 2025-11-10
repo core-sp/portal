@@ -41,6 +41,11 @@ class User extends Authenticatable
         return $this->idperfil == 3;
     }
 
+    public function isFinanceiro()
+    {
+        return $this->idperfil == 16;
+    }
+
     public function pagina()
     {
         return $this->hasMany('App\Pagina', 'idpagina');

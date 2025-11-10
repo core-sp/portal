@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\BdoServiceInterface;
+use App\Services\BdoAdminService;
 use App\Repositories\GerentiRepositoryInterface;
 use App\BdoRepresentante;
 use Illuminate\Support\Str;
@@ -12,6 +13,11 @@ class BdoService implements BdoServiceInterface {
     public function __construct()
     {
 
+    }
+
+    public function admin()
+    {
+        return new BdoAdminService();
     }
 
     public function viewPerfilRC($rep, GerentiRepositoryInterface $gerentiRepository = null)

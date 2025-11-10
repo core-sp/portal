@@ -122,6 +122,57 @@ class BdoRepresentante extends Model
         return ($s == "") || ($s == self::STATUS_ADMIN_COMUN) ? self::STATUS_RC_CADASTRO : $s;
     }
 
+    public function statusHTMLAdmin($id_perfil)
+    {
+        switch ($id_perfil) {
+            case 3:
+                return json_decode($this->status)->status_final;
+                    break;
+            case 6:
+            case 8:
+                return json_decode($this->status)->atendimento->status;
+                    break;
+            case 16:
+                return json_decode($this->status)->financeiro->status;
+                break;
+            default:
+                return $this->statusHTMLAdministrador();
+                break;
+        }
+    }
+
+    public function statusEtapaFinal()
+    {
+        return json_decode($this->status)->status_final == self::STATUS_ADMIN_COMUN;
+    }
+
+    public function statusContemAtendimento()
+    {
+        return isset(json_decode($this->status)->atendimento);
+    }
+
+    public function statusContemFinanceiro()
+    {
+        return isset(json_decode($this->status)->financeiro);
+    }
+
+    private function statusHTMLAdministrador()
+    {
+        $s = json_decode($this->status);
+        $t = '';
+
+        if($this->statusContemAtendimento())
+            $t .= '<span class="badge badge-primary mr-2">' . str_replace(' ', '<br>', $s->atendimento->status) . '</span>';
+
+        if($this->statusContemFinanceiro())
+            $t .= '<span class="badge badge-secondary mr-2">' . str_replace(' ', '<br>', $s->financeiro->status) . '</span>';
+
+        if($this->statusEtapaFinal())
+            $t .= '<span class="badge badge-success mr-2">' . str_replace(' ', '<br>', $s->status_final) . '</span>';
+
+        return $t;
+    }
+
     public function setores($dados)
     {
         $this->dadosParaAtendimento($dados['segmento_gerenti'], $dados['seccional_gerenti']);
