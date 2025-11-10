@@ -148,6 +148,9 @@ Route::middleware(['block_ip'])->group(function () {
       Route::get('/empresas/editar/{id}', 'BdoEmpresaController@edit')->name('bdoempresas.edit');
       Route::put('/empresas/editar/{id}', 'BdoEmpresaController@update')->name('bdoempresas.update');
       Route::delete('/empresas/apagar/{id}', 'BdoEmpresaController@destroy')->name('bdoempresas.destroy');
+      // Lida com os representantes
+      Route::get('/perfil-publico-representantes', 'BdoRepresentanteController@index')->name('bdorepresentantes.lista');
+      Route::get('/perfil-publico-representantes/editar/{id}', 'BdoRepresentanteController@edit')->name('bdorepresentantes.edit');
     });
 
     // Rota para Agendamentos

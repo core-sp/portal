@@ -89,13 +89,14 @@
             $curso = in_array($idperfil, $permitidos->find(11)['perfis']);
             $bdoEmpresa = in_array($idperfil, $permitidos->find(19)['perfis']);
             $bdoOportunidade = in_array($idperfil, $permitidos->find(23)['perfis']);
+            $bdoRepresentante = true;
             $home = in_array($idperfil, $permitidos->find(42)['perfis']);
             $compromisso = in_array($idperfil, $permitidos->find(53)['perfis']);
             $aviso = in_array($idperfil, $permitidos->find(57)['perfis']);
             $cartaServicos = in_array($idperfil, $permitidos->find(73)['perfis']);
         @endphp
 
-        @if($pagina || $noticia || $posts || $curso || $bdoEmpresa || $bdoOportunidade || $home || $compromisso || $aviso || $cartaServicos)
+        @if($pagina || $noticia || $posts || $curso || $bdoEmpresa || $bdoOportunidade || $bdoRepresentante || $home || $compromisso || $aviso || $cartaServicos)
         <li class="nav-header">CONTEÚDO</li>
 
         @if($pagina)
@@ -206,7 +207,7 @@
         </li>
         @endif
 
-        @if($bdoEmpresa || $bdoOportunidade)
+        @if($bdoEmpresa || $bdoOportunidade || $bdoRepresentante)
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-briefcase"></i>
@@ -227,6 +228,15 @@
                     <a href="{{ route('bdooportunidades.lista') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Oportunidades</p>
+                    </a>
+                </li>
+                @endif
+
+                @if($bdoRepresentante)
+                <li class="nav-item">
+                    <a href="{{ route('bdorepresentantes.lista') }}" class="nav-link d-flex align-items-center">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p><span class="text-nowrap">Perfil Público dos </span><br>Representantes - PJ</p>
                     </a>
                 </li>
                 @endif
