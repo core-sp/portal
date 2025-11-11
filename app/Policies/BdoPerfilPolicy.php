@@ -10,7 +10,7 @@ class BdoPerfilPolicy
 {
     use HandlesAuthorization;
 
-    public function podeEditarPerfil(User $user, BdoRepresentante $bdoRC)
+    public function podeAcessarPerfil(User $user, BdoRepresentante $bdoRC)
     {
         $id_perfil = $user->idperfil;
 
@@ -25,6 +25,8 @@ class BdoPerfilPolicy
             case 16:
                 return $bdoRC->statusContemFinanceiro();
                 break;
+            default:
+                return $user->isAdmin();
         }
     }
 }

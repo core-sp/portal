@@ -92,14 +92,19 @@ class BdoAdminService {
         ];
     }
 
-    public function editar($user, $id)
+    public function editar($user, $id, GerentiRepositoryInterface $gerentiRepository)
     {
         $resultado = BdoRepresentante::findOrFail($id);
 
-        if(!$user->isAdmin() && !$user->can('podeEditarPerfil', $resultado))
+        if(!$user->isAdmin() && !$user->can('podeAcessarPerfil', $resultado))
             throw new \Exception('Não autorizado', 403);
 
+        // se tiver financeiro
+        $gerenti['situacao'] = trim(explode(':', $gerentiRepository->gerentiStatus($resultado->representante->ass_id))[1]);
+        $gerenti['cobrancas'] = $gerentiRepository->gerentiCobrancas($resultado->representante->ass_id);
+
         return [
+            'gerenti' => $gerenti,
             'resultado' => $resultado, 
             'variaveis' => (object) $this->variaveis
         ];
