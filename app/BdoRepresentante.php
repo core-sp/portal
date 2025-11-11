@@ -173,6 +173,17 @@ class BdoRepresentante extends Model
         return $t;
     }
 
+    public function atendimentoPendente()
+    {
+        return ($this->alteracoesRC->count() > 0) && $this->statusContemAtendimento() && 
+        (json_decode($this->status)->atendimento->status == self::STATUS_ADMIN_ATEND);
+    }
+
+    public function financeiroPendente()
+    {
+        return $this->statusContemFinanceiro() && (json_decode($this->status)->financeiro->status == self::STATUS_ADMIN_FINAN);
+    }
+
     public function setores($dados)
     {
         $this->dadosParaAtendimento($dados['segmento_gerenti'], $dados['seccional_gerenti']);
