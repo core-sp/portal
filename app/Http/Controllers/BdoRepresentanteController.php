@@ -3,17 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-// use App\Http\Requests\AvisoRequest;
+use App\Repositories\GerentiRepositoryInterface;
 use App\Contracts\MediadorServiceInterface;
 
 class BdoRepresentanteController extends Controller
 {
     private $service;
+    private $gerentiRepository;
 
-    public function __construct(MediadorServiceInterface $service)
+    public function __construct(MediadorServiceInterface $service, GerentiRepositoryInterface $gerentiRepository)
     {
         $this->middleware('auth');
         $this->service = $service;
+        $this->gerentiRepository = $gerentiRepository;
     }  
 
     public function index()
@@ -35,7 +37,7 @@ class BdoRepresentanteController extends Controller
         // $this->authorize('updateOther', auth()->user());
 
         try{
-            $dados = $this->service->getService('Bdo')->admin()->editar(auth()->user(), $id);
+            $dados = $this->service->getService('Bdo')->admin()->editar(auth()->user(), $id, $this->gerentiRepository);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [403]) ? abort($e->getCode(), $e->getMessage()) : abort(500, "Erro ao carregar o formulário de alteração do perfil público do Representante.");
