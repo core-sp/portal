@@ -45,4 +45,19 @@ class BdoRepresentanteController extends Controller
 
         return view('admin.crud.editar', $dados);
     }
+
+    public function update(Request $request, $id)
+    {
+        // $this->authorize('updateOther', auth()->user());
+
+        try{
+            $validated = $request->all();
+            $dados = $this->service->getService('Bdo')->admin()->save($validated, $id, auth()->user());
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [403]) ? abort($e->getCode(), $e->getMessage()) : abort(500, "Erro ao atualizar o status da solicitação do perfil público.");
+        }
+
+        return redirect()->route('bdorepresentantes.lista')->with($dados);
+    }
 }
