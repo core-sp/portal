@@ -16,7 +16,7 @@ class BdoPerfilPolicy
 
         switch ($id_perfil) {
             case 3:
-                return $bdoRC->statusEtapaFinal();
+                return $bdoRC->statusEtapaFinal() || $bdoRC->statusFinalizado();
                     break;
             case 6:
             case 8:
@@ -27,6 +27,23 @@ class BdoPerfilPolicy
                 break;
             default:
                 return $user->isAdmin();
+        }
+    }
+
+    public function podeAtualizarPerfil(User $user, BdoRepresentante $bdoRC, string $status)
+    {
+        switch ($status) {
+            case 'final':
+                return $bdoRC->statusEtapaFinal() && ($user->isAdmin() || $user->isEditor());
+                    break;
+            case 'atendimento':
+                return $bdoRC->atendimentoPendente() && ($user->isAdmin() || (!$user->isEditor() && !$user->isFinanceiro()));
+                    break;
+            case 'financeiro':
+                return $bdoRC->financeiroPendente() && ($user->isAdmin() || $user->isFinanceiro());
+                break;
+            default:
+                return false;
         }
     }
 }
