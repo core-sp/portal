@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 
 class BdoRepresentante extends Model
 {
@@ -18,7 +20,7 @@ class BdoRepresentante extends Model
 
     const STATUS_ADMIN_ATEND = 'Aguardando Atendimento';
     const STATUS_ADMIN_FINAN = 'Aguardando Financeiro';
-    const STATUS_ADMIN_COMUN = 'Em Andamento';
+    const STATUS_ADMIN_FINAL = 'Em Andamento';
 
     const STATUS_ACAO_ACEITO = 'Aceito';
     const STATUS_ACAO_RECUSADO = 'Recusado';
@@ -72,88 +74,49 @@ class BdoRepresentante extends Model
 
     private function atualizarFinal()
     {
-        $status_final = !empty(json_decode($this->status, true)) ? "" : self::STATUS_ADMIN_COMUN;
-
-        return $this->update(['status->status_final' => $status_final, 'status->data' => now()->format(self::FORMATO_DATA_NOW)]);
-    }
-
-    private function justificarAtendimento()
-    {
-        // Se recusado: 
-            // incluir no status: {..."atendimento":{"status":"Recusado", "atendente":555, "data":"timestamp"}}
-            // incluir na justificativa: {..."atendimento":{"texto":"gdgdgdgdg","data":"timestamp"}}
-        // atualizarFinal()
-    }
-
-    private function justificarFinanceiro()
-    {
-        // Se recusado: 
-            // incluir no status: {..."financeiro":{"status":"Recusado", "atendente":555, "data":"timestamp"}}
-            // incluir na justificativa: {..."financeiro":{"texto":"gdgdgdgdg","data":"timestamp"}}
-        // atualizarFinal()
-    }
-
-    private function aprovarAtendimento()
-    {
-        // incluir no status: {..."atendimento":{"status":"Aceito", "atendente":5555, "data":"timestamp"}}
-        // atualizarFinal()
-    }
-
-    private function aprovarFinanceiro()
-    {
-        // incluir no status: {..."financeiro":{"status":"Aceito", "atendente":5555, "data":"timestamp"}}
-        // atualizarFinal()
-    }
-
-    private function aprovarFinal()
-    {
-        // Se aceito:
-            // incluir no status: {"status_final":"Aceito", "data":"timestamp"}
-            // ID do usuario
-        // Senão:
-            // incluir no status: {"status_final":"Recusado", "data":"timestamp"}
-            // incluir na justificativa: {"justificativa_final":{"texto":"gdgdgdgdg","data":"timestamp"}}
-    }
-
-    public function statusRC()
-    {
-        $s = json_decode($this->status)->status_final;
-
-        return ($s == "") || ($s == self::STATUS_ADMIN_COMUN) ? self::STATUS_RC_CADASTRO : $s;
-    }
-
-    public function statusHTMLAdmin($id_perfil)
-    {
-        switch ($id_perfil) {
-            case 3:
-                return json_decode($this->status)->status_final;
-                    break;
-            case 6:
-            case 8:
-                return json_decode($this->status)->atendimento->status;
-                    break;
-            case 16:
-                return json_decode($this->status)->financeiro->status;
-                break;
-            default:
-                return $this->statusHTMLAdministrador();
-                break;
+        if(!isset(json_decode($this->status)->status_final))
+        {
+            $status_final = !empty(json_decode($this->status, true)) ? "" : self::STATUS_ADMIN_FINAL;
+            return $this->update(['status->status_final' => $status_final, 'status->data' => now()->format(self::FORMATO_DATA_NOW)]);
         }
+        
+        if(empty(Arr::where(
+            Arr::flatten(json_decode($this->status, true)), function ($value, $key) {
+                return Str::contains($value, 'Aguardando');
+            })
+        ))
+            return $this->update(['status->status_final' => self::STATUS_ADMIN_FINAL, 'status->data' => now()->format(self::FORMATO_DATA_NOW)]);
     }
 
-    public function statusEtapaFinal()
+    private function acaoSetores($status, $user_id, $justificativa = null, $setor)
     {
-        return json_decode($this->status)->status_final == self::STATUS_ADMIN_COMUN;
+        $update = [
+            'status->' . $setor . '->status' => $status, 
+            'status->' . $setor . '->atendente' => $user_id, 
+            'status->' . $setor . '->data' => now()->format(self::FORMATO_DATA_NOW)
+        ];
+
+        if(isset($justificativa))
+            $update['justificativas->' . $setor] = $justificativa;
+
+        $ok = $this->update($update);
+
+        if($ok)
+            return $this->atualizarFinal();
     }
 
-    public function statusContemAtendimento()
+    private function acaoFinal($status, $user_id, $justificativa = null)
     {
-        return isset(json_decode($this->status)->atendimento);
-    }
+        $update = [
+            'status->status_final' => $status, 
+            'idusuario' => $user_id, 
+            'status->data' => now()->format(self::FORMATO_DATA_NOW)
+        ];
 
-    public function statusContemFinanceiro()
-    {
-        return isset(json_decode($this->status)->financeiro);
+        if(isset($justificativa))
+            $update['justificativas->justificativa_final'] = $justificativa;
+
+        return $this->update($update);
     }
 
     private function statusHTMLAdministrador()
@@ -170,7 +133,81 @@ class BdoRepresentante extends Model
         if($this->statusEtapaFinal())
             $t .= '<span class="badge badge-success mr-2">' . str_replace(' ', '<br>', $s->status_final) . '</span>';
 
+        if($this->statusFinalizado())
+            $t .= '<span class="badge badge-success mr-2">Final: ' . str_replace(' ', '<br>', $s->status_final) . '</span>';
+
         return $t;
+    }
+
+    public function aceitarOuRecusar($setor, $user_id, $justificativa)
+    {
+        $acao = $setor == 'final' ? 'acaoFinal' : 'acaoSetores';
+        $status = isset($justificativa) ? self::STATUS_ACAO_RECUSADO : self::STATUS_ACAO_ACEITO;
+
+        return call_user_func_array([$this, $acao], [$status, $user_id, $justificativa, $setor]);
+    }
+
+    public function statusRC()
+    {
+        $s = json_decode($this->status)->status_final;
+
+        return ($s == "") || ($s == self::STATUS_ADMIN_FINAL) ? self::STATUS_RC_CADASTRO : $s;
+    }
+
+    public function statusHTMLAdmin($id_perfil)
+    {
+        switch ($id_perfil) {
+            case 3:
+                return json_decode($this->status)->status_final;
+                break;
+            case 6:
+            case 8:
+                return json_decode($this->status)->atendimento->status;
+                break;
+            case 16:
+                return json_decode($this->status)->financeiro->status;
+                break;
+            default:
+                return $this->statusHTMLAdministrador();
+                break;
+        }
+    }
+
+    public function btnAcaoHTMLAdmin($id_perfil)
+    {
+        switch ($id_perfil) {
+            case 6:
+            case 8:
+                return $this->atendimentoPendente() ? 'Editar' : 'Ver';
+                break;
+            case 16:
+                return $this->financeiroPendente() ? 'Editar' : 'Ver';
+                break;
+            case 3:
+            default:
+                return $this->statusFinalizado() ? 'Ver' : 'Editar';
+                break;
+        }
+    }
+
+    public function statusFinalizado()
+    {
+        return in_array(json_decode($this->status)->status_final, [self::STATUS_ACAO_ACEITO, self::STATUS_ACAO_RECUSADO]);
+    }
+
+    public function statusEtapaFinal()
+    {
+        return json_decode($this->status)->status_final == self::STATUS_ADMIN_FINAL;
+    }
+
+    public function statusContemAtendimento()
+    {
+        return isset(json_decode($this->status)->atendimento);
+    }
+
+    public function statusContemFinanceiro()
+    {
+        return isset(json_decode($this->status)->financeiro);
     }
 
     public function atendimentoPendente()
@@ -182,6 +219,75 @@ class BdoRepresentante extends Model
     public function financeiroPendente()
     {
         return $this->statusContemFinanceiro() && (json_decode($this->status)->financeiro->status == self::STATUS_ADMIN_FINAN);
+    }
+
+    public function acaoAtendimentoFinalizada()
+    {
+        if($this->statusContemAtendimento() && !$this->atendimentoPendente()){
+            $s = json_decode($this->status)->atendimento;
+            $s->atendente = \App\User::withTrashed()->find($s->atendente)->nome;
+
+            if($s->status == self::STATUS_ACAO_RECUSADO)
+                $s->justificativa = json_decode($this->justificativas)->atendimento;
+
+            return $s;
+        }
+    }
+
+    public function acaoFinanceiroFinalizada()
+    {
+        if($this->statusContemFinanceiro() && !$this->financeiroPendente()){
+            $s = json_decode($this->status)->financeiro;
+            $s->atendente = \App\User::withTrashed()->find($s->atendente)->nome;
+
+            if($s->status == self::STATUS_ACAO_RECUSADO)
+                $s->justificativa = json_decode($this->justificativas)->financeiro;
+
+            return $s;
+        }
+    }
+
+    public function acaoFinalFinalizada()
+    {
+        $s = json_decode($this->status);
+        
+        if($this->statusFinalizado()){
+            $s->atendente = $this->user->nome;
+
+            if($s->status_final == self::STATUS_ACAO_RECUSADO)
+                $s->justificativa = json_decode($this->justificativas)->justificativa_final;
+
+            return $s;
+        }
+    }
+
+    public function statusAcaoRealizadaHTML($setor)
+    {
+        $acao = 'acao' . ucfirst($setor) . 'Finalizada';
+        $obj = call_user_func_array([$this, $acao], []);
+        
+        if(gettype($obj) != "object")
+            return '';
+
+        $final = '<div class="mt-3">';
+        $texto = $final;
+        $padrao = '&nbsp;&nbsp;<i class="fas fa-user"></i>&nbsp;&nbsp;' . $obj->atendente;
+        $padrao .= '&nbsp;&nbsp;|&nbsp;&nbsp;<i class="fas fa-clock"></i>&nbsp;&nbsp;' . formataData($obj->data);
+
+        if(!isset($obj->justificativa)){
+            $texto .= '<span class="border border-success rounded p-2">';
+            $texto .= '<i class="fas fa-check text-success"></i>';
+            $final = $texto . '&nbsp;&nbsp;<strong>Aceito!</strong>' . $padrao;
+        }
+            
+        if(isset($obj->justificativa)){
+            $texto .= '<span class="border border-danger rounded p-2">';
+            $texto .= '<i class="fas fa-times text-danger"></i>';
+            $texto .= '&nbsp;&nbsp;<strong>Recusado!</strong>' . $padrao;
+            $final = $texto . '&nbsp;&nbsp;|&nbsp;&nbsp;<i class="far fa-comment-dots"></i>&nbsp;&nbsp;' . $obj->justificativa;
+        }
+
+        return $final . '</span></div>';
     }
 
     public function setores($dados)

@@ -42,8 +42,10 @@
             @endforeach
             </dl>
 
+            {!! $resultado->statusAcaoRealizadaHTML('atendimento') !!}
+
             @if($resultado->atendimentoPendente())
-                @component('components.submit-bdo-perfil', ['setor' => 'atendimento'])
+                @component('components.submit-bdo-perfil', ['setor' => 'atendimento', 'resultado' => $resultado])
                 @endcomponent
             @endif
 
@@ -69,6 +71,8 @@
             <dd>
                 - {{ $gerenti['situacao'] }}
             </dd>
+
+        {!! $resultado->statusAcaoRealizadaHTML('financeiro') !!}
 
         @if(isset($gerenti['cobrancas']) && $resultado->financeiroPendente())
             <dt>ANUIDADES</dt>
@@ -104,7 +108,7 @@
         </dl>
 
         @if($resultado->financeiroPendente())
-            @component('components.submit-bdo-perfil', ['setor' => 'financeiro'])
+            @component('components.submit-bdo-perfil', ['setor' => 'financeiro', 'resultado' => $resultado])
             @endcomponent
         @endif
 
@@ -136,10 +140,20 @@
             </div>
         </div>
 
+        {!! $resultado->statusAcaoRealizadaHTML('final') !!}
+
         @if($resultado->statusEtapaFinal())
-            @component('components.submit-bdo-perfil', ['setor' => 'final'])
+            @component('components.submit-bdo-perfil', ['setor' => 'final', 'resultado' => $resultado])
             @endcomponent
         @endif
 
     @endif
+</div>
+
+<div class="card-footer">
+    <div class="float-left">
+        <a href="{{ route('bdorepresentantes.lista') }}" class="btn btn-default">
+            Voltar
+        </a>
+    </div>
 </div>

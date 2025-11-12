@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Repositories\GerentiRepositoryInterface;
 use App\BdoRepresentante;
-use Illuminate\Support\Str;
 
 class BdoAdminService {
 
@@ -41,7 +40,9 @@ class BdoAdminService {
         $id_perfil = $user->idperfil;
         foreach($resultados as $resultado) 
         {
-            $acoes = '<a href="' . route('bdorepresentantes.edit', $resultado->id) . '" class="btn btn-sm btn-primary">Editar</a> ';
+            $nome_btn = $resultado->btnAcaoHTMLAdmin($id_perfil);
+            $cor_btn = $nome_btn == 'Ver' ? 'default' : 'primary';
+            $acoes = '<a href="' . route('bdorepresentantes.edit', $resultado->id) . '" class="btn btn-sm btn-' . $cor_btn . '">' . $nome_btn . '</a> ';
             $conteudo = [
                 $resultado->id,
                 $resultado->representante->nome,
@@ -74,7 +75,7 @@ class BdoAdminService {
     public function listar($user)
     {
         $resultados = BdoRepresentante::when(in_array($user->idperfil, [3]), function($q){
-            $q->where('status->status_final', BdoRepresentante::STATUS_ADMIN_COMUN);
+            $q->where('status->status_final', '!=', "");
         })
         ->when($user->idperfil == 16, function($q){
             $q->whereNotNull('status->financeiro');
@@ -100,13 +101,37 @@ class BdoAdminService {
             throw new \Exception('Não autorizado', 403);
 
         // se tiver financeiro
-        $gerenti['situacao'] = trim(explode(':', $gerentiRepository->gerentiStatus($resultado->representante->ass_id))[1]);
-        $gerenti['cobrancas'] = $gerentiRepository->gerentiCobrancas($resultado->representante->ass_id);
+        $gerenti = null;
+        if($resultado->statusContemFinanceiro())
+            $gerenti['situacao'] = trim(explode(':', $gerentiRepository->gerentiStatus($resultado->representante->ass_id))[1]);
+
+        if($resultado->statusContemFinanceiro() && $resultado->financeiroPendente())
+            $gerenti['cobrancas'] = $gerentiRepository->gerentiCobrancas($resultado->representante->ass_id);
 
         return [
             'gerenti' => $gerenti,
             'resultado' => $resultado, 
             'variaveis' => (object) $this->variaveis
+        ];
+    }
+
+    public function save($dados, $id, $user)
+    {
+        $resultado = BdoRepresentante::findOrFail($id);
+
+        if(!$user->can('podeAcessarPerfil', $resultado))
+            throw new \Exception('Não autorizado', 403);
+
+        if(!$user->can('podeAtualizarPerfil', [$resultado, $dados['setor']]))
+            throw new \Exception('Não autorizado', 403);
+
+        $dados['justificativa'] = isset($dados['justificativa']) ? $dados['justificativa'] : null;
+
+        $ok = $resultado->aceitarOuRecusar($dados['setor'], $user->idusuario, $dados['justificativa']);
+
+        return [
+            'message' => $ok ? '<i class="icon fa fa-check"></i>Perfil Público com a ID: ' . $id . ' foi atualizado com sucesso!' : 'Erro!!!!',
+            'class' => $ok ? 'alert-success' : 'alert-danger',
         ];
     }
 
