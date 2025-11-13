@@ -1,6 +1,6 @@
 <div class="mt-2">
     <div class="float-left">
-        <form action="{{ route('bdorepresentantes.update', $resultado->id) }}" method="POST">
+        <form action="{{ route('bdorepresentantes.update', $resultado->id) }}" method="POST" id="form_aprovar_{{ $setor }}">
             @csrf
             @method('PATCH')
             <input type="hidden" name="setor" value="{{ $setor }}" />
@@ -28,7 +28,7 @@
     </a>
 
     <div id="perfil_justificar_{{ $setor }}" class="collapse">
-        <form action="{{ route('bdorepresentantes.update', $resultado->id) }}" method="POST" class="mt-2">
+        <form action="{{ route('bdorepresentantes.update', $resultado->id) }}" method="POST" class="mt-2" id="form_justificar_{{ $setor }}">
             @csrf
             @method('PATCH')
             <input type="hidden" name="setor" value="{{ $setor }}" />

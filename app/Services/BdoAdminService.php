@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\GerentiRepositoryInterface;
 use App\BdoRepresentante;
+use App\AlteracaoRC;
 
 class BdoAdminService {
 
@@ -100,6 +101,9 @@ class BdoAdminService {
         if(!$user->isAdmin() && !$user->can('podeAcessarPerfil', $resultado))
             throw new \Exception('Não autorizado', 403);
 
+        $item_publicado = $user->isAdmin() || $user->isEditor() ? 
+        '<i class="fas fa-circle fa-xs" style="color: #f08c2d;"></i>&nbsp;' : '';
+
         // se tiver financeiro
         $gerenti = null;
         if($resultado->statusContemFinanceiro())
@@ -109,6 +113,9 @@ class BdoAdminService {
             $gerenti['cobrancas'] = $gerentiRepository->gerentiCobrancas($resultado->representante->ass_id);
 
         return [
+            'muitos_campos' => $resultado->alteracoesRC->count() > 1,
+            'campos_atend' => AlteracaoRC::camposBdoRC(),
+            'item_publicado' => $item_publicado,
             'gerenti' => $gerenti,
             'resultado' => $resultado, 
             'variaveis' => (object) $this->variaveis
@@ -125,9 +132,19 @@ class BdoAdminService {
         if(!$user->can('podeAtualizarPerfil', [$resultado, $dados['setor']]))
             throw new \Exception('Não autorizado', 403);
 
+        // Em validação
         $dados['justificativa'] = isset($dados['justificativa']) ? $dados['justificativa'] : null;
+        $dados['campos_recusados'] = isset($dados['campos_recusados']) ? $dados['campos_recusados'] : [];
 
-        $ok = $resultado->aceitarOuRecusar($dados['setor'], $user->idusuario, $dados['justificativa']);
+        // Em validação --> na blade OK
+        // if(($resultado->alteracoesRC->count() == 1) && isset($dados['justificativa']))
+        //     $dados['campos_recusados'] = [$resultado->alteracoesRC->first()->informacao];
+
+        // Em validação --> toModel()
+        if(isset($dados['descricao']))
+            $resultado->descricao = $dados['descricao'];
+
+        $ok = $resultado->aceitarOuRecusar($user->idusuario, $dados);
 
         return [
             'message' => $ok ? '<i class="icon fa fa-check"></i>Perfil Público com a ID: ' . $id . ' foi atualizado com sucesso!' : 'Erro!!!!',

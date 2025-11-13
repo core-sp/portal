@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
+use App\AlteracaoRC;
 
 class BdoRepresentante extends Model
 {
@@ -49,10 +50,18 @@ class BdoRepresentante extends Model
         $alterar = null;
 
         if($s != $segmento_gerenti)
-            $alterar = $this->alteracoesRC()->create(["informacao" => "SEGMENTO", "valor_antigo" => $segmento_gerenti, "valor_atual" => $s]);
+            $alterar = $this->alteracoesRC()->create([
+                "informacao" => AlteracaoRC::camposBdoRC()[1], 
+                "valor_antigo" => $segmento_gerenti, 
+                "valor_atual" => $s
+            ]);
 
         if($sec != $seccional_gerenti)
-            $alterar = $this->alteracoesRC()->create(["informacao" => "REGIONAL", "valor_antigo" => $seccional_gerenti, "valor_atual" => $sec]);
+            $alterar = $this->alteracoesRC()->create([
+                "informacao" => AlteracaoRC::camposBdoRC()[0], 
+                "valor_antigo" => $seccional_gerenti, 
+                "valor_atual" => $sec
+            ]);
 
         if(!is_null($alterar))
             $this->update([
@@ -86,6 +95,29 @@ class BdoRepresentante extends Model
             })
         ))
             return $this->update(['status->status_final' => self::STATUS_ADMIN_FINAL, 'status->data' => now()->format(self::FORMATO_DATA_NOW)]);
+    }
+
+    private function atendimentoOkOuRollback($campos_recusados)
+    {
+        $campos = [
+            AlteracaoRC::camposBdoRC()[0] => 'regioes->seccional',
+            AlteracaoRC::camposBdoRC()[1] => 'segmento'
+        ];
+
+        foreach($this->alteracoesRC as $campo)
+        {
+            $aceite = !in_array($campo->informacao, $campos_recusados);
+            $campo->update(['aceito' => $aceite]);
+
+            if(!$aceite)
+                $this->update([$campos[$campo->informacao] => $campo->valor_antigo]);
+        }
+    }
+
+    private function finalOkOuRollback($status)
+    {
+        if($status == self::STATUS_ACAO_ACEITO)
+            $this->save();
     }
 
     private function acaoSetores($status, $user_id, $justificativa = null, $setor)
@@ -139,10 +171,18 @@ class BdoRepresentante extends Model
         return $t;
     }
 
-    public function aceitarOuRecusar($setor, $user_id, $justificativa)
+    public function aceitarOuRecusar($user_id, $dados)
     {
+        $setor = $dados['setor'];
+        $justificativa = $dados['justificativa'];
+        $campos_recusados = $dados['campos_recusados'];
+
         $acao = $setor == 'final' ? 'acaoFinal' : 'acaoSetores';
+        $ok_ou_rollback = $setor . 'OkOuRollback';
         $status = isset($justificativa) ? self::STATUS_ACAO_RECUSADO : self::STATUS_ACAO_ACEITO;
+
+        if(method_exists($this, $ok_ou_rollback))
+            call_user_func_array([$this, $ok_ou_rollback], ['campos_recusados' => $campos_recusados, 'status' => $status]);
 
         return call_user_func_array([$this, $acao], [$status, $user_id, $justificativa, $setor]);
     }
@@ -269,25 +309,24 @@ class BdoRepresentante extends Model
         if(gettype($obj) != "object")
             return '';
 
-        $final = '<div class="mt-3">';
-        $texto = $final;
+        $texto = '';
         $padrao = '&nbsp;&nbsp;<i class="fas fa-user"></i>&nbsp;&nbsp;' . $obj->atendente;
         $padrao .= '&nbsp;&nbsp;|&nbsp;&nbsp;<i class="fas fa-clock"></i>&nbsp;&nbsp;' . formataData($obj->data);
 
         if(!isset($obj->justificativa)){
-            $texto .= '<span class="border border-success rounded p-2">';
+            $texto .= '<p class="border border-success rounded p-2 col-xl-6">';
             $texto .= '<i class="fas fa-check text-success"></i>';
-            $final = $texto . '&nbsp;&nbsp;<strong>Aceito!</strong>' . $padrao;
+            $texto .= '&nbsp;&nbsp;<strong>Aceito!</strong>' . $padrao;
         }
             
         if(isset($obj->justificativa)){
-            $texto .= '<span class="border border-danger rounded p-2">';
+            $texto .= '<p class="border border-danger rounded p-2">';
             $texto .= '<i class="fas fa-times text-danger"></i>';
             $texto .= '&nbsp;&nbsp;<strong>Recusado!</strong>' . $padrao;
-            $final = $texto . '&nbsp;&nbsp;|&nbsp;&nbsp;<i class="far fa-comment-dots"></i>&nbsp;&nbsp;' . $obj->justificativa;
+            $texto .= '&nbsp;&nbsp;|&nbsp;&nbsp;<i class="far fa-comment-dots"></i>&nbsp;&nbsp;' . $obj->justificativa;
         }
 
-        return $final . '</span></div>';
+        return $texto . '</p>';
     }
 
     public function setores($dados)

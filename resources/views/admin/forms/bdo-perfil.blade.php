@@ -1,23 +1,60 @@
 <div class="card-body">
 
+    @if(auth()->user()->isAdmin() || auth()->user()->isEditor())
+    <p>{!! $item_publicado !!}: <i>item a ser publicado.</i></p>
+    @endif
+
     <!-- TODOS -->
     <h4>ID: <strong>{{ $resultado->id }}</strong> - Representante:</h4>
-    <p class="mb-0">Nome: <strong>{{ $resultado->representante->nome }}</strong></p>
     <p class="mb-0">
+        {!! $item_publicado !!}
+        Nome: <strong>{{ $resultado->representante->nome }}</strong>
+    </p>
+    <p class="mb-0">
+        {!! $item_publicado !!}
         Registro: <strong>{{ $resultado->representante->registro_core }}</strong>
         &nbsp;&nbsp;|&nbsp;&nbsp;
+        {!! $item_publicado !!}
         CNPJ: <strong>{{ $resultado->representante->cpf_cnpj }}</strong>
     </p>
     <p class="mb-0">
+        {!! $item_publicado !!}
         Telefone: <strong>{{ $resultado->telefone }}</strong>
         &nbsp;&nbsp;|&nbsp;&nbsp;
+        {!! $item_publicado !!}
         E-mail: <strong>{{ $resultado->email }}</strong>
     </p>
-    <p class="mb-0">Endereço: <strong>{{ $resultado->endereco }}</strong></p>
+    <p class="mb-0">
+        {!! $item_publicado !!}
+        Endereço: <strong>{{ $resultado->endereco }}</strong>
+    </p>
 
     <!-- COMUNICAÇÃO -->
     @if(auth()->user()->isAdmin() || auth()->user()->isEditor())
-        <p class="mb-0">Municípios: <strong>{{ implode(' | ', json_decode($resultado->regioes)->municipios) }}</strong></p>
+        <p class="mb-0">
+            {!! $item_publicado !!}
+            Municípios: <strong>{{ implode(' | ', json_decode($resultado->regioes)->municipios) }}</strong>
+        </p>
+    @endif
+
+    @if(!auth()->user()->isFinanceiro())
+        <p class="mb-0">
+
+        @if(!$resultado->statusContemAtendimento() || $resultado->alteracoesRC->where('informacao', $campos_atend[0])->isEmpty())
+            {!! $item_publicado !!}
+            Regional: <strong>{{ json_decode($resultado->regioes)->seccional }}</strong>
+        @endif
+
+        @if(!$resultado->statusContemAtendimento() || $resultado->alteracoesRC->whereIn('informacao', $campos_atend)->isEmpty())
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+        @endif
+
+        @if(!$resultado->statusContemAtendimento() || $resultado->alteracoesRC->where('informacao', $campos_atend[1])->isEmpty())
+            {!! $item_publicado !!}
+            Segmento: <strong>{{ $resultado->segmento }}</strong>
+        @endif
+
+        </p>
     @endif
 
     <!-- ATENDIMENTO E COMUNICAÇÃO -->
@@ -31,6 +68,7 @@
             <dl class="mb-4">
             @foreach($resultado->alteracoesRC as $campo)
                 <dt>
+                    {!! $item_publicado !!}
                     {{ $campo->informacao }}:
                 </dt>
                 <dd>
@@ -38,6 +76,25 @@
                 </dd>
                 <dd>
                     <i>- Novo valor solicitado:</i> <mark>{{ $campo->valor_atual }}</mark>
+                    &nbsp;&nbsp;
+
+                    @if($campo->aguardandoAlteracao())
+                    <div class="form-check-inline {{ $muitos_campos ? 'visible' : 'invisible' }}">
+                        <label class="form-check-label">{!! $muitos_campos ? 'Recusado&nbsp;' : '' !!}
+                            <input type="checkbox" 
+                                class="form-check-input align-middle" 
+                                value="{{ $campo->informacao }}" 
+                                name="campos_recusados[]" 
+                                form="form_justificar_atendimento"
+                                {{ $muitos_campos ? '' : 'checked' }}
+                            />
+                        </label>
+                    </div>
+                    @endif
+
+                    @if(!$campo->aguardandoAlteracao())
+                        {!! !$campo->alteracaoAceita() ? '<i class="fas fa-times text-danger"></i>' : '<i class="fas fa-check text-success"></i>' !!}
+                    @endif
                 </dd>
             @endforeach
             </dl>
@@ -51,13 +108,6 @@
 
         @endif
 
-        @if(!$resultado->statusContemAtendimento())
-        <p class="mb-0">
-            Regional: <strong>{{ json_decode($resultado->regioes)->seccional }}</strong>
-            &nbsp;&nbsp;|&nbsp;&nbsp;
-            Segmento: <strong>{{ $resultado->segmento }}</strong>
-        </p>
-        @endif
     @endif
 
     <!-- FINANCEIRO E COMUNICAÇÃO -->
@@ -123,12 +173,16 @@
 
         <div class="form-row mb-4">
             <div class="col">
-                <label for="descricao">Descrição</label>
+                <label for="descricao">
+                    {!! $item_publicado !!}
+                    Descrição
+                </label>
                 <textarea 
                     rows="5" 
                     class="form-control {{ $errors->has('descricao') ? 'is-invalid' : '' }}"
                     name="descricao"
                     maxlength="700"
+                    form="form_aprovar_final"
                     {{ (auth()->user()->isAdmin() || auth()->user()->isEditor()) && $resultado->statusEtapaFinal() ? '' : 'readonly' }}
                 >{{ old('descricao') ? old('descricao') : $resultado->descricao }}</textarea>
 
