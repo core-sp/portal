@@ -18,6 +18,7 @@ class CreateAlteracoesRc extends Migration
             $table->string('informacao', 100);
             $table->string('valor_antigo', 255);
             $table->string('valor_atual', 255);
+            $table->boolean('aceito')->nullable();
             $table->bigInteger('bdo_representante_id')->unsigned()->nullable();
             $table->foreign('bdo_representante_id')->references('id')->on('bdo_representantes');
             $table->timestamps();

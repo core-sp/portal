@@ -16,4 +16,22 @@ class AlteracaoRC extends Model
     {
     	return $this->belongsTo('App\BdoRepresentante')->withTrashed();
     }
+
+    public static function camposBdoRC()
+    {
+    	return [
+            'REGIONAL',
+            'SEGMENTO'
+        ];
+    }
+
+    public function alteracaoAceita()
+    {
+        return !$this->aguardandoAlteracao() && $this->aceito;
+    }
+
+    public function aguardandoAlteracao()
+    {
+        return is_null($this->aceito);
+    }
 }
