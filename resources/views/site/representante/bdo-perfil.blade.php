@@ -73,6 +73,11 @@
                         </span>
                     </label> 
                     <select name="email" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" required>
+                        @if(empty($emails))
+                        <option value="" selected>
+                            Deve incluir um e-mail clicando no ícone azul...
+                        </option>
+                        @endif
                     @foreach($emails as $email)
                         <option value="{{ $email }}" {{ old('email') == $email ? 'selected' : '' }}>{{ $email }}</option>
                     @endforeach
@@ -95,6 +100,11 @@
                         </span>
                     </label>
                     <select name="telefone" class="form-control {{ $errors->has('telefone') ? 'is-invalid' : '' }}" required>
+                        @if(empty($telefones))
+                        <option value="" selected>
+                            Deve incluir um telefone clicando no ícone azul...
+                        </option>
+                        @endif
                     @foreach($telefones as $telefone)
                         <option value="{{ $telefone }}" {{ old('telefone') == $telefone ? 'selected' : '' }}>{{ $telefone }}</option>
                     @endforeach
@@ -121,6 +131,7 @@
                         name="endereco"
                         class="form-control {{ $errors->has('endereco') ? 'is-invalid' : '' }}"
                         value="{{ $endereco }}"
+                        placeholder="Deve incluir um endereço clicando no ícone azul..."
                         readonly
                         required
                     >
@@ -134,10 +145,16 @@
 
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
-                    <label for="segmento">Segmento <em>--- ao mudar segmento, após envio direcionar para atendimento alterar no Gerenti ---</em></label>
+                    <label for="segmento">Segmento
+                        <i class="fas fa-sync-alt text-primary ml-2"></i>&nbsp;
+                        <em class="text-secondary">Alteração do SEGMENTO no sistema será solicitada após envio do cadastro</em>
+                    </label>
                     <select name="segmento" class="form-control {{ $errors->has('segmento') ? 'is-invalid' : '' }}" required>
+                        <option value="" {{ empty($segmento) ? 'selected' : '' }}>
+                            Selecione um segmento:
+                        </option>
                     @foreach(segmentos() as $segmentoAll)
-                        <option value="{{ $segmentoAll }}" {{ (old('segmento') == $segmento) || ($segmentoAll == $segmento) ? 'selected' : '' }}>
+                        <option value="{{ $segmentoAll }}" {{ !empty($segmento) && ($segmentoAll == $segmento) ? 'selected' : '' }}>
                             {{ $segmentoAll }}
                         </option>
                     @endforeach
@@ -152,11 +169,14 @@
 
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
-                    <label for="regioes">Regiões de atuação <em>--- ?????? ---</em></label>
+                    <label for="regioes">Regiões de atuação
+                        <i class="fas fa-sync-alt text-primary ml-2"></i>&nbsp;
+                        <em class="text-secondary">Alteração da REGIONAL no sistema será solicitada após envio do cadastro</em>
+                    </label>
                     <select name="regioes" class="form-control {{ $errors->has('regioes') ? 'is-invalid' : '' }}" required>
-                        <option value="">---------------- Seccionais ----------------</option>
+                        <option value="">---------------- Regionais ----------------</option>
                         @foreach($regionais as $regional)
-                            <option value="{{ $regional->regional }}" {{ (old('regioes') == $regional->regional) || (mb_strtolower($seccional) == mb_strtolower($regional->regional)) ? 'selected' : '' }}>
+                            <option value="{{ $regional->regional }}" {{ mb_strtolower($seccional) == mb_strtolower($regional->regional) ? 'selected' : '' }}>
                                 {{ $regional->regional }}
                             </option>
                         @endforeach

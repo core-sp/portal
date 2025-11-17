@@ -2,6 +2,13 @@
 
 @section('content-representante')
 
+<!-- incluir em site.css -->
+<style>
+    .border-3 {
+        border-width: 3px !important;
+    }
+</style>
+
 <div class="representante-content w-100">
     <div class="conteudo-txt-mini light">
         <h4 class="pt-1 pb-1">Perfil</h4>
@@ -9,45 +16,72 @@
 
         @if(isset($perfil_bdo))
         <div class="list-group w-100">
-            <div class="list-group-item light d-block bg-info">
+            <div class="list-group-item light d-block border border-3 rounded border-{{ $perfil_bdo->statusRCCores() }}">
         
-                <p class="pb-0 branco">
+                <p class="pb-0">
                     ID: <strong>{{ $perfil_bdo->id }}</strong>
-                </p>
-                <p class="pb-0 branco">
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
                     Nome: <strong>{{ $perfil_bdo->representante->nome }}</strong>
                 </p>
-                <p class="pb-0 branco">
+                <p class="pb-0">
                     Registro Core: <strong>{{ $perfil_bdo->representante->registro_core }}</strong>
                     &nbsp;&nbsp;|&nbsp;&nbsp;
                     CNPJ: <strong>{{ $perfil_bdo->representante->cpf_cnpj }}</strong>
                 </p>
-                <p class="pb-0 branco">
-                    Descrição: <strong>{{ $perfil_bdo->descricao }}</strong>
-                </p>
-                <p class="pb-0 branco">
+                <p class="pb-0">
+                <!-- Se foi solicitada mudança, mostrar o segmento pela tabela de alteração para evitar mostrar se foi aceito ou não antes de finalizar -->
+                @if(($perfil_bdo->statusRC() == $perfil_bdo::STATUS_RC_CADASTRO) && 
+                ($perfil_bdo->alteracoesRC->where('informacao', strtoupper('segmento'))->isNotEmpty()))
+                    <i class="fas fa-sync-alt fa-sm text-primary"></i>&nbsp;
+                    Segmento: <strong>{{ $perfil_bdo->alteracoesRC->where('informacao', strtoupper('segmento'))->first()->valor_atual }}</strong>
+                @else
                     Segmento: <strong>{{ $perfil_bdo->segmento }}</strong>
+                @endif
                     &nbsp;&nbsp;|&nbsp;&nbsp;
+
+                <!-- Se foi solicitada mudança, mostrar a regional pela tabela de alteração para evitar mostrar se foi aceito ou não antes de finalizar -->
+                @if(($perfil_bdo->statusRC() == $perfil_bdo::STATUS_RC_CADASTRO) && 
+                ($perfil_bdo->alteracoesRC->where('informacao', strtoupper('regional'))->isNotEmpty()))
+                    <i class="fas fa-sync-alt fa-sm text-primary"></i>&nbsp;
+                    Regional: <strong>{{ $perfil_bdo->alteracoesRC->where('informacao', strtoupper('regional'))->first()->valor_atual }}</strong>
+                @else
                     Regional: <strong>{{ json_decode($perfil_bdo->regioes)->seccional }}</strong>
+                @endif
                     &nbsp;&nbsp;|&nbsp;&nbsp;
                     Telefone: <strong>{{ $perfil_bdo->telefone }}</strong>
                 </p>
-                <p class="pb-0 branco">
+                <p class="pb-0">
                     E-mail: <strong>{{ $perfil_bdo->email }}</strong>
                 </p>
-                <p class="pb-0 branco">
+                <p class="pb-0">
                     Endereço: <strong>{{ $perfil_bdo->endereco }}</strong>
                 </p>
-                <p class="pb-0 branco">
+                <p class="pb-0">
                     Regiões de atuação: <strong>{!! implode('&nbsp;&nbsp;|&nbsp;&nbsp;', json_decode($perfil_bdo->regioes)->municipios) !!}</strong>
                 </p>
-                <p class="pb-0 branco">
+                <p class="pb-0">
+                    Descrição:<br>
+                    <!-- manter a formatação criada no <textarea> -->
+                    <span style="white-space: pre-wrap;"><strong>{{ $perfil_bdo->descricao }}</strong></span>
+                </p>
+                <p class="pb-0 mt-3">
                     Status: <strong>{{ $perfil_bdo->statusRC() }}</strong>
                     &nbsp;&nbsp;|&nbsp;&nbsp;
+
+                    @if(!is_null($perfil_bdo->justificativaParaRC()))
+                    <i class="far fa-comment-dots"></i>&nbsp;&nbsp;<strong>{{ $perfil_bdo->justificativaParaRC() }}</strong>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    @endif
+
                     <i><small>Atualizado em: <strong>{{ formataData(json_decode($perfil_bdo->status)->data) }}</strong></small></i>
                 </p>
             </div>
         </div>
+
+            @if($perfil_bdo->statusRC() == $perfil_bdo::STATUS_RC_REMOVIDO)
+            <a class="btn btn-primary text-white my-3" href="{{ route('representante.bdo.perfil') }}">Iniciar publicação de Perfil</a>
+            @endif
+
         @else
         <p>Agora pode publicar seu perfil de Representante no Portal!</p>
         <a class="btn btn-primary text-white my-3" href="{{ route('representante.bdo.perfil') }}">Iniciar publicação de Perfil</a>

@@ -16,7 +16,7 @@ class BdoRepresentante extends Model
     protected $guarded = [];
 
     const STATUS_RC_CADASTRO = 'Em Andamento';
-    const STATUS_RC_REMOVIDO = 'Removido';
+    const STATUS_RC_REMOVIDO = 'Publicação Recusada';
     const STATUS_RC_PUBLICO = 'Publicado';
 
     const STATUS_ADMIN_ATEND = 'Aguardando Atendimento';
@@ -190,8 +190,25 @@ class BdoRepresentante extends Model
     public function statusRC()
     {
         $s = json_decode($this->status)->status_final;
+        $status = [
+            self::STATUS_ACAO_ACEITO => self::STATUS_RC_PUBLICO,
+            self::STATUS_ACAO_RECUSADO => self::STATUS_RC_REMOVIDO,
+            self::STATUS_ADMIN_FINAL => self::STATUS_RC_CADASTRO,
+            "" => self::STATUS_RC_CADASTRO,
+        ];
 
-        return ($s == "") || ($s == self::STATUS_ADMIN_FINAL) ? self::STATUS_RC_CADASTRO : $s;
+        return $status[$s];
+    }
+
+    public function statusRCCores()
+    {
+        $cores = [
+            self::STATUS_RC_PUBLICO => 'success',
+            self::STATUS_RC_REMOVIDO => 'danger',
+            self::STATUS_RC_CADASTRO => 'secondary',
+        ];
+
+        return $cores[$this->statusRC()];
     }
 
     public function statusHTMLAdmin($id_perfil)
@@ -335,5 +352,12 @@ class BdoRepresentante extends Model
         $this->dadosParaFinanceiro($dados['em_dia']);
 
         return $this->atualizarFinal();
+    }
+
+    public function justificativaParaRC()
+    {
+        $j = json_decode($this->justificativas);
+
+        return isset($j->justificativa_final) ? $j->justificativa_final : null;
     }
 }
