@@ -78,21 +78,24 @@ class BdoService implements BdoServiceInterface {
 
     public function cadastrarPerfil($rep, $dados, GerentiRepositoryInterface $gerentiRepository)
     {
+        $dados['regioes->seccional'] = $dados['regioes_seccional'];
+        if(isset($dados['regioes_municipios']))
+            $dados['regioes->municipios'] = $dados['regioes_municipios'];
+        $dados['status'] = '{}';
+
+        unset($dados['checkbox-tdu']);
+        unset($dados['_token']);
+        unset($dados['nome']);
+        unset($dados['core']);
+        unset($dados['regioes_seccional']);
+        unset($dados['regioes_municipios']);
+
+        $bdo_perfil = $rep->bdoPerfis()->create($dados);
+
         $segmento = $gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
         $dados['segmento_gerenti'] = !empty($segmento) ? mb_strtoupper($segmento[0]["SEGMENTO"]) : mb_strtoupper($segmento);
         $dados['seccional_gerenti'] = mb_strtoupper($gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"]);
         $dados['em_dia'] = Str::contains(trim($gerentiRepository->gerentiStatus($rep->ass_id)), 'Em dia');
-
-        $bdo_perfil = $rep->bdoPerfis()->create([
-            'descricao' => $dados['descricao'],
-            'endereco' => $dados['endereco'],
-            'email' => $dados['email'],
-            'telefone' => $dados['telefone'],
-            'segmento' => $dados['segmento'],
-            'regioes->seccional' => $dados['regioes'], 
-            'regioes->municipios' => ['teste1', 'teste2'],
-            'status' => '{}'
-        ]);
 
         $criado = $bdo_perfil->setores($dados);
 

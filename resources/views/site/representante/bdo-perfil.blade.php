@@ -169,24 +169,68 @@
 
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
-                    <label for="regioes">Regiões de atuação
-                        <i class="fas fa-sync-alt text-primary ml-2"></i>&nbsp;
-                        <em class="text-secondary">Alteração da REGIONAL no sistema será solicitada após envio do cadastro</em>
-                    </label>
-                    <select name="regioes" class="form-control {{ $errors->has('regioes') ? 'is-invalid' : '' }}" required>
-                        <option value="">---------------- Regionais ----------------</option>
+                    <fieldset class="form-group border rounded border-secondary px-2 pb-3">
+                        <legend class="w-auto">
+                            <small>&nbsp;Regiões de atuação&nbsp;&nbsp;</small>
+                        </legend>
+                        <label class="mb-2">Regional
+                            <i class="fas fa-sync-alt text-primary ml-2"></i>&nbsp;
+                            <em class="text-secondary">Alteração da REGIONAL no sistema será solicitada após envio do cadastro</em>
+                        </label>
+
+                        <br />
+
                         @foreach($regionais as $regional)
-                            <option value="{{ $regional->regional }}" {{ mb_strtolower($seccional) == mb_strtolower($regional->regional) ? 'selected' : '' }}>
-                                {{ $regional->regional }}
-                            </option>
+                        <div class="form-check-inline">
+                            <label class="form-check-label font-weight-normal" for="regional_{{ mb_strtoupper($regional->regional) }}">
+                                <input type="radio" 
+                                    class="form-check-input {{ $errors->has('regioes.seccional') ? 'is-invalid' : '' }}" 
+                                    id="regional_{{ mb_strtoupper($regional->regional) }}" 
+                                    name="regioes.seccional" 
+                                    value="{{ mb_strtoupper($regional->regional) }}"
+                                    {{ mb_strtoupper($regional->regional) == mb_strtoupper($seccional) ? 'checked' : '' }}
+                                />
+                                {{ mb_strtoupper($regional->regional) }}
+
+                                @if($errors->has('regioes.seccional'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('regioes.seccional') }}
+                                </div>
+                                @endif
+                            </label>
+                        </div>
                         @endforeach
-                        <option value="">---------------- Municípios ----------------</option>
-                    </select>
-                    @if($errors->has('regioes'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('regioes') }}
-                    </div>
-                    @endif
+
+                        <hr />
+
+                        <!-- incluir no site.css -->
+                        <style>
+                            .scrollable-div {
+                                overflow-y: auto;
+                            }
+                        </style>
+
+                        <!-- municípios adicionados -->
+                        <div class="border rounded border-success p-2 mb-3">
+                            <p class="font-weight-bolder">
+                                <i class="fas fa-map-marked-alt fa-lg text-primary mr-2 mb-3"></i>
+                                Municípios adicionados
+                            </p>
+                            <div class="d-flex flex-wrap" id="municipios_escolhidos"></div>
+                        </div>
+
+                        <label>
+                            Municípios <em class="text-secondary">(opcional)</em>
+                        </label>
+                        <input class="form-control mb-2" id="buscar_municipios" type="text" placeholder="Buscar.." />
+                        <div class="scrollable-div bg-white" id="lista_municipios"></div>
+                        
+                        @if($errors->has('regioes'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('regioes') }}
+                        </div>
+                        @endif
+                    </fieldset>
                 </div>
             </div>
 
@@ -215,5 +259,27 @@
         </form>
     </div>
 </div>
+
+<script type="application/json" id="municipiosJSON">
+
+    {!! \Cache::remember('municipios', 86400, function () {
+        $file = 'municipios-sp.json';
+        if(!Storage::disk('local')->exists($file)){
+            $client = new \GuzzleHttp\Client();
+            $response =  $client->request('GET', "https://servicodados.ibge.gov.br/api/v1/localidades/estados/35/municipios?orderBy=nome");
+            $t = json_decode($response->getBody()->getContents());
+            $teste = [];
+
+            foreach($t as $m){
+                $temp = str_replace(['Á', 'Ó', 'Í', 'É'], ['A', 'O', 'I', 'E'], mb_substr($m->nome, 0, 1));
+                isset($teste[$temp]) ? array_push($teste[$temp], $m->nome) : $teste[$temp] = [$m->nome];
+            }
+            \Storage::disk('local')->put($file, json_encode($teste, JSON_UNESCAPED_UNICODE));
+        }
+
+        return \Storage::disk('local')->get($file);
+    }) !!}
+
+</script>
 
 @endsection

@@ -57,7 +57,7 @@
                     Endereço: <strong>{{ $perfil_bdo->endereco }}</strong>
                 </p>
                 <p class="pb-0">
-                    Regiões de atuação: <strong>{!! implode('&nbsp;&nbsp;|&nbsp;&nbsp;', json_decode($perfil_bdo->regioes)->municipios) !!}</strong>
+                    Municípios de atuação: <strong>{!! implode('&nbsp;&nbsp;|&nbsp;&nbsp;', json_decode($perfil_bdo->regioes)->municipios) !!}</strong>
                 </p>
                 <p class="pb-0">
                     Descrição:<br>
