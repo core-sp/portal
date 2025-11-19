@@ -589,6 +589,20 @@ class RepresentanteSiteController extends Controller
         return redirect()->route('representante.bdo')->with(['perfil' => $perfil]);
     }
 
+    public function bdoDestroy()
+    {
+        $rep = Auth::guard('representante')->user();
+        
+        try{
+            $removido = $rep->bdoPerfis()->where('status->status_final', 'Aceito')->delete();
+        }catch (Exception $e) {
+            Log::error($e->getMessage());
+            abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente mais tarde.');
+        }
+        
+        return redirect()->route('representante.bdo');
+    }
+
     public function cedulasView()
     {
         $retorno = Auth::guard('representante')->user()->estaHomologado($this->gerentiRepository, 'cedula');

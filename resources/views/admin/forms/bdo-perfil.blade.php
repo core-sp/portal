@@ -202,6 +202,17 @@
         @endif
 
     @endif
+
+    @if($resultado->trashed())
+        <p class="border border-danger rounded p-2 col-xl-6 mt-4">
+            <i class="fas fa-trash text-danger"></i>
+            &nbsp;&nbsp;<strong>Excluído pelo representante!</strong>
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            <i class="fas fa-clock"></i>
+            &nbsp;&nbsp;{{ formataData($resultado->deleted_at) }}
+        </p>
+    @endif
+    
 </div>
 
 <div class="card-footer">

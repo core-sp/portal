@@ -75,7 +75,8 @@ class BdoAdminService {
 
     public function listar($user)
     {
-        $resultados = BdoRepresentante::when(in_array($user->idperfil, [3]), function($q){
+        $resultados = BdoRepresentante::withTrashed()
+        ->when(in_array($user->idperfil, [3]), function($q){
             $q->where('status->status_final', '!=', "");
         })
         ->when($user->idperfil == 16, function($q){
@@ -96,7 +97,7 @@ class BdoAdminService {
 
     public function editar($user, $id, GerentiRepositoryInterface $gerentiRepository)
     {
-        $resultado = BdoRepresentante::findOrFail($id);
+        $resultado = BdoRepresentante::withTrashed()->findOrFail($id);
 
         if(!$user->isAdmin() && !$user->can('podeAcessarPerfil', $resultado))
             throw new \Exception('Não autorizado', 403);

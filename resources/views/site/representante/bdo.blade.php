@@ -82,6 +82,16 @@
             <a class="btn btn-primary text-white my-3" href="{{ route('representante.bdo.perfil') }}">Iniciar publicação de Perfil</a>
             @endif
 
+            @if($perfil_bdo->statusRC() == $perfil_bdo::STATUS_RC_PUBLICO)
+            <form method="POST" action="{{ route('representante.bdo.perfil.remover') }}" class="d-inline">
+                @csrf
+                @method('DELETE')
+                <button class="btn btn-danger my-3" type="submit">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+            @endif
+
         @else
         <p>Agora pode publicar seu perfil de Representante no Portal!</p>
         <a class="btn btn-primary text-white my-3" href="{{ route('representante.bdo.perfil') }}">Iniciar publicação de Perfil</a>

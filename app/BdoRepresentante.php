@@ -157,16 +157,19 @@ class BdoRepresentante extends Model
         $t = '';
 
         if($this->statusContemAtendimento())
-            $t .= '<span class="badge badge-primary mr-2">' . str_replace(' ', '<br>', $s->atendimento->status) . '</span>';
+            $t .= '<span class="badge badge-primary mr-2 mb-1">' . str_replace(' ', '<br>', $s->atendimento->status) . '</span>';
 
         if($this->statusContemFinanceiro())
-            $t .= '<span class="badge badge-secondary mr-2">' . str_replace(' ', '<br>', $s->financeiro->status) . '</span>';
+            $t .= '<span class="badge badge-secondary mr-2 mb-1">' . str_replace(' ', '<br>', $s->financeiro->status) . '</span>';
 
         if($this->statusEtapaFinal())
-            $t .= '<span class="badge badge-success mr-2">' . str_replace(' ', '<br>', $s->status_final) . '</span>';
+            $t .= '<span class="badge badge-success mr-2 mb-1">' . str_replace(' ', '<br>', $s->status_final) . '</span>';
 
         if($this->statusFinalizado())
-            $t .= '<span class="badge badge-success mr-2">Final: ' . str_replace(' ', '<br>', $s->status_final) . '</span>';
+            $t .= '<span class="badge badge-success mr-2 mb-1">Final: ' . str_replace(' ', '<br>', $s->status_final) . '</span>';
+
+        if($this->trashed())
+            $t .= '<span class="badge badge-danger mr-2 mb-1">Representante<br>excluiu</span>';
 
         return $t;
     }
@@ -213,16 +216,18 @@ class BdoRepresentante extends Model
 
     public function statusHTMLAdmin($id_perfil)
     {
+        $excluido = $this->trashed() ? '<br><small><i class="fas fa-trash"></i>&nbsp;&nbsp;<i>Representante excluiu</i></small>' : '';
+
         switch ($id_perfil) {
             case 3:
-                return json_decode($this->status)->status_final;
+                return json_decode($this->status)->status_final . $excluido;
                 break;
             case 6:
             case 8:
-                return json_decode($this->status)->atendimento->status;
+                return json_decode($this->status)->atendimento->status . $excluido;
                 break;
             case 16:
-                return json_decode($this->status)->financeiro->status;
+                return json_decode($this->status)->financeiro->status . $excluido;
                 break;
             default:
                 return $this->statusHTMLAdministrador();

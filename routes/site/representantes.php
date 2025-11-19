@@ -42,6 +42,7 @@ Route::prefix('representante')->group(function(){
     // Perfil em BDO
     Route::get('/oportunidades-perfil', 'RepresentanteSiteController@bdoPerfil')->name('representante.bdo.perfil');
     Route::post('/oportunidades-perfil', 'RepresentanteSiteController@bdoPerfilDados')->name('representante.bdo.perfil.cadastrar');
+    Route::delete('/oportunidades/remover-perfil', 'RepresentanteSiteController@bdoDestroy')->name('representante.bdo.perfil.remover');
 
     // Solicitar cédula
     Route::get('/cedulas', 'RepresentanteSiteController@cedulasView')->name('representante.solicitarCedulaView');
