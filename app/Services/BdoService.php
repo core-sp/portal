@@ -22,10 +22,12 @@ class BdoService implements BdoServiceInterface {
 
     public function viewPerfilRC($rep, GerentiRepositoryInterface $gerentiRepository = null)
     {
+        $perfil = $rep->bdoPerfis->whereIn('status->status_final', [
+            '', BdoRepresentante::STATUS_ADMIN_FINAL, BdoRepresentante::STATUS_ACAO_ACEITO, BdoRepresentante::STATUS_ACAO_RECUSADO
+        ])->last();
+
         if(is_null($gerentiRepository))
-            return $rep->bdoPerfis->whereIn('status->status_final', [
-                '', BdoRepresentante::STATUS_ADMIN_FINAL, BdoRepresentante::STATUS_ACAO_ACEITO, BdoRepresentante::STATUS_ACAO_RECUSADO
-            ])->last();
+            return $perfil;
 
         $endereco = $gerentiRepository->gerentiEnderecos($rep->ass_id);
         $end = '';
@@ -67,6 +69,7 @@ class BdoService implements BdoServiceInterface {
         }
 
         return [
+            'perfil' => isset($perfil) && (json_decode($perfil->status)->status_final == BdoRepresentante::STATUS_ACAO_ACEITO) ? $perfil : null,
             'rep' => $rep, 
             'emails' => $emails, 
             'telefones' => $telefones, 
@@ -85,8 +88,6 @@ class BdoService implements BdoServiceInterface {
 
         unset($dados['checkbox-tdu']);
         unset($dados['_token']);
-        unset($dados['nome']);
-        unset($dados['core']);
         unset($dados['regioes_seccional']);
         unset($dados['regioes_municipios']);
 
@@ -100,5 +101,23 @@ class BdoService implements BdoServiceInterface {
         $criado = $bdo_perfil->setores($dados);
 
         return $criado ? $bdo_perfil->fresh() : collect();
+    }
+
+    public function editarPerfil($rep, $dados)
+    {
+        $dados['regioes->municipios'] = isset($dados['regioes_municipios']) ? $dados['regioes_municipios'] : [];
+
+        unset($dados['_method']);
+        unset($dados['_token']);
+        unset($dados['descricao']);
+        unset($dados['regioes_seccional']);
+        unset($dados['regioes_municipios']);
+
+        $bdo_perfil = $rep->bdoPerfis()->where('status->status_final', BdoRepresentante::STATUS_ACAO_ACEITO)->orderBy('id', 'DESC')->first();
+        
+        if(isset($bdo_perfil))
+            $bdo_perfil->update($dados);
+
+        return $bdo_perfil->fresh();
     }
 }

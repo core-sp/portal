@@ -10,6 +10,9 @@
 </style>
 
 <div class="representante-content w-100">
+
+    <!-- PERFIL PÚBLICO NO BALCÃO DE OPORTUNIDADES DO REPRESENTANTE CADASTRADO -->
+
     <div class="conteudo-txt-mini light">
         <h4 class="pt-1 pb-1">Perfil</h4>
         <div class="linha-lg-mini mb-1"></div>
@@ -73,7 +76,9 @@
                     &nbsp;&nbsp;|&nbsp;&nbsp;
                     @endif
 
-                    <i><small>Atualizado em: <strong>{{ formataData(json_decode($perfil_bdo->status)->data) }}</strong></small></i>
+                    <i><small>Status atualizado em: <strong>{{ formataData(json_decode($perfil_bdo->status)->data) }}</strong></small></i>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <i><small>Perfil atualizado em: <strong>{{ formataData($perfil_bdo->updated_at) }}</strong></small></i>
                 </p>
             </div>
         </div>
@@ -83,6 +88,10 @@
             @endif
 
             @if($perfil_bdo->statusRC() == $perfil_bdo::STATUS_RC_PUBLICO)
+            <a class="btn btn-warning my-3 mr-4" href="{{ route('representante.bdo.perfil') }}">
+                <i class="fas fa-edit text-dark"></i>
+            </a>
+
             <form method="POST" action="{{ route('representante.bdo.perfil.remover') }}" class="d-inline">
                 @csrf
                 @method('DELETE')
@@ -99,6 +108,8 @@
     </div>
 
     <hr class="bg-success"/>
+
+    <!-- OPORTUNIDADES DO BALCÃO DE OPORTUNIDADES EM RELAÇÃO AS VAGAS -->
 
     <div class="conteudo-txt-mini light">
         <h4 class="pt-1 pb-1">Oportunidades</h4>

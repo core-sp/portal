@@ -53,20 +53,27 @@ function buscarMunicipios(){
     });
 }
 
+function btnRemoverMunicipio(municipio_escolhido){
+
+    const icone_remover = '<i class="fas fa-times-circle text-danger ml-2"></i>';
+
+    let botao = '<button type="button" class="btn btn-sm btn-outline-danger font-weight-normal mr-2 mb-2" ';
+    botao += 'style="font-size: 0.75rem;" value="' + municipio_escolhido + '">';
+    botao += municipio_escolhido + icone_remover + '</button>';
+
+    let input = '<input type="hidden" name="regioes.municipios[]" value="' + municipio_escolhido + '" />';
+
+    return {'botao': botao, 'input': input};
+}
+
 function adicionarMunicipio(){
 
     $('#lista_municipios').on('click', '.item-municipio button', function(){
         let municipio_escolhido = $(this).val();
-        const icone_remover = '<i class="fas fa-times-circle text-danger ml-2"></i>';
-
-        let botao = '<button type="button" class="btn btn-sm btn-outline-danger font-weight-normal mr-2 mb-2" ';
-        botao += 'style="font-size: 0.75rem;" value="' + municipio_escolhido + '">';
-        botao += municipio_escolhido + icone_remover + '</button>';
-
-        let input = '<input type="hidden" name="regioes.municipios[]" value="' + municipio_escolhido + '" />';
+        const resp = btnRemoverMunicipio(municipio_escolhido);
 
         if($('#municipios_escolhidos button[value="' + municipio_escolhido + '"]').length == 0)
-            $('#municipios_escolhidos').append($(botao + input));
+            $('#municipios_escolhidos').append($(resp.botao + resp.input));
     });
 }
 
@@ -76,6 +83,32 @@ function removerMunicipio(){
         $(this).remove();
         $('input[type="hidden"][value="' + $(this).val() + '"]').remove();
     });
+}
+
+function carregarMunicipios(){
+
+    if($('#municipios_carregados span').length == 0)
+        return false;
+
+    $('#municipios_carregados span').each(function(){
+        let municipio_escolhido = $(this).text();
+        const resp = btnRemoverMunicipio(municipio_escolhido);
+
+        if($('#municipios_escolhidos button[value="' + municipio_escolhido + '"]').length == 0){
+            $('#municipios_escolhidos').append($(resp.botao + resp.input));
+            $(this).remove();
+        }
+    });
+}
+
+function removerTodosMunicipios(){
+
+    $('#remover_todos_municipios').click(function(){
+        if($('#municipios_escolhidos button').length == 0)
+            return false;
+        
+        $('#municipios_escolhidos').html('');
+    });    
 }
 
 export function executar(){
@@ -104,4 +137,6 @@ export function executar(){
     buscarMunicipios();
     adicionarMunicipio();
     removerMunicipio();
+    carregarMunicipios();
+    removerTodosMunicipios();
 }

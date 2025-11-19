@@ -580,7 +580,9 @@ class RepresentanteSiteController extends Controller
 
         try{
             $dados = $request->all();
-            $perfil = $this->service->getService('Bdo')->cadastrarPerfil($rep, $dados, $this->gerentiRepository);
+            $perfil = $request->isMethod('post') ? 
+                $this->service->getService('Bdo')->cadastrarPerfil($rep, $dados, $this->gerentiRepository) : 
+                $this->service->getService('Bdo')->editarPerfil($rep, $dados);
         }catch (Exception $e) {
             Log::error($e->getMessage());
             abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente mais tarde.');
