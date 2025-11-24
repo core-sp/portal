@@ -22,9 +22,9 @@ class BdoService implements BdoServiceInterface {
 
     public function viewPerfilRC($rep, GerentiRepositoryInterface $gerentiRepository = null)
     {
-        $perfil = $rep->bdoPerfis->whereIn('status->status_final', [
+        $perfil = $rep->bdoPerfis()->whereIn('status->status_final', [
             '', BdoRepresentante::STATUS_ADMIN_FINAL, BdoRepresentante::STATUS_ACAO_ACEITO, BdoRepresentante::STATUS_ACAO_RECUSADO
-        ])->last();
+        ])->orderBy('id', 'DESC')->first();
 
         if(is_null($gerentiRepository))
             return $perfil;
