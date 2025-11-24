@@ -125,6 +125,11 @@ class Representante extends Authenticable
         return $this->hasMany('App\BdoRepresentante', 'idrepresentante');
     }
 
+    public function perfilPublicoSolicitado()
+    {
+        return $this->bdoPerfis()->whereIn('status->status_final', ['', 'Em Andamento'])->orderBy('id', 'DESC')->first();
+    }
+
     public function agendamentosAtivos()
     {
         return $this->agendamentosSalas()

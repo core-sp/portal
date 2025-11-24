@@ -29,7 +29,19 @@
                     </div>
                 @else
                     <div class="contato-single {{ $loop->last ? '' : 'b-dashed' }}" data-clarity-mask="True">
-                        <p class="pb-0">{{ $key }}: <strong>{!! empty($dado) ? '----------' : $dado !!}</strong></p>
+                        <p class="pb-0">
+                            @if((strtoupper($key) == 'REGIONAL') && 
+                                !is_null(auth()->guard('representante')->user()->perfilPublicoSolicitado()) && 
+                                (auth()->guard('representante')->user()->perfilPublicoSolicitado()->alteracoesRC->where('informacao', strtoupper('regional'))->isNotEmpty()))
+                            <i class="fas fa-sync-alt fa-sm text-primary"></i>
+                            &nbsp;{{ $key }}:
+                            <strong>
+                                está em processo de alteração no perfil público
+                            </strong>
+                            @else
+                            {{ $key }}: <strong>{!! empty($dado) ? '----------' : $dado !!}</strong>
+                            @endif
+                        </p>
                     </div>
                 @endif
             @endforeach

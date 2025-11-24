@@ -121,30 +121,40 @@
                 </a>
             </span>
         </h5>
-    @if($segmento)
-        <div class="contatos-table space-single bg-info mb-2">
-            <p class="light pb-0 text-white" data-clarity-mask="True">
-                @if($bdo->count() == 0)
-                Não foi encontrada nenhuma oportunidade <strong>em andamento</strong> para o seu segmento - <strong>{{ $segmento }}</strong> e sua seccional - <strong>{{ $seccional }}</strong>
-                @else
-                {!! $bdo->count() == 1 ? 'Foi encontrada 1 oportunidade' : 'Foram encontradas <strong>'.$bdo->count().'</strong> oportunidades' !!} <strong>em andamento</strong> para o seu segmento - <strong>{{ $segmento }}</strong> e sua seccional - <strong>{{ $seccional }}</strong>
-                @endif
-            </p>
-        </div>
-        <div class="contatos-table">
-            @foreach($bdo as $b)
-                <div class="contato-single {{ $loop->last ? '' : 'b-dashed' }}">
-                    <p class="pb-0">
-                    <strong>{{ $b->titulo }} -</strong> Essa empresa possui {{ $b->vagasdisponiveis }} {{ $b->vagasdisponiveis > 1 ? 'vagas disponíveis' : 'vaga disponível' }}! 
-                    <a href="{{ $b->observacao }}" target="_blank" class="alert-link"><u>Confira aqui</u></a>.
-                    </p>
-                </div>
-            @endforeach
-        </div>
+
+    @if(isset($perfil_bdo) && ($perfil_bdo->statusRC() == $perfil_bdo::STATUS_RC_CADASTRO) && 
+        ($perfil_bdo->alteracoesRC->where('informacao', strtoupper('segmento'))->isNotEmpty()))
+        <i class="fas fa-sync-alt fa-sm text-primary mt-3"></i>
+        &nbsp;<strong>Segmento está em processo de alteração no perfil público</strong>
+
     @else
-        <div class="contatos-table space-single">
-            <p class="light pb-0">Você não cadastrou o segmento. Por favor, atualize seus dados para receber as oportunidades.</p>
-        </div>
+
+        @if($segmento)
+            <div class="contatos-table space-single bg-info mb-2">
+                <p class="light pb-0 text-white" data-clarity-mask="True">
+                    @if($bdo->count() == 0)
+                    Não foi encontrada nenhuma oportunidade <strong>em andamento</strong> para o seu segmento - <strong>{{ $segmento }}</strong> e sua seccional - <strong>{{ $seccional }}</strong>
+                    @else
+                    {!! $bdo->count() == 1 ? 'Foi encontrada 1 oportunidade' : 'Foram encontradas <strong>'.$bdo->count().'</strong> oportunidades' !!} <strong>em andamento</strong> para o seu segmento - <strong>{{ $segmento }}</strong> e sua seccional - <strong>{{ $seccional }}</strong>
+                    @endif
+                </p>
+            </div>
+            <div class="contatos-table">
+                @foreach($bdo as $b)
+                    <div class="contato-single {{ $loop->last ? '' : 'b-dashed' }}">
+                        <p class="pb-0">
+                        <strong>{{ $b->titulo }} -</strong> Essa empresa possui {{ $b->vagasdisponiveis }} {{ $b->vagasdisponiveis > 1 ? 'vagas disponíveis' : 'vaga disponível' }}! 
+                        <a href="{{ $b->observacao }}" target="_blank" class="alert-link"><u>Confira aqui</u></a>.
+                        </p>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="contatos-table space-single">
+                <p class="light pb-0">Você não cadastrou o segmento. Por favor, atualize seus dados para receber as oportunidades.</p>
+            </div>
+        @endif
+
     @endif
     </div>
 </div>
