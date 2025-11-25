@@ -1335,9 +1335,9 @@ footer p {
 	padding: 0px;
 }
 
-.pesquisaLicitacao .btn {
+.pesquisaLicitacao .btn:not(#btn_apagar_municipio, .btnMunicipio) {
 	font-size: 0.85rem;
-	width: 49.2%;
+	/* width: 49.2%; */
 }
 
 .pesquisaLicitacao-btn {
@@ -2139,12 +2139,20 @@ h5 {
 	align-self: center;	
 }
 
+.show-inline {
+	display: inline-block;
+}
+
 /* FINAL */
 
 /*
  * CSS PARA DISPOSITIVOS MÓVEIS
  */
 @media screen and (max-width: 1600px) {
+
+	.show-inline {
+		display: inline-block;
+	}
 
 	h1 {
 		font-size: 2.6rem;
@@ -2223,6 +2231,10 @@ h5 {
 }
 
 @media screen and (max-width: 1200px) {
+
+	.show-inline {
+		display: inline-block;
+	}
 
 	h1 {
 		font-size: 2.45rem;
@@ -3095,6 +3107,10 @@ h5 {
 	#popup-campanha video {
 		height: 100%;
 	}
+
+	.show-inline {
+		display: inline-block;
+	}
 }
 
 @media screen and (max-width: 465px) {
@@ -3163,4 +3179,8 @@ h5 {
 .custom-file-label {
     overflow: hidden;
     white-space: nowrap;
+}
+
+.scrollable-div {
+	overflow-y: auto;
 }

@@ -246,13 +246,6 @@
 
                         <hr />
 
-                        <!-- incluir no site.css -->
-                        <style>
-                            .scrollable-div {
-                                overflow-y: auto;
-                            }
-                        </style>
-
                         <!-- municípios carregados (old() ou $perfil) -->
                         <div style="display: none;" id="municipios_carregados">
                         @if(isset($perfil) && !empty(json_decode($perfil->regioes)->municipios))

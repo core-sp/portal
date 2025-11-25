@@ -201,7 +201,8 @@
                         </div>
                         <div class="sub-dropdown-menu">
                           <a href="/balcao-de-oportunidades" class="dropdown-item">Acessar</a>
-                          <a href="/anunciar-vaga" class="dropdown-item bb-0">Anunciar</a>
+                          <a href="/anunciar-vaga" class="dropdown-item">Anunciar Vagas</a>
+                          <a href="{{ route('representante.bdo') }}" class="dropdown-item bb-0">Anunciar Representante</a>
                         </div>
                       </div>
                       <a href="{{ route('carta-servicos') }}" class="dropdown-item">Carta de Serviços ao Usuário</a>

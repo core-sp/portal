@@ -38,7 +38,7 @@ use \App\BdoOportunidade;
           </div>
           <div class="linha-lg-mini"></div>
           <div class="form-row">
-            <div class="col">
+            <div class="col-md mb-2-768">
               <label for="palavra-chave">Palavra-chave</label>
               <input type="text"
                 name="palavra-chave"
@@ -50,7 +50,20 @@ use \App\BdoOportunidade;
                 @endif
                 />
             </div>
-            <div class="col">
+
+            <div class="col-md mb-2-768">
+              <label for="bdo_tipo">Tipo</label>
+              <select name="tipo" 
+                class="form-control 
+                {{ !empty(Request::input('tipo')) && in_array(Request::input('tipo'), ['empresas', 'representantes']) ? 'bg-focus border-info' : '' }}" 
+                id="bdo_tipo"
+              >
+                <option value="empresas">Empresas</option>
+                <option value="representantes">Representantes</option>
+              </select>
+            </div>
+
+            <div class="col-md mb-2-768">
               <label for="segmento">Segmento</label>
               <select name="segmento" class="form-control {{ !empty(Request::input('segmento')) && in_array(Request::input('segmento'), $segmentos) ? 'bg-focus border-info' : '' }}" id="segmento">
                 <option value="">Todos</option>
@@ -63,10 +76,9 @@ use \App\BdoOportunidade;
                 @endforeach
               </select>
             </div>
-          </div>
-          <div class="form-row mt-2">
-            <div class="col">
-              <label for="regional">Área de atuação</label>
+
+            <div class="col-md mb-2-768">
+              <label for="regional"><span class="hide-992 show-inline-768 show-inline">Área de atuação -&nbsp;</span>Regional</label>
               <select name="regional" class="form-control {{ !empty(Request::input('regional')) && (Request::input('regional') >= 0 || Request::input('regional') <= 13 || Request::input('regional') === 'todas') ? 'bg-focus border-info' : '' }}">
                 <option value="todas">Qualquer</option>
                 @foreach($regionais as $regional)
@@ -78,11 +90,47 @@ use \App\BdoOportunidade;
                 @endforeach
               </select>
             </div>
-            <div class="col-lg-4 col-md-12 align-self-end pesquisaLicitacao-btn">
-              <button type="submit" class="btn-buscaavancada loadingPagina"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
-              <a href="/balcao-de-oportunidades" class="btn btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</a>
-            </div>
           </div>
+          <div class="form-row mt-2">
+
+            <div class="col-md mb-2-768">
+              <label for="">Área de atuação - Município</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fas fa-map-marker-alt text-primary"></i>
+                  </span>
+                </div>
+                <input type="text" class="form-control" id="buscar_municipios" placeholder="Buscar...">
+              </div>
+              <div class="scrollable-div bg-white" id="lista_municipios"></div>
+            </div>
+
+            <div class="col-md mb-2-768">
+              <label for="">Área de atuação - Município Escolhido</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fas fa-map-marked-alt text-primary"></i>
+                  </span>
+                </div>
+                <input type="text" class="form-control" id="municipios_escolhidos" name="municipio" value="Qualquer" readonly>
+                <div class="input-group-append">
+                  <button class="btn btn-danger" type="button" id="btn_apagar_municipio">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- <div class="col-md mb-2-768"> -->
+              <div class="col-lg-4 col-md-12 mt-4 pt-1">
+                <button type="submit" class="btn-buscaavancada loadingPagina"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
+                <a href="/balcao-de-oportunidades" class="btn btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</a>
+              </div>
+            <!-- </div> -->
+
+          
           </div>
         </form>
       </div>
@@ -184,5 +232,27 @@ use \App\BdoOportunidade;
     @endif
   </div>  
 </section>
+
+<script type="application/json" id="municipiosJSON">
+
+    {!! \Cache::remember('municipios', 86400, function () {
+        $file = 'municipios-sp.json';
+        if(!Storage::disk('local')->exists($file)){
+            $client = new \GuzzleHttp\Client();
+            $response =  $client->request('GET', "https://servicodados.ibge.gov.br/api/v1/localidades/estados/35/municipios?orderBy=nome");
+            $t = json_decode($response->getBody()->getContents());
+            $teste = [];
+
+            foreach($t as $m){
+                $temp = str_replace(['Á', 'Ó', 'Í', 'É'], ['A', 'O', 'I', 'E'], mb_substr($m->nome, 0, 1));
+                isset($teste[$temp]) ? array_push($teste[$temp], $m->nome) : $teste[$temp] = [$m->nome];
+            }
+            \Storage::disk('local')->put($file, json_encode($teste, JSON_UNESCAPED_UNICODE));
+        }
+
+        return \Storage::disk('local')->get($file);
+    }) !!}
+
+</script>
 
 @endsection
