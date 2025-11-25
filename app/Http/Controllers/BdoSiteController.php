@@ -57,14 +57,17 @@ class BdoSiteController extends Controller
         $buscaSegmento = IlluminateRequest::input('segmento');
         $buscaRegional = IlluminateRequest::input('regional') === 'todas' ?  $buscaRegional = '' : ','. IlluminateRequest::input('regional').',';
 
-        $oportunidades = $this->bdoOportunidadeRepository->buscagetToBalcaoSite($buscaSegmento, $buscaRegional, $buscaPalavraChave);
         $regionais = $this->service->getService('Regional')->getRegionais();
         $segmentos = BdoEmpresa::segmentos();
+        $oportunidades = IlluminateRequest::input('tipo') == 'representantes' ? 
+        $this->service->getService('Bdo')->buscarPerfisPublicos(IlluminateRequest::only(['palavra-chave', 'tipo', 'segmento', 'municipio', 'regional']), $regionais) : 
+        $this->bdoOportunidadeRepository->buscagetToBalcaoSite($buscaSegmento, $buscaRegional, $buscaPalavraChave);
         
         if (count($oportunidades) > 0) {
-            foreach($oportunidades as $o) {
-                $o->regiaoFormatada = $this->displayRegioes($o->regiaoatuacao, $regionais->toArray());
-            }      
+            if(get_class($oportunidades->get(0)) == "App\BdoOportunidade")
+                foreach($oportunidades as $o) {
+                    $o->regiaoFormatada = $this->displayRegioes($o->regiaoatuacao, $regionais->toArray());
+                }      
         } 
         else {
             $oportunidades = null;

@@ -58,8 +58,8 @@ use \App\BdoOportunidade;
                 {{ !empty(Request::input('tipo')) && in_array(Request::input('tipo'), ['empresas', 'representantes']) ? 'bg-focus border-info' : '' }}" 
                 id="bdo_tipo"
               >
-                <option value="empresas">Empresas</option>
-                <option value="representantes">Representantes</option>
+                <option value="empresas" {{ Request::input('tipo') == 'empresas' ? 'selected' : '' }}>Empresas</option>
+                <option value="representantes" {{ Request::input('tipo') == 'representantes' ? 'selected' : '' }}>Representantes</option>
               </select>
             </div>
 
@@ -94,7 +94,7 @@ use \App\BdoOportunidade;
           <div class="form-row mt-2">
 
             <div class="col-md mb-2-768">
-              <label for="">Área de atuação - Município</label>
+              <label for="buscar_municipios">Área de atuação - Município</label>
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text">
@@ -107,14 +107,14 @@ use \App\BdoOportunidade;
             </div>
 
             <div class="col-md mb-2-768">
-              <label for="">Área de atuação - Município Escolhido</label>
+              <label for="municipios_escolhidos">Área de atuação - Município Escolhido</label>
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text">
                     <i class="fas fa-map-marked-alt text-primary"></i>
                   </span>
                 </div>
-                <input type="text" class="form-control" id="municipios_escolhidos" name="municipio" value="Qualquer" readonly>
+                <input type="text" class="form-control" id="municipios_escolhidos" name="municipio" value="{{ !empty(Request::input('municipio')) ? Request::input('municipio') : 'Qualquer' }}" readonly>
                 <div class="input-group-append">
                   <button class="btn btn-danger" type="button" id="btn_apagar_municipio">
                     <i class="fas fa-trash"></i>
@@ -148,6 +148,10 @@ use \App\BdoOportunidade;
           @foreach($oportunidades as $oportunidade)
           <div class="licitacao-grid">
             <div class="licitacao-grid-main">
+
+
+            @if(get_class($oportunidade) == "App\BdoOportunidade")
+
               <h5 class="marrom mb-1 text-break">{{ $oportunidade->titulo }}</h5>
               <h6 class="light">
                 <i class="far fa-building"></i>&nbsp;
@@ -206,14 +210,75 @@ use \App\BdoOportunidade;
                 </div>
               </div>
               <button class="saiba-mais mt-3"><i class="fas fa-angle-double-down"></i>&nbsp;&nbsp;Mais Detalhes</button>
+
+            @else
+
+            <h5 class="marrom mb-1 text-break">{{ $oportunidade->representante->nome }}</h5>
+            <h6 class="light mt-2">
+              <strong>CORE</strong>&nbsp;
+              {{ $oportunidade->representante->registro_core }}
+              &nbsp;&nbsp;&nbsp;
+              <i class="fas fa-map-marker-alt"></i>&nbsp;
+              {{ json_decode($oportunidade->regioes)->seccional }}
+              &nbsp;&nbsp;&nbsp;
+              <i class="far fa-building"></i>&nbsp;
+              {{ $oportunidade->representante->cpf_cnpj }}
+              &nbsp;&nbsp;&nbsp;
+              <strong>SEGMENTO</strong>&nbsp;
+              {{ $oportunidade->segmento }}
+            </h6>
+
+              @if(!empty(json_decode($oportunidade->regioes)->municipios))
+              <h6 class="light mt-2">
+                <i class="fas fa-map-marked-alt"></i>&nbsp;
+                {!! implode('&nbsp;&nbsp;|&nbsp;&nbsp;', json_decode($oportunidade->regioes)->municipios) !!}
+                &nbsp;&nbsp;&nbsp;
+              </h6>
+              @endif
+
+              <div class="linha-lg-mini"></div>
+              <p class="text-break mb-4">{{ $oportunidade->descricao }}</p>
+              <p class="mb-2">
+                <i class="fas fa-street-view p-2 border rounded bg-white"></i>&nbsp;&nbsp;
+                {{ $oportunidade->endereco }}
+              </p>
+              <p>
+                <i class="fas fa-at p-2 border rounded bg-white"></i>&nbsp;&nbsp;
+                {{ $oportunidade->email }}
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <i class="fas fa-phone p-2 border rounded bg-white"></i>&nbsp;&nbsp;
+                {{ $oportunidade->telefone }}
+              </p>
+
+            @endif
+
             </div>
             <div class="licitacao-grid-bottom">
               <div class="col nopadding">
                 <div class="text-right">
-                  <h6 class="light marrom"><strong>Data de inclusão da oportunidade:</strong> {{ onlyDate($oportunidade->datainicio) }}</h6>
+                  <h6 class="light marrom">
+                    <span>
+                      <strong>
+                        Data de inclusão 
+                        {{ get_class($oportunidade) == "App\BdoOportunidade" ? 'da oportunidade' : 'do perfil público' }}:
+                      </strong> 
+                      {{ get_class($oportunidade) == "App\BdoOportunidade" ? onlyDate($oportunidade->datainicio) : onlyDate(json_decode($oportunidade->status)->data) }}
+                    </span>
+
+                    @if(get_class($oportunidade) != "App\BdoOportunidade")
+                    <span class="ml-3">
+                      <strong>
+                        Última atualização:
+                      </strong> 
+                      {{ onlyDate($oportunidade->updated_at) }}
+                    </span>
+                    @endif
+
+                  </h6>
                 </div>
               </div>
             </div>
+
           </div>
           @endforeach
         @else

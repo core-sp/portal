@@ -13,4 +13,6 @@ interface BdoServiceInterface {
     public function cadastrarPerfil($rep, $dados, GerentiRepositoryInterface $gerentiRepository);
 
     public function editarPerfil($rep, $dados);
+
+    public function buscarPerfisPublicos($dados, $regionais);
 }

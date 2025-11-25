@@ -120,4 +120,27 @@ class BdoService implements BdoServiceInterface {
 
         return $bdo_perfil->fresh();
     }
+
+    public function buscarPerfisPublicos($dados, $regionais)
+    {
+        $regional_existe = isset($dados['regional']) && ($dados['regional'] != 'todas');
+
+        if($regional_existe)
+            $dados['regional'] = mb_strtoupper($regionais->where('idregional', $dados['regional'])->first()->regional);
+
+        return BdoRepresentante::where('status->status_final', BdoRepresentante::STATUS_ACAO_ACEITO)
+        ->when(isset($dados['segmento']), function($q) use($dados){
+            return $q->where('segmento', mb_strtoupper($dados['segmento']));
+        })
+        ->when($regional_existe, function($q) use($dados){
+            return $q->where('regioes->seccional', $dados['regional']);
+        })
+        ->when(isset($dados['municipio']) && ($dados['municipio'] != 'Qualquer'), function($q) use($dados){
+            return $q->whereJsonContains('regioes->municipios', [$dados['municipio']]);
+        })
+        ->when(isset($dados['palavra-chave']), function($q) use($dados){
+            return $q->where('descricao', 'LIKE', '%' . $dados['palavra-chave'] . '%');
+        })
+        ->paginate(10);
+    }
 }
