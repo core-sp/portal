@@ -71,8 +71,11 @@
                     @endif
 
                     <i><small>Status atualizado em: <strong>{{ formataData(json_decode($perfil_bdo->status)->data) }}</strong></small></i>
+
+                    @if($perfil_bdo->statusRC() == $perfil_bdo::STATUS_RC_PUBLICO)
                     &nbsp;&nbsp;|&nbsp;&nbsp;
                     <i><small>Perfil atualizado em: <strong>{{ formataData($perfil_bdo->updated_at) }}</strong></small></i>
+                    @endif
                 </p>
             </div>
         </div>
