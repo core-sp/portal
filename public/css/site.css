@@ -3184,3 +3184,7 @@ h5 {
 .scrollable-div {
 	overflow-y: auto;
 }
+
+.border-all-3 {
+	border-width: 3px !important;
+}

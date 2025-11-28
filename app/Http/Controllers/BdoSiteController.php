@@ -43,12 +43,13 @@ class BdoSiteController extends Controller
         $oportunidades = $this->bdoOportunidadeRepository->getToBalcaoSite();
         $regionais = $this->service->getService('Regional')->getRegionais();
         $segmentos = BdoEmpresa::segmentos();
+        $municipios = $this->service->getService('Bdo')->temp_municipios();
 
         foreach($oportunidades as $o) {
             $o->regiaoFormatada = $this->displayRegioes($o->regiaoatuacao, $regionais->toArray());
         }
 
-        return view('site.balcao-de-oportunidades', compact('oportunidades', 'regionais', 'segmentos'));
+        return view('site.balcao-de-oportunidades', compact('oportunidades', 'regionais', 'segmentos', 'municipios'));
     }
 
     public function buscaOportunidades()
@@ -59,6 +60,7 @@ class BdoSiteController extends Controller
 
         $regionais = $this->service->getService('Regional')->getRegionais();
         $segmentos = BdoEmpresa::segmentos();
+        $municipios = $this->service->getService('Bdo')->temp_municipios();
         $oportunidades = IlluminateRequest::input('tipo') == 'representantes' ? 
         $this->service->getService('Bdo')->buscarPerfisPublicos(IlluminateRequest::only(['palavra-chave', 'tipo', 'segmento', 'municipio', 'regional']), $regionais) : 
         $this->bdoOportunidadeRepository->buscagetToBalcaoSite($buscaSegmento, $buscaRegional, $buscaPalavraChave);
@@ -73,7 +75,7 @@ class BdoSiteController extends Controller
             $oportunidades = null;
         }
 
-        return view('site.balcao-de-oportunidades', compact('oportunidades', 'regionais', 'segmentos'));
+        return view('site.balcao-de-oportunidades', compact('oportunidades', 'regionais', 'segmentos', 'municipios'));
     }
 
     public function anunciarVagaView()

@@ -130,6 +130,11 @@ class Representante extends Authenticable
         return $this->bdoPerfis()->whereIn('status->status_final', ['', 'Em Andamento'])->orderBy('id', 'DESC')->first();
     }
 
+    public function podeSolicitarPerfilPublico()
+    {
+        return $this->bdoPerfis()->whereIn('status->status_final', ['', 'Em Andamento', 'Aceito'])->count() == 0;
+    }
+
     public function agendamentosAtivos()
     {
         return $this->agendamentosSalas()

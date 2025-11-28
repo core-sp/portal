@@ -529,7 +529,10 @@ class RepresentanteSiteController extends Controller
     {
         $rep = Auth::guard('representante')->user();
         try{
-            $perfil_bdo = session()->has('perfil') ? session()->get('perfil') : $this->service->getService('Bdo')->viewPerfilRC($rep);
+            $perfil_bdo = null;
+            
+            if($rep->tipoPessoa() == 'PJ')
+                $perfil_bdo = session()->has('perfil') ? session()->get('perfil') : $this->service->getService('Bdo')->viewPerfilRC($rep);
 
             $seccional = $this->gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"];
             $idregional = $this->service->getService('Regional')->getByName($seccional)->idregional;
@@ -552,14 +555,25 @@ class RepresentanteSiteController extends Controller
     public function bdoPerfil()
     {
         $rep = Auth::guard('representante')->user();
+        if($rep->tipoPessoa() != 'PJ')
+            return redirect()->route('representante.dashboard')->with([
+                'message' => 'Somente representante PJ.', 'class' => 'alert-info'
+            ]);
+
         if(utf8_converter($this->gerentiRepository->gerentiAtivo(apenasNumeros($rep->cpf_cnpj)))[0]['SITUACAO'] != 'Ativo')
             return redirect()->route('representante.dashboard')->with([
                 'message' => 'Seu registro Core não está ativo.', 'class' => 'alert-warning'
             ]);
 
+        if(!$rep->podeSolicitarPerfilPublico())
+            return redirect()->route('representante.dashboard')->with([
+                'message' => 'Já possui um perfil público em andamento ou publicado', 'class' => 'alert-info'
+            ]);
+
         try{
             $dados = $this->service->getService('Bdo')->viewPerfilRC($rep, $this->gerentiRepository);
             $dados['regionais'] = $this->service->getService('Regional')->getRegionais();
+            $dados['municipios'] = $this->service->getService('Bdo')->temp_municipios();
         }catch (Exception $e) {
             Log::error($e->getMessage());
             abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente mais tarde.');
@@ -573,9 +587,19 @@ class RepresentanteSiteController extends Controller
     public function bdoPerfilDados(Request $request)
     {
         $rep = Auth::guard('representante')->user();
+        if($rep->tipoPessoa() != 'PJ')
+            return redirect()->route('representante.dashboard')->with([
+                'message' => 'Somente representante PJ.', 'class' => 'alert-info'
+            ]);
+
         if(utf8_converter($this->gerentiRepository->gerentiAtivo(apenasNumeros($rep->cpf_cnpj)))[0]['SITUACAO'] != 'Ativo')
             return redirect()->route('representante.dashboard')->with([
                 'message' => 'Seu registro Core não está ativo.', 'class' => 'alert-warning'
+            ]);
+
+        if(!$rep->podeSolicitarPerfilPublico())
+            return redirect()->route('representante.dashboard')->with([
+                'message' => 'Já possui um perfil público em andamento ou publicado', 'class' => 'alert-info'
             ]);
 
         try{

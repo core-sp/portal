@@ -2,24 +2,18 @@
 
 @section('content-representante')
 
-<!-- incluir em site.css -->
-<style>
-    .border-3 {
-        border-width: 3px !important;
-    }
-</style>
-
 <div class="representante-content w-100">
 
     <!-- PERFIL PÚBLICO NO BALCÃO DE OPORTUNIDADES DO REPRESENTANTE CADASTRADO -->
 
+    @if(auth()->guard('representante')->user()->tipoPessoa() == 'PJ')
     <div class="conteudo-txt-mini light">
         <h4 class="pt-1 pb-1">Perfil</h4>
         <div class="linha-lg-mini mb-1"></div>
 
         @if(isset($perfil_bdo))
         <div class="list-group w-100">
-            <div class="list-group-item light d-block border border-3 rounded border-{{ $perfil_bdo->statusRCCores() }}">
+            <div class="list-group-item light d-block border border-all-3 rounded border-{{ $perfil_bdo->statusRCCores() }}">
         
                 <p class="pb-0">
                     ID: <strong>{{ $perfil_bdo->id }}</strong>
@@ -108,6 +102,8 @@
     </div>
 
     <hr class="bg-success"/>
+
+    @endif
 
     <!-- OPORTUNIDADES DO BALCÃO DE OPORTUNIDADES EM RELAÇÃO AS VAGAS -->
 

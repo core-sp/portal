@@ -20,6 +20,31 @@ class BdoService implements BdoServiceInterface {
         return new BdoAdminService();
     }
 
+    public function temp_municipios()
+    {
+        return [
+            'tag' => '<script type="application/json" id="municipiosJSON">aqui</script>',
+            'json' => \Cache::remember('municipios', 86400, function () {
+                $file = 'municipios-sp.json';
+    
+                if(!Storage::disk('local')->exists($file)){
+                    $client = new \GuzzleHttp\Client();
+                    $response =  $client->request('GET', "https://servicodados.ibge.gov.br/api/v1/localidades/estados/35/municipios?orderBy=nome");
+                    $conteudo = json_decode($response->getBody()->getContents());
+                    $linha = [];
+        
+                    foreach($conteudo as $m){
+                        $temp = str_replace(['Á', 'Ó', 'Í', 'É'], ['A', 'O', 'I', 'E'], mb_substr($m->nome, 0, 1));
+                        isset($linha[$temp]) ? array_push($linha[$temp], $m->nome) : $linha[$temp] = [$m->nome];
+                    }
+                    \Storage::disk('local')->put($file, json_encode($linha, JSON_UNESCAPED_UNICODE));
+                }
+        
+                return \Storage::disk('local')->get($file);
+            })
+        ];
+    }
+
     public function viewPerfilRC($rep, GerentiRepositoryInterface $gerentiRepository = null)
     {
         $perfil = $rep->bdoPerfis()->whereIn('status->status_final', [

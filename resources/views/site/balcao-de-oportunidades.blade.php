@@ -298,26 +298,6 @@ use \App\BdoOportunidade;
   </div>  
 </section>
 
-<script type="application/json" id="municipiosJSON">
-
-    {!! \Cache::remember('municipios', 86400, function () {
-        $file = 'municipios-sp.json';
-        if(!Storage::disk('local')->exists($file)){
-            $client = new \GuzzleHttp\Client();
-            $response =  $client->request('GET', "https://servicodados.ibge.gov.br/api/v1/localidades/estados/35/municipios?orderBy=nome");
-            $t = json_decode($response->getBody()->getContents());
-            $teste = [];
-
-            foreach($t as $m){
-                $temp = str_replace(['Á', 'Ó', 'Í', 'É'], ['A', 'O', 'I', 'E'], mb_substr($m->nome, 0, 1));
-                isset($teste[$temp]) ? array_push($teste[$temp], $m->nome) : $teste[$temp] = [$m->nome];
-            }
-            \Storage::disk('local')->put($file, json_encode($teste, JSON_UNESCAPED_UNICODE));
-        }
-
-        return \Storage::disk('local')->get($file);
-    }) !!}
-
-</script>
+{!! str_replace('aqui', $municipios['json'], $municipios['tag']) !!}
 
 @endsection
