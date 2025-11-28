@@ -565,9 +565,9 @@ class RepresentanteSiteController extends Controller
                 'message' => 'Seu registro Core não está ativo.', 'class' => 'alert-warning'
             ]);
 
-        if(!$rep->podeSolicitarPerfilPublico())
+        if(!is_null($rep->perfilPublicoSolicitado()))
             return redirect()->route('representante.dashboard')->with([
-                'message' => 'Já possui um perfil público em andamento ou publicado', 'class' => 'alert-info'
+                'message' => 'Já possui um perfil público em andamento.', 'class' => 'alert-info'
             ]);
 
         try{
@@ -597,9 +597,9 @@ class RepresentanteSiteController extends Controller
                 'message' => 'Seu registro Core não está ativo.', 'class' => 'alert-warning'
             ]);
 
-        if(!$rep->podeSolicitarPerfilPublico())
+        if(!is_null($rep->perfilPublicoSolicitado()))
             return redirect()->route('representante.dashboard')->with([
-                'message' => 'Já possui um perfil público em andamento ou publicado', 'class' => 'alert-info'
+                'message' => 'Já possui um perfil público em andamento.', 'class' => 'alert-info'
             ]);
 
         try{
