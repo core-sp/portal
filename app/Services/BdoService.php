@@ -27,7 +27,7 @@ class BdoService implements BdoServiceInterface {
             'json' => \Cache::remember('municipios', 86400, function () {
                 $file = 'municipios-sp.json';
     
-                if(!Storage::disk('local')->exists($file)){
+                if(!\Storage::disk('local')->exists($file)){
                     $client = new \GuzzleHttp\Client();
                     $response =  $client->request('GET', "https://servicodados.ibge.gov.br/api/v1/localidades/estados/35/municipios?orderBy=nome");
                     $conteudo = json_decode($response->getBody()->getContents());
