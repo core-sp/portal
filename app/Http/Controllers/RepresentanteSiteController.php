@@ -22,6 +22,7 @@ use App\Mail\SolicitacaoAlteracaoEnderecoMail;
 use App\Repositories\GerentiRepositoryInterface;
 use App\Http\Requests\RepresentanteEnderecoRequest;
 use App\Http\Requests\SolicitaCedulaRequest;
+use App\Http\Requests\BdoPerfilRequest;
 use App\Repositories\RepresentanteEnderecoRepository;
 use App\Repositories\BdoOportunidadeRepository;
 use Illuminate\Support\Facades\View;
@@ -574,6 +575,9 @@ class RepresentanteSiteController extends Controller
             $dados = $this->service->getService('Bdo')->viewPerfilRC($rep, $this->gerentiRepository);
             $dados['regionais'] = $this->service->getService('Regional')->getRegionais();
             $dados['municipios'] = $this->service->getService('Bdo')->temp_municipios();
+
+            // não precisar acessar novamente os dados no bd e gerenti na validação
+            request()->session()->flash('dados', \Illuminate\Support\Arr::except($dados, ['rep', 'perfil', 'municipios']));
         }catch (Exception $e) {
             Log::error($e->getMessage());
             abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente mais tarde.');
@@ -584,7 +588,7 @@ class RepresentanteSiteController extends Controller
         return view('site.representante.bdo-perfil', $dados);
     }
 
-    public function bdoPerfilDados(Request $request)
+    public function bdoPerfilDados(BdoPerfilRequest $request)
     {
         $rep = Auth::guard('representante')->user();
         if($rep->tipoPessoa() != 'PJ')
@@ -603,7 +607,7 @@ class RepresentanteSiteController extends Controller
             ]);
 
         try{
-            $dados = $request->all();
+            $dados = $request->validated();
             $perfil = $request->isMethod('post') ? 
                 $this->service->getService('Bdo')->cadastrarPerfil($rep, $dados, $this->gerentiRepository) : 
                 $this->service->getService('Bdo')->editarPerfil($rep, $dados);

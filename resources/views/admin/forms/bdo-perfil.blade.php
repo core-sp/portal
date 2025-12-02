@@ -72,7 +72,7 @@
                     {{ $campo->informacao }}:
                 </dt>
                 <dd>
-                    <i>- Valor atual no Gerenti:</i> {{ $campo->valor_antigo }}
+                    <i>- Valor atual no Gerenti:</i> {{ strlen($campo->valor_antigo) < 3 ? 'SEM ' . $campo->informacao : $campo->valor_antigo }}
                 </dd>
                 <dd>
                     <i>- Novo valor solicitado:</i> <mark>{{ $campo->valor_atual }}</mark>

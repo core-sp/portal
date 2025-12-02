@@ -58,7 +58,7 @@
                         class="form-control {{ $errors->has('descricao') ? 'is-invalid' : '' }}"
                         maxlength="700"
                         {{ isset($perfil) ? 'readonly' : 'required' }}
-                    >{{ isset($perfil) ? $perfil->descricao : '' }}</textarea>
+                    >{{ isset($perfil) && empty(old('descricao')) ? $perfil->descricao : old('descricao') }}</textarea>
                     @if($errors->has('descricao'))
                     <div class="invalid-feedback">
                         {{ $errors->first('descricao') }}
@@ -187,12 +187,12 @@
                             {{ $perfil->segmento }}
                         </option>
                     @else
-                        <option value="" {{ empty($segmento) ? 'selected' : '' }}>
+                        <option value="" {{ isset($segmento) ? 'selected' : '' }}>
                             Selecione um segmento:
                         </option>
                         @foreach(segmentos() as $segmentoAll)
-                        <option value="{{ $segmentoAll }}" {{ !empty($segmento) && ($segmentoAll == $segmento) ? 'selected' : '' }}>
-                            {{ $segmentoAll }}
+                        <option value="{{ mb_strtoupper($segmentoAll) }}" {{ isset($segmento) && (mb_strtoupper($segmentoAll) == mb_strtoupper($segmento)) ? 'selected' : '' }}>
+                            {{ mb_strtoupper($segmentoAll) }}
                         </option>
                         @endforeach
                     @endif
@@ -226,7 +226,7 @@
                             <div class="form-check-inline">
                                 <label class="form-check-label font-weight-normal" for="regional_{{ mb_strtoupper($regional->regional) }}">
                                     <input type="radio" 
-                                        class="form-check-input {{ $errors->has('regioes.seccional') ? 'is-invalid' : '' }}" 
+                                        class="form-check-input {{ $errors->has('regioes_seccional') ? 'is-invalid' : '' }}" 
                                         id="regional_{{ mb_strtoupper($regional->regional) }}" 
                                         name="regioes.seccional" 
                                         value="{{ mb_strtoupper($regional->regional) }}"
@@ -234,9 +234,9 @@
                                     />
                                     {{ mb_strtoupper($regional->regional) }}
 
-                                    @if($errors->has('regioes.seccional'))
+                                    @if($errors->has('regioes_seccional'))
                                     <div class="invalid-feedback">
-                                        {{ $errors->first('regioes.seccional') }}
+                                        {{ $errors->first('regioes_seccional') }}
                                     </div>
                                     @endif
                                 </label>
@@ -248,10 +248,16 @@
 
                         <!-- municípios carregados (old() ou $perfil) -->
                         <div style="display: none;" id="municipios_carregados">
-                        @if(isset($perfil) && !empty(json_decode($perfil->regioes)->municipios))
-                            @foreach(json_decode($perfil->regioes)->municipios as $municipio)
-                                <span>{{ $municipio }}</span>
-                            @endforeach
+                        @if(!empty(old('regioes_municipios')) || (isset($perfil) && !empty(json_decode($perfil->regioes)->municipios)))
+                            
+                            @php
+                                $temp_mun = !empty(old('regioes_municipios')) ? collect(old('regioes_municipios')) : collect(json_decode($perfil->regioes)->municipios);
+                                $temp_mun->transform(function ($item, $key) {
+                                    return '<span>' . $item . '</span>';
+                                });
+                            @endphp
+
+                            {!! $temp_mun->implode(' ') !!}
                         @endif
                         </div>
 
@@ -271,14 +277,14 @@
                         <label>
                             Municípios <em class="text-secondary">(opcional)</em>
                         </label>
-                        <input class="form-control mb-2" id="buscar_municipios" type="text" placeholder="Buscar.." />
-                        <div class="scrollable-div bg-white" id="lista_municipios"></div>
+                        <input class="form-control mb-2 {{ $errors->has('regioes_municipios') || $errors->has('regioes_municipios.*') ? 'is-invalid' : '' }}" id="buscar_municipios" type="text" placeholder="Buscar.." />
                         
-                        @if($errors->has('regioes'))
+                        @if($errors->has('regioes_municipios') || $errors->has('regioes_municipios.*'))
                         <div class="invalid-feedback">
-                            {{ $errors->first('regioes') }}
+                            {{ $errors->has('regioes_municipios') ? $errors->first('regioes_municipios') : $errors->first('regioes_municipios.*') }}
                         </div>
                         @endif
+                        <div class="scrollable-div bg-white" id="lista_municipios"></div>
                     </fieldset>
                 </div>
             </div>

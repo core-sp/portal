@@ -7,6 +7,7 @@ use App\Services\BdoAdminService;
 use App\Repositories\GerentiRepositoryInterface;
 use App\BdoRepresentante;
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 
 class BdoService implements BdoServiceInterface {
 
@@ -77,7 +78,7 @@ class BdoService implements BdoServiceInterface {
             }
         $contatos = $gerentiRepository->gerentiContatos($rep->ass_id);
         $segmento = $gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
-        $segmento = !empty($segmento) ? $segmento[0]["SEGMENTO"] : $segmento;
+        $segmento = !empty($segmento) ? mb_strtoupper($segmento[0]["SEGMENTO"]) : null;
         $emails = array();
         $telefones = array();
         foreach($contatos as $contato){
@@ -100,27 +101,21 @@ class BdoService implements BdoServiceInterface {
             'telefones' => $telefones, 
             'segmento' => $segmento, 
             'endereco' => $end,
-            'seccional' => $gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"]
+            'seccional' => mb_strtoupper($gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"])
         ];
     }
 
     public function cadastrarPerfil($rep, $dados, GerentiRepositoryInterface $gerentiRepository)
     {
-        $dados['regioes->seccional'] = $dados['regioes_seccional'];
-        if(isset($dados['regioes_municipios']))
-            $dados['regioes->municipios'] = $dados['regioes_municipios'];
         $dados['status'] = '{}';
 
-        unset($dados['checkbox-tdu']);
-        unset($dados['_token']);
-        unset($dados['regioes_seccional']);
-        unset($dados['regioes_municipios']);
+        $bdo_perfil = $rep->bdoPerfis()->create(Arr::where($dados, function ($value, $key) {
+            return !Str::contains($key, '_gerenti');
+        }));
 
-        $bdo_perfil = $rep->bdoPerfis()->create($dados);
+        // **** Falta incluir registro de termo na tabela de termos_consentimentos
 
-        $segmento = $gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
-        $dados['segmento_gerenti'] = !empty($segmento) ? mb_strtoupper($segmento[0]["SEGMENTO"]) : mb_strtoupper($segmento);
-        $dados['seccional_gerenti'] = mb_strtoupper($gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"]);
+        // ****
         $dados['em_dia'] = Str::contains(trim($gerentiRepository->gerentiStatus($rep->ass_id)), 'Em dia');
 
         $criado = $bdo_perfil->setores($dados);
