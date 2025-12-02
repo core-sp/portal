@@ -77,6 +77,7 @@ class BdoPerfilRequest extends FormRequest
             'regioes->seccional' => $this->regioes_seccional,
             'segmento_gerenti' => isset(session('dados')['segmento']) ? session('dados')['segmento'] : '',
             'seccional_gerenti' => isset(session('dados')['seccional']) ? session('dados')['seccional'] : '',
+            'em_dia_gerenti' => isset(session('dados')['em_dia']) ? session('dados')['em_dia'] : false,
         ]);
 
         $except = [
@@ -84,7 +85,7 @@ class BdoPerfilRequest extends FormRequest
         ];
 
         if($this->_method == 'PATCH')
-            array_push($except, 'descricao', 'segmento', 'regioes->seccional', 'segmento_gerenti', 'seccional_gerenti');
+            array_push($except, 'descricao', 'segmento', 'regioes->seccional', 'segmento_gerenti', 'seccional_gerenti', 'em_dia_gerenti');
 
         return Arr::except($this->all(), $except);
         // return $this->validator->validated();

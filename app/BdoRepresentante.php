@@ -354,7 +354,7 @@ class BdoRepresentante extends Model
     public function setores($dados)
     {
         $this->dadosParaAtendimento($dados['segmento_gerenti'], $dados['seccional_gerenti']);
-        $this->dadosParaFinanceiro($dados['em_dia']);
+        $this->dadosParaFinanceiro($dados['em_dia_gerenti']);
 
         return $this->atualizarFinal();
     }

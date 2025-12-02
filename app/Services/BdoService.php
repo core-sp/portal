@@ -101,11 +101,12 @@ class BdoService implements BdoServiceInterface {
             'telefones' => $telefones, 
             'segmento' => $segmento, 
             'endereco' => $end,
-            'seccional' => mb_strtoupper($gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"])
+            'seccional' => mb_strtoupper($gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"]),
+            'em_dia' => Str::contains(trim($gerentiRepository->gerentiStatus($rep->ass_id)), 'Em dia'),
         ];
     }
 
-    public function cadastrarPerfil($rep, $dados, GerentiRepositoryInterface $gerentiRepository)
+    public function cadastrarPerfil($rep, $dados)
     {
         $dados['status'] = '{}';
 
@@ -114,9 +115,6 @@ class BdoService implements BdoServiceInterface {
         }));
 
         // **** Falta incluir registro de termo na tabela de termos_consentimentos
-
-        // ****
-        $dados['em_dia'] = Str::contains(trim($gerentiRepository->gerentiStatus($rep->ass_id)), 'Em dia');
 
         $criado = $bdo_perfil->setores($dados);
 

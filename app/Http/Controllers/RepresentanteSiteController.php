@@ -609,7 +609,7 @@ class RepresentanteSiteController extends Controller
         try{
             $dados = $request->validated();
             $perfil = $request->isMethod('post') ? 
-                $this->service->getService('Bdo')->cadastrarPerfil($rep, $dados, $this->gerentiRepository) : 
+                $this->service->getService('Bdo')->cadastrarPerfil($rep, $dados) : 
                 $this->service->getService('Bdo')->editarPerfil($rep, $dados);
         }catch (Exception $e) {
             Log::error($e->getMessage());
