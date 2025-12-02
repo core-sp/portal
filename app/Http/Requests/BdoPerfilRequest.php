@@ -31,21 +31,29 @@ class BdoPerfilRequest extends FormRequest
 
     public function rules()
     {
-        return [
-            'descricao' => 'required|max:700',
+        $geral = [
             'email' => 'required|email|in:' . $this->gerenti_emails,
             'telefone' => 'required|in:' . $this->gerenti_telefones,
             'endereco' => 'required',
-            'segmento' => 'required|in:' . collect(segmentos())->map(function ($name) {
-                return mb_strtoupper($name);
-            })->implode(','),
-            'regioes_seccional' => 'required|in:' . collect(session('dados')['regionais'])->pluck('regional')->map(function ($name) {
-                return mb_strtoupper($name);
-            })->implode(','),
             'regioes_municipios' => 'nullable|array|max:20',
             'regioes_municipios.*' => 'distinct|in:' . implode(',', Arr::flatten(json_decode($this->mun, true))),
-            'checkbox-tdu' => 'required|accepted',
         ];
+
+        if($this->_method == 'POST'){
+            return array_merge([
+                'descricao' => 'required|max:700',
+                'segmento' => 'required|in:' . collect(segmentos())->map(function ($name) {
+                    return mb_strtoupper($name);
+                })->implode(','),
+                'regioes_seccional' => 'required|in:' . collect(session('dados')['regionais'])->pluck('regional')->map(function ($name) {
+                    return mb_strtoupper($name);
+                })->implode(','),
+                'checkbox-tdu' => 'required|accepted',
+            ], $geral);
+        }
+
+        return $geral;
+        
     }
 
     public function messages()
@@ -71,9 +79,14 @@ class BdoPerfilRequest extends FormRequest
             'seccional_gerenti' => isset(session('dados')['seccional']) ? session('dados')['seccional'] : '',
         ]);
 
-        return Arr::except($this->all(), [
+        $except = [
             '_token', '_method', 'checkbox-tdu', 'regioes_municipios', 'regioes_seccional'
-        ]);
+        ];
+
+        if($this->_method == 'PATCH')
+            array_push($except, 'descricao', 'segmento', 'regioes->seccional', 'segmento_gerenti', 'seccional_gerenti');
+
+        return Arr::except($this->all(), $except);
         // return $this->validator->validated();
     }
 }

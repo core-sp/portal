@@ -125,14 +125,6 @@ class BdoService implements BdoServiceInterface {
 
     public function editarPerfil($rep, $dados)
     {
-        $dados['regioes->municipios'] = isset($dados['regioes_municipios']) ? $dados['regioes_municipios'] : [];
-
-        unset($dados['_method']);
-        unset($dados['_token']);
-        unset($dados['descricao']);
-        unset($dados['regioes_seccional']);
-        unset($dados['regioes_municipios']);
-
         $bdo_perfil = $rep->bdoPerfis()->where('status->status_final', BdoRepresentante::STATUS_ACAO_ACEITO)->orderBy('id', 'DESC')->first();
         
         if(isset($bdo_perfil))

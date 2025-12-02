@@ -69,6 +69,9 @@ function btnRemoverMunicipio(municipio_escolhido){
 function adicionarMunicipio(){
 
     $('#lista_municipios').on('click', '.item-municipio button', function(){
+        if($('#municipios_escolhidos button').length >= 20)
+            return false;
+
         let municipio_escolhido = $(this).val();
         const resp = btnRemoverMunicipio(municipio_escolhido);
 

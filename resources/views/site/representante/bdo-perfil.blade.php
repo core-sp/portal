@@ -265,7 +265,7 @@
                         <div class="border rounded border-success p-2 mb-3">
                             <p class="font-weight-bolder">
                                 <i class="fas fa-map-marked-alt fa-lg text-primary mr-2 mb-3"></i>
-                                Municípios adicionados
+                                Municípios adicionados <small><i>(máximo 20)</i></small>
                                 <button type="button" class="btn btn-sm btn-danger float-right" style="font-size: 0.85rem;" id="remover_todos_municipios">
                                     <i class="fas fa-trash"></i>
                                 </button>
