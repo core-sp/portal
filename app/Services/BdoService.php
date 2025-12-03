@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Contracts\BdoServiceInterface;
 use App\Services\BdoAdminService;
-use App\Repositories\GerentiRepositoryInterface;
 use App\BdoRepresentante;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
@@ -46,63 +45,19 @@ class BdoService implements BdoServiceInterface {
         ];
     }
 
-    public function viewPerfilRC($rep, GerentiRepositoryInterface $gerentiRepository = null)
+    public function viewPerfilRC($rep, $home = true)
     {
+        // Bdo - Home
         $perfil = $rep->bdoPerfis()->whereIn('status->status_final', [
             '', BdoRepresentante::STATUS_ADMIN_FINAL, BdoRepresentante::STATUS_ACAO_ACEITO, BdoRepresentante::STATUS_ACAO_RECUSADO
         ])->orderBy('id', 'DESC')->first();
 
-        if(is_null($gerentiRepository))
+        if($home)
             return $perfil;
-
-        $endereco = $gerentiRepository->gerentiEnderecos($rep->ass_id);
-        $end = '';
-        foreach($endereco as $key => $campo)
-            switch ($key) {
-                case 'Logradouro':
-                case 'UF':
-                    $end .= $campo;
-                    break;
-                case 'Complemento':
-                    $end .= empty($campo) ? '' : ', ' . $campo;
-                    break;
-                case 'Bairro':
-                    $end .= ' - ' . $campo . '. ';
-                    break;
-                case 'CEP':
-                    $end .= 'CEP: ' . $campo . '. ';
-                    break;
-                case 'Cidade':
-                    $end .= $campo . ' - ';
-                    break;
-            }
-        $contatos = $gerentiRepository->gerentiContatos($rep->ass_id);
-        $segmento = $gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
-        $segmento = !empty($segmento) ? mb_strtoupper($segmento[0]["SEGMENTO"]) : null;
-        $emails = array();
-        $telefones = array();
-        foreach($contatos as $contato){
-            switch ($contato['CXP_TIPO']) {
-                case 3:
-                    array_push($emails, $contato['CXP_VALOR']);
-                    break;
-                case 5:
-                    break;
-                default:
-                    array_push($telefones, $contato['CXP_VALOR']);
-                    break;
-            }
-        }
 
         return [
             'perfil' => isset($perfil) && (json_decode($perfil->status)->status_final == BdoRepresentante::STATUS_ACAO_ACEITO) ? $perfil : null,
             'rep' => $rep, 
-            'emails' => $emails, 
-            'telefones' => $telefones, 
-            'segmento' => $segmento, 
-            'endereco' => $end,
-            'seccional' => mb_strtoupper($gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"]),
-            'em_dia' => Str::contains(trim($gerentiRepository->gerentiStatus($rep->ass_id)), 'Em dia'),
         ];
     }
 

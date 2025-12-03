@@ -535,11 +535,18 @@ class RepresentanteSiteController extends Controller
             if($rep->tipoPessoa() == 'PJ')
                 $perfil_bdo = session()->has('perfil') ? session()->get('perfil') : $this->service->getService('Bdo')->viewPerfilRC($rep);
 
-            $seccional = $this->gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"];
-            $idregional = $this->service->getService('Regional')->getByName($seccional)->idregional;
-            $segmentoGerenti = $this->gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
-            $segmento = !empty($segmentoGerenti) ? $segmentoGerenti[0]["SEGMENTO"] : $segmentoGerenti;
-            $bdo = !empty($segmento) ? $this->bdoOportunidadeRepository->buscaBySegmentoEmAndamento($segmento, $idregional) : collect();
+            // request()->session()->forget('dados_bdo'); ???
+            $dados = $this->service->getService('Representante')->dadosBdoGerenti($rep, $this->gerentiRepository);
+            request()->session()->flash('dados_bdo', $dados);
+
+            $seccional = $dados['seccional'];
+            $segmento = $dados['segmento'];
+
+            $idregional = isset(session('dados_bdo')['regionais']) ? 
+                session('dados_bdo')['regionais']->firstWhere('regional', $seccional) : 
+                $this->service->getService('Regional')->getByName($seccional)->idregional;
+
+            $bdo = !is_null($segmento) ? $this->bdoOportunidadeRepository->buscaBySegmentoEmAndamento($segmento, $idregional) : collect();
             foreach($bdo as $b)
                 // usei o campo observação do model para armazenar temporariamente o link
                 $b->observacao = '/balcao-de-oportunidades/busca?palavra-chave='.str_replace('"', '', $b->titulo).'&segmento='.$segmento.'&regional='.$idregional;
@@ -556,28 +563,32 @@ class RepresentanteSiteController extends Controller
     public function bdoPerfil()
     {
         $rep = Auth::guard('representante')->user();
-        if($rep->tipoPessoa() != 'PJ')
-            return redirect()->route('representante.dashboard')->with([
-                'message' => 'Somente representante PJ.', 'class' => 'alert-info'
-            ]);
-
-        if(utf8_converter($this->gerentiRepository->gerentiAtivo(apenasNumeros($rep->cpf_cnpj)))[0]['SITUACAO'] != 'Ativo')
-            return redirect()->route('representante.dashboard')->with([
-                'message' => 'Seu registro Core não está ativo.', 'class' => 'alert-warning'
-            ]);
-
-        if(!is_null($rep->perfilPublicoSolicitado()))
-            return redirect()->route('representante.dashboard')->with([
-                'message' => 'Já possui um perfil público em andamento.', 'class' => 'alert-info'
-            ]);
 
         try{
-            $dados = $this->service->getService('Bdo')->viewPerfilRC($rep, $this->gerentiRepository);
-            $dados['regionais'] = $this->service->getService('Regional')->getRegionais();
-            $dados['municipios'] = $this->service->getService('Bdo')->temp_municipios();
+            if($rep->tipoPessoa() != 'PJ')
+                return redirect()->route('representante.dashboard')->with([
+                    'message' => 'Somente representante PJ.', 'class' => 'alert-info'
+                ]);
+    
+            if(!is_null($rep->perfilPublicoSolicitado()))
+                return redirect()->route('representante.dashboard')->with([
+                    'message' => 'Já possui um perfil público em andamento.', 'class' => 'alert-info'
+                ]);
 
-            // não precisar acessar novamente os dados no bd e gerenti na validação
-            request()->session()->flash('dados', \Illuminate\Support\Arr::except($dados, ['rep', 'perfil', 'municipios']));
+            $dados = $this->service->getService('Representante')->dadosBdoGerenti($rep, $this->gerentiRepository);
+            $dados['regionais'] = isset(session('dados_bdo')['regionais']) ? 
+                session('dados_bdo')['regionais'] : 
+                $this->service->getService('Regional')->getRegionais();
+
+            request()->session()->flash('dados_bdo', $dados);
+
+            if(!$dados['ativo'])
+                return redirect()->route('representante.dashboard')->with([
+                    'message' => 'Seu registro Core não está ativo.', 'class' => 'alert-warning'
+                ]);
+
+            $dados = array_merge($dados, $this->service->getService('Bdo')->viewPerfilRC($rep, false));
+            $dados['municipios'] = $this->service->getService('Bdo')->temp_municipios();
         }catch (Exception $e) {
             Log::error($e->getMessage());
             abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente mais tarde.');
@@ -591,22 +602,24 @@ class RepresentanteSiteController extends Controller
     public function bdoPerfilDados(BdoPerfilRequest $request)
     {
         $rep = Auth::guard('representante')->user();
-        if($rep->tipoPessoa() != 'PJ')
-            return redirect()->route('representante.dashboard')->with([
-                'message' => 'Somente representante PJ.', 'class' => 'alert-info'
-            ]);
-
-        if(utf8_converter($this->gerentiRepository->gerentiAtivo(apenasNumeros($rep->cpf_cnpj)))[0]['SITUACAO'] != 'Ativo')
-            return redirect()->route('representante.dashboard')->with([
-                'message' => 'Seu registro Core não está ativo.', 'class' => 'alert-warning'
-            ]);
-
-        if(!is_null($rep->perfilPublicoSolicitado()))
-            return redirect()->route('representante.dashboard')->with([
-                'message' => 'Já possui um perfil público em andamento.', 'class' => 'alert-info'
-            ]);
 
         try{
+            if($rep->tipoPessoa() != 'PJ')
+                return redirect()->route('representante.dashboard')->with([
+                    'message' => 'Somente representante PJ.', 'class' => 'alert-info'
+                ]);
+    
+            if(!is_null($rep->perfilPublicoSolicitado()))
+                return redirect()->route('representante.dashboard')->with([
+                    'message' => 'Já possui um perfil público em andamento.', 'class' => 'alert-info'
+                ]);
+    
+            $dados = $this->service->getService('Representante')->dadosBdoGerenti($rep, $this->gerentiRepository);
+            if(!$dados['ativo'])
+                return redirect()->route('representante.dashboard')->with([
+                    'message' => 'Seu registro Core não está ativo.', 'class' => 'alert-warning'
+                ]);
+
             $dados = $request->validated();
             $perfil = $request->isMethod('post') ? 
                 $this->service->getService('Bdo')->cadastrarPerfil($rep, $dados) : 

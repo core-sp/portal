@@ -2,15 +2,13 @@
 
 namespace App\Contracts;
 
-use App\Repositories\GerentiRepositoryInterface;
-
 interface BdoServiceInterface {
 
     public function admin();
 
     public function temp_municipios();
 
-    public function viewPerfilRC($rep, GerentiRepositoryInterface $gerentiRepository = null);
+    public function viewPerfilRC($rep, $home = true);
 
     public function cadastrarPerfil($rep, $dados);
 

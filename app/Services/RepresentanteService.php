@@ -6,6 +6,8 @@ use App\Representante;
 use App\Contracts\RepresentanteServiceInterface;
 use App\Repositories\GerentiRepositoryInterface;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 
 class RepresentanteService implements RepresentanteServiceInterface {
 
@@ -86,5 +88,65 @@ class RepresentanteService implements RepresentanteServiceInterface {
     {
         $cpfCnpj = apenasNumeros($cpfCnpj);
         return Representante::where('cpf_cnpj', $cpfCnpj)->first()->registrarUltimoAcesso();
+    }
+
+    public function dadosBdoGerenti($rep, GerentiRepositoryInterface $gerentiRepository)
+    {
+        if(session()->exists('dados_bdo') && Arr::has(session('dados_bdo'), [
+            'ativo', 'seccional', 'em_dia', 'emails', 'telefones', 'segmento', 'endereco'
+        ])) 
+            return session('dados_bdo');
+
+        $segmento = $gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
+        $segmento = !empty($segmento) ? mb_strtoupper($segmento[0]["SEGMENTO"]) : null;
+
+        $endereco = $gerentiRepository->gerentiEnderecos($rep->ass_id);
+        $end = '';
+        foreach($endereco as $key => $campo)
+            switch ($key) {
+                case 'Logradouro':
+                case 'UF':
+                    $end .= $campo;
+                    break;
+                case 'Complemento':
+                    $end .= empty($campo) ? '' : ', ' . $campo;
+                    break;
+                case 'Bairro':
+                    $end .= ' - ' . $campo . '. ';
+                    break;
+                case 'CEP':
+                    $end .= 'CEP: ' . $campo . '. ';
+                    break;
+                case 'Cidade':
+                    $end .= $campo . ' - ';
+                    break;
+        }
+
+        $contatos = $gerentiRepository->gerentiContatos($rep->ass_id);
+        $emails = array();
+        $telefones = array();
+
+        foreach($contatos as $contato){
+            switch ($contato['CXP_TIPO']) {
+                case 3:
+                    array_push($emails, $contato['CXP_VALOR']);
+                    break;
+                case 5:
+                    break;
+                default:
+                    array_push($telefones, $contato['CXP_VALOR']);
+                    break;
+            }
+        }
+
+        return [
+            'ativo' => utf8_converter($gerentiRepository->gerentiAtivo(apenasNumeros($rep->cpf_cnpj)))[0]['SITUACAO'] == 'Ativo',
+            'seccional' => mb_strtoupper($gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"]),
+            'em_dia' => Str::contains(trim($gerentiRepository->gerentiStatus($rep->ass_id)), 'Em dia'),
+            'emails' => $emails, 
+            'telefones' => $telefones, 
+            'segmento' => $segmento, 
+            'endereco' => $end,
+        ];
     }
 }

@@ -5,6 +5,8 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Arr;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException;
 
 class BdoPerfilRequest extends FormRequest
 {
@@ -21,9 +23,9 @@ class BdoPerfilRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        $this->gerenti_emails = isset(session('dados')['emails']) ? implode(',', session('dados')['emails']) : '';
-        $this->gerenti_telefones = isset(session('dados')['telefones']) ? implode(',', session('dados')['telefones']) : '';
-        $this->gerenti_endereco = isset(session('dados')['endereco']) ? session('dados')['endereco'] : '';
+        $this->gerenti_emails = isset(session('dados_bdo')['emails']) ? implode(',', session('dados_bdo')['emails']) : '';
+        $this->gerenti_telefones = isset(session('dados_bdo')['telefones']) ? implode(',', session('dados_bdo')['telefones']) : '';
+        $this->gerenti_endereco = isset(session('dados_bdo')['endereco']) ? session('dados_bdo')['endereco'] : '';
         $this->merge(['endereco' => $this->gerenti_endereco]);
 
         $this->mun = $this->service->temp_municipios()['json'];
@@ -39,13 +41,13 @@ class BdoPerfilRequest extends FormRequest
             'regioes_municipios.*' => 'distinct|in:' . implode(',', Arr::flatten(json_decode($this->mun, true))),
         ];
 
-        if($this->_method == 'POST'){
+        if($this->isMethod('post')){
             return array_merge([
                 'descricao' => 'required|max:700',
                 'segmento' => 'required|in:' . collect(segmentos())->map(function ($name) {
                     return mb_strtoupper($name);
                 })->implode(','),
-                'regioes_seccional' => 'required|in:' . collect(session('dados')['regionais'])->pluck('regional')->map(function ($name) {
+                'regioes_seccional' => 'required|in:' . collect(session('dados_bdo')['regionais'])->pluck('regional')->map(function ($name) {
                     return mb_strtoupper($name);
                 })->implode(','),
                 'checkbox-tdu' => 'required|accepted',
@@ -70,21 +72,30 @@ class BdoPerfilRequest extends FormRequest
         ];
     }
 
+    protected function failedValidation(Validator $validator)
+    {
+        request()->session()->flash('dados_bdo', session('dados_bdo'));
+    
+        throw (new ValidationException($validator))
+                    ->errorBag($this->errorBag)
+                    ->redirectTo($this->getRedirectUrl());
+    }
+
     public function validated()
     {
         $this->merge([
             'regioes->municipios' => isset($this->regioes_municipios) ? $this->regioes_municipios : array(),
             'regioes->seccional' => $this->regioes_seccional,
-            'segmento_gerenti' => isset(session('dados')['segmento']) ? session('dados')['segmento'] : '',
-            'seccional_gerenti' => isset(session('dados')['seccional']) ? session('dados')['seccional'] : '',
-            'em_dia_gerenti' => isset(session('dados')['em_dia']) ? session('dados')['em_dia'] : false,
+            'segmento_gerenti' => isset(session('dados_bdo')['segmento']) ? session('dados_bdo')['segmento'] : '',
+            'seccional_gerenti' => isset(session('dados_bdo')['seccional']) ? session('dados_bdo')['seccional'] : '',
+            'em_dia_gerenti' => isset(session('dados_bdo')['em_dia']) ? session('dados_bdo')['em_dia'] : false,
         ]);
 
         $except = [
             '_token', '_method', 'checkbox-tdu', 'regioes_municipios', 'regioes_seccional'
         ];
 
-        if($this->_method == 'PATCH')
+        if($this->isMethod('patch'))
             array_push($except, 'descricao', 'segmento', 'regioes->seccional', 'segmento_gerenti', 'seccional_gerenti', 'em_dia_gerenti');
 
         return Arr::except($this->all(), $except);
