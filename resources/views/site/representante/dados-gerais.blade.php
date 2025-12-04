@@ -32,7 +32,7 @@
                         <p class="pb-0">
                             @if((strtoupper($key) == 'REGIONAL') && 
                                 !is_null(auth()->guard('representante')->user()->perfilPublicoSolicitado()) && 
-                                (auth()->guard('representante')->user()->perfilPublicoSolicitado()->alteracoesRC->where('informacao', strtoupper('regional'))->isNotEmpty()))
+                                auth()->guard('representante')->user()->perfilPublicoSolicitado()->existeAlteracaoRC('REGIONAL'))
                             <i class="fas fa-sync-alt fa-sm text-primary"></i>
                             &nbsp;{{ $key }}:
                             <strong>

@@ -27,20 +27,18 @@
                 </p>
                 <p class="pb-0">
                 <!-- Se foi solicitada mudança, mostrar o segmento pela tabela de alteração para evitar mostrar se foi aceito ou não antes de finalizar -->
-                @if(($perfil_bdo->statusRC() == $perfil_bdo::STATUS_RC_CADASTRO) && 
-                ($perfil_bdo->alteracoesRC->where('informacao', strtoupper('segmento'))->isNotEmpty()))
+                @if($perfil_bdo->perfilRCEmAndamento() && $perfil_bdo->existeAlteracaoRC('SEGMENTO'))
                     <i class="fas fa-sync-alt fa-sm text-primary"></i>&nbsp;
-                    Segmento: <strong>{{ $perfil_bdo->alteracoesRC->where('informacao', strtoupper('segmento'))->first()->valor_atual }}</strong>
+                    Segmento: <strong>{{ $perfil_bdo->alteracoesRC->where('informacao', 'SEGMENTO')->first()->valor_atual }}</strong>
                 @else
                     Segmento: <strong>{{ $perfil_bdo->segmento }}</strong>
                 @endif
                     &nbsp;&nbsp;|&nbsp;&nbsp;
 
                 <!-- Se foi solicitada mudança, mostrar a regional pela tabela de alteração para evitar mostrar se foi aceito ou não antes de finalizar -->
-                @if(($perfil_bdo->statusRC() == $perfil_bdo::STATUS_RC_CADASTRO) && 
-                ($perfil_bdo->alteracoesRC->where('informacao', strtoupper('regional'))->isNotEmpty()))
+                @if($perfil_bdo->perfilRCEmAndamento() && $perfil_bdo->existeAlteracaoRC('REGIONAL'))
                     <i class="fas fa-sync-alt fa-sm text-primary"></i>&nbsp;
-                    Regional: <strong>{{ $perfil_bdo->alteracoesRC->where('informacao', strtoupper('regional'))->first()->valor_atual }}</strong>
+                    Regional: <strong>{{ $perfil_bdo->alteracoesRC->where('informacao', 'REGIONAL')->first()->valor_atual }}</strong>
                 @else
                     Regional: <strong>{{ json_decode($perfil_bdo->regioes)->seccional }}</strong>
                 @endif
@@ -54,7 +52,7 @@
                     Endereço: <strong>{{ $perfil_bdo->endereco }}</strong>
                 </p>
                 <p class="pb-0">
-                    Municípios de atuação: <strong>{!! implode('&nbsp;&nbsp;|&nbsp;&nbsp;', json_decode($perfil_bdo->regioes)->municipios) !!}</strong>
+                    Municípios de atuação: <strong>{!! $perfil_bdo->municipiosTextual('&nbsp;&nbsp;|&nbsp;&nbsp;') !!}</strong>
                 </p>
                 <p class="pb-0">
                     Descrição:<br>
@@ -72,7 +70,7 @@
 
                     <i><small>Status atualizado em: <strong>{{ formataData(json_decode($perfil_bdo->status)->data) }}</strong></small></i>
 
-                    @if($perfil_bdo->statusRC() == $perfil_bdo::STATUS_RC_PUBLICO)
+                    @if($perfil_bdo->perfilRCPublicado())
                     &nbsp;&nbsp;|&nbsp;&nbsp;
                     <i><small>Perfil atualizado em: <strong>{{ formataData($perfil_bdo->updated_at) }}</strong></small></i>
                     @endif
@@ -80,11 +78,11 @@
             </div>
         </div>
 
-            @if($perfil_bdo->statusRC() == $perfil_bdo::STATUS_RC_REMOVIDO)
+            @if($perfil_bdo->perfilRCRecusado())
             <a class="btn btn-primary text-white my-3" href="{{ route('representante.bdo.perfil') }}">Iniciar publicação de Perfil</a>
             @endif
 
-            @if($perfil_bdo->statusRC() == $perfil_bdo::STATUS_RC_PUBLICO)
+            @if($perfil_bdo->perfilRCPublicado())
             <a class="btn btn-warning my-3 mr-4" href="{{ route('representante.bdo.perfil') }}">
                 <i class="fas fa-edit text-dark"></i>
             </a>
@@ -121,8 +119,7 @@
             </span>
         </h5>
 
-    @if(isset($perfil_bdo) && ($perfil_bdo->statusRC() == $perfil_bdo::STATUS_RC_CADASTRO) && 
-        ($perfil_bdo->alteracoesRC->where('informacao', strtoupper('segmento'))->isNotEmpty()))
+    @if(isset($perfil_bdo) && $perfil_bdo->perfilRCEmAndamento() && $perfil_bdo->existeAlteracaoRC('SEGMENTO'))
         <i class="fas fa-sync-alt fa-sm text-primary mt-3"></i>
         &nbsp;<strong>Segmento está em processo de alteração no perfil público</strong>
 

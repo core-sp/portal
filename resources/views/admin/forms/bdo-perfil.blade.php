@@ -41,23 +41,23 @@
     @if(auth()->user()->isAdmin() || auth()->user()->isEditor())
         <p class="mb-0">
             {!! $item_publicado !!}
-            Municípios: <strong>{{ implode(' | ', json_decode($resultado->regioes)->municipios) }}</strong>
+            Municípios: <strong>{{ $resultado->municipiosTextual(' | ') }}</strong>
         </p>
     @endif
 
     @if(!auth()->user()->isFinanceiro())
         <p class="mb-0">
 
-        @if(!$resultado->statusContemAtendimento() || $resultado->alteracoesRC->where('informacao', $campos_atend[0])->isEmpty())
+        @if(!$resultado->statusContemAtendimento() || !$resultado->existeAlteracaoRC($campos_atend[0]))
             {!! $item_publicado !!}
             Regional: <strong>{{ json_decode($resultado->regioes)->seccional }}</strong>
         @endif
 
-        @if(!$resultado->statusContemAtendimento() || $resultado->alteracoesRC->whereIn('informacao', $campos_atend)->isEmpty())
+        @if(!$resultado->statusContemAtendimento() || !$resultado->existeAlteracaoRC($campos_atend))
             &nbsp;&nbsp;|&nbsp;&nbsp;
         @endif
 
-        @if(!$resultado->statusContemAtendimento() || $resultado->alteracoesRC->where('informacao', $campos_atend[1])->isEmpty())
+        @if(!$resultado->statusContemAtendimento() || !$resultado->existeAlteracaoRC($campos_atend[1]))
             {!! $item_publicado !!}
             Segmento: <strong>{{ $resultado->segmento }}</strong>
         @endif

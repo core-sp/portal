@@ -16,7 +16,7 @@ class BdoRepresentante extends Model
     protected $guarded = [];
 
     const STATUS_RC_CADASTRO = 'Em Andamento';
-    const STATUS_RC_REMOVIDO = 'Publicação Recusada';
+    const STATUS_RC_RECUSADO = 'Publicação Recusada';
     const STATUS_RC_PUBLICO = 'Publicado';
 
     const STATUS_ADMIN_ATEND = 'Aguardando Atendimento';
@@ -195,7 +195,7 @@ class BdoRepresentante extends Model
         $s = json_decode($this->status)->status_final;
         $status = [
             self::STATUS_ACAO_ACEITO => self::STATUS_RC_PUBLICO,
-            self::STATUS_ACAO_RECUSADO => self::STATUS_RC_REMOVIDO,
+            self::STATUS_ACAO_RECUSADO => self::STATUS_RC_RECUSADO,
             self::STATUS_ADMIN_FINAL => self::STATUS_RC_CADASTRO,
             "" => self::STATUS_RC_CADASTRO,
         ];
@@ -207,7 +207,7 @@ class BdoRepresentante extends Model
     {
         $cores = [
             self::STATUS_RC_PUBLICO => 'success',
-            self::STATUS_RC_REMOVIDO => 'danger',
+            self::STATUS_RC_RECUSADO => 'danger',
             self::STATUS_RC_CADASTRO => 'secondary',
         ];
 
@@ -364,5 +364,32 @@ class BdoRepresentante extends Model
         $j = json_decode($this->justificativas);
 
         return isset($j->justificativa_final) ? $j->justificativa_final : null;
+    }
+
+    public function municipiosTextual($separador)
+    {
+        return implode($separador, json_decode($this->regioes)->municipios);
+    }
+
+    public function existeAlteracaoRC($informacao)
+    {
+        return is_array($informacao) ? 
+            $this->alteracoesRC->whereIn('informacao', $informacao)->isNotEmpty() : 
+            $this->alteracoesRC->where('informacao', $informacao)->isNotEmpty();
+    }
+
+    public function perfilRCEmAndamento()
+    {
+        return $this->statusRC() == self::STATUS_RC_CADASTRO;
+    }
+
+    public function perfilRCPublicado()
+    {
+        return $this->statusRC() == self::STATUS_RC_PUBLICO;
+    }
+
+    public function perfilRCRecusado()
+    {
+        return $this->statusRC() == self::STATUS_RC_RECUSADO;
     }
 }

@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticable;
 use App\Notifications\RepresentanteResetPasswordNotification;
 use Carbon\Carbon;
 use App\Repositories\GerentiRepositoryInterface;
+use App\BdoRepresentante;
 
 class Representante extends Authenticable
 {
@@ -127,7 +128,7 @@ class Representante extends Authenticable
 
     public function perfilPublicoSolicitado()
     {
-        return $this->bdoPerfis()->whereIn('status->status_final', ['', 'Em Andamento'])->orderBy('id', 'DESC')->first();
+        return $this->bdoPerfis()->whereIn('status->status_final', ['', BdoRepresentante::STATUS_RC_CADASTRO])->orderBy('id', 'DESC')->first();
     }
 
     public function agendamentosAtivos()

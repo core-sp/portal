@@ -231,7 +231,7 @@ use \App\BdoOportunidade;
               @if(!empty(json_decode($oportunidade->regioes)->municipios))
               <h6 class="light mt-2">
                 <i class="fas fa-map-marked-alt"></i>&nbsp;
-                {!! implode('&nbsp;&nbsp;|&nbsp;&nbsp;', json_decode($oportunidade->regioes)->municipios) !!}
+                {!! $oportunidade->municipiosTextual('&nbsp;&nbsp;|&nbsp;&nbsp;') !!}
                 &nbsp;&nbsp;&nbsp;
               </h6>
               @endif
