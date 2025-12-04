@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Repositories\GerentiRepositoryInterface;
 use App\BdoRepresentante;
 use App\AlteracaoRC;
 
@@ -95,7 +94,7 @@ class BdoAdminService {
         ];
     }
 
-    public function editar($user, $id, GerentiRepositoryInterface $gerentiRepository)
+    public function editar($user, $id)
     {
         $resultado = BdoRepresentante::withTrashed()->findOrFail($id);
 
@@ -108,10 +107,10 @@ class BdoAdminService {
         // se tiver financeiro
         $gerenti = null;
         if($resultado->statusContemFinanceiro())
-            $gerenti['situacao'] = trim(explode(':', $gerentiRepository->gerentiStatus($resultado->representante->ass_id))[1]);
+            $gerenti['situacao'] = null;
 
         if($resultado->statusContemFinanceiro() && $resultado->financeiroPendente())
-            $gerenti['cobrancas'] = $gerentiRepository->gerentiCobrancas($resultado->representante->ass_id);
+            $gerenti['cobrancas'] = null;
 
         return [
             'muitos_campos' => $resultado->alteracoesRC->count() > 1,
@@ -133,23 +132,17 @@ class BdoAdminService {
         if(!$user->can('podeAtualizarPerfil', [$resultado, $dados['setor']]))
             throw new \Exception('Não autorizado', 403);
 
-        // Em validação
-        $dados['justificativa'] = isset($dados['justificativa']) ? $dados['justificativa'] : null;
-        $dados['campos_recusados'] = isset($dados['campos_recusados']) ? $dados['campos_recusados'] : [];
+        if(($dados['setor'] == 'atendimento') && ($dados['status'] == 'recusado') && ($resultado->alteracoesRC->count() == 1))
+            $dados['campos_recusados'] = [$resultado->alteracoesRC->first()->informacao];
 
-        // Em validação --> na blade OK
-        // if(($resultado->alteracoesRC->count() == 1) && isset($dados['justificativa']))
-        //     $dados['campos_recusados'] = [$resultado->alteracoesRC->first()->informacao];
-
-        // Em validação --> toModel()
-        if(isset($dados['descricao']))
+        if(($dados['setor'] == 'final') && ($dados['status'] == 'aceito'))
             $resultado->descricao = $dados['descricao'];
 
-        $ok = $resultado->aceitarOuRecusar($user->idusuario, $dados);
+        $resultado->aceitarOuRecusar($user->idusuario, $dados);
 
         return [
-            'message' => $ok ? '<i class="icon fa fa-check"></i>Perfil Público com a ID: ' . $id . ' foi atualizado com sucesso!' : 'Erro!!!!',
-            'class' => $ok ? 'alert-success' : 'alert-danger',
+            'message' => '<i class="icon fa fa-check"></i>Perfil Público com a ID: ' . $id . ' foi atualizado com sucesso!',
+            'class' => 'alert-success',
         ];
     }
 

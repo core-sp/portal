@@ -1,5 +1,13 @@
 <div class="card-body">
 
+@if($errors->any())
+    <ul class="list-group mb-3">
+        @foreach($errors->all() as $error)
+        <li class="list-group-item list-group-item-danger"><i class="fas fa-times text-danger mr-2"></i>{{ $error }}</li>
+        @endforeach
+    </ul>
+@endif
+
     @if(auth()->user()->isAdmin() || auth()->user()->isEditor())
     <p>{!! $item_publicado !!}: <i>item a ser publicado.</i></p>
     @endif

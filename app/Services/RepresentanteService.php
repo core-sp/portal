@@ -11,13 +11,6 @@ use Illuminate\Support\Arr;
 
 class RepresentanteService implements RepresentanteServiceInterface {
 
-    // private $variaveisLog;
-
-    public function __construct()
-    {
-    
-    }
-
     private function verificaSeAtivo($cpf_cnpj)
     {
         $cpfCnpj = apenasNumeros($cpf_cnpj);
@@ -90,16 +83,64 @@ class RepresentanteService implements RepresentanteServiceInterface {
         return Representante::where('cpf_cnpj', $cpfCnpj)->first()->registrarUltimoAcesso();
     }
 
-    public function dadosBdoGerenti($rep, GerentiRepositoryInterface $gerentiRepository)
+    private function situacao($rep, GerentiRepositoryInterface $gerentiRepository)
     {
-        if(session()->exists('dados_bdo') && Arr::has(session('dados_bdo'), [
-            'ativo', 'seccional', 'em_dia', 'emails', 'telefones', 'segmento', 'endereco'
-        ])) 
-            return session('dados_bdo');
+        return trim(explode(':', $gerentiRepository->gerentiStatus($rep->ass_id))[1]);
+    }
 
+    private function cobrancas($rep, GerentiRepositoryInterface $gerentiRepository)
+    {
+        return $gerentiRepository->gerentiCobrancas($rep->ass_id);
+    }
+
+    private function ativo($rep, GerentiRepositoryInterface $gerentiRepository)
+    {
+        return utf8_converter($gerentiRepository->gerentiAtivo(apenasNumeros($rep->cpf_cnpj)))[0]['SITUACAO'] == 'Ativo';
+    }
+
+    private function seccional($rep, GerentiRepositoryInterface $gerentiRepository)
+    {
+        return mb_strtoupper($gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"]);
+    }
+
+    private function segmento($rep, GerentiRepositoryInterface $gerentiRepository)
+    {
         $segmento = $gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
-        $segmento = !empty($segmento) ? mb_strtoupper($segmento[0]["SEGMENTO"]) : null;
+        return !empty($segmento) ? mb_strtoupper($segmento[0]["SEGMENTO"]) : null;
+    }
 
+    private function em_dia($rep, GerentiRepositoryInterface $gerentiRepository)
+    {
+        return Str::contains(trim($gerentiRepository->gerentiStatus($rep->ass_id)), 'Em dia');
+    }
+
+    private function contatos($rep, GerentiRepositoryInterface $gerentiRepository)
+    {
+        $contatos = $gerentiRepository->gerentiContatos($rep->ass_id);
+        $emails = array();
+        $telefones = array();
+
+        foreach($contatos as $contato){
+            switch ($contato['CXP_TIPO']) {
+                case 3:
+                    array_push($emails, $contato['CXP_VALOR']);
+                    break;
+                case 5:
+                    break;
+                default:
+                    array_push($telefones, $contato['CXP_VALOR']);
+                    break;
+            }
+        }
+
+        return [
+            'emails' => $emails,
+            'telefones' => $telefones
+        ];
+    }
+
+    private function endereco($rep, GerentiRepositoryInterface $gerentiRepository)
+    {
         $endereco = $gerentiRepository->gerentiEnderecos($rep->ass_id);
         $end = '';
         foreach($endereco as $key => $campo)
@@ -122,31 +163,39 @@ class RepresentanteService implements RepresentanteServiceInterface {
                     break;
         }
 
-        $contatos = $gerentiRepository->gerentiContatos($rep->ass_id);
-        $emails = array();
-        $telefones = array();
+        return $end;
+    }
 
-        foreach($contatos as $contato){
-            switch ($contato['CXP_TIPO']) {
-                case 3:
-                    array_push($emails, $contato['CXP_VALOR']);
-                    break;
-                case 5:
-                    break;
-                default:
-                    array_push($telefones, $contato['CXP_VALOR']);
-                    break;
-            }
+    public function dadosBdoGerenti($rep, GerentiRepositoryInterface $gerentiRepository, &$verificarAdmin = null)
+    {
+        if(isset($verificarAdmin))
+        {
+            foreach($verificarAdmin as $key => $campo)
+                if(method_exists($this, $key))
+                    $verificarAdmin[$key] = call_user_func_array([$this, $key], ['rep' => $rep, 'gerentiRepository' => $gerentiRepository]);
+            return;
         }
 
-        return [
-            'ativo' => utf8_converter($gerentiRepository->gerentiAtivo(apenasNumeros($rep->cpf_cnpj)))[0]['SITUACAO'] == 'Ativo',
-            'seccional' => mb_strtoupper($gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"]),
-            'em_dia' => Str::contains(trim($gerentiRepository->gerentiStatus($rep->ass_id)), 'Em dia'),
-            'emails' => $emails, 
-            'telefones' => $telefones, 
-            'segmento' => $segmento, 
-            'endereco' => $end,
+        $dados = [
+            'ativo' => null, 'seccional' => null, 'em_dia' => null, 'emails' => null, 'telefones' => null, 'segmento' => null, 'endereco' => null,
         ];
+
+        if(session()->exists('dados_bdo') && Arr::has(session('dados_bdo'), array_keys($dados))) 
+            return session('dados_bdo');
+
+        $temp = [];
+        foreach($dados as $key => $campo){
+            if(in_array($key, ['emails', 'telefones']) && empty($temp)){
+                $key = 'contatos';
+                $temp = call_user_func_array([$this, $key], ['rep' => $rep, 'gerentiRepository' => $gerentiRepository]);
+                $dados = array_merge($dados, $temp);
+                continue;
+            }
+                
+            if(method_exists($this, $key))
+                $dados[$key] = call_user_func_array([$this, $key], ['rep' => $rep, 'gerentiRepository' => $gerentiRepository]);
+        }
+
+        return $dados;
     }
 }
