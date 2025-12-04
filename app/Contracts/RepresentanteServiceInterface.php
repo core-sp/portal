@@ -14,5 +14,5 @@ interface RepresentanteServiceInterface {
 
     public function registrarUltimoAcesso($cpfCnpj);
 
-    public function dadosBdoGerenti($rep, GerentiRepositoryInterface $gerentiRepository, &$verificarAdmin = null);
+    public function dadosBdoGerenti($rep, GerentiRepositoryInterface $gerentiRepository, &$verificarAdmin = null, $id = null);
 }

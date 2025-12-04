@@ -26,7 +26,6 @@ class BdoPerfilRequest extends FormRequest
     {
         if(\Route::is('bdorepresentantes.update'))
             return;
-        // session gerenti admin
 
         $this->gerenti_emails = isset(session('dados_bdo')['emails']) ? implode(',', session('dados_bdo')['emails']) : '';
         $this->gerenti_telefones = isset(session('dados_bdo')['telefones']) ? implode(',', session('dados_bdo')['telefones']) : '';
@@ -102,8 +101,9 @@ class BdoPerfilRequest extends FormRequest
 
     protected function failedValidation(Validator $validator)
     {
-        if(!\Route::is('bdorepresentantes.update'))
-            request()->session()->flash('dados_bdo', session('dados_bdo'));
+        \Route::is('bdorepresentantes.update') ? 
+        request()->session()->flash('dados_bdo_' . $this->id, session('dados_bdo_' . $this->id)) : 
+        request()->session()->flash('dados_bdo', session('dados_bdo'));
     
         throw (new ValidationException($validator))
                     ->errorBag($this->errorBag)

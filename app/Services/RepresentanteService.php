@@ -166,10 +166,16 @@ class RepresentanteService implements RepresentanteServiceInterface {
         return $end;
     }
 
-    public function dadosBdoGerenti($rep, GerentiRepositoryInterface $gerentiRepository, &$verificarAdmin = null)
+    public function dadosBdoGerenti($rep, GerentiRepositoryInterface $gerentiRepository, &$verificarAdmin = null, $id = null)
     {
         if(isset($verificarAdmin))
         {
+            if(isset($id) && session()->exists('dados_bdo_' . $id))
+            {
+                $verificarAdmin = session('dados_bdo_' . $id);
+                return;
+            }
+
             foreach($verificarAdmin as $key => $campo)
                 if(method_exists($this, $key))
                     $verificarAdmin[$key] = call_user_func_array([$this, $key], ['rep' => $rep, 'gerentiRepository' => $gerentiRepository]);
