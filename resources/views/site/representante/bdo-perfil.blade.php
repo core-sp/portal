@@ -277,7 +277,7 @@
                         <label>
                             Municípios <em class="text-secondary">(opcional)</em>
                         </label>
-                        <input class="form-control mb-2 {{ $errors->has('regioes_municipios') || $errors->has('regioes_municipios.*') ? 'is-invalid' : '' }}" id="buscar_municipios" type="text" placeholder="Buscar.." />
+                        <input class="form-control mb-2 {{ $errors->has('regioes_municipios') || $errors->has('regioes_municipios.*') ? 'is-invalid' : '' }}" id="buscar_municipios" type="text" placeholder="Buscar.." autocomplete="off"/>
                         
                         @if($errors->has('regioes_municipios') || $errors->has('regioes_municipios.*'))
                         <div class="invalid-feedback">
@@ -318,5 +318,6 @@
 </div>
 
 {!! str_replace('aqui', $municipios['json'], $municipios['tag']) !!}
+{!! $municipios['modulo'] !!}
 
 @endsection

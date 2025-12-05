@@ -52,11 +52,11 @@ use \App\BdoOportunidade;
             </div>
 
             <div class="col-md mb-2-768">
-              <label for="bdo_tipo">Tipo</label>
+              <label for="on_off_municipios">Tipo</label>
               <select name="tipo" 
                 class="form-control 
                 {{ !empty(Request::input('tipo')) && in_array(Request::input('tipo'), ['empresas', 'representantes']) ? 'bg-focus border-info' : '' }}" 
-                id="bdo_tipo"
+                id="on_off_municipios"
               >
                 <option value="empresas" {{ Request::input('tipo') == 'empresas' ? 'selected' : '' }}>Empresas</option>
                 <option value="representantes" {{ Request::input('tipo') == 'representantes' ? 'selected' : '' }}>Representantes</option>
@@ -101,7 +101,7 @@ use \App\BdoOportunidade;
                     <i class="fas fa-map-marker-alt text-primary"></i>
                   </span>
                 </div>
-                <input type="text" class="form-control" id="buscar_municipios" placeholder="Buscar...">
+                <input type="text" class="form-control" id="buscar_municipios" placeholder="Buscar..." autocomplete="off">
               </div>
               <div class="scrollable-div bg-white" id="lista_municipios"></div>
             </div>
@@ -299,5 +299,6 @@ use \App\BdoOportunidade;
 </section>
 
 {!! str_replace('aqui', $municipios['json'], $municipios['tag']) !!}
+{!! $municipios['modulo'] !!}
 
 @endsection

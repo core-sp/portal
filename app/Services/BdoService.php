@@ -22,7 +22,9 @@ class BdoService implements BdoServiceInterface {
 
     public function temp_municipios()
     {
+        $src = asset('/js/modulos/municipios.js?' . hashScriptJs());
         return [
+            'modulo' => '<script type="module" src="' . $src . '" data-modulo-id="municipios" data-modulo-acao="visualizar"></script>',
             'tag' => '<script type="application/json" id="municipiosJSON">aqui</script>',
             'json' => \Cache::remember('municipios', 86400, function () {
                 $file = 'municipios-sp.json';
