@@ -535,9 +535,11 @@ class RepresentanteSiteController extends Controller
             if($rep->tipoPessoa() == 'PJ')
                 $perfil_bdo = session()->has('perfil') ? session()->get('perfil') : $this->service->getService('Bdo')->viewPerfilRC($rep);
 
-            // request()->session()->forget('dados_bdo'); ???
+            if(!session()->exists('manter_dados'))
+                request()->session()->forget('dados_bdo');
+            
             $dados = $this->service->getService('Representante')->dadosBdoGerenti($rep, $this->gerentiRepository);
-            request()->session()->flash('dados_bdo', $dados);
+            request()->session()->put('dados_bdo', $dados);
 
             $seccional = $dados['seccional'];
             $segmento = $dados['segmento'];
@@ -580,7 +582,7 @@ class RepresentanteSiteController extends Controller
                 session('dados_bdo')['regionais'] : 
                 $this->service->getService('Regional')->getRegionais();
 
-            request()->session()->flash('dados_bdo', $dados);
+            request()->session()->put('dados_bdo', $dados);
 
             if(!$dados['ativo'])
                 return redirect()->route('representante.dashboard')->with([
@@ -629,7 +631,7 @@ class RepresentanteSiteController extends Controller
             abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente mais tarde.');
         }
         
-        return redirect()->route('representante.bdo')->with(['perfil' => $perfil]);
+        return redirect()->route('representante.bdo')->with(['perfil' => $perfil, 'manter_dados' => true]);
     }
 
     public function bdoDestroy()

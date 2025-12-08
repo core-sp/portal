@@ -99,17 +99,6 @@ class BdoPerfilRequest extends FormRequest
         ];
     }
 
-    protected function failedValidation(Validator $validator)
-    {
-        \Route::is('bdorepresentantes.update') ? 
-        request()->session()->flash('dados_bdo_' . $this->id, session('dados_bdo_' . $this->id)) : 
-        request()->session()->flash('dados_bdo', session('dados_bdo'));
-    
-        throw (new ValidationException($validator))
-                    ->errorBag($this->errorBag)
-                    ->redirectTo($this->getRedirectUrl());
-    }
-
     public function validated()
     {
         if(\Route::is('bdorepresentantes.update'))

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\BdoPerfilRequest;
 use App\Repositories\GerentiRepositoryInterface;
 use App\Contracts\MediadorServiceInterface;
+use Illuminate\Support\Str;
 
 class BdoRepresentanteController extends Controller
 {
@@ -24,6 +25,10 @@ class BdoRepresentanteController extends Controller
         // $this->authorize('viewAny', auth()->user());
 
         try{
+            foreach(session()->all() as $key => $session)
+                if(Str::startsWith($key, 'dados_bdo_') && !session()->exists('manter_dados'))
+                    request()->session()->forget($key);
+
             $dados = $this->service->getService('Bdo')->admin()->listar(auth()->user());
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -40,7 +45,7 @@ class BdoRepresentanteController extends Controller
         try{
             $dados = $this->service->getService('Bdo')->admin()->editar(auth()->user(), $id);
             $this->service->getService('Representante')->dadosBdoGerenti($dados['resultado']->representante, $this->gerentiRepository, $dados['gerenti'], $id);
-            request()->session()->flash('dados_bdo_' . $id, $dados['gerenti']);
+            request()->session()->put('dados_bdo_' . $id, $dados['gerenti']);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [403]) ? abort($e->getCode(), $e->getMessage()) : abort(500, "Erro ao carregar o formulário de alteração do perfil público do Representante.");
@@ -56,6 +61,7 @@ class BdoRepresentanteController extends Controller
         try{
             $validated = $request->validated();
             $dados = $this->service->getService('Bdo')->admin()->save($validated, $id, auth()->user());
+            $dados['manter_dados'] = true;
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [403]) ? abort($e->getCode(), $e->getMessage()) : abort(500, "Erro ao atualizar o status da solicitação do perfil público.");
