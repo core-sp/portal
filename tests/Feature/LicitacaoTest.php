@@ -1140,6 +1140,18 @@ class LicitacaoTest extends TestCase
             ->assertSee($licitacao->modalidade)
             ->assertSee($licitacao->situacao)
             ->assertSee(formataData($licitacao->datarealizacao));
+
+        $licitacao = factory('App\Licitacao')->create([
+            'modalidade' => Licitacao::MOD_SEM_MODALIDADE
+        ]);
+        
+        $this->get(route('licitacoes.show', $licitacao->idlicitacao))
+            ->assertSee($licitacao->titulo)
+            ->assertSee($licitacao->nrlicitacao)
+            ->assertSee($licitacao->nrprocesso)
+            ->assertDontSee('<td><h6 class="light">' . $licitacao->modalidade . '</h6></td>')
+            ->assertSee($licitacao->situacao)
+            ->assertSee(formataData($licitacao->datarealizacao));
     }
 
     /** @test */
@@ -1204,7 +1216,18 @@ class LicitacaoTest extends TestCase
         $this->get(route('licitacoes.siteBusca', [
             'modalidade' => $licitacao->modalidade
         ]))->assertOk()
-            ->assertSee($licitacao->titulo);
+            ->assertSee($licitacao->titulo)
+            ->assertSee('<strong>Modalidade:</strong> ' . $licitacao->modalidade . '<br />');
+
+        $licitacao = factory('App\Licitacao')->create([
+            'modalidade' => Licitacao::MOD_SEM_MODALIDADE
+        ]);
+
+        $this->get(route('licitacoes.siteBusca', [
+            'modalidade' => $licitacao->modalidade
+        ]))->assertOk()
+            ->assertSee($licitacao->titulo)
+            ->assertDontSee('<strong>Modalidade:</strong> ' . $licitacao->modalidade . '<br />');
     }
 
     /** @test */

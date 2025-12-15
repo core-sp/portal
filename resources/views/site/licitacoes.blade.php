@@ -42,9 +42,12 @@
                 class="form-control {{ !empty(request()->query('modalidade')) && in_array(request()->query('modalidade'), $modalidades) ? 'bg-focus border-info' : '' }} {{ $errors->has('modalidade') ? 'is-invalid' : '' }}" 
                 id="modalidade"
               >
+                <option value="{{ $modalidades[0] }}" {{ $modalidades[0] == request()->query('modalidade') ? 'selected' : '' }}>{{ $modalidades[0] }}</option>
           	  	<option value="">Todas</option>
-	         	    @foreach($modalidades as $modalidade)
+	         	    @foreach($modalidades as $chave => $modalidade)
+                  @if($chave > 0)
                   <option value="{{ $modalidade }}" {{ $modalidade == request()->query('modalidade') ? 'selected' : '' }}>{{ $modalidade }}</option>
+                  @endif
 	          	  @endforeach
 	            </select>
               @if($errors->has('modalidade'))
@@ -169,7 +172,9 @@
                     </div>
                     <div class="flex-one align-self-center">
                       <h6 class="light">
+                      @if($licitacao->modalidade != $licitacao::MOD_SEM_MODALIDADE)
                         <strong>Modalidade:</strong> {{ $licitacao->modalidade }}<br />
+                      @endif
                         <strong>Situação:</strong> {{ btnSituacao($licitacao->situacao) }}
                       </h6>
                     </div>

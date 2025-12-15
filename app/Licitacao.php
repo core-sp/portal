@@ -15,6 +15,7 @@ class Licitacao extends Model
     protected $guarded = [];
 
     // Modalidades de licitação
+    const MOD_SEM_MODALIDADE = '----------';
     const MOD_CARTA_CONVITE = 'Carta Convite';
     const MOD_CONCORRENCIA = 'Concorrência - Lei 14.133/2021';
     const MOD_CONCORRECIA_PUBLICA = 'Concorrência Pública';
@@ -65,6 +66,7 @@ class Licitacao extends Model
     public static function modalidadesLicitacao()
     {
         return [
+            Licitacao::MOD_SEM_MODALIDADE,
             Licitacao::MOD_CARTA_CONVITE,
             Licitacao::MOD_CONCORRENCIA,
             Licitacao::MOD_CONCORRECIA_PUBLICA,

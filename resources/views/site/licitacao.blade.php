@@ -47,10 +47,12 @@
               <td><h6>UASG</h6></td>
               <td><h6 class="light">{{ $licitacao->uasg }}</h6></td>
             </tr>
+            @if($licitacao->modalidade != $licitacao::MOD_SEM_MODALIDADE)
             <tr>
               <td><h6>Modalidade</h6></td>
               <td><h6 class="light">{{ $licitacao->modalidade }}</h6></td>
             </tr>
+            @endif
             <tr>
               <td><h6>Nº do Processo</h6></td>
               <td><h6 class="light">{{ $licitacao->nrprocesso }}</h6></td>
