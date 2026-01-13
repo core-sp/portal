@@ -110,11 +110,9 @@
       @component('components.modal-geral')
       @endcomponent
 
-      {{--
-      @if(config('app.env') != 'local')
+      @if(!\File::exists(public_path('/js/tinymce')))
       <span id="chave-tiny-{{ env('TINY_API_KEY') }}"></span>
       @endif
-      --}}
 
       @component('components.scriptsJs', ['local_final' => 'interno/custom'])
       @endcomponent
