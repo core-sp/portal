@@ -57,8 +57,8 @@ class LoginController extends Controller
         }
 
         if ($this->attemptLogin($request)) {
-            $temp = $this->findUsername($request);
-            \App\User::where($temp, $request->input($temp))->first()->registrarUltimoAcesso();
+            // $temp = $this->findUsername($request);
+            // \App\User::where($temp, $request->input($temp))->first()->registrarUltimoAcesso();
             return $this->sendLoginResponse($request);
         }
 
@@ -137,6 +137,7 @@ class LoginController extends Controller
                 if(!$update)
                     abort(500);
             }
+            \App\User::findOrFail($user->idusuario)->registrarUltimoAcesso();
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao configurar a sessão no banco.");

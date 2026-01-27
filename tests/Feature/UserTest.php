@@ -68,6 +68,52 @@ class UserTest extends TestCase
     }
 
     /** @test */
+    public function session_created_when_login_on_admin()
+    {
+        $user = factory('App\User')->make([
+            'password' => bcrypt('TestePorta1@')
+        ]);
+
+        $user->save();
+
+        $this->assertDatabaseMissing('sessoes', [
+            'idusuario' => $user->idusuario,
+        ]);
+
+        $this->get('admin/login')->assertOk();
+        $this->post('admin/login', ['login' => $user->username, 'password' => 'TestePorta1@'])->assertRedirect(route('admin'));
+
+        $this->assertDatabaseHas('sessoes', [
+            'idusuario' => $user->idusuario,
+        ]);
+    }
+
+    /** @test */
+    public function session_updated_when_login_on_admin()
+    {
+        $user = factory('App\User')->create([
+            'password' => bcrypt('TestePorta1@')
+        ]);
+
+        $old = $user->sessao->ultimo_acesso;
+
+        $this->assertDatabaseHas('sessoes', [
+            'idusuario' => $user->idusuario,
+            'ultimo_acesso' => $old
+        ]);
+
+        sleep(0.5);
+
+        $this->get('admin/login')->assertOk();
+        $this->post('admin/login', ['login' => $user->username, 'password' => 'TestePorta1@'])->assertRedirect(route('admin'));
+
+        $this->assertDatabaseMissing('sessoes', [
+            'idusuario' => $user->idusuario,
+            'ultimo_acesso' => $old
+        ]);
+    }
+
+    /** @test */
     public function log_is_generated_when_login_on_admin()
     {
         $user = factory('App\User')->create([
@@ -301,7 +347,7 @@ class UserTest extends TestCase
 
         $this->assertDatabaseHas('sessoes', [
             'updated_at' => now(),
-            'ultimo_acesso' => '2023-05-22 05:20:33',
+            'ultimo_acesso' => now(),
         ]);
     }
 }
