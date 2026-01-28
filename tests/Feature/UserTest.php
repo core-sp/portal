@@ -107,7 +107,7 @@ class UserTest extends TestCase
         $this->get('admin/login')->assertOk();
         $this->post('admin/login', ['login' => $user->username, 'password' => 'TestePorta1@'])->assertRedirect(route('admin'));
 
-        $this->assertDatabaseMissing('sessoes', [
+        $this->assertDatabaseHas('sessoes', [
             'idusuario' => $user->idusuario,
             'ultimo_acesso' => $old
         ]);
@@ -342,12 +342,14 @@ class UserTest extends TestCase
             'password' => bcrypt('TestePorta1@')
         ]);
 
+        $ua = $user->sessao->ultimo_acesso;
+
         $this->post('admin/login', ['login' => $user->username, 'password' => 'TestePorta1@'])
         ->assertRedirect(route('admin'));
 
         $this->assertDatabaseHas('sessoes', [
             'updated_at' => now(),
-            'ultimo_acesso' => now(),
+            'ultimo_acesso' => $ua,
         ]);
     }
 }

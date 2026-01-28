@@ -125,9 +125,11 @@ class LoginController extends Controller
                 $sessao->idusuario = $user->idusuario;
                 $sessao->ip_address = $request->ip();
                 $save = $sessao->save();
+                \App\User::findOrFail($user->idusuario)->registrarUltimoAcesso();
                 if(!$save)
                     abort(500);
             } else {
+                \App\User::findOrFail($user->idusuario)->registrarUltimoAcesso();
                 if($check->ip_address == $request->ip()) {
                     $update = $check->touch();
                 } else {
@@ -137,7 +139,6 @@ class LoginController extends Controller
                 if(!$update)
                     abort(500);
             }
-            \App\User::findOrFail($user->idusuario)->registrarUltimoAcesso();
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao configurar a sessão no banco.");
