@@ -66,7 +66,6 @@ class Licitacao extends Model
     public static function modalidadesLicitacao()
     {
         return [
-            Licitacao::MOD_SEM_MODALIDADE,
             Licitacao::MOD_CARTA_CONVITE,
             Licitacao::MOD_CONCORRENCIA,
             Licitacao::MOD_CONCORRECIA_PUBLICA,
@@ -87,7 +86,8 @@ class Licitacao extends Model
             Licitacao::MOD_PREGAO_ELETRONICO_TRADICIONAL,
             Licitacao::MOD_PREGAO_PRESENCIAL,
             Licitacao::MOD_DESFAZIMENTO,
-            Licitacao::MOD_TOMADA_DE_PRECOS
+            Licitacao::MOD_TOMADA_DE_PRECOS,
+            Licitacao::MOD_SEM_MODALIDADE
         ];
     }
 
