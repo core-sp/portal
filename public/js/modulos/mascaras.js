@@ -1,9 +1,19 @@
 const cpf_text = '000.000.000-00';
-const cnpj_text = '00.000.000/0000-00';
+const cnpj_text = 'xx.xxx.xxx/xxxx-00';
 const dt_text = '00/00/0000';
 const hora_text = '00:00';
 const fone_4_text = '(00) 0000-0000';
 const fone_5_text = '(00) 00000-0000';
+const obj_pattern_cnpj = {
+    translation: {
+        '0': {
+            pattern: /[0-9]/
+        },
+        'x': {
+            pattern: /[A-Za-z0-9]/
+        },
+    }
+};
 
 function gerentiContato(conteudo, id){
 
@@ -52,7 +62,12 @@ function mascarasGerais(){
 
     $('.cep').mask('00000-000');
     $('.cpfInput').mask(cpf_text);
-    $('.cnpjInput').mask(cnpj_text);
+    $('.cnpjInput').mask(cnpj_text, {
+        translation: obj_pattern_cnpj.translation,
+        onKeyPress: function (cnpj, ev, el, op) {
+            ev.currentTarget.value = cnpj.toUpperCase();
+        }
+    });
     $('.nrlicitacaoInput').mask('99999/9999');
     $('.nrprocessoInput').mask('999/9999');
     $('.dataInput').mask(dt_text);
@@ -68,16 +83,22 @@ function mascarasGerais(){
         }
     });
 
-    // .cpfOuCnpj
-    let options_cpf_cnpj = {
+	$('.cpfOuCnpj').mask(cnpj_text, {
+        translation: obj_pattern_cnpj.translation,
         onKeyPress: function (cpf, ev, el, op) {
-            let masks = [cpf_text + '0', cnpj_text];
-            $('.cpfOuCnpj').mask((cpf.length > 14) ? masks[1] : masks[0], op);
+            let masks = [cpf_text + 'x', cnpj_text];
+            let regex = /[A-Za-z]/;
+            let mask = masks[1];
+
+            if(regex.test(cpf))
+                ev.currentTarget.value = cpf.toUpperCase();
+
+            if((cpf.length == 14) && !regex.test(cpf))
+                mask = masks[0];
+
+            $(el).mask(mask, op);
         }
-    }
-    $('.cpfOuCnpj').index() > -1 && $('.cpfOuCnpj').val().length > 11 ? 
-	$('.cpfOuCnpj').mask(cnpj_text, options_cpf_cnpj) : 
-	$('.cpfOuCnpj').mask(cpf_text + '#', options_cpf_cnpj);
+    });
 
     // copiado
     $('.placaVeiculo').mask('AAA 0U00', {
