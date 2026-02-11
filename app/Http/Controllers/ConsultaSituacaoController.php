@@ -21,7 +21,7 @@ class ConsultaSituacaoController extends Controller
 
     protected function validateRequest()
     {
-        $cpfCnpj = apenasNumeros(request('cpfCnpj'));
+        $cpfCnpj = apenasNumerosLetras(request('cpfCnpj'));
 
         request()->request->set('cpfCnpj', $cpfCnpj);
 

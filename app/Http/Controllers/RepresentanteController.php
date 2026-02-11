@@ -160,7 +160,7 @@ class RepresentanteController extends Controller
     {
         $request->merge([
             'registro' => apenasNumeros($request->registro),
-            'cpf_cnpj' => apenasNumeros($request->cpf_cnpj)
+            'cpf_cnpj' => apenasNumerosLetras($request->cpf_cnpj)
         ]);
         $this->validateRequest();
         $variaveis = (object) $this->variaveis;
