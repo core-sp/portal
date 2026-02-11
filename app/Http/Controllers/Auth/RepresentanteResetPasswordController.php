@@ -68,7 +68,7 @@ class RepresentanteResetPasswordController extends Controller
     protected function credentials(Request $request)
     {
         return [
-            'cpf_cnpj' => apenasNumeros($request->cpf_cnpj),
+            'cpf_cnpj' => apenasNumerosLetras($request->cpf_cnpj),
             'password' => $request->password,
             'password_confirmation' => $request->password_confirmation,
             'token' => $request->token
