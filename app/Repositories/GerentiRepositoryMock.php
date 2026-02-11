@@ -9,7 +9,7 @@ use App\Repositories\GerentiRepositoryInterface;
 class GerentiRepositoryMock implements GerentiRepositoryInterface{
     public function gerentiChecaLogin($registro, $cpfCnpj, $email = null)
     {
-        $cpfCnpj = apenasNumeros($cpfCnpj);
+        $cpfCnpj = apenasNumerosLetras($cpfCnpj);
 
         // RC Teste 1 (PF)
         if($cpfCnpj == '86294373085') {
