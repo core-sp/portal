@@ -528,16 +528,16 @@ function formataRegistro($registro)
 
 function formataCpfCnpj($value)
 {
-    $cnpj_cpf = preg_replace("/\D/", '', $value);
+    $cnpj_cpf = apenasNumerosLetras($value);
     if (strlen($cnpj_cpf) === 11) {
         return preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "\$1.\$2.\$3-\$4", $cnpj_cpf);
     }
-    return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf);
+    return strtoupper(preg_replace("/([A-Za-z0-9]{2})([A-Za-z0-9]{3})([A-Za-z0-9]{3})([A-Za-z0-9]{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf));
 }
 
 function tipoPessoaCpfCnpj($cpf_cpnj)
 {
-    $cpf_cnpj_numero = apenasNumeros($cpf_cpnj);
+    $cpf_cnpj_numero = apenasNumerosLetras($cpf_cpnj);
 
     return strlen($cpf_cnpj_numero) === 11 ? Representante::PESSOA_FISICA : Representante::PESSOA_JURIDICA;
 }
