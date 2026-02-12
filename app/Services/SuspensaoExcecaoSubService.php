@@ -157,9 +157,9 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
         $resultados = SuspensaoExcecao::with('representante')
         ->when($possuiNumeros, function ($query) use ($busca){
             return $query->whereHas('representante', function($q) use($busca){
-                $q->where('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%');
+                $q->where('cpf_cnpj', 'LIKE', '%'.apenasNumerosLetras($busca).'%');
             })
-            ->orWhere('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%')
+            ->orWhere('cpf_cnpj', 'LIKE', '%'.apenasNumerosLetras($busca).'%')
             ->orWhere('id', apenasNumeros($busca));
         }, function ($query) use($busca) {
             return $query->where('situacao', $busca);
@@ -177,7 +177,7 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
 
     public function verificaSuspenso($cpf_cnpj)
     {
-        return SuspensaoExcecao::existeSuspensao(apenasNumeros($cpf_cnpj));
+        return SuspensaoExcecao::existeSuspensao(apenasNumerosLetras($cpf_cnpj));
     }
 
     public function participantesSuspensos($cpfs)

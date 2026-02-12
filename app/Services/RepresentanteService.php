@@ -18,7 +18,7 @@ class RepresentanteService implements RepresentanteServiceInterface {
 
     private function verificaSeAtivo($cpf_cnpj)
     {
-        $cpfCnpj = apenasNumeros($cpf_cnpj);
+        $cpfCnpj = apenasNumerosLetras($cpf_cnpj);
         $representante = Representante::where('cpf_cnpj', $cpfCnpj)->first();
 
         if(isset($representante)) 
@@ -39,7 +39,7 @@ class RepresentanteService implements RepresentanteServiceInterface {
 
     private function verificaGerentiLogin($cpfCnpj, GerentiRepositoryInterface $gerenti)
     {
-        $cpfCnpj = apenasNumeros($cpfCnpj);
+        $cpfCnpj = apenasNumerosLetras($cpfCnpj);
         $registro = Representante::where('cpf_cnpj', $cpfCnpj)->first();
 
         if(isset($registro)) {
@@ -65,7 +65,7 @@ class RepresentanteService implements RepresentanteServiceInterface {
 
     public function getRepresentanteByCpfCnpj($cpfCnpj)
     {
-        $cpfCnpj = apenasNumeros($cpfCnpj);
+        $cpfCnpj = apenasNumerosLetras($cpfCnpj);
         return Representante::where('cpf_cnpj', $cpfCnpj)->where('ativo', 1)->first();
     }
 
@@ -74,7 +74,7 @@ class RepresentanteService implements RepresentanteServiceInterface {
         $situacao = trim($gerenti->gerentiStatus($rep->ass_id));
         $tel = $rep->getContatosTipoTelefone($gerenti);
         $rep->telefone = empty($tel) ? '' : $tel[array_keys($tel)[0]]['CXP_VALOR'];
-        $rep->registro_core = $gerenti->gerentiAtivo(apenasNumeros($rep->cpf_cnpj))[0]['REGISTRONUM'];
+        $rep->registro_core = $gerenti->gerentiAtivo(apenasNumerosLetras($rep->cpf_cnpj))[0]['REGISTRONUM'];
 
         return [
             'situacao' => $situacao,
@@ -84,7 +84,7 @@ class RepresentanteService implements RepresentanteServiceInterface {
 
     public function registrarUltimoAcesso($cpfCnpj)
     {
-        $cpfCnpj = apenasNumeros($cpfCnpj);
+        $cpfCnpj = apenasNumerosLetras($cpfCnpj);
         return Representante::where('cpf_cnpj', $cpfCnpj)->first()->registrarUltimoAcesso();
     }
 }

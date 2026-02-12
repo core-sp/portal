@@ -219,7 +219,7 @@ class CedulaService implements CedulaServiceInterface {
         $resultados = SolicitaCedula::when($possuiNumeros, function ($query) use ($busca) {
                 return $query->where('id', $busca)
                 ->orWhereHas('representante', function ($query2) use ($busca) {
-                    $query2->where('cpf_cnpj', 'LIKE','%'.apenasNumeros($busca).'%')
+                    $query2->where('cpf_cnpj', 'LIKE','%'.apenasNumerosLetras($busca).'%')
                         ->orWhere('registro_core','LIKE','%'.apenasNumeros($busca).'%');
                 });
             }, function ($query) use($busca) {
