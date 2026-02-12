@@ -34,7 +34,7 @@ class SuspensaoExcecao extends Model
 
     public static function existeSuspensao($cpf_cnpj)
     {
-        $cpf_cnpj = apenasNumeros($cpf_cnpj);
+        $cpf_cnpj = apenasNumerosLetras($cpf_cnpj);
 
     	return self::with('representante')
         ->where('cpf_cnpj', $cpf_cnpj)

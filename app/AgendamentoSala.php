@@ -90,9 +90,9 @@ class AgendamentoSala extends Model
 
         $atual = self::where(function($query) use ($cpf_cnpj){
             // em caso de agendamento presencial e/ou online
-            $query->where('rep_presencial', 'LIKE', '%"'.apenasNumeros($cpf_cnpj).'"%')
+            $query->where('rep_presencial', 'LIKE', '%"'.apenasNumerosLetras($cpf_cnpj).'"%')
             ->orWhereHas('representante', function ($q) use ($cpf_cnpj){
-                $q->where('cpf_cnpj', apenasNumeros($cpf_cnpj));
+                $q->where('cpf_cnpj', apenasNumerosLetras($cpf_cnpj));
             });
         })
         ->when(isset($mes) && !isset($ano), function($query) use($mes){
@@ -125,7 +125,7 @@ class AgendamentoSala extends Model
         
         if(!isset($mes) && !isset($ano))
             $seguinte = self::whereHas('representante', function ($q) use ($cpf_cnpj){
-                $q->where('cpf_cnpj', apenasNumeros($cpf_cnpj));
+                $q->where('cpf_cnpj', apenasNumerosLetras($cpf_cnpj));
             })
             ->whereMonth('dia', $mesSeguinte)
             ->whereYear('dia', $anoSeguinte)
