@@ -127,6 +127,10 @@ class RepresentanteService implements RepresentanteServiceInterface {
         $rtsArray = explode(';', $dg['Responsável Técnico']);
         $total = count($rtsArray) - 1;
         $rtArray = explode('-', $rtsArray[$total]);
+        
+        if(!isset($rtArray[2]))
+            return null;
+
         $rt_ass_id = $rtArray[2];
 
         $anuidades_rt = utf8_converter($gerenti->gerentiBolestosLista($rt_ass_id));
