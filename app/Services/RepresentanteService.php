@@ -6,10 +6,12 @@ use App\Representante;
 use App\Contracts\RepresentanteServiceInterface;
 use App\Repositories\GerentiRepositoryInterface;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 
 class RepresentanteService implements RepresentanteServiceInterface {
 
     // private $variaveisLog;
+    private $txt_anuidade;
 
     public function __construct()
     {
@@ -86,5 +88,53 @@ class RepresentanteService implements RepresentanteServiceInterface {
     {
         $cpfCnpj = apenasNumeros($cpfCnpj);
         return Representante::where('cpf_cnpj', $cpfCnpj)->first()->registrarUltimoAcesso();
+    }
+
+    private function valorAnuidadeVigente($anuidades)
+    {
+        $filtered = Arr::where($anuidades, function ($value, $key) {
+            return $value['DESCRICAO'] == $this->txt_anuidade;
+        });
+
+        if(empty($filtered))
+            return null;
+
+        $filtered = $filtered[0];
+
+        if(isset($filtered['VENCIMENTO']) && (Carbon::parse($filtered['VENCIMENTO']) < now()->format('Y-m-d')))
+            return null;
+
+        return (float) $filtered['VALOR'];
+    }
+
+    public function anuidadeUnificada(GerentiRepositoryInterface $gerenti, $anuidades_pj, $tipoPessoa, $ass_id)
+    {
+        $this->txt_anuidade = 'Anuidade ' . date('Y') . ' (Parcela Única)';
+
+        if($tipoPessoa != Representante::PESSOA_JURIDICA)
+            return null;
+
+        $pj = $this->valorAnuidadeVigente($anuidades_pj);
+        if(is_null($pj))
+            return null;
+
+        // -------------- RT ----------------------
+
+        $dg = utf8_converter($gerenti->gerentiDadosGeraisPJ($ass_id));
+        if(!isset($dg['Responsável Técnico']) || empty($dg['Responsável Técnico']))
+            return null;
+
+        $rtsArray = explode(';', $dg['Responsável Técnico']);
+        $total = count($rtsArray) - 1;
+        $rtArray = explode('-', $rtsArray[$total]);
+        $rt_ass_id = $rtArray[2];
+
+        $anuidades_rt = utf8_converter($gerenti->gerentiBolestosLista($rt_ass_id));
+
+        $rt = $this->valorAnuidadeVigente($anuidades_rt);
+        if(is_null($rt))
+            return null;
+        
+        return ["total" => $pj + $rt, "texto" => $this->txt_anuidade];
     }
 }

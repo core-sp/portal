@@ -13,4 +13,6 @@ interface RepresentanteServiceInterface {
     public function getDadosInscricaoCurso($rep, GerentiRepositoryInterface $gerenti);
 
     public function registrarUltimoAcesso($cpfCnpj);
+
+    public function anuidadeUnificada(GerentiRepositoryInterface $gerenti, $anuidades_pj, $tipoPessoa, $ass_id);
 }
