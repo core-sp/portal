@@ -7,6 +7,7 @@ use App\Rules\CpfCnpj;
 use Illuminate\Http\Request;
 use App\Repositories\GerentiApiRepository;
 use App\Repositories\GerentiRepositoryInterface;
+use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteController extends Controller
@@ -16,6 +17,7 @@ class RepresentanteController extends Controller
     private $class = 'RepresentanteController';
     private $gerentiRepository;
     private $gerentiApiRepository;
+    private $service;
 
     // Variáveis
     public $variaveis = [
@@ -28,11 +30,12 @@ class RepresentanteController extends Controller
         'btn_lista' => '<a href="/admin/representantes/buscaGerenti" class="btn btn-primary">Nova Busca</a>'
     ];
 
-    public function __construct(GerentiRepositoryInterface $gerentiRepository, GerentiApiRepository $gerentiApiRepository)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, GerentiApiRepository $gerentiApiRepository, MediadorServiceInterface $service)
     {
         $this->middleware('auth');
         $this->gerentiRepository = $gerentiRepository;
         $this->gerentiApiRepository = $gerentiApiRepository;
+        $this->service = $service;
     }
 
     public function resultados()
@@ -182,12 +185,13 @@ class RepresentanteController extends Controller
         $contatos = $this->gerentiRepository->gerentiContatos($request->ass_id);
         $enderecos = $this->gerentiRepository->gerentiEnderecos($request->ass_id);
         $cobrancas = $this->gerentiRepository->gerentiCobrancas($request->ass_id);
+        $unificada = $this->service->getService('Representante')->anuidadeUnificada($this->gerentiRepository, $cobrancas['anuidades'], $tipoPessoa, $request->ass_id);
         $situacao = trim(explode(':', $this->gerentiRepository->gerentiStatus($request->ass_id))[1]);
         $certidoes = $this->listarCertidao($request->ass_id);
         $assId = $request->ass_id;
         $valoresRefis = $this->simuladorRefis($request->ass_id);
         
-        return view('admin.crud.mostra', compact('variaveis', 'nome', 'situacao', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas', 'certidoes', 'assId', 'valoresRefis'));
+        return view('admin.crud.mostra', compact('variaveis', 'nome', 'situacao', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas', 'unificada', 'certidoes', 'assId', 'valoresRefis'));
     }
 
     public function listarCertidao($assId) 

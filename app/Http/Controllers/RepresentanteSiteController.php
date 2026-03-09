@@ -109,10 +109,12 @@ class RepresentanteSiteController extends Controller
 
     public function listaCobrancas()
     {
-        $cobrancas = $this->gerentiRepository->gerentiCobrancas(Auth::guard('representante')->user()->ass_id);
+        $rep = Auth::guard('representante')->user();
+        $cobrancas = $this->gerentiRepository->gerentiCobrancas($rep->ass_id);
+        $unificada = $this->service->getService('Representante')->anuidadeUnificada($this->gerentiRepository, $cobrancas['anuidades'], $rep->tipoPessoa(), $rep->ass_id);
         event(new ExternoEvent('.', 'Situação Financeira'));
 
-        return view('site.representante.lista-cobrancas', compact("cobrancas"));
+        return view('site.representante.lista-cobrancas', compact("cobrancas", "unificada"));
     }
 
     public function cadastroView()
