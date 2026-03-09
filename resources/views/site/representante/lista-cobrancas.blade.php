@@ -14,6 +14,9 @@
                     <tr>
                         <th>Descrição</th>
                         <th class="quinze">Valor</th>
+                        @if(isset($unificada))
+                        <th class="">Valor Unificado</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -23,6 +26,9 @@
                                 {{ $cobranca['DESCRICAO'] }} ⋅ {!! secondLine($cobranca['SITUACAO'], $cobranca['VENCIMENTOBOLETO'], $cobranca['LINK'], $cobranca['DESCRICAO'], $cobranca['BOLETO']) !!}
                             </td>
                             <td class="ls-meio-neg">R$ {{ toReais($cobranca['VALOR']) }}</td>
+                            @if(isset($unificada))
+                            <td class="ls-meio-neg">{{ $unificada["texto"] == $cobranca['DESCRICAO'] ? 'R$ ' . toReais($unificada["total"]) : '----------' }}</td>
+                            @endif
                         </tr>
                     @endforeach
                 </tbody>
