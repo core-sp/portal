@@ -15,11 +15,13 @@ class Licitacao extends Model
     protected $guarded = [];
 
     // Modalidades de licitação
+    const MOD_SEM_MODALIDADE = '----------';
     const MOD_CARTA_CONVITE = 'Carta Convite';
     const MOD_CONCORRENCIA = 'Concorrência - Lei 14.133/2021';
     const MOD_CONCORRECIA_PUBLICA = 'Concorrência Pública';
     const MOD_CONCURSO = 'Concurso';
     const MOD_CONCURSO_LEI2021 = 'Concurso - Lei 14.133/2021';
+    const MOD_CONTRATA_MAIS_BRASIL_LEI2021 = 'Contrata Mais Brasil - Lei nº 14.133/2021';
     const MOD_CONTRATA_DIRETA_COM_LEI2021 = 'Contratação Direta (COM DISPUTA) - Lei 14.133/2021';
     const MOD_CONTRATA_DIRETA_SEM_LEI2021 = 'Contratação Direta (SEM DISPUTA) - Lei 14.133/2021';
     const MOD_COTACAO_ELETRONICA = 'Cotação Eletrônica';
@@ -69,6 +71,7 @@ class Licitacao extends Model
             Licitacao::MOD_CONCORRECIA_PUBLICA,
             Licitacao::MOD_CONCURSO,
             Licitacao::MOD_CONCURSO_LEI2021,
+            Licitacao::MOD_CONTRATA_MAIS_BRASIL_LEI2021,
             Licitacao::MOD_CONTRATA_DIRETA_COM_LEI2021,
             Licitacao::MOD_CONTRATA_DIRETA_SEM_LEI2021,
             Licitacao::MOD_COTACAO_ELETRONICA,
@@ -83,7 +86,8 @@ class Licitacao extends Model
             Licitacao::MOD_PREGAO_ELETRONICO_TRADICIONAL,
             Licitacao::MOD_PREGAO_PRESENCIAL,
             Licitacao::MOD_DESFAZIMENTO,
-            Licitacao::MOD_TOMADA_DE_PRECOS
+            Licitacao::MOD_TOMADA_DE_PRECOS,
+            Licitacao::MOD_SEM_MODALIDADE
         ];
     }
 

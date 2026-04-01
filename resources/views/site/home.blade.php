@@ -80,7 +80,7 @@
         </div>
       </div>
     </div>
-    <div class="row justify-content-center">
+    <div class="row">
       <div class="col-lg-3 col-sm-6 pb-15">
         <div class="box text-center {{ isset($itens_home['cards_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_1']) ? 'background-color:'.$itens_home['cards_1'] : '' }}">
           <div class="inside-box">
@@ -167,17 +167,6 @@
           </div>
         </a>
       </div>
-      {{--<div class="col-lg-3 col-sm-6 pb-15">
-        <!-- <a href="/noticias/anuidade-2021-taxas-e-emolumentos" class="d-block h-100"> -->
-          <div class="box text-center {{ isset($itens_home['cards_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_1']) ? 'background-color:'.$itens_home['cards_1'] : '' }}">
-            <div class="inside-box">
-              <img src="{{ asset('img/003-bill.png') }}" class="inside-img" alt="Anuidade 2019 | Core-SP" />
-              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Anuidade 2021<br class="hide-992" /> taxas e emolumentos</h3>
-              <!-- <button href="#" class="btn-box azul-escuro">ACESSAR</button> -->
-            </div>
-          </div>
-        <!-- </a> -->
-      </div>--}}
 
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="{{ route('cursos.index.website') }}" class="d-block h-100">
@@ -239,6 +228,41 @@
         </a>
       </div>
 
+      <div class="col-lg-3 col-sm-6 pb-15">
+        <a href="/cartilha-de-prevencao-ao-assedio-moral-e-sexual" class="d-block h-100">
+          <div class="box text-center {{ isset($itens_home['cards_2']) ? '' : 'azul-bg' }}" style="{{ isset($itens_home['cards_2']) ? 'background-color:'.$itens_home['cards_2'] : '' }}">
+            <div class="inside-box">
+              <img src="{{ asset('img/icone-cartilha-prevencao.png') }}" class="inside-img" alt="Cartilha de Prevenção ao Assédio Moral e Sexual" />
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Cartilha de Prevenção ao Assédio Moral e Sexual</h3>
+              <button href="#" class="btn-box azul-escuro">ACESSAR</button>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-lg-3 col-sm-6 pb-15">
+        <a href="/relatorio-de-gestao-core-sp-2024" class="d-block h-100">
+          <div class="box text-center {{ isset($itens_home['cards_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_1']) ? 'background-color:'.$itens_home['cards_1'] : '' }}">
+            <div class="inside-box">
+              <img src="{{ asset('img/icone-relatorio-gestao.png') }}" class="inside-img" alt="Relatório de Gestão" />
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Relatório de <br class="hide-992" /> Gestão</h3>
+              <button href="#" class="btn-box azul-escuro">ACESSAR</button>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-lg-3 col-sm-6 pb-15">
+        <a href="/livro-lei-codigo-de-etica-e-disciplina-dos-representantes-comerciais" class="d-block h-100">
+          <div class="box text-center {{ isset($itens_home['cards_2']) ? '' : 'azul-bg' }}" style="{{ isset($itens_home['cards_2']) ? 'background-color:'.$itens_home['cards_2'] : '' }}">
+            <div class="inside-box">
+              <img src="{{ asset('img/icone-livro-lei.png') }}" class="inside-img" alt="Livro Lei: Código de Ética e Disciplina dos Representantes Comerciais" />
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Livro Lei: <br>Código de Ética e Disciplina dos Representantes Comerciais</h3>
+              <button href="#" class="btn-box azul-escuro">ACESSAR</button>
+            </div>
+          </div>
+        </a>
+      </div>
     </div>
   </div>
 </section>

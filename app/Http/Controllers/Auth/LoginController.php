@@ -57,8 +57,8 @@ class LoginController extends Controller
         }
 
         if ($this->attemptLogin($request)) {
-            $temp = $this->findUsername($request);
-            \App\User::where($temp, $request->input($temp))->first()->registrarUltimoAcesso();
+            // $temp = $this->findUsername($request);
+            // \App\User::where($temp, $request->input($temp))->first()->registrarUltimoAcesso();
             return $this->sendLoginResponse($request);
         }
 
@@ -125,9 +125,11 @@ class LoginController extends Controller
                 $sessao->idusuario = $user->idusuario;
                 $sessao->ip_address = $request->ip();
                 $save = $sessao->save();
+                \App\User::findOrFail($user->idusuario)->registrarUltimoAcesso();
                 if(!$save)
                     abort(500);
             } else {
+                \App\User::findOrFail($user->idusuario)->registrarUltimoAcesso();
                 if($check->ip_address == $request->ip()) {
                     $update = $check->touch();
                 } else {

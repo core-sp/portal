@@ -49,7 +49,10 @@ function cookies(){
         localStorage.setItem("pureJavaScriptCookies", "accept");
 
         if(typeof window.clarity === 'function')
-            window.clarity('consent');
+            window.clarity('consentv2', {
+                ad_Storage: "granted",
+                analytics_Storage: "granted"
+            });
 	});
 }
 

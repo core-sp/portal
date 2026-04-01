@@ -43,7 +43,7 @@
                 id="modalidade"
               >
           	  	<option value="">Todas</option>
-	         	    @foreach($modalidades as $modalidade)
+	         	    @foreach($modalidades as $chave => $modalidade)
                   <option value="{{ $modalidade }}" {{ $modalidade == request()->query('modalidade') ? 'selected' : '' }}>{{ $modalidade }}</option>
 	          	  @endforeach
 	            </select>
@@ -169,7 +169,9 @@
                     </div>
                     <div class="flex-one align-self-center">
                       <h6 class="light">
+                      @if($licitacao->modalidade != $licitacao::MOD_SEM_MODALIDADE)
                         <strong>Modalidade:</strong> {{ $licitacao->modalidade }}<br />
+                      @endif
                         <strong>Situação:</strong> {{ btnSituacao($licitacao->situacao) }}
                       </h6>
                     </div>

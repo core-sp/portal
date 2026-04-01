@@ -23,6 +23,7 @@ $factory->define(User::class, function (Faker $faker) {
 $factory->afterCreating(User::class, function ($user, $faker) {
     factory('App\Sessao')->create([
         'idusuario' => $user->idusuario,
-        'updated_at' => '2023-05-22 05:20:33'
+        'updated_at' => '2023-05-22 05:20:33',
+        'ultimo_acesso' => '2023-05-22 05:20:33',
     ]);
 });
