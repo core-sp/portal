@@ -396,6 +396,10 @@ figure.align-left {
 	margin-bottom: 1rem;
 }
 
+#home-atende {
+	font-size: 1.6rem;
+}
+
 @media (min-width: 992px) {
 	.offset-lg-1-5 {
 		margin-left: 12.4999995%;
@@ -2219,7 +2223,6 @@ h5 {
 	.conteudo-txt li {
 		font-size: 1.05rem;
 	}
-
 }
 
 @media screen and (max-width: 1200px) {
@@ -2240,7 +2243,8 @@ h5 {
 	#conteudo-principal h1,
 	#conteudo-principal h2,
 	.home-title h1,
-	.home-title h2 {
+	.home-title h2,
+	#home-atende {
 		font-size: 1.3rem;
 	}
 	

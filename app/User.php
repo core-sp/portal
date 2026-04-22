@@ -131,6 +131,7 @@ class User extends Authenticatable
         switch($this->idperfil)
         {
             case 1:
+            case 3:
             case 6:
                 $subject = 'em São Paulo e Seccionais';
                 break;
