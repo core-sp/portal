@@ -55,7 +55,7 @@ class NoticiaService implements NoticiaServiceInterface {
                 $acoes .= '<form method="POST" action="'.route('noticias.destroy', $resultado->idnoticia).'" class="d-inline acaoTabelaAdmin">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="hidden" class="cor-danger txtTabelaAdmin" value="Tem certeza que deseja excluir a notícia <i>' . $resultado->titulo . '</i>?" />';
+                $acoes .= '<input type="hidden" class="cor-danger txtTabelaAdmin" value="Tem certeza que deseja excluir a notícia <i>' . str_replace('"', '\'', $resultado->titulo) . '</i>?" />';
                 $acoes .= '<button type="button" class="btn btn-sm btn-danger" value="' . $resultado->idnoticia . '">Apagar</button>';
                 $acoes .= '</form>';
             }
