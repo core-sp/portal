@@ -2143,6 +2143,36 @@ h5 {
 	align-self: center;	
 }
 
+.btn-total-bdo-cad, .btn-total-bdo-con {
+	padding: 0.75rem 2.25rem;
+	color: #FFF;
+	display: inline-block;
+	transition: .3s;
+}
+
+.btn-total-bdo-cad:hover, .btn-total-bdo-con:hover {
+	border: 1px solid transparent;
+	color: #FFF;
+}
+
+.btn-total-bdo-cad {
+	background-color: #15AAE2;
+	border: 1px solid #15AAE2;
+}
+
+.btn-total-bdo-cad:hover {
+	background-color: #004587;
+}
+
+.btn-total-bdo-con {
+	background-color: #004587;
+	border: 1px solid #004587;
+}
+
+.btn-total-bdo-con:hover {
+	background-color: #15AAE2;
+}
+
 /* FINAL */
 
 /*
@@ -2655,6 +2685,47 @@ h5 {
 	}
 }
 
+@media screen and (max-width: 991px) {
+	.total_bdo {
+		display: flex;
+		flex-direction: row;
+	}
+	
+	.total_bdo {
+		width: 100%;
+		line-height: 1;
+		font-size: 0.9rem;
+	}
+
+	.total_op_emp {
+		margin-left: 20%;
+		margin-right: 20%;
+	}
+
+	#total_bdo_op:before {
+		content: "";
+		flex: 1 1;
+		border-bottom: 1px solid #FFF;
+		margin-top: auto;
+		margin-bottom: auto;
+	}
+
+	#total_bdo_emp:after {
+		content: "";
+		flex: 1 1;
+		border-bottom: 1px solid #004587;
+		margin-top: auto;
+		margin-bottom: auto;
+	}
+
+	.btn-total-bdo-cad, .btn-total-bdo-con {
+		width: 100%;
+	}
+
+	.hide-991 {
+		display: none;
+	}
+}
 
 @media screen and (max-width: 767px) {
 	.hide-768 {
@@ -2945,6 +3016,11 @@ h5 {
 	#prender img {
 		max-width: 70%;
 	}
+
+	.total_op_emp {
+		margin-left: 17%;
+		margin-right: 17%;
+	}
 }
 
 
@@ -3107,6 +3183,12 @@ h5 {
 	}
 }
 
+@media screen and (min-width: 992px) {
+	.hide-min-992 {
+		display: none !important;
+	}
+}
+
 /* 
 	Cuida do comportamento da mensagem do uso dos cookies
 */
@@ -3167,4 +3249,13 @@ h5 {
 .custom-file-label {
     overflow: hidden;
     white-space: nowrap;
+}
+
+.total_bdo_texto {
+	font-size: 2.7rem;
+}
+
+#total_bdo_hr {
+	border: 1px solid #ffc100; 
+	margin-right: 10%;
 }

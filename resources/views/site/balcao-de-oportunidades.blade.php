@@ -26,6 +26,66 @@ use \App\BdoOportunidade;
   </div>
 </section>
 
+<!-- TOTAL OPORTUNIDADES E EMPRESAS CADASTRADAS -->
+<section style="padding-top: 2.25rem; padding-bottom: 0.25rem;">
+  <div class="container">
+    <div class="row px-2">
+
+      <!-- TEXTO BDO -->
+      <div class="col-lg-7">
+        <h2 style="line-height: 1">
+          <span class="bold" style="font-size: 3rem">Balcão de </span>
+          <br> 
+          <span class="azul">Oportunidades</span>
+        </h2>
+
+        <hr id="total_bdo_hr" />
+
+        <a href="{{ route('bdosite.anunciarVagaView') }}" class="bold btn-total-bdo-cad ml-2 hide-991">CADASTRAR VAGAS</a>
+        <a href="{{ route('bdosite.index') }}" class="bold btn-total-bdo-con ml-1 hide-991">CONSULTAR VAGAS</a>
+      </div>
+
+      <!-- TOTAIS -->
+      <div class="col-lg-5 p-2 azul-bg">
+
+        <!-- LG para baixo -->
+        <div id="total_bdo_op" class="px-0 py-3 total_bdo hide-min-992">
+          <div class="bold ml-2 align-self-center branco">Oportunidades <br>disponíveis hoje</div>
+          <div class="bold total_op_emp branco total_bdo_texto">{{ $total_op }}</div>
+        </div>
+
+        <div id="total_bdo_emp" class="px-0 py-3 float-right total_bdo hide-min-992">
+          <div class="bold total_op_emp azul-escuro total_bdo_texto">{{ $total_emp }}</div>
+          <div class="bold mr-2 align-self-center azul-escuro">Empresas <br>cadastradas</div>
+        </div>
+
+        <!-- LG pra cima -->
+        <div class="row p-4 hide-991">
+          <div class="col-lg-6 text-center">
+            <span class="bold branco">OPORTUNIDADES <br>DISPONÍVEIS HOJE</span>
+            <br>
+            <span class="bold total_bdo_texto azul-escuro">{{ $total_op }}</span>
+          </div>
+
+          <div class="col-lg-6 text-center">
+            <span class="bold total_bdo_texto azul-escuro">{{ $total_emp }}</span>
+            <br>
+            <span class="bold branco">EMPRESAS <br>CADASTRADAS</span>
+          </div>
+        </div>
+        
+      </div>
+
+      <!-- BOTÕES LG para baixo -->
+      <div class="text-center w-100 mt-3">
+        <a href="{{ route('bdosite.anunciarVagaView') }}" class="bold btn-total-bdo-cad mb-3 hide-min-992">CADASTRAR VAGAS</a>
+        <a href="{{ route('bdosite.index') }}" class="bold btn-total-bdo-con hide-min-992">CONSULTAR VAGAS</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <section id="pagina-bdo">
   <div class="container">
     <div class="row pb-4" id="conteudo-principal">
