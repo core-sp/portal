@@ -28,7 +28,7 @@ use \App\BdoOportunidade;
 
 <!-- TOTAL OPORTUNIDADES E EMPRESAS CADASTRADAS -->
 <section style="padding-top: 2.25rem; padding-bottom: 0.25rem;">
-  <div class="container">
+  <div class="container lib-animacao">
     <div class="row px-2">
 
       <!-- TEXTO BDO -->
@@ -46,16 +46,16 @@ use \App\BdoOportunidade;
       </div>
 
       <!-- TOTAIS -->
-      <div class="col-lg-5 p-2 azul-bg">
+      <div class="col-lg-5 p-2 azul-bg invisible" id="cx_totais_bdo">
 
         <!-- LG para baixo -->
         <div id="total_bdo_op" class="px-0 py-3 total_bdo hide-min-992">
           <div class="bold ml-2 align-self-center branco">Oportunidades <br>disponíveis hoje</div>
-          <div class="bold total_op_emp branco total_bdo_texto">{{ $total_op }}</div>
+          <div class="bold total_op_emp branco total_bdo_texto numero_bdo_op">{{ $total_op }}</div>
         </div>
 
         <div id="total_bdo_emp" class="px-0 py-3 float-right total_bdo hide-min-992">
-          <div class="bold total_op_emp azul-escuro total_bdo_texto">{{ $total_emp }}</div>
+          <div class="bold total_op_emp azul-escuro total_bdo_texto numero_bdo_emp">{{ $total_emp }}</div>
           <div class="bold mr-2 align-self-center azul-escuro">Empresas <br>cadastradas</div>
         </div>
 
@@ -64,11 +64,11 @@ use \App\BdoOportunidade;
           <div class="col-lg-6 text-center">
             <span class="bold branco">OPORTUNIDADES <br>DISPONÍVEIS HOJE</span>
             <br>
-            <span class="bold total_bdo_texto azul-escuro">{{ $total_op }}</span>
+            <span class="bold total_bdo_texto azul-escuro numero_bdo_op">{{ $total_op }}</span>
           </div>
 
           <div class="col-lg-6 text-center">
-            <span class="bold total_bdo_texto azul-escuro">{{ $total_emp }}</span>
+            <span class="bold total_bdo_texto azul-escuro numero_bdo_emp">{{ $total_emp }}</span>
             <br>
             <span class="bold branco">EMPRESAS <br>CADASTRADAS</span>
           </div>
@@ -84,6 +84,7 @@ use \App\BdoOportunidade;
 
     </div>
   </div>
+  <script type="module" src="{{ asset('/js/externo/modulos/balcao-oportunidades.js?'.hashScriptJs()) }}" data-modulo-id="balcao-oportunidades" data-modulo-acao="visualizar"></script>
 </section>
 
 <section id="pagina-bdo">

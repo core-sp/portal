@@ -3187,6 +3187,11 @@ h5 {
 	.hide-min-992 {
 		display: none !important;
 	}
+
+	#cx_totais_bdo {
+		animation: fadeInUp;
+		animation-duration: 2.3s;
+	}
 }
 
 /* 
