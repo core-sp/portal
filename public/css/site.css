@@ -3175,6 +3175,10 @@ h5 {
 	.btn-beneficios {
 		margin-bottom: 0.25rem;
 	}
+
+	.center-465 {
+		text-align: center !important;
+	}
 }
 
 @media screen and (min-width: 992px) {

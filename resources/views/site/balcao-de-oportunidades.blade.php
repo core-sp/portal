@@ -51,11 +51,11 @@ use \App\BdoOportunidade;
         <!-- LG para baixo -->
         <div id="total_bdo_op" class="px-0 py-3 total_bdo hide-min-992">
           <div class="col bold ml-2 align-self-center branco text-nowrap">Oportunidades <br>disponíveis hoje</div>
-          <div class="col bold branco total_bdo_texto numero_bdo_op">{{ $total_op }}</div>
+          <div class="col bold branco total_bdo_texto numero_bdo_op center-465">{{ $total_op }}</div>
         </div>
 
         <div id="total_bdo_emp" class="px-0 py-3 total_bdo hide-min-992">
-          <div class="col bold azul-escuro total_bdo_texto numero_bdo_emp center-992">{{ $total_emp }}</div>
+          <div class="col bold azul-escuro total_bdo_texto numero_bdo_emp right-max-991 center-576">{{ $total_emp }}</div>
           <div class="col bold mr-2 align-self-center azul-escuro right-max-991"><span class="p-3">Empresas</span> <br>cadastradas</div>
         </div>
 
