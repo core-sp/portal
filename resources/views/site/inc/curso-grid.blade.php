@@ -4,7 +4,7 @@
       <div class="curso-grid">
         <img class="lazy-loaded-image lazy bn-img" src="{{ isset($curso->img) ? $curso->imgBlur() : asset('img/small-news-generica-thumb.png') }}" data-src="{{ isset($curso->img) ? asset($curso->img) : asset('img/news-generica-thumb.png') }}" />
         <div class="curso-grid-txt">
-          <h6 class="light cinza-claro">{{ $curso->regional->regional }} - {{ onlyDate($curso->datarealizacao) }}</h6>
+          <h6 class="light cinza-claro">{{-- $curso->regional->regional --}} <!-- - -->{{ onlyDate($curso->datarealizacao) }}</h6>
           <h5 class="branco mt-1">{{ $curso->tipo }} - {{ $curso->tema }}</h5>
         </div>
       </div>
