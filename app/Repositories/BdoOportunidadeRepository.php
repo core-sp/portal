@@ -46,6 +46,11 @@ class BdoOportunidadeRepository {
             ->paginate(10);
     }
 
+    public function getTotalOportunidades()
+    {
+        return BdoOportunidade::where('status', BdoOportunidade::STATUS_EM_ANDAMENTO)->count();
+    }
+
     public function buscagetToBalcaoSite($buscaSegmento, $buscaRegional, $buscaPalavraChave)  
     {
         $oportunidades = BdoOportunidade::whereNotIn('status', [BdoOportunidade::STATUS_SOB_ANALISE, BdoOportunidade::STATUS_CONCLUIDO, BdoOportunidade::STATUS_RECUSADO]);

@@ -69,5 +69,10 @@ class BdoEmpresaRepository {
         return BdoEmpresa::findOrFail($id, ['idempresa', 'razaosocial', 'segmento']);
     }
 
+    public function getTotalEmpresas()
+    {
+        return BdoEmpresa::count();
+    }
+
 
 }

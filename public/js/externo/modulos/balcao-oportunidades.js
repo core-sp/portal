@@ -143,7 +143,47 @@ function editar(){
     });
 }
 
+function contador(){
+
+    $('.numero_bdo_op:visible, .numero_bdo_emp:visible').each(function(){
+        let max = parseInt(this.innerHTML);
+        let numero = this;
+
+        for (let i = 1; i <= max; i++) {
+            setTimeout(function(nr) {
+                numero.innerHTML = nr;
+            }, i * 1500 / max, i);
+        }
+    });
+}
+
+function contadorDeTotais(){
+
+    if(($(window).width() > 991) && !$('#cx_totais_bdo').hasClass('maior')){
+        contador();
+        $('#cx_totais_bdo').removeClass('menor').addClass('maior');
+    }
+
+    if(($(window).width() <= 991) && !$('#cx_totais_bdo').hasClass('menor')){
+        contador();
+        $('#cx_totais_bdo').removeClass('maior').addClass('menor');
+    }
+}
+
+function visualizar(){
+
+    $('#cx_totais_bdo').removeClass('invisible');
+
+    $(window).resize(function(){
+        contadorDeTotais();
+    });
+
+    contadorDeTotais();
+}
+
 export function executar(funcao){
     if(funcao == 'editar')
         return editar();
+    if(funcao == 'visualizar')
+        return visualizar();
 }

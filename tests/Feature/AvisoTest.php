@@ -940,6 +940,9 @@ class AvisoTest extends TestCase
     /** @test */
     public function view_aviso_agendamento_with_status_ativado()
     {
+        $this->markTestSkipped(
+            'Temporariamente com redirecionamento na parte de agendamento.'
+        );
         $aviso = factory('App\Aviso')->states('agendamento')->create([
             'status' => 'Ativado',
         ]);
@@ -949,6 +952,9 @@ class AvisoTest extends TestCase
     /** @test */
     public function cannot_view_aviso_agendamento_with_status_desativado()
     {
+        $this->markTestSkipped(
+            'Temporariamente com redirecionamento na parte de agendamento.'
+        );
         $aviso = factory('App\Aviso')->states('agendamento')->create();
         $this->get(route('agendamentosite.formview'))->assertDontSee($aviso->conteudo);
     }

@@ -17,6 +17,8 @@ class AgendamentoSiteController extends Controller
 
     public function formView()
     {
+        return redirect()->route('paginas.site', 'servicos-atendimento-ao-rc');
+
         try{
             $aviso = $this->service->getService('Aviso')->getByArea($this->service->getService('Aviso')->areas()[3]);
             $aviso = isset($aviso) && $aviso->isAtivado() ? $aviso : null;
@@ -34,11 +36,14 @@ class AgendamentoSiteController extends Controller
 
     public function consultaView()
     {
+        return redirect()->route('paginas.site', 'servicos-atendimento-ao-rc');
         return view('site.agendamento-consulta');
     }
 
     public function consulta(AgendamentoRequest $request)
     {
+        return redirect()->route('paginas.site', 'servicos-atendimento-ao-rc');
+
         try{
             $validated = $request->validated();
             $resultado = $this->service->getService('Agendamento')->consultaSite($validated);
@@ -52,6 +57,8 @@ class AgendamentoSiteController extends Controller
 
     public function store(AgendamentoRequest $request)
     {
+        return redirect()->route('paginas.site', 'servicos-atendimento-ao-rc');
+
         try{
             $validated = $request->validated();
             $message = $this->service->getService('Agendamento')->saveSite($validated, $this->service);
@@ -67,6 +74,8 @@ class AgendamentoSiteController extends Controller
 
     public function cancelamento(AgendamentoRequest $request)
     {
+        return redirect()->route('paginas.site', 'servicos-atendimento-ao-rc');
+        
         try{
             $validated = $request->validated();
             $validated['protocolo'] = request()->query('protocolo');
@@ -83,6 +92,8 @@ class AgendamentoSiteController extends Controller
 
     public function getDiasHorasAjax(Request $request)
     {
+        return redirect()->route('paginas.site', 'servicos-atendimento-ao-rc');
+
         try{
             $validate = $request->only('idregional', 'servico', 'dia');
             if(($validate['idregional'] == '14') && ($validate['servico'] != 'Plantão Jurídico'))
@@ -100,6 +111,8 @@ class AgendamentoSiteController extends Controller
 
     public function regionaisPlantaoJuridico()
     {
+        return redirect()->route('paginas.site', 'servicos-atendimento-ao-rc');
+
         try{
             $dados = $this->service->getService('PlantaoJuridico')->getRegionaisAtivas();
         } catch (\Exception $e) {

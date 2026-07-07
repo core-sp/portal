@@ -43,12 +43,14 @@ class BdoSiteController extends Controller
         $oportunidades = $this->bdoOportunidadeRepository->getToBalcaoSite();
         $regionais = $this->service->getService('Regional')->getRegionais();
         $segmentos = BdoEmpresa::segmentos();
+        $total_op = $this->bdoOportunidadeRepository->getTotalOportunidades();
+        $total_emp = $this->bdoEmpresaRepository->getTotalEmpresas();
 
         foreach($oportunidades as $o) {
             $o->regiaoFormatada = $this->displayRegioes($o->regiaoatuacao, $regionais->toArray());
         }
 
-        return view('site.balcao-de-oportunidades', compact('oportunidades', 'regionais', 'segmentos'));
+        return view('site.balcao-de-oportunidades', compact('oportunidades', 'regionais', 'segmentos', 'total_op', 'total_emp'));
     }
 
     public function buscaOportunidades()
@@ -60,6 +62,8 @@ class BdoSiteController extends Controller
         $oportunidades = $this->bdoOportunidadeRepository->buscagetToBalcaoSite($buscaSegmento, $buscaRegional, $buscaPalavraChave);
         $regionais = $this->service->getService('Regional')->getRegionais();
         $segmentos = BdoEmpresa::segmentos();
+        $total_op = $this->bdoOportunidadeRepository->getTotalOportunidades();
+        $total_emp = $this->bdoEmpresaRepository->getTotalEmpresas();
         
         if (count($oportunidades) > 0) {
             foreach($oportunidades as $o) {
@@ -70,7 +74,7 @@ class BdoSiteController extends Controller
             $oportunidades = null;
         }
 
-        return view('site.balcao-de-oportunidades', compact('oportunidades', 'regionais', 'segmentos'));
+        return view('site.balcao-de-oportunidades', compact('oportunidades', 'regionais', 'segmentos', 'total_op', 'total_emp'));
     }
 
     public function anunciarVagaView()
@@ -127,7 +131,7 @@ class BdoSiteController extends Controller
 
         event(new ExternoEvent('*' . $empresa->razaosocial . '* (' . $empresa->email . ') solicitou inclusão de oportunidade no Balcão de Oportunidades e '.$termo->message()));
 
-        Mail::to(['comunicacao@core-sp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($oportunidade->idoportunidade));
+        Mail::to(['comunicacao@core-sp.org.br', 'comunicacao.adm01@core-sp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($oportunidade->idoportunidade));
 
         return view('site.agradecimento')->with([
             'agradece' => $this->agradecimento()
