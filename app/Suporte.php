@@ -83,7 +83,7 @@ class Suporte
     public static function filtros()
     {
         return [
-            self::FILTRO_ACESSO => 'Acessos na área restrita (logins)',
+            self::FILTRO_ACESSO => 'Acessos na área exclusiva (logins)',
             self::FILTRO_BOLETOS => 'Download de boletos na área do RC',
             self::FILTRO_CERTIDAO_GERADA => 'Novas certidões geradas na área do RC',
             self::FILTRO_CERTIDAO_BAIXADA => 'Downloads das certidões na área do RC',

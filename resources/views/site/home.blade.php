@@ -75,7 +75,7 @@
             <h2 class="pr-3 ml-1">Espaço do Representante</h2>
           </blockquote>
           <h5 class="float-right cinza-claro-bg hide-576">
-          <a href="{{ route('representante.login') }}"><i class="fas fa-lock icon-title"></i> Área restrita do Representante</a>
+          <a href="{{ route('representante.login') }}"><i class="fas fa-lock icon-title"></i> Área exclusiva do Representante</a>
           </h5>
         </div>
       </div>
@@ -84,8 +84,8 @@
       <div class="col-lg-3 col-sm-6 pb-15">
         <div class="box text-center {{ isset($itens_home['cards_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_1']) ? 'background-color:'.$itens_home['cards_1'] : '' }}">
           <div class="inside-box">
-            <img src="{{ asset('img/padlock.png') }}" class="inside-img" alt="Área restrita do Representante | Core-SP" />
-            <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Área restrita<br class="hide-992" /> do Representante</h3>
+            <img src="{{ asset('img/padlock.png') }}" class="inside-img" alt="Área exclusiva do Representante | Core-SP" />
+            <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Área exclusiva<br class="hide-992" /> do Representante</h3>
             <a href="/representante/login" class="d-block h-100">
               <button class="btn-box azul-escuro">Acessar</button>
             </a>
