@@ -195,7 +195,7 @@
                         </div>
                       </div>
                       <a href="/anuidade-ano-vigente" class="dropdown-item">Anuidade {{ date('Y') }}</a>
-                      <a href="/representante/login" class="dropdown-item">Área Restrita</a>
+                      <a href="/representante/login" class="dropdown-item">Área Exclusiva</a>
                       <a href="/servicos-atendimento-ao-rc" class="dropdown-item">Atendimento</a>
                       <div class="sub-dropdown">
                         <div class="dropdown-item">
@@ -326,7 +326,7 @@
               </div>
               <p class="branco"><a href="/agendamento">Agendamento</a></p>
               <p class="branco"><a href="/anuidade-ano-vigente">Anuidade {{ date('Y') }}</a></p>
-              <p class="branco"><a href="/representante/login">Área Restrita</a></p>
+              <p class="branco"><a href="/representante/login">Área Exclusiva</a></p>
               <p class="branco"><a href="/servicos-atendimento-ao-rc">Atendimento</a></p>
               <p class="branco"><a href="/balcao-de-oportunidades">Balcão de Oportunidades</a></p>
               <p class="branco"><a href="{{ route('carta-servicos') }}">Carta de Serviços ao Usuário</a></p>

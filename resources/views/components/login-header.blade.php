@@ -18,7 +18,7 @@
                 <small>
                     <a href="{{ route('representante.login') }}">
                         <i class="fas fa-lock"></i>&nbsp;
-                        Área restrita do Representante
+                        Área exclusiva do Representante
                     </a>
                     &nbsp;&nbsp;|&nbsp;&nbsp;
                     <a href="{{ route('representante.cadastro') }}">

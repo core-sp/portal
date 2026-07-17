@@ -261,7 +261,7 @@ class CursoSubService implements CursoSubServiceInterface {
         if(!$curso->liberarAcesso($rep, $situacao))
             return $situacao == '' ? [
                 'rota' => 'representante.login',
-                'message' => 'Deve realizar login na área restrita do representante para se inscrever.',
+                'message' => 'Deve realizar login na área exclusiva do representante para se inscrever.',
                 'class' => 'alert-danger'
             ] : [
                 'rota' => 'representante.cursos',

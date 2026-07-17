@@ -63,8 +63,8 @@ class AgendamentoSalaVerificaRequest extends FormRequest
         {
             $suspensos = $this->service->getService('SalaReuniao')->suspensaoExcecao()->participantesSuspensos($this->participantes_cpf);
             $textoSuspensos = isset($suspensos) && !empty($suspensos) && (count($suspensos) == 1) ? 
-            'O seguinte participante está suspenso para novos agendamentos na área restrita do representante:' :
-            'Os seguintes participantes estão suspensos para novos agendamentos na área restrita do representante:';
+            'O seguinte participante está suspenso para novos agendamentos na área exclusiva do representante:' :
+            'Os seguintes participantes estão suspensos para novos agendamentos na área exclusiva do representante:';
             $participantesSuspensos = isset($suspensos) && !empty($suspensos) ? 
             '<br><strong>' . implode('<br>', $suspensos) . '</strong>' : '';
 

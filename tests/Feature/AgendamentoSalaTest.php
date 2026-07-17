@@ -521,7 +521,7 @@ class AgendamentoSalaTest extends TestCase
 
         $this->post(route('sala.reuniao.agendados.verifica.criar'), ['participantes_cpf' => [$suspenso->fresh()->representante->cpf_cnpj]])
         ->assertJson([
-            "suspenso" => "O seguinte participante está suspenso para novos agendamentos na área restrita do representante:<br><strong>862.943.730-85</strong>",
+            "suspenso" => "O seguinte participante está suspenso para novos agendamentos na área exclusiva do representante:<br><strong>862.943.730-85</strong>",
         ]);
 
         $this->post(route('sala.reuniao.agendados.verifica.criar'), ['participantes_cpf' => [formataCpfCnpj('11748345000144')]])
