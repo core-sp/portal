@@ -143,6 +143,7 @@ class SimuladorControllerHelper extends Controller
                 <li>Cópia da quitação das contribuições devidas ao Sindicato conforme artigo 579 e 608 da CLT e nota técnica da Secretaria de Relações do Trabalho (SRT) nº 202 de 10 de dezembro de 2009. (www.sircesp.com.br); <small><strong>(caráter facultativo)</strong></small></li>
                 -->
                 <li>Alvará de localização e inscrição ISS;</li>
+                <li>Declaração de Antecedentes Criminais emitida no Departamento da Polícia Federal <a href="https://www.gov.br/pt-br/servicos/emitir-certidao-de-antecedentes-criminais" class="vermelho" target="_blank">https://www.gov.br/pt-br/servicos/emitir-certidao-de-antecedentes-criminais</a> e Secretaria de Segurança Pública do Governo do Estado de São Paulo <a href="https://www2.ssp.sp.gov.br/aacweb/carrega-iframe" class="vermelho" target="_blank">https://www2.ssp.sp.gov.br/aacweb/carrega-iframe</a></li>
             </ol>
             <p>OBS. Se o registro for requerido através de terceiros será necessário apresentar procuração especifica para realizar o registro no CORE-SP, dando poderes para representá-lo, e cópia do documento do procurador;</p>
             <strong>Conselho Regional dos Representantes Comerciais no Estado de São Paulo</strong>

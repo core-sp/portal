@@ -131,7 +131,7 @@ class BdoSiteController extends Controller
 
         event(new ExternoEvent('*' . $empresa->razaosocial . '* (' . $empresa->email . ') solicitou inclusão de oportunidade no Balcão de Oportunidades e '.$termo->message()));
 
-        Mail::to(['comunicacao@core-sp.org.br', 'comunicacao.adm01@core-sp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($oportunidade->idoportunidade));
+        Mail::to(['aline.vieira@core-sp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($oportunidade->idoportunidade));
 
         return view('site.agradecimento')->with([
             'agradece' => $this->agradecimento()
