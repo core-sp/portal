@@ -428,9 +428,7 @@ Route::middleware(['block_ip'])->group(function () {
     Route::get('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigenteView')->name('anuidade-ano-vigente');
     Route::post('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigente');
 
-    Route::get('/chat', function(){
-      return view('site.chat');
-    });
+    Route::get('/carousel', 'SiteController@index')->name('site.carousel');
 
     Route::get('/agenda-institucional', 'SiteController@agendaInstitucional')->name('agenda-institucional');
     Route::get('/agenda-institucional/{data}', 'SiteController@agendaInstitucionalByData')->name('agenda-institucional-data');

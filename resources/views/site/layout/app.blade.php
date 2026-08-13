@@ -422,7 +422,7 @@
       </footer>
       @show
 
-      <div class="container">
+      <div class="container" id="box-consentimento">
         <div class="row d-flex justify-content-center">
           <div class="border border-primary rounded box-cookies hide">
             <p class="msg-cookies">

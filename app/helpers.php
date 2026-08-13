@@ -691,7 +691,7 @@ function concursoSituacoes()
 
 function mostraChatScript()
 {
-    if(config('app.env') !== 'local') {
+    if((config('app.env') !== 'local') && !\Route::is('site.carousel')){
         $hour = date('H');
         $day = date('w');
         if($hour >= 9 && $hour < 18 && $day !== '6' && $day !== '0') {
@@ -826,7 +826,7 @@ function ambiente()
 
 function versaoScriptJs()
 {
-    return '1.3.6';
+    return '1.3.7';
 }
 
 function hashScriptJs()
