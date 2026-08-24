@@ -16,10 +16,14 @@ class BdoPerfilRequest extends FormRequest
     private $gerenti_telefones;
     private $gerenti_endereco;
     private $mun;
+    private $listaSegmentos;
 
     public function __construct(MediadorServiceInterface $service)
     {
         $this->service = $service->getService('Bdo');
+        $this->listaSegmentos = collect(segmentos())->map(function ($name) {
+            return mb_strtoupper($name);
+        })->implode(',');
     }
 
     protected function prepareForValidation()
@@ -27,8 +31,8 @@ class BdoPerfilRequest extends FormRequest
         if(\Route::is('bdorepresentantes.update'))
             return;
 
-        $this->gerenti_emails = isset(session('dados_bdo')['emails']) ? implode(',', session('dados_bdo')['emails']) : '';
-        $this->gerenti_telefones = isset(session('dados_bdo')['telefones']) ? implode(',', session('dados_bdo')['telefones']) : '';
+        // $this->gerenti_emails = isset(session('dados_bdo')['emails']) ? implode(',', session('dados_bdo')['emails']) : '';
+        // $this->gerenti_telefones = isset(session('dados_bdo')['telefones']) ? implode(',', session('dados_bdo')['telefones']) : '';
         $this->gerenti_endereco = isset(session('dados_bdo')['endereco']) ? session('dados_bdo')['endereco'] : '';
         $this->merge(['endereco' => $this->gerenti_endereco]);
 
@@ -56,8 +60,10 @@ class BdoPerfilRequest extends FormRequest
 
         // Área Restrita RC 
         $geral = [
-            'email' => 'required|email|in:' . $this->gerenti_emails,
-            'telefone' => 'required|in:' . $this->gerenti_telefones,
+            // 'email' => 'required|email|in:' . $this->gerenti_emails,
+            'email' => 'required|email',
+            // 'telefone' => 'required|in:' . $this->gerenti_telefones,
+            'telefone' => 'required|max:17|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})/',
             'endereco' => 'required',
             'regioes_municipios' => 'nullable|array|max:20',
             'regioes_municipios.*' => 'distinct|in:' . implode(',', Arr::flatten(json_decode($this->mun, true))),
@@ -67,9 +73,9 @@ class BdoPerfilRequest extends FormRequest
         {
             return array_merge([
                 'descricao' => 'required|max:700',
-                'segmento' => 'required|in:' . collect(segmentos())->map(function ($name) {
-                    return mb_strtoupper($name);
-                })->implode(','),
+                'segmento' => 'required|in:' . $this->listaSegmentos,
+                'segmentos_opcionais' => 'nullable|array|max:2',
+                'segmentos_opcionais.*' => 'distinct|nullable|not_in:' . $this->segmento . '|in:' . $this->listaSegmentos,
                 'regioes_seccional' => 'required|in:' . collect(session('dados_bdo')['regionais'])->pluck('regional')->map(function ($name) {
                     return mb_strtoupper($name);
                 })->implode(','),
@@ -96,6 +102,10 @@ class BdoPerfilRequest extends FormRequest
             "campos_recusados.array" => "Itens a serem recusados não estão num formato válido",
             "campos_recusados.*.distinct" => "Não pode repetir campo a ser recusado",
             "campos_recusados.max" => "Somente até :max itens a serem recusados",
+            "segmentos_opcionais.max" => "Limite de :max segmentos opcionais",
+            "segmentos_opcionais.array" => "Formato inválido",
+            "segmentos_opcionais.*.distinct" => "Não pode repetir segmento",
+            "segmentos_opcionais.*.not_in" => "Não pode repetir o segmento principal",
         ];
     }
 
@@ -114,6 +124,7 @@ class BdoPerfilRequest extends FormRequest
         $this->merge([
             'regioes->municipios' => isset($this->regioes_municipios) ? $this->regioes_municipios : array(),
             'regioes->seccional' => $this->regioes_seccional,
+            'segmentos_opcionais' => json_encode($this->segmentos_opcionais, JSON_FORCE_OBJECT),
             'segmento_gerenti' => isset(session('dados_bdo')['segmento']) ? session('dados_bdo')['segmento'] : '',
             'seccional_gerenti' => isset(session('dados_bdo')['seccional']) ? session('dados_bdo')['seccional'] : '',
             'em_dia_gerenti' => isset(session('dados_bdo')['em_dia']) ? session('dados_bdo')['em_dia'] : false,

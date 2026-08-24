@@ -36,6 +36,10 @@
         {!! $item_publicado !!}
         Endereço: <strong>{{ $resultado->endereco }}</strong>
     </p>
+    <p class="mb-0">
+        {!! $item_publicado !!}
+        Segmentos opcionais: <strong>{{ $resultado->segmentosOpcionais() }}</strong>
+    </p>
 
     <!-- COMUNICAÇÃO -->
     @if(auth()->user()->isAdmin() || auth()->user()->isEditor())
@@ -65,7 +69,7 @@
         </p>
     @endif
 
-    <!-- ATENDIMENTO E COMUNICAÇÃO -->
+    <!-- ATENDIMENTO E CONVENIOS -->
     @if(!auth()->user()->isFinanceiro())
 
         @if($resultado->statusContemAtendimento())
@@ -118,7 +122,7 @@
 
     @endif
 
-    <!-- FINANCEIRO E COMUNICAÇÃO -->
+    <!-- FINANCEIRO E CONVENIOS -->
     @if((auth()->user()->isAdmin() || auth()->user()->isFinanceiro() || auth()->user()->isEditor()) && ($resultado->statusContemFinanceiro()))
         <hr class="mb-4 mt-4"/>
 
@@ -173,11 +177,11 @@
     @endif
 
 
-    <!-- COMUNICAÇÃO -->
+    <!-- CONVENIOS -->
     @if(auth()->user()->isAdmin() || auth()->user()->isEditor())
         <hr class="mb-4 mt-4"/>
 
-        <h5 class="text-success mb-3"><i class="fas fa-user-edit"></i>&nbsp;<strong>COMUNICAÇÃO</strong> - Solicitação de publicação do perfil público:</h5>
+        <h5 class="text-success mb-3"><i class="fas fa-user-edit"></i>&nbsp;<strong>CONVÊNIOS E PARCERIAS</strong> - Solicitação de publicação do perfil público:</h5>
 
         <div class="form-row mb-4">
             <div class="col">

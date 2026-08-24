@@ -22,6 +22,7 @@ class CreateBdoRepresentantes extends Migration
             $table->string('email', 150);
             $table->string('telefone', 30);
             $table->string('segmento', 100);
+            $table->json('segmentos_opcionais')->nullable();
             $table->json('regioes');
             $table->json('justificativas')->nullable();
             $table->json('status');

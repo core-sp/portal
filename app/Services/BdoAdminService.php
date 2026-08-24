@@ -65,7 +65,7 @@ class BdoAdminService {
         $legenda .= '&nbsp;&nbsp;|&nbsp;&nbsp;';
         $legenda .= '<span class="badge badge-secondary">Financeiro</span>';
         $legenda .= '&nbsp;&nbsp;|&nbsp;&nbsp;';
-        $legenda .= '<span class="badge badge-success">Comunicação</span></p><hr>';
+        $legenda .= '<span class="badge badge-success">Convênios e Parcerias</span></p><hr>';
 
         $legenda = $user->isAdmin() ? $legenda : '';
 

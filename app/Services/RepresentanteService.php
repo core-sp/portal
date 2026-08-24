@@ -183,7 +183,7 @@ class RepresentanteService implements RepresentanteServiceInterface {
         }
 
         $dados = [
-            'ativo' => null, 'seccional' => null, 'em_dia' => null, 'emails' => null, 'telefones' => null, 'segmento' => null, 'endereco' => null,
+            'ativo' => null, 'seccional' => null, 'em_dia' => null, /*'emails' => null, 'telefones' => null, */'segmento' => null, 'endereco' => null,
         ];
 
         if(session()->exists('dados_bdo') && Arr::has(session('dados_bdo'), array_keys($dados))) 
@@ -191,12 +191,12 @@ class RepresentanteService implements RepresentanteServiceInterface {
 
         $temp = [];
         foreach($dados as $key => $campo){
-            if(in_array($key, ['emails', 'telefones']) && empty($temp)){
-                $key = 'contatos';
-                $temp = call_user_func_array([$this, $key], ['rep' => $rep, 'gerentiRepository' => $gerentiRepository]);
-                $dados = array_merge($dados, $temp);
-                continue;
-            }
+            // if(in_array($key, ['emails', 'telefones']) && empty($temp)){
+            //     $key = 'contatos';
+            //     $temp = call_user_func_array([$this, $key], ['rep' => $rep, 'gerentiRepository' => $gerentiRepository]);
+            //     $dados = array_merge($dados, $temp);
+            //     continue;
+            // }
                 
             if(method_exists($this, $key))
                 $dados[$key] = call_user_func_array([$this, $key], ['rep' => $rep, 'gerentiRepository' => $gerentiRepository]);

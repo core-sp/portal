@@ -224,8 +224,8 @@ use \App\BdoOportunidade;
               <i class="far fa-building"></i>&nbsp;
               {{ $oportunidade->representante->cpf_cnpj }}
               &nbsp;&nbsp;&nbsp;
-              <strong>SEGMENTO</strong>&nbsp;
-              {{ $oportunidade->segmento }}
+              <strong>SEGMENTOS</strong>&nbsp;
+              {{ $oportunidade->segmentosTodos() }}
             </h6>
 
               @if(!empty(json_decode($oportunidade->regioes)->municipios))

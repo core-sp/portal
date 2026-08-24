@@ -9,6 +9,11 @@
 
         @if(!isset($perfil))
         <p>Preencha as informações abaixo para cadastrar seu <strong>perfil público</strong> no Portal.</p>
+        <p>
+            <em>
+                <span class="text-danger font-weight-bolder">*</span> Itens obrigatórios
+            </em>
+        </p>
         @endif
 
         <form action="{{ isset($perfil) ? route('representante.bdo.perfil.editar') : route('representante.bdo.perfil.cadastrar') }}" method="POST">
@@ -51,7 +56,7 @@
 
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
-                    <label for="descricao">Descrição</label>
+                    <label for="descricao">Descrição <span class="text-danger font-weight-bolder">*</span></label>
                     <textarea
                         rows="5"
                         name="descricao"
@@ -69,27 +74,14 @@
 
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
-                    <label for="email">E-mail 
-                        <span class="ml-2">
-                            <a href="{{ route('representante.contatos.view') }}">
-                                <i class="fas fa-edit text-primary"></i>
-                            </a>
-                        </span>
-                    </label> 
-                    <select name="email" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" required>
-                        @if(empty($emails))
-                        <option value="" selected>
-                            Deve incluir um e-mail clicando no ícone azul...
-                        </option>
-                        @endif
-                    @foreach($emails as $email)
-                        <option value="{{ $email }}" 
-                            {{ (isset($perfil) && ($perfil->email == $email)) || (old('email') == $email) ? 'selected' : '' }}
-                        >
-                            {{ $email }}
-                        </option>
-                    @endforeach
-                    </select>
+                    <label for="email">E-mail <span class="text-danger font-weight-bolder">*</span></label> 
+                    <input type="email" 
+                        class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" 
+                        id="email" 
+                        name="email" 
+                        value="{{ isset($perfil) ? $perfil->email : '' }}"
+                        required
+                    />
                     @if($errors->has('email'))
                     <div class="invalid-feedback">
                         {{ $errors->first('email') }}
@@ -100,27 +92,14 @@
 
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
-                    <label for="telefone">Telefone
-                        <span class="ml-2">
-                            <a href="{{ route('representante.contatos.view') }}">
-                                <i class="fas fa-edit text-primary"></i>
-                            </a>
-                        </span>
-                    </label>
-                    <select name="telefone" class="form-control {{ $errors->has('telefone') ? 'is-invalid' : '' }}" required>
-                        @if(empty($telefones))
-                        <option value="" selected>
-                            Deve incluir um telefone clicando no ícone azul...
-                        </option>
-                        @endif
-                    @foreach($telefones as $telefone)
-                        <option value="{{ $telefone }}" 
-                            {{ (isset($perfil) && ($perfil->telefone == $telefone)) || old('telefone') == $telefone ? 'selected' : '' }}
-                        >
-                            {{ $telefone }}
-                        </option>
-                    @endforeach
-                    </select>
+                    <label for="telefone">Telefone <span class="text-danger font-weight-bolder">*</span></label>
+                    <input type="text" 
+                        class="form-control {{ $errors->has('telefone') ? 'is-invalid' : '' }} telefoneInput" 
+                        id="telefone" 
+                        name="telefone" 
+                        value="{{ isset($perfil) ? $perfil->telefone : '' }}"
+                        required
+                    />
                     @if($errors->has('telefone'))
                     <div class="invalid-feedback">
                         {{ $errors->first('telefone') }}
@@ -175,13 +154,13 @@
 
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
-                    <label for="segmento">Segmento
+                    <label for="segmento">Segmento principal <span class="text-danger font-weight-bolder">*</span>
                         @if(!isset($perfil))
                         <i class="fas fa-sync-alt text-primary ml-2"></i>&nbsp;
-                        <em class="text-secondary">Alteração do SEGMENTO no sistema será solicitada após envio do cadastro</em>
+                        <em class="text-secondary">Alteração do SEGMENTO principal no sistema será solicitada após envio do cadastro</em>
                         @endif
                     </label>
-                    <select name="segmento" class="form-control {{ $errors->has('segmento') ? 'is-invalid' : '' }}" {{ isset($perfil) ? 'disabled' : 'required' }}>
+                    <select name="segmento" class="form-control {{ $errors->has('segmento') ? 'is-invalid' : '' }}" {{ isset($perfil) ? 'disabled' : 'required' }} id="segmento">
                     @if(isset($perfil))
                         <option value="{{ $perfil->segmento }}" selected>
                             {{ $perfil->segmento }}
@@ -203,6 +182,49 @@
                     </div>
                     @endif
                 </div>
+            </div>
+
+            <div class="form-row mb-2 cadastroRepresentante">
+
+                <div class="col-sm mb-2-576">
+                    <label for="segmento_opcional1">Segmento opcional</label>
+                    <select name="segmentos_opcionais[]" class="form-control {{ $errors->has('segmentos_opcionais') || $errors->has('segmentos_opcionais.0') ? 'is-invalid' : '' }}" id="segmento_opcional1">
+                        <option value="">
+                            Selecione um segmento:
+                        </option>
+                        @foreach(segmentos() as $segmentoAll)
+                            <option value="{{ mb_strtoupper($segmentoAll) }}" {{ isset($perfil) && (mb_strtoupper($segmentoAll) == mb_strtoupper($perfil->segmentosOpcionais(0))) ? 'selected' : '' }}>
+                                {{ mb_strtoupper($segmentoAll) }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('segmentos_opcionais') || $errors->has('segmentos_opcionais.0'))
+                    <div class="invalid-feedback">
+                        {{ $errors->has('segmentos_opcionais') ? $errors->first('segmentos_opcionais') : $errors->first('segmentos_opcionais.0') }}
+                    </div>
+                    @endif
+                </div>
+
+
+                <div class="col-sm mb-2-576">
+                    <label for="segmento_opcional2">Segmento opcional</label>
+                    <select name="segmentos_opcionais[]" class="form-control {{ $errors->has('segmentos_opcionais') || $errors->has('segmentos_opcionais.1') ? 'is-invalid' : '' }}" id="segmento_opcional2">
+                        <option value="">
+                            Selecione um segmento:
+                        </option>    
+                        @foreach(segmentos() as $segmentoAll)
+                            <option value="{{ mb_strtoupper($segmentoAll) }}" {{ isset($perfil) && (mb_strtoupper($segmentoAll) == mb_strtoupper($perfil->segmentosOpcionais(1))) ? 'selected' : '' }}>
+                                {{ mb_strtoupper($segmentoAll) }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('segmentos_opcionais') || $errors->has('segmentos_opcionais.1'))
+                    <div class="invalid-feedback">
+                        {{ $errors->has('segmentos_opcionais') ? $errors->first('segmentos_opcionais') : $errors->first('segmentos_opcionais.1') }}
+                    </div>
+                    @endif
+                </div>
+
             </div>
 
             <div class="form-row mb-2 cadastroRepresentante">

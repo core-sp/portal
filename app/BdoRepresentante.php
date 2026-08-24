@@ -43,6 +43,24 @@ class BdoRepresentante extends Model
         return $this->hasMany('App\AlteracaoRC', 'bdo_representante_id');
     }
 
+    public function segmentosOpcionais($num = -1)
+    {
+        if(!isset($this->segmentos_opcionais))
+            return "";
+
+        if($num == -1)
+            return implode(', ', json_decode($this->segmentos_opcionais, true));
+
+        return isset(json_decode($this->segmentos_opcionais, true)[$num]) ? json_decode($this->segmentos_opcionais, true)[$num] : "";
+    }
+
+    public function segmentosTodos()
+    {
+        $seg = $this->segmentosOpcionais();
+
+        return strlen($seg) > 1 ? $this->segmento . ', ' . $seg : $this->segmento;
+    }
+
     private function dadosParaAtendimento($segmento_gerenti, $seccional_gerenti)
     {
         $s = mb_strtoupper($this->segmento);

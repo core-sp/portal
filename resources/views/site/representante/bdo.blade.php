@@ -29,24 +29,26 @@
                 <!-- Se foi solicitada mudança, mostrar o segmento pela tabela de alteração para evitar mostrar se foi aceito ou não antes de finalizar -->
                 @if($perfil_bdo->perfilRCEmAndamento() && $perfil_bdo->existeAlteracaoRC('SEGMENTO'))
                     <i class="fas fa-sync-alt fa-sm text-primary"></i>&nbsp;
-                    Segmento: <strong>{{ $perfil_bdo->alteracoesRC->where('informacao', 'SEGMENTO')->first()->valor_atual }}</strong>
+                    Segmento principal: <strong>{{ $perfil_bdo->alteracoesRC->where('informacao', 'SEGMENTO')->first()->valor_atual }}</strong>
                 @else
-                    Segmento: <strong>{{ $perfil_bdo->segmento }}</strong>
+                    Segmento principal: <strong>{{ $perfil_bdo->segmento }}</strong>
                 @endif
                     &nbsp;&nbsp;|&nbsp;&nbsp;
-
-                <!-- Se foi solicitada mudança, mostrar a regional pela tabela de alteração para evitar mostrar se foi aceito ou não antes de finalizar -->
-                @if($perfil_bdo->perfilRCEmAndamento() && $perfil_bdo->existeAlteracaoRC('REGIONAL'))
-                    <i class="fas fa-sync-alt fa-sm text-primary"></i>&nbsp;
-                    Regional: <strong>{{ $perfil_bdo->alteracoesRC->where('informacao', 'REGIONAL')->first()->valor_atual }}</strong>
-                @else
-                    Regional: <strong>{{ json_decode($perfil_bdo->regioes)->seccional }}</strong>
-                @endif
-                    &nbsp;&nbsp;|&nbsp;&nbsp;
-                    Telefone: <strong>{{ $perfil_bdo->telefone }}</strong>
+                    Segmentos opcionais: <strong>{!! $perfil_bdo->segmentosOpcionais() !!}</strong>
                 </p>
                 <p class="pb-0">
                     E-mail: <strong>{{ $perfil_bdo->email }}</strong>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+
+                    <!-- Se foi solicitada mudança, mostrar a regional pela tabela de alteração para evitar mostrar se foi aceito ou não antes de finalizar -->
+                    @if($perfil_bdo->perfilRCEmAndamento() && $perfil_bdo->existeAlteracaoRC('REGIONAL'))
+                        <i class="fas fa-sync-alt fa-sm text-primary"></i>&nbsp;
+                        Regional: <strong>{{ $perfil_bdo->alteracoesRC->where('informacao', 'REGIONAL')->first()->valor_atual }}</strong>
+                    @else
+                        Regional: <strong>{{ json_decode($perfil_bdo->regioes)->seccional }}</strong>
+                    @endif
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    Telefone: <strong>{{ $perfil_bdo->telefone }}</strong>
                 </p>
                 <p class="pb-0">
                     Endereço: <strong>{{ $perfil_bdo->endereco }}</strong>
