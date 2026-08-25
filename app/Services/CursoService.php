@@ -7,6 +7,7 @@ use App\Events\CrudEvent;
 use App\Contracts\CursoServiceInterface;
 use Carbon\Carbon;
 use App\Traits\ImagensLazyLoad;
+use App\Repositories\GerentiRepositoryInterface;
 
 class CursoService implements CursoServiceInterface {
 
@@ -234,14 +235,79 @@ class CursoService implements CursoServiceInterface {
         ];
     }
 
-    public function downloadInscricoes($id)
+    private function teste($tabela, GerentiRepositoryInterface $gerenti)
+    {
+        foreach($tabela as $key => $valor)
+        {
+            $rep = array();
+            $dados = $gerenti->gerentiBusca(null, null, apenasNumeros($valor["CPF"]));
+
+            if(count($dados))
+            {
+                foreach($dados as $dado)
+                {
+                    if($dado["ASS_CPF_CGC"] == apenasNumeros($valor["CPF"])){
+                        $rep["RC Ativo"] = $dado["ASS_ATIVO"] == "T" ? 'Ativo' : 'Não Ativo';
+                        $rep["RC Registro"] = $dado["ASS_REGISTRO"];
+                        $rep["RC Nome Empresa"] = "-----";
+                        $rep["RC Financeiro"] = $dado["ASS_ATIVO"] == "T" ? trim(explode(':', $gerenti->gerentiStatus($dado["ASS_ID"]))[1]) : "-----";
+                        break;
+                    }
+                }
+            }
+
+            if(empty($rep) && (strlen($valor["Registro Core"]) > 1))
+            {
+                $dados = $gerenti->gerentiBusca($valor["Registro Core"], null, null);
+
+                if(count($dados))
+                {
+                    foreach($dados as $dado)
+                    {
+                        if($dado["ASS_REGISTRO"] == apenasNumeros($valor["Registro Core"])){
+                            $rep["RC Ativo"] = $dado["ASS_ATIVO"] == "T" ? 'Ativo' : 'Não Ativo';
+                            $rep["RC Registro"] = $dado["ASS_REGISTRO"];
+                            $rep["RC Nome Empresa"] = $dado["ASS_TP_PESSOA"] == "J" ? $dado["ASS_NOME"] : "-----";
+                            $rep["RC Financeiro"] = $dado["ASS_ATIVO"] == "T" ? trim(explode(':', $gerenti->gerentiStatus($dado["ASS_ID"]))[1]) : "-----";
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            if(!empty($rep))
+            {
+                $ano = substr($rep["RC Registro"], -4);
+                $homenagem = intval(date("Y")) - intval($ano);
+                $rep["RC Homenagem"] = $homenagem >= 25 ? $homenagem . " anos" : "-----";
+            }
+
+            if(empty($rep))
+            {
+                $rep["RC Ativo"] = "-----";
+                $rep["RC Registro"] = "-----";
+                $rep["RC Nome Empresa"] = "-----";
+                $rep["RC Financeiro"] = "-----";
+                $rep["RC Homenagem"] = "-----";
+            }
+            
+            $tabela[$key] = array_merge($valor, $rep);
+        }
+
+        return $tabela;
+    }
+
+    public function downloadInscricoes($id, GerentiRepositoryInterface $gerenti)
     {
         $resultado = Curso::findOrFail($id)->cursoinscrito()
         ->selectRaw('email AS "E-mail", cpf AS "CPF", nome AS "Nome", telefone AS "Telefone", registrocore AS "Registro Core", tipo_inscrito AS "Tipo da Inscrição", campo_adicional AS "Campo Adicional", presenca AS "Compareceu", created_at AS "Data da Inscrição"')
         ->orderBy('created_at', 'desc')
         ->get();
-        
+
         $lista = $resultado->toArray();
+
+        $lista = $this->teste($lista, $gerenti);
+
         array_unshift($lista, array_keys($lista[0]));
         $callback = function() use($lista) {
             $fh = fopen('php://output','w');
