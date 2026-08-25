@@ -237,20 +237,26 @@ class CursoService implements CursoServiceInterface {
 
     private function getRepGerenti($gerenti, $dados = [])
     {
+        $rep["RC Ativo"] = "";
+        $rep["RC Registro"] = "";
+        $rep["RC Nome / Empresa"] = "";
+        $rep["RC Tipo"] = "";
+        $rep["RC Financeiro"] = "";
+        $rep["RC Homenagem"] = "";
+
         if(!empty($dados))
         {
-            foreach($dados as $dado)
+            foreach($dados as $key => $dado)
             {
-                $rep["RC Ativo"] = $dado["ASS_ATIVO"] == "T" ? 'Ativo' : 'Não Ativo';
-                $rep["RC Registro"] = $dado["ASS_REGISTRO"];
-                $rep["RC Nome / Empresa"] = $dado["ASS_NOME"];
-                $rep["RC Tipo"] = \App\Representante::mapaCodigoTipoPessoa($dado["ASS_TP_ASSOC"]);
-                $rep["RC Financeiro"] = $dado["ASS_ATIVO"] == "T" ? trim(explode(':', $gerenti->gerentiStatus($dado["ASS_ID"]))[1]) : "-----";
+                $rep["RC Ativo"] .= $dado["ASS_ATIVO"] == "T" ? 'Ativo * ' : 'Não Ativo * ';
+                $rep["RC Registro"] .= $dado["ASS_REGISTRO"] . ' * ';
+                $rep["RC Nome / Empresa"] .= $dado["ASS_NOME"] . ' * ';
+                $rep["RC Tipo"] .= \App\Representante::mapaCodigoTipoPessoa($dado["ASS_TP_ASSOC"]) . ' * ';
+                $rep["RC Financeiro"] .= $dado["ASS_ATIVO"] == "T" ? trim(explode(':', $gerenti->gerentiStatus($dado["ASS_ID"]))[1]) . ' * ' : "----- * ";
 
                 $ano = substr($rep["RC Registro"], -4);
                 $homenagem = intval(date("Y")) - intval($ano);
-                $rep["RC Homenagem"] = $homenagem >= 25 ? $homenagem . " anos" : "-----";
-                break;
+                $rep["RC Homenagem"] .= $homenagem >= 25 ? $homenagem . " anos * " : "----- * ";
             }
             return $rep;
         }
