@@ -246,13 +246,14 @@ class CursoService implements CursoServiceInterface {
             {
                 foreach($dados as $dado)
                 {
-                    if($dado["ASS_CPF_CGC"] == apenasNumeros($valor["CPF"])){
+                    // if($dado["ASS_CPF_CGC"] == apenasNumeros($valor["CPF"])){
                         $rep["RC Ativo"] = $dado["ASS_ATIVO"] == "T" ? 'Ativo' : 'Não Ativo';
                         $rep["RC Registro"] = $dado["ASS_REGISTRO"];
-                        $rep["RC Nome Empresa"] = "-----";
+                        $rep["RC Nome / Empresa"] = $dado["ASS_NOME"];
+                        $rep["RC Tipo"] = \App\Representante::mapaCodigoTipoPessoa($dado["ASS_TP_ASSOC"]);
                         $rep["RC Financeiro"] = $dado["ASS_ATIVO"] == "T" ? trim(explode(':', $gerenti->gerentiStatus($dado["ASS_ID"]))[1]) : "-----";
                         break;
-                    }
+                    // }
                 }
             }
 
@@ -264,13 +265,14 @@ class CursoService implements CursoServiceInterface {
                 {
                     foreach($dados as $dado)
                     {
-                        if($dado["ASS_REGISTRO"] == apenasNumeros($valor["Registro Core"])){
+                        // if($dado["ASS_REGISTRO"] == apenasNumeros($valor["Registro Core"])){
                             $rep["RC Ativo"] = $dado["ASS_ATIVO"] == "T" ? 'Ativo' : 'Não Ativo';
                             $rep["RC Registro"] = $dado["ASS_REGISTRO"];
-                            $rep["RC Nome Empresa"] = $dado["ASS_TP_PESSOA"] == "J" ? $dado["ASS_NOME"] : "-----";
+                            $rep["RC Nome / Empresa"] = $dado["ASS_NOME"];
+                            $rep["RC Tipo"] = \App\Representante::mapaCodigoTipoPessoa($dado["ASS_TP_ASSOC"]);
                             $rep["RC Financeiro"] = $dado["ASS_ATIVO"] == "T" ? trim(explode(':', $gerenti->gerentiStatus($dado["ASS_ID"]))[1]) : "-----";
                             break;
-                        }
+                        // }
                     }
                 }
             }
@@ -286,7 +288,8 @@ class CursoService implements CursoServiceInterface {
             {
                 $rep["RC Ativo"] = "-----";
                 $rep["RC Registro"] = "-----";
-                $rep["RC Nome Empresa"] = "-----";
+                $rep["RC Nome / Empresa"] = "-----";
+                $rep["RC Tipo"] = "-----";
                 $rep["RC Financeiro"] = "-----";
                 $rep["RC Homenagem"] = "-----";
             }
