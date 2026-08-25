@@ -259,7 +259,7 @@ class CursoService implements CursoServiceInterface {
 
             if(empty($rep) && (strlen($valor["Registro Core"]) > 1))
             {
-                $dados = $gerenti->gerentiBusca($valor["Registro Core"], null, null);
+                $dados = $gerenti->gerentiBusca(apenasNumeros($valor["Registro Core"]), null, null);
 
                 if(count($dados))
                 {
