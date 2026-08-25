@@ -322,7 +322,7 @@
                     required
                 />
                 <label for="checkbox-termo-de-uso" class="textoTermo text-justify">
-                    Li e concordo com os <a class="text-primary" href="/arquivos/Termo_de_Uso_e_Consentimento_Area_Restrita_rev.pdf" target="_blank">Termos de Uso</a> gfgfgfgfgfgfgfgfgf do Core-SP.
+                    Ao efetivar este cadastro, declaro, sob minha responsabilidade, que as informações fornecidas são verdadeiras, completas e atualizadas, estando ciente e de acordo com a divulgação dos dados no Balcão de Oportunidades do CORE-SP, bem como com sua utilização para atualização e saneamento cadastral e inclusão no Domicílio Tributário Eletrônico (DTE), autorizando seu tratamento para as finalidades relacionadas às competências legais, regulamentares e administrativas da Autarquia, nos termos da legislação aplicável.
                 </label>
                 @if($errors->has('checkbox-tdu'))
                 <div class="invalid-feedback">
