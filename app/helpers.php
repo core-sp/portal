@@ -139,7 +139,7 @@ function segmentos()
         'Artigos de festa',
         'Atacadista',
         'Audiovisual',
-        'Auto Peças',
+        'Autopeças',
         'Automação Industrial',
         'Automobilística',
         'Bebidas e Congêneres',
@@ -163,8 +163,8 @@ function segmentos()
         'Decoração',
         'Descartáveis',
         'Educação/Cultura/Lazer',
-        'Eletro Domésticos',
-        'Eletro Eletrônicos',
+        'Eletrodomésticos',
+        'Eletroeletrônicos',
         'Eletrônicos',
         'Embalagens',
         'Energia',
@@ -194,17 +194,17 @@ function segmentos()
         'Informática/Telecom.',
         'Instrumentos Musicais',
         'Isolamento Térmico',
-        'Jóias e Acessórios',
+        'Joias e Acessórios',
         'Jornais e Revistas',
         'Laboratorial',
-        'Langerie',
         'Limpeza e Conservação',
+        'Lingerie',
         'Lubrificantes',
         'Madeira',
         'Máquinas e Equip. Industriais',
         'Máquinas e Equipamentos',
         'Máquinas/Ferramentas',
-        'Matéria Prima',
+        'Matéria-Prima',
         'Materiais Elétricos',
         'Materiais Hidráulicos',
         'Mecânica Industrial',
@@ -214,11 +214,11 @@ function segmentos()
         'Metais',
         'Metalurgia/Mecânica',
         'Mobiliário/Móveis',
-        'Moto Peças',
+        'Motopeças',
         'Motos',
         'Nutrição Animal',
         'Odontológicos',
-        'Óticos',
+        'Óptico',
         'Ortodônticos',
         'Papel e Celulose',
         'Papelaria/Livraria/Revistas',
@@ -245,7 +245,7 @@ function segmentos()
         'Segurança Patrimonial',
         'Segurança',
         'Segurança Industrial',
-        'Sensores Óticos',
+        'Sensores Ópticos',
         'Serviço de Proteção ao Consumidor',
         'Siderúrgica',
         'Suplemento Alimentar',
@@ -691,7 +691,7 @@ function concursoSituacoes()
 
 function mostraChatScript()
 {
-    if(config('app.env') !== 'local') {
+    if((config('app.env') !== 'local') && !\Route::is('site.carousel')){
         $hour = date('H');
         $day = date('w');
         if($hour >= 9 && $hour < 18 && $day !== '6' && $day !== '0') {
@@ -826,7 +826,7 @@ function ambiente()
 
 function versaoScriptJs()
 {
-    return '1.3.6';
+    return '1.4.7';
 }
 
 function hashScriptJs()

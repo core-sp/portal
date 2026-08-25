@@ -204,7 +204,7 @@ class CursoInscritoController extends Controller
         $this->authorize('viewAny', auth()->user());
         
         try{
-            $callback = $this->service->getService('Curso')->downloadInscricoes($id);
+            $callback = $this->service->getService('Curso')->downloadInscricoes($id, $this->gerentiRepository);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao realizar download dos inscritos no curso com ID ".$id.".");

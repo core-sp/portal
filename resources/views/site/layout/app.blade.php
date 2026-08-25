@@ -82,10 +82,9 @@
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai hide-768">
               <div class="d-block setembro">
-                <h3><a href="/servicos-atendimento-ao-rc" class="cinza-claro">
-                  <span id="home-atende">Serviços de atendimento ao RC</span></a>
-                </h3>
-                <p class="light"><a href="/servicos-atendimento-ao-rc" class="cinza-claro"><small>Clique aqui e tenha acesso aos principais<br>serviços realizados pelo Setor de Atendimento do Core-SP.</small></a></p>
+                <h4><a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" class="cinza-claro" target="_blank">
+                <img src="{{ asset('img/icon_transparencia.png') }}" alt="Transparência | Core-SP" class="d-inline transparencia-footer">&nbsp;<span id="">Acesso à Informação <br>e Prestação de Contas</span></a>
+                </h4>
               </div>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
@@ -164,10 +163,7 @@
                     </div>
                   </li>
                   <li class="nav-item">
-                    <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" class="nav-link" target="_blank">Transparência</a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/prestacao-de-contas-do-core-sp" class="nav-link">Prestação de Contas</a>
+                    <a href="/ouvidoria" class="nav-link">Ouvidoria</a>
                   </li>
                   <li class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownFiscal" role="button" data-toggle="dropdown">Fiscalização</a>
@@ -238,7 +234,7 @@
                 <div class="container">
                   <div class="d-flex">
                     <div class="flex-one text-center">
-                      <h5 class="d-inline-block pr-3 cinza-claro"><strong>Dúvidas frequentes</strong></h5>
+                      <h5 class="d-inline-block pr-3 cinza-claro"><strong>Serviços de atendimento ao RC</strong></h5>
                       <p class="d-inline-block cinza-claro">Clique aqui e tenha acesso aos principais serviços realizados <br class="show-768">pelo Setor de Atendimento do Core-SP.</p>
                     </div>
                   </div>
@@ -426,7 +422,7 @@
       </footer>
       @show
 
-      <div class="container">
+      <div class="container" id="box-consentimento">
         <div class="row d-flex justify-content-center">
           <div class="border border-primary rounded box-cookies hide">
             <p class="msg-cookies">
