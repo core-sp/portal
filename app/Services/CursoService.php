@@ -254,7 +254,7 @@ class CursoService implements CursoServiceInterface {
                 $rep["RC Tipo"] .= \App\Representante::mapaCodigoTipoPessoa($dado["ASS_TP_ASSOC"]) . ' * ';
                 $rep["RC Financeiro"] .= $dado["ASS_ATIVO"] == "T" ? trim(explode(':', $gerenti->gerentiStatus($dado["ASS_ID"]))[1]) . ' * ' : "----- * ";
 
-                $ano = substr($rep["RC Registro"], -4);
+                $ano = substr($dado["ASS_REGISTRO"], -4);
                 $homenagem = intval(date("Y")) - intval($ano);
                 $rep["RC Homenagem"] .= $homenagem >= 25 ? $homenagem . " anos * " : "----- * ";
             }
