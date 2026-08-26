@@ -105,11 +105,14 @@ class RepresentanteController extends Controller
             'Nome',
             'Registro',
             'CPF/CNPJ',
+            'Tempo de exercício',
             'Ações'
         ];
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
+            $exercicio = substr($resultado["ASS_REGISTRO"], -4);
+            $exercicio = intval(date("Y")) - intval($exercicio);
             $acoes = '<form method="GET" action="/admin/representantes/info" class="d-inline">';
             $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
             $acoes .= '<input type="hidden" name="tipo" value="'.$resultado["ASS_TP_ASSOC"].'" />';
@@ -121,6 +124,7 @@ class RepresentanteController extends Controller
                 $resultado['ASS_NOME'] . ' <strong>(' . Representante::mapaCodigoTipoPessoa($resultado['ASS_TP_ASSOC']) . ')</strong>',
                 formataRegistro($resultado['ASS_REGISTRO']),
                 '<span class="nowrap">' . formataCpfCnpj($resultado['ASS_CPF_CGC']) . '</span>',
+                $exercicio . ' anos',
                 $acoes
             ];
             array_push($contents, $conteudo);
