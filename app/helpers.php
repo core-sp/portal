@@ -472,6 +472,8 @@ function secondLine($situacao, $vencimento = null, $link = null, $descricao = nu
             $str = '<strong class="text-info">PROC. ADM.</strong> ⋅ <a href="' . $link . '" class="normal text-info" data-descricao="'. $descricao .'">BAIXAR BOLETO</a>';
         else
             $str = '<strong class="text-info">PROC. ADM.</strong>';
+    } elseif($situacao === 'Prescrito'){
+        $str = '<strong class="text-secondary">PRESCRITO</strong>';
     } else {
         $str = '<strong class="text-primary">VERIFICAR COM FINANCEIRO</strong>';
     }

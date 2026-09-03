@@ -172,7 +172,7 @@ class BdoSiteController extends Controller
         $agradece .= '<br><br>';
         $agradece .= 'A(s) vaga(s) será(ão) disponibilizada(s) em até 03 (três) dias úteis, após a verificação dos dados informados.';
         $agradece .= '<br><br>';
-        $agradece .= 'Caso necessite mais esclarecimentos, entre em contato conosco através do email comunicacao@core-sp.org.br.';
+        $agradece .= 'Caso necessite mais esclarecimentos, entre em contato conosco através do email convenios.parcerias@core-sp.org.br.';
         return $agradece;
     }
 }
