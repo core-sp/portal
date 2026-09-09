@@ -6,9 +6,12 @@ use PDO;
 use App\Representante;
 use App\Connections\FirebirdConnection;
 use App\Repositories\GerentiRepositoryInterface;
+use App\Traits\GerentiSQL;
 
 class GerentiRepository implements GerentiRepositoryInterface
 {
+    use GerentiSQL;
+
     private $gerentiConnection;
 
     protected function connect()
@@ -470,5 +473,26 @@ class GerentiRepository implements GerentiRepositoryInterface
         $resultado = $run->fetchAll();
         
         return utf8_converter($resultado);
+    }
+
+    public function teste($registro, $nome, $cpfCnpj, $email, $telefone, $regional, $municipio, $anoCadastro)
+    {
+        $this->connect();
+
+        $query = $this->busca();
+
+        $run = $this->gerentiConnection->prepare($query);
+        $run->execute([
+            $registro,
+            $nome,
+            $cpfCnpj,
+            $email,
+            $telefone,
+            $regional,
+            $municipio,
+            $anoCadastro
+        ]);
+
+        return $run->fetchAll(PDO::FETCH_ASSOC);
     }
 }
