@@ -496,7 +496,7 @@ class GerentiRepository implements GerentiRepositoryInterface
 
             return $run->fetchAll(PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
-            return $e->getMessage();
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
         }
     }
 }

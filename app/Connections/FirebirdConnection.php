@@ -16,6 +16,10 @@ class FirebirdConnection
             $this->connection = new PDO('firebird:dbname='.$this->config()->host.':'.$this->config()->dbname.';charset=UTF8',
                 $this->config()->username,
                 $this->config()->password);
+
+            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->connection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+
         } catch (PDOException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Os servidores estão passando por manutenção. Por favor, tente dentro de alguns minutos.'/*'Estamos enfrentando problemas técnicos no momento. Por favor, tente dentro de alguns minutos.'*/);
