@@ -24,9 +24,7 @@ trait GerentiSQL
         )
          
         SELECT FIRST 1000 DISTINCT
-         
-            /* Dados principais do associado */
-         
+                  
             A.ASS_ID,
             A.ASS_ATIVO,
             A.ASS_ENTIDADE,
@@ -43,14 +41,6 @@ trait GerentiSQL
             A.USU_CODIGO,
             A.SYS_LAST_UPDATE,
          
-            /*
-            ===========================================================================
-            TIPO DO ASSOCIADO
-         
-            Obtém a descrição em TP_ASSOC e, quando ASS_TP_ASSOC = 1,
-            acrescenta o parâmetro Tipo_Empresa.
-            ===========================================================================
-            */
          
             CASE
                 WHEN A.ASS_TP_ASSOC = 1
@@ -106,10 +96,6 @@ trait GerentiSQL
          
             ||
          
-            /*
-            Regra específica do CORE-RJ para acrescentar EX-CORE ao tipo.
-            */
-         
             CASE
                 WHEN
                     (
@@ -147,19 +133,6 @@ trait GerentiSQL
          
                 ELSE ""
             END AS TIPO,
-         
-            /*
-            ===========================================================================
-            CANCELADO
-         
-            Reproduz a lógica da PROCCANCELADO diretamente pela VWCANCELADOS.
-         
-            T = cancelado
-            F = não cancelado
-         
-            Mantém também a exceção existente para o CORE-RS.
-            ===========================================================================
-            */
          
             CASE
                 WHEN COALESCE(
@@ -204,14 +177,6 @@ trait GerentiSQL
                 ELSE "F"
             END AS CANCELADO,
          
-            /*
-            ===========================================================================
-            INDICADOR EXCORE
-         
-            Regra utilizada especificamente pelo CORE-RJ.
-            ===========================================================================
-            */
-         
             CASE
                 WHEN
                     (
@@ -250,12 +215,7 @@ trait GerentiSQL
                 ELSE 0
             END AS EXCORE,
          
-            /*
-            ===========================================================================
-            NOVOS CAMPOS
-            ===========================================================================
-            */
-         
+            
             A.REGIONALREPRESENTANTE,
          
             (
@@ -286,13 +246,6 @@ trait GerentiSQL
          
         WHERE 1 = 1
          
-            /*
-            ===========================================================================
-            FILTRO 1: REGISTRO
-         
-            Procura registros que começam com o valor informado.
-            ===========================================================================
-            */
          
             AND
             (
@@ -301,14 +254,7 @@ trait GerentiSQL
                 OR A.ASS_REGISTRO STARTING WITH PAR.REGISTRO
             )
          
-            /*
-            ===========================================================================
-            FILTRO 2: NOME
-         
-            Procura nomes que começam com o valor informado.
-            ===========================================================================
-            */
-         
+            
             AND
             (
                 PAR.NOME = ""
@@ -316,18 +262,7 @@ trait GerentiSQL
                 OR UPPER(A.ASS_NOME) STARTING WITH UPPER(PAR.NOME)
             )
          
-            /*
-            ===========================================================================
-            FILTRO 3: CPF/CNPJ
-         
-            Faz três verificações:
-         
-            1. CPF/CNPJ diretamente no associado;
-            2. CPF de pessoa relacionada em RELASSOCIADOS;
-            3. Regra de empresário individual existente para o CORE-BA.
-            ===========================================================================
-            */
-         
+            
             AND
             (
                 PAR.CPFCNPJ = ""
@@ -340,10 +275,6 @@ trait GerentiSQL
          
                     AND
                     (
-                        /*
-                        Busca de CPF nas pessoas relacionadas para COREs
-                        diferentes do CORE-BA.
-                        */
          
                         (
                             (
@@ -388,10 +319,6 @@ trait GerentiSQL
          
                         OR
          
-                        /*
-                        Regra específica do CORE-BA.
-                        Pesquisa o CPF em DADOS, parâmetro TPD_ID = 51.
-                        */
          
                         (
                             (
@@ -418,13 +345,6 @@ trait GerentiSQL
                 )
             )
          
-            /*
-            ===========================================================================
-            FILTRO 4: E-MAIL
-         
-            Pesquisa parte do e-mail nos contatos do tipo 3.
-            ===========================================================================
-            */
          
             AND
             (
@@ -443,14 +363,6 @@ trait GerentiSQL
                 )
             )
          
-            /*
-            ===========================================================================
-            FILTRO 5: TELEFONE
-         
-            Pesquisa parte do telefone, excluindo tipos 3 e 5.
-            ===========================================================================
-            */
-         
             AND
             (
                 PAR.TELEFONE = ""
@@ -468,15 +380,7 @@ trait GerentiSQL
                 )
             )
          
-            /*
-            ===========================================================================
-            FILTRO 6: REGIONAL
-         
-            Utiliza ASSOCIADOS.REGIONALREPRESENTANTE.
-            A pesquisa é por correspondência exata.
-            ===========================================================================
-            */
-         
+            
             AND
             (
                 PAR.REGIONAL = ""
@@ -485,14 +389,7 @@ trait GerentiSQL
                    = UPPER(TRIM(PAR.REGIONAL))
             )
          
-            /*
-            ===========================================================================
-            FILTRO 7: MUNICÍPIO
-         
-            Utiliza o município do endereço marcado como endereço
-            de correspondência.
-            ===========================================================================
-            */
+           
         AND
         (
             PAR.MUNICIPIO = ""
@@ -542,13 +439,6 @@ trait GerentiSQL
             )
         )
          
-            /*
-            ===========================================================================
-            FILTRO 8: ANO DE CADASTRO
-         
-            Obtém o ano nos quatro últimos caracteres de ASS_REGISTRO.
-            ===========================================================================
-            */
          
             AND
             (
