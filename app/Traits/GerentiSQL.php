@@ -7,7 +7,7 @@ trait GerentiSQL
     // Tentativa 1
     public function busca()
     {
-        return 'SET LIST ON;
+        return '
          
         WITH PARAMETROS AS
         (
@@ -456,8 +456,8 @@ trait GerentiSQL
                 )
             )
          
-        ORDER BY A.ASS_REGISTRO;
+        ORDER BY A.ASS_REGISTRO
          
-        QUIT;';
+        ';
     }
 }
