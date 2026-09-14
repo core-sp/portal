@@ -484,14 +484,14 @@ class GerentiRepository implements GerentiRepositoryInterface
 
             $run = $this->gerentiConnection->prepare($query);
             $run->execute([
-                $registro,
-                $nome,
-                $cpfCnpj,
-                $email,
-                $telefone,
-                $regional,
-                $municipio,
-                $anoCadastro
+                'registro' => $registro,
+                'nome' => $nome,
+                'cpfCnpj' => $cpfCnpj,
+                'email' => $email,
+                'telefone' => $telefone,
+                'regional' => $regional,
+                'municipio' => $municipio,
+                'anoCadastro' => $anoCadastro
             ]);
 
             return $run->fetchAll(PDO::FETCH_ASSOC);
