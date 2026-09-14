@@ -12,14 +12,14 @@ trait GerentiSQL
         WITH PARAMETROS AS
         (
             SELECT
-                CAST("?" AS VARCHAR(20))  AS REGISTRO,
-                CAST("?" AS VARCHAR(100)) AS NOME,
-                CAST("?" AS VARCHAR(20))  AS CPFCNPJ,
-                CAST("?" AS VARCHAR(80))  AS EMAIL,
-                CAST("?" AS VARCHAR(80))  AS TELEFONE,
-                CAST("?" AS VARCHAR(50))  AS REGIONAL,
-                CAST("?" AS VARCHAR(100)) AS MUNICIPIO,
-                CAST("?" AS VARCHAR(4)) AS ANOCADASTRO
+                CAST(:registro AS VARCHAR(20))  AS REGISTRO,
+                CAST(:nome AS VARCHAR(100)) AS NOME,
+                CAST(:cpfCnpj AS VARCHAR(20))  AS CPFCNPJ,
+                CAST(:email AS VARCHAR(80))  AS EMAIL,
+                CAST(:telefone AS VARCHAR(80))  AS TELEFONE,
+                CAST(:regional AS VARCHAR(50))  AS REGIONAL,
+                CAST(:municipio AS VARCHAR(100)) AS MUNICIPIO,
+                CAST(:anoCadastro AS VARCHAR(4)) AS ANOCADASTRO
             FROM RDB$DATABASE
         )
          
