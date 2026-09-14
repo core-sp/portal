@@ -482,6 +482,11 @@ class GerentiRepository implements GerentiRepositoryInterface
         $query = $this->busca();
 
         $run = $this->gerentiConnection->prepare($query);
+
+        if ($run === false) {
+            die("SQL Prepare Error: " . $this->gerentiConnection->error); 
+        }
+
         $run->execute([
             $registro,
             $nome,
