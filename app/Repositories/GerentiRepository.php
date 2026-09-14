@@ -477,27 +477,26 @@ class GerentiRepository implements GerentiRepositoryInterface
 
     public function teste($registro, $nome, $cpfCnpj, $email, $telefone, $regional, $municipio, $anoCadastro)
     {
-        $this->connect();
+        try {
+            $this->connect();
 
-        $query = $this->busca();
+            $query = $this->busca();
 
-        $run = $this->gerentiConnection->prepare($query);
+            $run = $this->gerentiConnection->prepare($query);
+            $run->execute([
+                $registro,
+                $nome,
+                $cpfCnpj,
+                $email,
+                $telefone,
+                $regional,
+                $municipio,
+                $anoCadastro
+            ]);
 
-        if ($run === false) {
-            die("SQL Prepare Error: " . $this->gerentiConnection->error); 
+            return $run->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            return $e->getMessage();
         }
-
-        $run->execute([
-            $registro,
-            $nome,
-            $cpfCnpj,
-            $email,
-            $telefone,
-            $regional,
-            $municipio,
-            $anoCadastro
-        ]);
-
-        return $run->fetchAll(PDO::FETCH_ASSOC);
     }
 }
