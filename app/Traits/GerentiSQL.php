@@ -8,20 +8,6 @@ trait GerentiSQL
     public function busca()
     {
         return 'SET LIST ON;
- 
-        /*
-        ===============================================================================
-        PARÂMETROS DO TESTE
-         
-        Preencha somente os filtros que deseja utilizar.
-        Para ignorar um filtro, mantenha o valor como texto vazio: ""
-         
-        Exemplos:
-            CAST("JOSE" AS VARCHAR(100))      AS NOME
-            CAST("2017" AS VARCHAR(4))        AS ANOCADASTRO
-            CAST("SAO PAULO" AS VARCHAR(100)) AS MUNICIPIO
-        ===============================================================================
-        */
          
         WITH PARAMETROS AS
         (
