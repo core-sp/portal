@@ -53,11 +53,11 @@ trait GerentiSQL
                             INNER JOIN TP_PARAMETRO TP
                                 ON TP.TPP_ID = D.TPD_ID
          
-                            WHERE TP.TPP_CODIGO = 'Tipo_Empresa'
+                            WHERE TP.TPP_CODIGO = \'Tipo_Empresa\'
                               AND D.ASS_ID = A.ASS_ID
                         ),
-                        ''
-                     ) <> ''
+                        \'\'
+                     ) <> \'\'
          
                  AND COALESCE(
                         (
@@ -67,15 +67,15 @@ trait GerentiSQL
                             INNER JOIN TP_PARAMETRO TP
                                 ON TP.TPP_ID = D.TPD_ID
          
-                            WHERE TP.TPP_CODIGO = 'Tipo_Empresa'
+                            WHERE TP.TPP_CODIGO = \'Tipo_Empresa\'
                               AND D.ASS_ID = A.ASS_ID
                         ),
-                        ''
+                        \'\'
                      ) <> TRIM(T.TPA_DESCRICAO)
          
                 THEN
                     TRIM(T.TPA_DESCRICAO)
-                    || ' ('
+                    || \' (\'
                     || COALESCE(
                         (
                             SELECT FIRST 1 TRIM(D.DAD_VALOR)
@@ -84,12 +84,12 @@ trait GerentiSQL
                             INNER JOIN TP_PARAMETRO TP
                                 ON TP.TPP_ID = D.TPD_ID
          
-                            WHERE TP.TPP_CODIGO = 'Tipo_Empresa'
+                            WHERE TP.TPP_CODIGO = \'Tipo_Empresa\'
                               AND D.ASS_ID = A.ASS_ID
                         ),
-                        ''
+                        \'\'
                     )
-                    || ')'
+                    || \')\'
          
                 ELSE TRIM(T.TPA_DESCRICAO)
             END
@@ -101,7 +101,7 @@ trait GerentiSQL
                     (
                         SELECT FIRST 1 TRIM(EMP.EMP_NOME_ABREV)
                         FROM EMPRESA EMP
-                    ) = 'CORE-RJ'
+                    ) = \'CORE-RJ\'
          
                 AND EXISTS
                     (
@@ -112,8 +112,8 @@ trait GerentiSQL
                             ON TP1.TPP_ID = D1.TPD_ID
          
                         WHERE D1.ASS_ID = A.ASS_ID
-                          AND TP1.TPP_CODIGO = 'OUTROCORE'
-                          AND D1.DAD_VALOR = 'SIM'
+                          AND TP1.TPP_CODIGO = \'OUTROCORE\'
+                          AND D1.DAD_VALOR = \'SIM\'
                     )
          
                 AND EXISTS
@@ -125,13 +125,13 @@ trait GerentiSQL
                             ON TP2.TPP_ID = D2.TPD_ID
          
                         WHERE D2.ASS_ID = A.ASS_ID
-                          AND TP2.TPP_CODIGO = 'qual_core'
-                          AND D2.DAD_VALOR = 'CORE-GB'
+                          AND TP2.TPP_CODIGO = \'qual_core\'
+                          AND D2.DAD_VALOR = \'CORE-GB\'
                     )
          
-                THEN ' (EX-CORE)'
+                THEN \' (EX-CORE)\'
          
-                ELSE ''
+                ELSE \'\'
             END AS TIPO,
          
             CASE
@@ -150,7 +150,7 @@ trait GerentiSQL
                             (
                                 SELECT FIRST 1 TRIM(EMP.EMP_NOME_ABREV)
                                 FROM EMPRESA EMP
-                            ) = 'CORE-RS'
+                            ) = \'CORE-RS\'
          
                         AND
                             (
@@ -169,12 +169,12 @@ trait GerentiSQL
                                     EV.EVE_ID DESC
                             ) IN (21, 99, 100, 101, 123, 124, 125)
          
-                        THEN 'F'
+                        THEN \'F\'
          
-                        ELSE 'T'
+                        ELSE \'T\'
                     END
          
-                ELSE 'F'
+                ELSE \'F\'
             END AS CANCELADO,
          
             CASE
@@ -182,7 +182,7 @@ trait GerentiSQL
                     (
                         SELECT FIRST 1 TRIM(EMP.EMP_NOME_ABREV)
                         FROM EMPRESA EMP
-                    ) = 'CORE-RJ'
+                    ) = \'CORE-RJ\'
          
                 AND EXISTS
                     (
@@ -193,8 +193,8 @@ trait GerentiSQL
                             ON TP1.TPP_ID = D1.TPD_ID
          
                         WHERE D1.ASS_ID = A.ASS_ID
-                          AND TP1.TPP_CODIGO = 'OUTROCORE'
-                          AND D1.DAD_VALOR = 'SIM'
+                          AND TP1.TPP_CODIGO = \'OUTROCORE\'
+                          AND D1.DAD_VALOR = \'SIM\'
                     )
          
                 AND EXISTS
@@ -206,8 +206,8 @@ trait GerentiSQL
                             ON TP2.TPP_ID = D2.TPD_ID
          
                         WHERE D2.ASS_ID = A.ASS_ID
-                          AND TP2.TPP_CODIGO = 'qual_core'
-                          AND D2.DAD_VALOR = 'CORE-GB'
+                          AND TP2.TPP_CODIGO = \'qual_core\'
+                          AND D2.DAD_VALOR = \'CORE-GB\'
                     )
          
                 THEN 1
@@ -222,7 +222,7 @@ trait GerentiSQL
                 SELECT FIRST 1 TRIM(E.END_MUNICIPIO)
                 FROM ENDERECOS E
                 WHERE E.ASS_ID = A.ASS_ID
-                  AND E.END_CORRESP = 'T'
+                  AND E.END_CORRESP = \'T\'
             ) AS MUNICIPIO,
          
             CASE
@@ -249,7 +249,7 @@ trait GerentiSQL
          
             AND
             (
-                PAR.REGISTRO = ''
+                PAR.REGISTRO = \'\'
          
                 OR A.ASS_REGISTRO STARTING WITH PAR.REGISTRO
             )
@@ -257,7 +257,7 @@ trait GerentiSQL
             
             AND
             (
-                PAR.NOME = ''
+                PAR.NOME = \'\'
          
                 OR UPPER(A.ASS_NOME) STARTING WITH UPPER(PAR.NOME)
             )
@@ -265,7 +265,7 @@ trait GerentiSQL
             
             AND
             (
-                PAR.CPFCNPJ = ''
+                PAR.CPFCNPJ = \'\'
          
                 OR A.ASS_CPF_CGC STARTING WITH PAR.CPFCNPJ
          
@@ -280,7 +280,7 @@ trait GerentiSQL
                             (
                                 SELECT FIRST 1 TRIM(EMP.EMP_NOME_ABREV)
                                 FROM EMPRESA EMP
-                            ) <> 'CORE-BA'
+                            ) <> \'CORE-BA\'
          
                             AND EXISTS
                             (
@@ -298,7 +298,7 @@ trait GerentiSQL
                                           SELECT FIRST 1
                                                  TRIM(EMP.EMP_NOME_ABREV)
                                           FROM EMPRESA EMP
-                                      ) = 'CORE-MS'
+                                      ) = \'CORE-MS\'
          
                                       OR R.REL_TP_RELACAO
                                          IN (1, 2, 7, 100)
@@ -306,7 +306,7 @@ trait GerentiSQL
          
                                   AND
                                   (
-                                      PAR.NOME = ''
+                                      PAR.NOME = \'\'
          
                                       OR UPPER(R.REL_NOME)
                                          STARTING WITH UPPER(PAR.NOME)
@@ -324,7 +324,7 @@ trait GerentiSQL
                             (
                                 SELECT FIRST 1 TRIM(EMP.EMP_NOME_ABREV)
                                 FROM EMPRESA EMP
-                            ) = 'CORE-BA'
+                            ) = \'CORE-BA\'
          
                             AND EXISTS
                             (
@@ -336,8 +336,8 @@ trait GerentiSQL
          
                                   AND REPLACE(
                                           DBA.DAD_VALOR,
-                                          '-',
-                                          ''
+                                          \'-\',
+                                          \'\'
                                       ) STARTING WITH PAR.CPFCNPJ
                             )
                         )
@@ -348,7 +348,7 @@ trait GerentiSQL
          
             AND
             (
-                PAR.EMAIL = ''
+                PAR.EMAIL = \'\'
          
                 OR EXISTS
                 (
@@ -365,7 +365,7 @@ trait GerentiSQL
          
             AND
             (
-                PAR.TELEFONE = ''
+                PAR.TELEFONE = \'\'
          
                 OR EXISTS
                 (
@@ -383,7 +383,7 @@ trait GerentiSQL
             
             AND
             (
-                PAR.REGIONAL = ''
+                PAR.REGIONAL = \'\'
          
                 OR UPPER(TRIM(A.REGIONALREPRESENTANTE))
                    = UPPER(TRIM(PAR.REGIONAL))
@@ -392,14 +392,14 @@ trait GerentiSQL
            
         AND
         (
-            PAR.MUNICIPIO = ''
+            PAR.MUNICIPIO = \'\'
          
             OR EXISTS
             (
                 SELECT 1
                 FROM ENDERECOS EM
                 WHERE EM.ASS_ID = A.ASS_ID
-                  AND EM.END_CORRESP = 'T'
+                  AND EM.END_CORRESP = \'T\'
          
                   AND
          
@@ -411,13 +411,13 @@ trait GerentiSQL
                   REPLACE(
                   REPLACE(
                       UPPER(TRIM(EM.END_MUNICIPIO)),
-                      'Á','A'),
-                      'À','A'),
-                      'Ã','A'),
-                      'Â','A'),
-                      'É','E'),
-                      'Ç','C'),
-                      'Ó','O')
+                      \'Á\',\'A\'),
+                      \'À\',\'A\'),
+                      \'Ã\',\'A\'),
+                      \'Â\',\'A\'),
+                      \'É\',\'E\'),
+                      \'Ç\',\'C\'),
+                      \'Ó\',\'O\')
          
                   STARTING WITH
          
@@ -429,20 +429,20 @@ trait GerentiSQL
                   REPLACE(
                   REPLACE(
                       UPPER(TRIM(PAR.MUNICIPIO)),
-                      'Á','A'),
-                      'À','A'),
-                      'Ã','A'),
-                      'Â','A'),
-                      'É','E'),
-                      'Ç','C'),
-                      'Ó','O')
+                      \'Á\',\'A\'),
+                      \'À\',\'A\'),
+                      \'Ã\',\'A\'),
+                      \'Â\',\'A\'),
+                      \'É\',\'E\'),
+                      \'Ç\',\'C\'),
+                      \'Ó\',\'O\')
             )
         )
          
          
             AND
             (
-                PAR.ANOCADASTRO = ''
+                PAR.ANOCADASTRO = \'\'
          
                 OR
                 (
