@@ -8,9 +8,11 @@ use Illuminate\Http\Request;
 use App\Repositories\GerentiApiRepository;
 use App\Repositories\GerentiRepositoryInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
+use App\Contracts\MediadorServiceInterface;
 
 class RepresentanteController extends Controller
 {
+    private $service;
 
     // Nome da classe
     private $class = 'RepresentanteController';
@@ -28,11 +30,12 @@ class RepresentanteController extends Controller
         'btn_lista' => '<a href="/admin/representantes/buscaGerenti" class="btn btn-primary">Nova Busca</a>'
     ];
 
-    public function __construct(GerentiRepositoryInterface $gerentiRepository, GerentiApiRepository $gerentiApiRepository)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, GerentiApiRepository $gerentiApiRepository, MediadorServiceInterface $service)
     {
         $this->middleware('auth');
         $this->gerentiRepository = $gerentiRepository;
         $this->gerentiApiRepository = $gerentiApiRepository;
+        $this->service = $service;
     }
 
     public function resultados()
@@ -143,15 +146,23 @@ class RepresentanteController extends Controller
     {
         $this->authorize('viewAny', auth()->user());
         $variaveis = (object) $this->variaveis;
-        return view('admin.crud.criar', compact('variaveis'));
+        $regionais = $this->service->getService('Regional')->getRegionais();
+
+        return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
 
     protected function validateRequest()
     {
         return request()->validate([
-            'nome' => 'nullable|min:5|required_without_all:cpf_cnpj,registro',
-            'cpf_cnpj' => ['min:11', new CpfCnpj, 'required_without_all:nome,registro'],
-            'registro' => 'nullable|min:5|required_without_all:nome,cpf_cnpj'
+            // 'nome' => 'nullable|min:5|required_without_all:cpf_cnpj,registro',
+            'nome' => 'nullable|min:5',
+            // 'cpf_cnpj' => ['min:11', new CpfCnpj, 'required_without_all:nome,registro'],
+            'cpf_cnpj' => ['min:11', new CpfCnpj],
+            // 'registro' => 'nullable|min:5|required_without_all:nome,cpf_cnpj',
+            'registro' => 'nullable|min:5',
+            'regional' => '',
+            'municipio' => '',
+            'anoCadastro' => '',
         ], [
             'nome.min' => 'Preencha no mínimo 5 caracteres',
             'registro.min' => 'Preencha no mínimo 5 caracteres',
@@ -164,15 +175,17 @@ class RepresentanteController extends Controller
     {
         $request->merge([
             'registro' => apenasNumeros($request->registro),
-            'cpf_cnpj' => apenasNumeros($request->cpf_cnpj)
+            'cpf_cnpj' => apenasNumeros($request->cpf_cnpj),
+            'anoCadastro' => apenasNumeros($request->anoCadastro),
         ]);
         $this->validateRequest();
         $variaveis = (object) $this->variaveis;
-        $resultados = $this->gerentiRepository->gerentiBusca($request->registro, $request->nome, $request->cpf_cnpj);
+        $resultados = $this->gerentiRepository->gerentiBuscaAmpliada($request->registro, $request->nome, $request->cpf_cnpj, $request->regional, $request->municipio, $request->anoCadastro);
         $count = count($resultados);
         $count ? $tabela = $this->tabelaGerenti($resultados) : $tabela = 'vazia';
+        $regionais = $this->service->getService('Regional')->getRegionais();
         
-        return view('admin.crud.criar', compact('variaveis', 'tabela', 'count'));
+        return view('admin.crud.criar', compact('variaveis', 'tabela', 'count', 'regionais'));
     }
 
     public function representanteInfo(Request $request)

@@ -64,6 +64,70 @@
                 @endif
             </div>
         </div>
+
+        <div class="form-row mt-3">
+            <div class="col">
+                <label for="regional">Regional</label>
+                <select name="regional" class="form-control {{ $errors->has('regional') ? 'is-invalid' : '' }}" id="regional">
+                    <option value="" {{ empty(old('regional')) ? 'selected' : '' }}>Escolha uma regional...</option>
+                @foreach($regionais as $regional)
+                    @if(old('regional'))
+                    <option value="{{ $regional->idregional }}" {{ old('regional') == $regional->idregional ? 'selected' : '' }}>{{ $regional->regional }}</option>
+                    @else
+                    <option value="{{ $regional->idregional }}" {{ isset($resultado->idregional) && ($resultado->idregional == $regional->idregional) ? 'selected' : '' }}>{{ $regional->regional }}</option>
+                    @endif
+                @endforeach
+                </select>
+
+                @if($errors->has('regional'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('regional') }}
+                    </div>
+                @endif
+            </div>
+            <div class="col">
+                <label for="municipio">Município</label>
+                <input
+                    type="text"
+                    name="municipio"
+                    id="municipio"
+                    placeholder="Município"
+                    class="form-control {{ $errors->has('municipio') ? 'is-invalid' : '' }}"
+                    @if(!empty(Request::old('municipio')))
+                        value="{{ Request::old('municipio') }}"
+                    @endif
+                    @if(!empty(Request::input('municipio')))
+                        value="{{ Request::input('municipio') }}"
+                    @endif
+                >
+                @if($errors->has('municipio'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('municipio') }}
+                    </div>
+                @endif
+            </div>
+            <div class="col">
+                <label for="anoCadastro">Ano de cadastro</label>
+                <input
+                    type="text"
+                    name="anoCadastro"
+                    class="form-control anoInput {{ $errors->has('anoCadastro') ? 'is-invalid' : '' }}"
+                    id="anoCadastro"
+                    @if(!empty(Request::old('anoCadastro')))
+                        value="{{ Request::old('anoCadastro') }}"
+                    @endif
+                    @if(!empty(Request::input('anoCadastro')))
+                        value="{{ Request::input('anoCadastro') }}"
+                    @endif
+                >
+                @if($errors->has('anoCadastro'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('anoCadastro') }}
+                    </div>
+                @endif
+            </div>
+        </div>
+
         <div class="form-group mt-3 mb-0">
         <button type="submit" class="btn btn-primary">Buscar {{ isset($tabela) ? 'novamente' : '' }}</button>
         </div>

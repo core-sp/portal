@@ -475,7 +475,7 @@ class GerentiRepository implements GerentiRepositoryInterface
         return utf8_converter($resultado);
     }
 
-    public function teste($registro, $nome, $cpfCnpj, $email, $telefone, $regional, $municipio, $anoCadastro)
+    public function gerentiBuscaAmpliada($registro, $nome, $cpfCnpj, $regional, $municipio, $anoCadastro)
     {
         try {
             $this->connect();
@@ -487,8 +487,8 @@ class GerentiRepository implements GerentiRepositoryInterface
                 'registro' => $registro,
                 'nome' => $nome,
                 'cpfCnpj' => $cpfCnpj,
-                'email' => $email,
-                'telefone' => $telefone,
+                'email' => '',
+                'telefone' => '',
                 'regional' => $regional,
                 'municipio' => $municipio,
                 'anoCadastro' => $anoCadastro

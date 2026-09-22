@@ -4,7 +4,6 @@ namespace App\Traits;
 
 trait GerentiSQL
 {
-    // Tentativa 1
     public function busca()
     {
         return '

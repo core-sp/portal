@@ -484,4 +484,9 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
             ],
         ];
     }
+
+    public function gerentiBuscaAmpliada($registro, $nome, $cpfCnpj, $regional, $municipio, $anoCadastro)
+    {
+        return $this->gerentiBusca($registro, $nome, $cpfCnpj);
+    }
 }
