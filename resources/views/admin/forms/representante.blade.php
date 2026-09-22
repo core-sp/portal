@@ -71,11 +71,7 @@
                 <select name="regional" class="form-control {{ $errors->has('regional') ? 'is-invalid' : '' }}" id="regional">
                     <option value="" {{ empty(old('regional')) ? 'selected' : '' }}>Escolha uma regional...</option>
                 @foreach($regionais as $regional)
-                    @if(old('regional'))
-                    <option value="{{ $regional->idregional }}" {{ old('regional') == $regional->idregional ? 'selected' : '' }}>{{ $regional->regional }}</option>
-                    @else
-                    <option value="{{ $regional->idregional }}" {{ isset($resultado->idregional) && ($resultado->idregional == $regional->idregional) ? 'selected' : '' }}>{{ $regional->regional }}</option>
-                    @endif
+                    <option value="{{ $regional->regional }}" {{ old('regional') && (old('regional') == $regional->regional) ? 'selected' : '' }}>{{ $regional->regional }}</option>
                 @endforeach
                 </select>
 

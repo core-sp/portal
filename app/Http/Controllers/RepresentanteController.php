@@ -180,7 +180,7 @@ class RepresentanteController extends Controller
         ]);
         $this->validateRequest();
         $variaveis = (object) $this->variaveis;
-        $resultados = $this->gerentiRepository->gerentiBuscaAmpliada($request->registro, $request->nome, $request->cpf_cnpj, $request->regional, $request->municipio, $request->anoCadastro);
+        $resultados = $this->gerentiRepository->gerentiBuscaAmpliada($request->registro, $request->nome, $request->cpf_cnpj, mb_strtoupper($request->regional), mb_strtoupper($request->municipio), $request->anoCadastro);
         $count = count($resultados);
         $count ? $tabela = $this->tabelaGerenti($resultados) : $tabela = 'vazia';
         $regionais = $this->service->getService('Regional')->getRegionais();
