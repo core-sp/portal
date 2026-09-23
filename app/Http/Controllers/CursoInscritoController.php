@@ -115,6 +115,9 @@ class CursoInscritoController extends Controller
     public function inscricaoView($idcurso)
     {
         try{
+            if($idcurso == 109)
+                return redirect()->route('cursos.show', $idcurso);
+
             $curso = $this->service->getService('Curso')->show($idcurso, true);
             $rep = auth()->guard('representante')->check();
             $dados = array();
@@ -143,6 +146,9 @@ class CursoInscritoController extends Controller
     public function inscricao(CursoInscricaoRequest $request, $idcurso)
     {
         try{
+            if($idcurso == 109)
+                return redirect()->route('cursos.show', $idcurso);
+            
             $validated = $request->validated();
             $curso = $this->service->getService('Curso')->show($idcurso, true);
 

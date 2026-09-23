@@ -94,9 +94,13 @@
           <span class="{{ $curso::TEXTO_BTN_INSCRITO }} btn-curso-inscrito">Inscrição realizada</span>
         </div>
         @elseif($curso->podeInscreverExterno())
+
+          @if($curso->idcurso != 109)
           <div class="center-992">
             <a href="{{ route('cursos.inscricao.website', $curso->idcurso) }}" class="btn-curso-interna">Inscrever-se</a>
           </div>
+          @endif
+          
         @endif
       </div>
       <div class="col-lg-8 mt-2-992">
