@@ -9,6 +9,7 @@ use App\Repositories\GerentiApiRepository;
 use App\Repositories\GerentiRepositoryInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 use App\Contracts\MediadorServiceInterface;
+use Illuminate\Validation\Rule;
 
 class RepresentanteController extends Controller
 {
@@ -153,21 +154,42 @@ class RepresentanteController extends Controller
 
     protected function validateRequest()
     {
+        $outros = !request()->filled('nome') && !request()->filled('cpf_cnpj') && !request()->filled('registro');
+
         return request()->validate([
-            // 'nome' => 'nullable|min:5|required_without_all:cpf_cnpj,registro',
-            'nome' => 'nullable|min:5',
-            // 'cpf_cnpj' => ['min:11', new CpfCnpj, 'required_without_all:nome,registro'],
-            'cpf_cnpj' => ['nullable', 'min:11', new CpfCnpj],
-            // 'registro' => 'nullable|min:5|required_without_all:nome,cpf_cnpj',
-            'registro' => 'nullable|min:5',
-            'regional' => 'nullable',
-            'municipio' => 'nullable',
-            'anoCadastro' => 'nullable',
+            'nome' => 'nullable|min:5|required_without_all:cpf_cnpj,registro,regional,municipio,anoCadastro',
+            'cpf_cnpj' => ['nullable', 'min:11', new CpfCnpj, 'required_without_all:nome,registro,regional,municipio,anoCadastro'],
+            'registro' => 'nullable|min:5|required_without_all:nome,cpf_cnpj,regional,municipio,anoCadastro',
+            'regional' => ['nullable', 'in:' . implode(",", $this->service->getService('Regional')->getRegionais()->pluck('regional')->all()),
+                Rule::requiredIf(function () use($outros){
+                    return $outros && ((request()->filled('municipio') && !request()->filled('anoCadastro')) || 
+                    (request()->filled('anoCadastro') && !request()->filled('municipio')));
+                })
+            ],
+            'municipio' => [
+                'nullable', 'min:3',
+                Rule::requiredIf(function () use($outros){
+                    return $outros && ((request()->filled('regional') && !request()->filled('anoCadastro')) || 
+                    (request()->filled('anoCadastro') && !request()->filled('regional')));
+                })
+            ],
+            'anoCadastro' => [
+                'nullable', 'size:4', 'date_format:Y', 'before_or_equal:' . date('Y'),
+                Rule::requiredIf(function () use($outros){
+                    return $outros && ((request()->filled('regional') && !request()->filled('municipio')) || 
+                    (request()->filled('municipio') && !request()->filled('regional')));
+                })
+            ],
         ], [
-            'nome.min' => 'Preencha no mínimo 5 caracteres',
-            'registro.min' => 'Preencha no mínimo 5 caracteres',
-            'min' => 'Erro no preenchimento!',
-            'required_without_all' => 'Preencha pelo menos um campo'
+            'min' => 'Preencha no mínimo :min caracteres',
+            'in' => 'Item selecionado não é válido',
+            'anoCadastro.date_format' => 'Formato do ano deve ser com 4 dígitos',
+            'required_without_all' => 'Preencha pelo menos um campo: :attribute',
+            'regional.required' => 'Ao pesquisar somente por Regional deve incluir Município e/ou Ano de cadastro',
+            'municipio.required' => 'Ao pesquisar somente por Município deve incluir Regional e/ou Ano de cadastro',
+            'anoCadastro.required' => 'Ao pesquisar somente por Ano de cadastro deve incluir Município e/ou Regional',
+            'before_or_equal' => 'Somente ano igual ou anterior a ' . date('Y'),
+            'size' => 'Deve conter 4 dígitos',
         ]);
     }
     
@@ -184,7 +206,7 @@ class RepresentanteController extends Controller
         $this->validateRequest();
         $variaveis = (object) $this->variaveis;
         $resultados = $this->gerentiRepository->gerentiBuscaAmpliada($request->registro, $request->nome, $request->cpf_cnpj, mb_strtoupper($request->regional), mb_strtoupper($request->municipio), $request->anoCadastro);
-        $count = is_null($resultados) ? 0 : count($resultados);
+        $count = count($resultados);
         $count ? $tabela = $this->tabelaGerenti($resultados) : $tabela = 'vazia';
         $regionais = $this->service->getService('Regional')->getRegionais();
         
