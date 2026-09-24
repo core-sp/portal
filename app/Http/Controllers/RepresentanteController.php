@@ -110,11 +110,15 @@ class RepresentanteController extends Controller
             'Registro',
             'CPF/CNPJ',
             'Tempo de exercício',
+            'Ativo',
+            'Cancelado',
             'Ações'
         ];
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
+            $ativo = trim($resultado['ASS_ATIVO']);
+            $cancelado = trim($resultado['CANCELADO']);
             $exercicio = substr($resultado["ASS_REGISTRO"], -4);
             $exercicio = intval(date("Y")) - intval($exercicio);
             $acoes = '<form method="GET" action="/admin/representantes/info" class="d-inline">';
@@ -129,6 +133,8 @@ class RepresentanteController extends Controller
                 formataRegistro($resultado['ASS_REGISTRO']),
                 '<span class="nowrap">' . formataCpfCnpj($resultado['ASS_CPF_CGC']) . '</span>',
                 $exercicio . ' anos',
+                $ativo == "T" ? 'Sim' : 'Não',
+                $cancelado == "T" ? 'Sim' : 'Não',
                 $acoes
             ];
             array_push($contents, $conteudo);
