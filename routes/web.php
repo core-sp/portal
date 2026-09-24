@@ -442,6 +442,16 @@ Route::middleware(['block_ip'])->group(function () {
     Route::get('/carta-de-servicos-ao-usuario/buscar', 'GerarTextoController@buscar')->name('carta-servicos-buscar');
     Route::get('/carta-de-servicos-ao-usuario/{id?}', 'GerarTextoController@show')->name('carta-servicos');
 
+    // Calculadora
+    Route::get('/calculadora', function(){
+        return view('site.calculadora');
+    })->name('calculadora');
+
+    // TEMPORÁRIO
+    Route::get('/programa-de-beneficios-core-sp', function(){
+        return redirect('/parcerias');
+    });
+
     // Páginas (deve ser inserido no final do arquivo de rotas)
     Route::get('{slug}', 'PaginaController@show')->name('paginas.site');
   });

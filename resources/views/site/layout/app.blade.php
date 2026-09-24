@@ -162,6 +162,23 @@
                       <a href="/politica-de-privacidade" class="dropdown-item bb-0">Política de Privacidade</a>
                     </div>
                   </li>
+                  <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownParcerias" role="button" data-toggle="dropdown">Convênios</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownParcerias">
+                      <a href="/parcerias" class="dropdown-item">Parceiros</a>
+                      <a href="/calculadora" class="dropdown-item">Calculadora</a>
+                      <div class="sub-dropdown">
+                        <div class="dropdown-item">
+                          Vagas de Representação <i class="fas fa-angle-right hide-768"></i><i class="fas fa-angle-down show-inline-768"></i>
+                        </div>
+                        <div class="sub-dropdown-menu">
+                          <a href="/balcao-de-oportunidades" class="dropdown-item">Acessar</a>
+                          <a href="/anunciar-vaga" class="dropdown-item bb-0">Anunciar</a>
+                        </div>
+                      </div>
+                      {{--<a href="#" class="dropdown-item">Modelo de contrato</a>--}}
+                    </div>
+                  </li>
                   <li class="nav-item">
                     <a href="/ouvidoria" class="nav-link">Ouvidoria</a>
                   </li>
@@ -193,15 +210,6 @@
                       <a href="/anuidade-ano-vigente" class="dropdown-item">Anuidade {{ date('Y') }}</a>
                       <a href="/representante/login" class="dropdown-item">Área Exclusiva</a>
                       <a href="/servicos-atendimento-ao-rc" class="dropdown-item">Atendimento</a>
-                      <div class="sub-dropdown">
-                        <div class="dropdown-item">
-                          Balcão de Oportunidades <i class="fas fa-angle-right hide-768"></i><i class="fas fa-angle-down show-inline-768"></i>
-                        </div>
-                        <div class="sub-dropdown-menu">
-                          <a href="/balcao-de-oportunidades" class="dropdown-item">Acessar</a>
-                          <a href="/anunciar-vaga" class="dropdown-item bb-0">Anunciar</a>
-                        </div>
-                      </div>
                       <a href="{{ route('carta-servicos') }}" class="dropdown-item">Carta de Serviços ao Usuário</a>
                       <a href="/consulta-de-situacao" class="dropdown-item">Consulta Pública</a>
                       <a href="/cursos" class="dropdown-item">Cursos</a>

@@ -6,7 +6,24 @@
 
 @section('content')
 
-@include('site.inc.popup')
+{{-- @include('site.inc.popup') --}}
+
+<!-- POP UP TEMPORÁRIO -->
+
+<div class="modal hide fade" id="popup-campanha">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content d-flex flex-column">
+            <button type="button" class="btn btn-link position-absolute align-self-end" data-dismiss="modal" aria-label="Close">
+              <i class="fas fa-times-circle fa-lg"></i>
+            </button>
+            <a href="/parcerias">
+              <img src="{{ asset('img/pop-up-parcerias.png') }}" />
+            </a>
+        </div>
+    </div>
+</div>
+
+<!--  -->
 
 @if($imagens->isNotEmpty())
 <section>
