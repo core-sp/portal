@@ -487,8 +487,8 @@ class GerentiRepository implements GerentiRepositoryInterface
                 'registro' => $registro,
                 'nome' => $nome,
                 'cpfCnpj' => $cpfCnpj,
-                'email' => '',
-                'telefone' => '',
+                'email' => "",
+                'telefone' => "",
                 'regional' => $regional,
                 'municipio' => $municipio,
                 'anoCadastro' => $anoCadastro
