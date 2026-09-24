@@ -157,12 +157,12 @@ class RepresentanteController extends Controller
             // 'nome' => 'nullable|min:5|required_without_all:cpf_cnpj,registro',
             'nome' => 'nullable|min:5',
             // 'cpf_cnpj' => ['min:11', new CpfCnpj, 'required_without_all:nome,registro'],
-            'cpf_cnpj' => ['min:11', new CpfCnpj],
+            'cpf_cnpj' => ['nullable', 'min:11', new CpfCnpj],
             // 'registro' => 'nullable|min:5|required_without_all:nome,cpf_cnpj',
             'registro' => 'nullable|min:5',
-            'regional' => '',
-            'municipio' => '',
-            'anoCadastro' => '',
+            'regional' => 'nullable',
+            'municipio' => 'nullable',
+            'anoCadastro' => 'nullable',
         ], [
             'nome.min' => 'Preencha no mínimo 5 caracteres',
             'registro.min' => 'Preencha no mínimo 5 caracteres',
@@ -177,6 +177,9 @@ class RepresentanteController extends Controller
             'registro' => apenasNumeros($request->registro),
             'cpf_cnpj' => apenasNumeros($request->cpf_cnpj),
             'anoCadastro' => apenasNumeros($request->anoCadastro),
+            'regional' => is_null($request->regional) ? "" : $request->regional,
+            'nome' => is_null($request->nome) ? "" : $request->nome,
+            'municipio' => is_null($request->municipio) ? "" : $request->municipio,
         ]);
         $this->validateRequest();
         $variaveis = (object) $this->variaveis;
