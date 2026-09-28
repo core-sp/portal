@@ -393,15 +393,30 @@ trait GerentiSQL
                 REPLACE(
                 REPLACE(
                 REPLACE(
-                    UPPER(TRIM(A.REGIONALREPRESENTANTE))
-                        = UPPER(TRIM(PAR.REGIONAL)),
-                        \'Á\',\'A\'),
-                        \'À\',\'A\'),
-                        \'Ã\',\'A\'),
-                        \'Â\',\'A\'),
-                        \'É\',\'E\'),
-                        \'Ç\',\'C\'),
-                        \'Ó\',\'O\')
+                    UPPER(TRIM(A.REGIONALREPRESENTANTE)),
+                    \'Á\',\'A\'),
+                    \'À\',\'A\'),
+                    \'Ã\',\'A\'),
+                    \'Â\',\'A\'),
+                    \'É\',\'E\'),
+                    \'Ç\',\'C\'),
+                    \'Ó\',\'O\')
+                    = 
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                    UPPER(TRIM(PAR.REGIONAL)),
+                    \'Á\',\'A\'),
+                    \'À\',\'A\'),
+                    \'Ã\',\'A\'),
+                    \'Â\',\'A\'),
+                    \'É\',\'E\'),
+                    \'Ç\',\'C\'),
+                    \'Ó\',\'O\')
             )
          
            
