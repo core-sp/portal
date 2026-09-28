@@ -387,7 +387,7 @@ trait GerentiSQL
                 OR UPPER(TRIM(
                     CAST(A.REGIONALREPRESENTANTE AS VARCHAR(150) CHARACTER SET ISO8859_1)
                 ))
-                   = UPPER(TRIM(PAR.REGIONAL))
+                   = UPPER(TRIM(CAST(PAR.REGIONAL AS VARCHAR(150) CHARACTER SET ISO8859_1)))
             )
          
            
