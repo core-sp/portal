@@ -215,7 +215,7 @@ trait GerentiSQL
             END AS EXCORE,
          
             
-            CAST(A.REGIONALREPRESENTANTE AS VARCHAR(150) CHARACTER SET ISO8859_1) AS REGIONALREPRESENTANTE,
+            A.REGIONALREPRESENTANTE,
          
             (
                 SELECT FIRST 1 TRIM(E.END_MUNICIPIO)
@@ -384,7 +384,9 @@ trait GerentiSQL
             (
                 PAR.REGIONAL = \'\'
          
-                OR UPPER(TRIM(A.REGIONALREPRESENTANTE))
+                OR UPPER(TRIM(
+                    CAST(A.REGIONALREPRESENTANTE AS VARCHAR(150) CHARACTER SET ISO8859_1)
+                ))
                    = UPPER(TRIM(PAR.REGIONAL))
             )
          
