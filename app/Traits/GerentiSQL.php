@@ -384,10 +384,41 @@ trait GerentiSQL
             (
                 PAR.REGIONAL = \'\'
          
-                OR UPPER(TRIM(
-                    CAST(A.REGIONALREPRESENTANTE AS VARCHAR(150) CHARACTER SET ANSI)
-                ))
-                   = UPPER(TRIM(CAST(PAR.REGIONAL AS VARCHAR(150) CHARACTER SET ANSI)))
+                OR 
+                
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                    UPPER(TRIM(
+                        CAST(A.REGIONALREPRESENTANTE AS VARCHAR(150) CHARACTER SET ANSI)
+                    )),
+                    \'Á\',\'A\'),
+                    \'À\',\'A\'),
+                    \'Ã\',\'A\'),
+                    \'Â\',\'A\'),
+                    \'É\',\'E\'),
+                    \'Ç\',\'C\'),
+                    \'Ó\',\'O\')
+                   = 
+                    REPLACE(
+                    REPLACE(
+                    REPLACE(
+                    REPLACE(
+                    REPLACE(
+                    REPLACE(
+                    REPLACE(
+                        UPPER(TRIM(PAR.REGIONAL)),
+                        \'Á\',\'A\'),
+                        \'À\',\'A\'),
+                        \'Ã\',\'A\'),
+                        \'Â\',\'A\'),
+                        \'É\',\'E\'),
+                        \'Ç\',\'C\'),
+                        \'Ó\',\'O\')
             )
          
            
