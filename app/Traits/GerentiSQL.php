@@ -393,6 +393,8 @@ trait GerentiSQL
                 REPLACE(
                 REPLACE(
                 REPLACE(
+                REPLACE(
+                REPLACE(
                     UPPER(TRIM(
                         CAST(A.REGIONALREPRESENTANTE AS VARCHAR(150) CHARACTER SET ANSI)
                     )),
@@ -401,9 +403,13 @@ trait GerentiSQL
                     \'Ã\',\'A\'),
                     \'Â\',\'A\'),
                     \'É\',\'E\'),
+                    \'Í\',\'I\'),
+                    \'Ú\',\'U\'),
                     \'Ç\',\'C\'),
                     \'Ó\',\'O\')
                    = 
+                    REPLACE(
+                    REPLACE(
                     REPLACE(
                     REPLACE(
                     REPLACE(
@@ -417,6 +423,8 @@ trait GerentiSQL
                         \'Ã\',\'A\'),
                         \'Â\',\'A\'),
                         \'É\',\'E\'),
+                        \'Í\',\'I\'),
+                        \'Ú\',\'U\'),
                         \'Ç\',\'C\'),
                         \'Ó\',\'O\')
             )
@@ -442,17 +450,23 @@ trait GerentiSQL
                   REPLACE(
                   REPLACE(
                   REPLACE(
+                  REPLACE(
+                  REPLACE(
                       UPPER(TRIM(EM.END_MUNICIPIO)),
                       \'Á\',\'A\'),
                       \'À\',\'A\'),
                       \'Ã\',\'A\'),
                       \'Â\',\'A\'),
                       \'É\',\'E\'),
+                      \'Í\',\'I\'),
+                      \'Ú\',\'U\'),
                       \'Ç\',\'C\'),
                       \'Ó\',\'O\')
          
                   STARTING WITH
          
+                  REPLACE(
+                  REPLACE(
                   REPLACE(
                   REPLACE(
                   REPLACE(
@@ -466,6 +480,8 @@ trait GerentiSQL
                       \'Ã\',\'A\'),
                       \'Â\',\'A\'),
                       \'É\',\'E\'),
+                      \'Í\',\'I\'),
+                      \'Ú\',\'U\'),
                       \'Ç\',\'C\'),
                       \'Ó\',\'O\')
             )
