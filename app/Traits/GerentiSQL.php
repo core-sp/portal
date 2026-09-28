@@ -39,7 +39,6 @@ trait GerentiSQL
             A.ASS_DT_UPDATE,
             A.USU_CODIGO,
             A.SYS_LAST_UPDATE,
-            A.REGIONALREPRESENTANTE,
          
          
             CASE
@@ -216,7 +215,7 @@ trait GerentiSQL
             END AS EXCORE,
          
             
-            A.REGIONALREPRESENTANTE,
+            CAST(A.REGIONALREPRESENTANTE AS VARCHAR(150) CHARACTER SET ISO8859_1),
          
             (
                 SELECT FIRST 1 TRIM(E.END_MUNICIPIO)
@@ -385,39 +384,8 @@ trait GerentiSQL
             (
                 PAR.REGIONAL = \'\'
          
-                OR 
-                
-                REPLACE(
-                REPLACE(
-                REPLACE(
-                REPLACE(
-                REPLACE(
-                REPLACE(
-                REPLACE(
-                    UPPER(TRIM(A.REGIONALREPRESENTANTE)),
-                    \'Á\',\'A\'),
-                    \'À\',\'A\'),
-                    \'Ã\',\'A\'),
-                    \'Â\',\'A\'),
-                    \'É\',\'E\'),
-                    \'Ç\',\'C\'),
-                    \'Ó\',\'O\')
-                    = 
-                REPLACE(
-                REPLACE(
-                REPLACE(
-                REPLACE(
-                REPLACE(
-                REPLACE(
-                REPLACE(
-                    UPPER(TRIM(PAR.REGIONAL)),
-                    \'Á\',\'A\'),
-                    \'À\',\'A\'),
-                    \'Ã\',\'A\'),
-                    \'Â\',\'A\'),
-                    \'É\',\'E\'),
-                    \'Ç\',\'C\'),
-                    \'Ó\',\'O\')
+                OR UPPER(TRIM(A.REGIONALREPRESENTANTE))
+                   = UPPER(TRIM(PAR.REGIONAL))
             )
          
            
