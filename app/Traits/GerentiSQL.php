@@ -385,7 +385,21 @@ trait GerentiSQL
                 PAR.REGIONAL = \'\'
          
                 OR UPPER(TRIM(A.REGIONALREPRESENTANTE))
-                   = UPPER(TRIM(PAR.REGIONAL))
+                   = REPLACE(
+                    REPLACE(
+                    REPLACE(
+                    REPLACE(
+                    REPLACE(
+                    REPLACE(
+                    REPLACE(
+                        UPPER(TRIM(PAR.REGIONAL)),
+                        \'Á\',\'A\'),
+                        \'À\',\'A\'),
+                        \'Ã\',\'A\'),
+                        \'Â\',\'A\'),
+                        \'É\',\'E\'),
+                        \'Ç\',\'C\'),
+                        \'Ó\',\'O\')
             )
          
            
