@@ -39,6 +39,7 @@ trait GerentiSQL
             A.ASS_DT_UPDATE,
             A.USU_CODIGO,
             A.SYS_LAST_UPDATE,
+            A.REGIONALREPRESENTANTE,
          
          
             CASE
