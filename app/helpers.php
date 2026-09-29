@@ -841,7 +841,7 @@ function hashScriptJs()
 
 function versaoScriptCss()
 {
-    return '1.1.1';
+    return '1.1.2';
 }
 
 function hashScriptCss()
