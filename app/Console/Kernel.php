@@ -73,7 +73,14 @@ class Kernel extends ConsoleKernel
              * =======================================================================================================
             */ 
             try{
-                $users->push(User::select('email','idregional','idperfil')->where('email', 'LIKE', 'comunicacao@%')->first());
+                $comunica = User::select('email','idregional','idperfil')
+                ->where('email', 'LIKE', 'comunicacao@%')
+                ->orWhere('email', 'LIKE', 'comunicacao.adm01@%')
+                ->get();
+
+                foreach($comunica as $com)
+                    $users->push($com);
+
                 $service = resolve('App\Contracts\MediadorServiceInterface');
                 $service->getService('SalaReuniao')->agendados()->executarRotinaAgendadosDoDia($users);
             } catch(\Exception $e) {

@@ -4,7 +4,7 @@
       <div class="curso-grid">
         <img class="lazy-loaded-image lazy bn-img" src="{{ isset($curso->img) ? $curso->imgBlur() : asset('img/small-news-generica-thumb.png') }}" data-src="{{ isset($curso->img) ? asset($curso->img) : asset('img/news-generica-thumb.png') }}" />
         <div class="curso-grid-txt">
-          <h6 class="light cinza-claro">{{ $curso->regional->regional }} - {{ onlyDate($curso->datarealizacao) }}</h6>
+          <h6 class="light cinza-claro">{{-- $curso->regional->regional --}} <!-- - -->{{ onlyDate($curso->datarealizacao) }}</h6>
           <h5 class="branco mt-1">{{ $curso->tipo }} - {{ $curso->tema }}</h5>
         </div>
       </div>
@@ -17,7 +17,11 @@
           <span class="{{ $curso::TEXTO_BTN_INSCRITO }} btn-inscrito-grid"><b>Inscrição realizada</b></span>
         </div>
         @elseif($curso->podeInscreverExterno())
+
+          @if($curso->idcurso != 109)
           <a href="{{ route('cursos.inscricao.website', $curso->idcurso) }}" class="btn-curso-grid mt-3">Inscrever-se</a>
+          @endif
+          
         @elseif(!$curso->aguardandoAbrirInscricao())
           <button class="btn-esgotado mt-3">Vagas esgotadas</button>
         @else

@@ -514,7 +514,7 @@ class HomeImagemTest extends TestCase
             '/> Usar cor padrão do card escuro<i class="fas fa-circle fa-lg ml-1" style="color:' . HomeImagem::padrao()['cards_1_default'].';"></i>',
             'checked',
             '/> Usar cor padrão do card claro<i class="fas fa-circle fa-lg ml-1" style="color:' . HomeImagem::padrao()['cards_2_default'].';"></i>',
-            '<small>Cards Laterais - Localizados em notícias, páginas, área restrita...</small>',
+            '<small>Cards Laterais - Localizados em notícias, páginas, área exclusiva...</small>',
             'checked',
             '/> Usar cor padrão do card lateral escuro<i class="fas fa-circle fa-lg ml-1" style="color:' . HomeImagem::padrao()['cards_laterais_1_default'].';"></i>',
             'checked',

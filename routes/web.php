@@ -434,9 +434,7 @@ Route::middleware(['block_ip'])->group(function () {
     Route::get('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigenteView')->name('anuidade-ano-vigente');
     Route::post('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigente');
 
-    Route::get('/chat', function(){
-      return view('site.chat');
-    });
+    Route::get('/carousel', 'SiteController@index')->name('site.carousel');
 
     Route::get('/agenda-institucional', 'SiteController@agendaInstitucional')->name('agenda-institucional');
     Route::get('/agenda-institucional/{data}', 'SiteController@agendaInstitucionalByData')->name('agenda-institucional-data');
@@ -449,6 +447,16 @@ Route::middleware(['block_ip'])->group(function () {
 
     Route::get('/carta-de-servicos-ao-usuario/buscar', 'GerarTextoController@buscar')->name('carta-servicos-buscar');
     Route::get('/carta-de-servicos-ao-usuario/{id?}', 'GerarTextoController@show')->name('carta-servicos');
+
+    // Calculadora
+    Route::get('/calculadora', function(){
+        return view('site.calculadora');
+    })->name('calculadora');
+
+    // TEMPORÁRIO
+    Route::get('/programa-de-beneficios-core-sp', function(){
+        return redirect('/parcerias');
+    });
 
     // Páginas (deve ser inserido no final do arquivo de rotas)
     Route::get('{slug}', 'PaginaController@show')->name('paginas.site');

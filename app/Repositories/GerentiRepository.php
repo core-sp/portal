@@ -22,7 +22,7 @@ class GerentiRepository implements GerentiRepositoryInterface
     {
         $this->connect();
 
-        $cpfCnpj = apenasNumeros($cpfCnpj);
+        $cpfCnpj = apenasNumerosLetras($cpfCnpj);
 
         $run = $this->gerentiConnection->prepare("select SITUACAO, REGISTRONUM, ASS_ID, NOME, EMAILS from PROCLOGINPORTAL(:registro, :cpfCnpj)");
 

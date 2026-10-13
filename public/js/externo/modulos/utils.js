@@ -229,6 +229,13 @@ export function executar(local = 'externo'){
         });
     });
 
+    $(document).ready(function(){
+        if(window.location.pathname == "/carousel"){
+            $('.carousel-item img').css('height', 'unset');
+            $('#header-principal, #fixed-menu, #menuResponsivo, #sidebar, #home-news, #espaco-representante, #beneficios, #fale, #eouv-calendario, #rodape, #box-consentimento, .linha-dourada').remove();
+        }
+    });
+
     $('.loadingPagina').on('click', function(){
 		document.dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR"));
 	});

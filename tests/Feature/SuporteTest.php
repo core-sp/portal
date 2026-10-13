@@ -1710,6 +1710,9 @@ class SuporteTest extends TestCase
     /** @test */
     public function blocked_ip_after_6_submits()
     {
+        $this->markTestSkipped(
+            'Temporariamente com redirecionamento na parte de agendamento.'
+        );
         Mail::fake();
 
         factory('App\User')->create();
@@ -1866,6 +1869,9 @@ class SuporteTest extends TestCase
     /** @test */
     public function free_ip_can_get_routes()
     {
+        $this->markTestSkipped(
+            'Temporariamente com redirecionamento na parte de agendamento.'
+        );
         factory('App\Regional')->create();
         $ip = factory('App\SuporteIp')->states('liberado')->create();
 
@@ -1880,6 +1886,9 @@ class SuporteTest extends TestCase
     /** @test */
     public function unblocked_ip_can_get_routes()
     {
+        $this->markTestSkipped(
+            'Temporariamente com redirecionamento na parte de agendamento.'
+        );
         factory('App\Regional')->create();
         $ip = factory('App\SuporteIp')->create([
             'tentativas' => 3

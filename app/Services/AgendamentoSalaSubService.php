@@ -328,9 +328,9 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
                 ->where(function($q) use ($busca, $possuiNumeros) {
                     $q->when($possuiNumeros, function ($q1) use ($busca) {
                         $q1->whereHas('representante', function ($q2) use ($busca){
-                            $q2->where('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%');
+                            $q2->where('cpf_cnpj', 'LIKE', '%'.apenasNumerosLetras($busca).'%');
                         })
-                        ->orWhere('rep_presencial', 'LIKE', '%"'.apenasNumeros($busca).'"%')
+                        ->orWhere('rep_presencial', 'LIKE', '%"'.apenasNumerosLetras($busca).'"%')
                         ->orWhere('participantes', 'LIKE', '%"'.apenasNumeros($busca).'"%')
                         ->orWhere('id', apenasNumeros($busca))
                         ->orWhere('periodo', 'LIKE', $busca . ' - %')
@@ -342,9 +342,9 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             }, function ($query) use ($busca, $possuiNumeros) {
                 return $query->when($possuiNumeros, function ($q1) use ($busca) {
                     $q1->whereHas('representante', function ($q2) use ($busca){
-                        $q2->where('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%');
+                        $q2->where('cpf_cnpj', 'LIKE', '%'.apenasNumerosLetras($busca).'%');
                     })
-                    ->orWhere('rep_presencial', 'LIKE', '%"'.apenasNumeros($busca).'"%')
+                    ->orWhere('rep_presencial', 'LIKE', '%"'.apenasNumerosLetras($busca).'"%')
                     ->orWhere('participantes', 'LIKE', '%"'.apenasNumeros($busca).'"%')
                     ->orWhere('id', apenasNumeros($busca))
                     ->orWhere('periodo', 'LIKE', $busca . ' - %')

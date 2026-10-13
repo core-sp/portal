@@ -49,11 +49,15 @@
                 {!! $curso->btnSituacao() !!}
               </h6></td>
             </tr>
+
+            {{--
             <tr>
               <td><h6>Onde</h6></td>
               <td><h6 class="light">{{ $curso->regional->regional }}</h6></td>
             </tr>
             <tr>
+            --}}
+            
               <td><h6>Início</h6></td>
               <td><h6 class="light">{{ onlyDate($curso->datarealizacao) }}</h6></td>
             </tr>
@@ -90,9 +94,13 @@
           <span class="{{ $curso::TEXTO_BTN_INSCRITO }} btn-curso-inscrito">Inscrição realizada</span>
         </div>
         @elseif($curso->podeInscreverExterno())
+
+          @if($curso->idcurso != 109)
           <div class="center-992">
             <a href="{{ route('cursos.inscricao.website', $curso->idcurso) }}" class="btn-curso-interna">Inscrever-se</a>
           </div>
+          @endif
+          
         @endif
       </div>
       <div class="col-lg-8 mt-2-992">

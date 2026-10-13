@@ -3,6 +3,7 @@
 namespace App\Contracts;
 
 use App\Contracts\MediadorServiceInterface;
+use App\Repositories\GerentiRepositoryInterface;
 
 interface CursoServiceInterface {
 
@@ -28,7 +29,7 @@ interface CursoServiceInterface {
 
     public function buscar($busca, $user);
 
-    public function downloadInscricoes($id);
+    public function downloadInscricoes($id, GerentiRepositoryInterface $gerenti);
 
     public function show($id, $publicado = false);
 

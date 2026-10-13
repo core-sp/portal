@@ -116,7 +116,7 @@
             <div class="col">
                 <label for="telefone">Telefone</label>
                 <input type="text"
-                    class="form-control fixoInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
+                    class="form-control telefoneInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
                     placeholder="Telefone"
                     name="telefone"
                     value="{{ empty(old('telefone')) && isset($resultado->telefone) ? $resultado->telefone : old('telefone') }}"

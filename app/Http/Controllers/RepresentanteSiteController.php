@@ -59,11 +59,11 @@ class RepresentanteSiteController extends Controller
     public function index()
     {
         $rep = Auth::guard('representante')->user();
-        $resultado = $this->gerentiRepository->gerentiAnuidadeVigente(apenasNumeros($rep->cpf_cnpj));
+        $resultado = $this->gerentiRepository->gerentiAnuidadeVigente(apenasNumerosLetras($rep->cpf_cnpj));
         $nrBoleto = isset($resultado[0]['NOSSONUMERO']) ? $resultado[0]['NOSSONUMERO'] : null;
         $status = statusBold($this->gerentiRepository->gerentiStatus($rep->ass_id));
         $ano = date("Y");
-        $dadosBasicos = utf8_converter($this->gerentiRepository->gerentiAtivo(apenasNumeros($rep->cpf_cnpj)));
+        $dadosBasicos = utf8_converter($this->gerentiRepository->gerentiAtivo(apenasNumerosLetras($rep->cpf_cnpj)));
         $dados = isset($dadosBasicos) && (count($dadosBasicos) == 1) ? $dadosBasicos[0] : null;
         if(isset($dados['SITUACAO']) && ($dados['SITUACAO'] != 'Não encontrado'))
         {
@@ -209,7 +209,7 @@ class RepresentanteSiteController extends Controller
                 'verify_token' => null
             ]);
         } else {
-            abort(500, 'Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Portal, caso contrário, por favor refazer cadastro no Portal.');
+            abort(500, 'Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área exclusiva do Portal, caso contrário, por favor refazer cadastro no Portal.');
         }
 
         event(new ExternoEvent('Usuário ' . $find->id . ' ("'. $find->cpf_cnpj .'") verificou o email após o cadastro.'));
@@ -226,7 +226,7 @@ class RepresentanteSiteController extends Controller
     {
         $cpfCnpjCru = request('cpfCnpj');
 
-        $cpfCnpj = apenasNumeros(request('cpfCnpj'));
+        $cpfCnpj = apenasNumerosLetras(request('cpfCnpj'));
 
         $this->rules($request, $cpfCnpj);
 

@@ -44,12 +44,14 @@ class BdoSiteController extends Controller
         $regionais = $this->service->getService('Regional')->getRegionais();
         $segmentos = BdoEmpresa::segmentos();
         $municipios = $this->service->getService('Bdo')->temp_municipios();
+        $total_op = $this->bdoOportunidadeRepository->getTotalOportunidades();
+        $total_emp = $this->bdoEmpresaRepository->getTotalEmpresas();
 
         foreach($oportunidades as $o) {
             $o->regiaoFormatada = $this->displayRegioes($o->regiaoatuacao, $regionais->toArray());
         }
 
-        return view('site.balcao-de-oportunidades', compact('oportunidades', 'regionais', 'segmentos', 'municipios'));
+        return view('site.balcao-de-oportunidades', compact('oportunidades', 'regionais', 'segmentos', 'municipios', 'total_op', 'total_emp'));
     }
 
     public function buscaOportunidades()
@@ -64,6 +66,8 @@ class BdoSiteController extends Controller
         $oportunidades = IlluminateRequest::input('tipo') == 'representantes' ? 
         $this->service->getService('Bdo')->buscarPerfisPublicos(IlluminateRequest::only(['palavra-chave', 'tipo', 'segmento', 'municipio', 'regional']), $regionais) : 
         $this->bdoOportunidadeRepository->buscagetToBalcaoSite($buscaSegmento, $buscaRegional, $buscaPalavraChave);
+        $total_op = $this->bdoOportunidadeRepository->getTotalOportunidades();
+        $total_emp = $this->bdoEmpresaRepository->getTotalEmpresas();
         
         if (count($oportunidades) > 0) {
             if(get_class($oportunidades->get(0)) == "App\BdoOportunidade")
@@ -75,7 +79,7 @@ class BdoSiteController extends Controller
             $oportunidades = null;
         }
 
-        return view('site.balcao-de-oportunidades', compact('oportunidades', 'regionais', 'segmentos', 'municipios'));
+        return view('site.balcao-de-oportunidades', compact('oportunidades', 'regionais', 'segmentos', 'municipios', 'total_op', 'total_emp'));
     }
 
     public function anunciarVagaView()
@@ -110,7 +114,7 @@ class BdoSiteController extends Controller
                 return redirect()
                     ->back()
                     ->with([
-                        'message' => 'A empresa informada <strong>já possui uma vaga sob análise ou em andamento no Balcão de Oportunidades</strong> do Core-SP. Para solicitar nova inclusão, favor entrar em contato através do e-mail: <strong>comunicacao@core-sp.org.br</strong> informando CNPJ, nome do responsável e telefone para contato.',
+                        'message' => 'A empresa informada <strong>já possui uma vaga sob análise ou em andamento no Balcão de Oportunidades</strong> do Core-SP. Para solicitar nova inclusão, favor entrar em contato através do e-mail: <strong>flavio.ferraro@core-sp.org.br</strong> informando CNPJ, nome do responsável e telefone para contato.',
                         'class' => 'alert-danger'
                     ]);
             }
@@ -132,7 +136,7 @@ class BdoSiteController extends Controller
 
         event(new ExternoEvent('*' . $empresa->razaosocial . '* (' . $empresa->email . ') solicitou inclusão de oportunidade no Balcão de Oportunidades e '.$termo->message()));
 
-        Mail::to(['comunicacao@core-sp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($oportunidade->idoportunidade));
+        Mail::to(['flavio.ferraro@core-sp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($oportunidade->idoportunidade));
 
         return view('site.agradecimento')->with([
             'agradece' => $this->agradecimento()
@@ -173,7 +177,7 @@ class BdoSiteController extends Controller
         $agradece .= '<br><br>';
         $agradece .= 'A(s) vaga(s) será(ão) disponibilizada(s) em até 03 (três) dias úteis, após a verificação dos dados informados.';
         $agradece .= '<br><br>';
-        $agradece .= 'Caso necessite mais esclarecimentos, entre em contato conosco através do email comunicacao@core-sp.org.br.';
+        $agradece .= 'Caso necessite mais esclarecimentos, entre em contato conosco através do email convenios.parcerias@core-sp.org.br.';
         return $agradece;
     }
 }

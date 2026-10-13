@@ -22,7 +22,7 @@ class SolicitaCedulaMail extends Mailable
             $this->body .= '<br /><br />';
             $this->body .= '<strong>Status:</strong> '. $cedula->status;
             $this->body .= '<br /><br />';
-            $this->body .= 'Poderá acompanhar o andamento pela sua própria área restrita.';
+            $this->body .= 'Poderá acompanhar o andamento pela sua própria área exclusiva.';
             $this->body .= '<br /><br />';
             $this->body .= 'O CORE-SP agradece sua solicitação.';
         } else{
@@ -38,7 +38,7 @@ class SolicitaCedulaMail extends Mailable
             if($cedula->contemTipoDigital() && $cedula->cedulaAceita()){
                 $this->body .= '<br /><br />';
                 $this->body .= '<strong>Pedido de Cédula Digital aceito. Em breve, receberá um e-mail com instruções de cadastro no aplicativo. ';
-                $this->body .= '<br>Certifique que o e-mail cadastrado na Área Restrita do Representante está ativo.</strong>';
+                $this->body .= '<br>Certifique que o e-mail cadastrado na Área Exclusiva do Representante está ativo.</strong>';
             }
 
             if($cedula->cedulaRecusada()) {
@@ -46,7 +46,7 @@ class SolicitaCedulaMail extends Mailable
                 $this->body .= '<strong>Motivo:</strong> '. $cedula->justificativa;
                 $this->body .= '<br /><br />';
                 $this->body .= 'Diante disso, deverá cumprir com a exigência acima e posteriormente ingressar com o novo pedido';
-                $this->body .= ' de emissão de cédula na Área Restrita do Representante Comercial no Portal do CORE-SP.';
+                $this->body .= ' de emissão de cédula na Área Exclusiva do Representante Comercial no Portal do CORE-SP.';
             }
         }
         $this->body .= '<br /><br />';

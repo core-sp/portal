@@ -82,10 +82,9 @@
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai hide-768">
               <div class="d-block setembro">
-                <h3><a href="/servicos-atendimento-ao-rc" class="cinza-claro">
-                  <span id="home-atende">Serviços de atendimento ao RC</span></a>
-                </h3>
-                <p class="light"><a href="/servicos-atendimento-ao-rc" class="cinza-claro"><small>Clique aqui e tenha acesso aos principais<br>serviços realizados pelo Setor de Atendimento do Core-SP.</small></a></p>
+                <h4><a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" class="cinza-claro" target="_blank">
+                <img src="{{ asset('img/icon_transparencia.png') }}" alt="Transparência | Core-SP" class="d-inline transparencia-footer">&nbsp;<span id="">Acesso à Informação <br>e Prestação de Contas</span></a>
+                </h4>
               </div>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
@@ -163,11 +162,34 @@
                       <a href="/politica-de-privacidade" class="dropdown-item bb-0">Política de Privacidade</a>
                     </div>
                   </li>
-                  <li class="nav-item">
-                    <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" class="nav-link" target="_blank">Transparência</a>
+                  <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownParcerias" role="button" data-toggle="dropdown">Convênios</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownParcerias">
+                      <a href="/parcerias" class="dropdown-item">Parceiros</a>
+                      <a href="/calculadora" class="dropdown-item">Calculadora</a>
+                      <div class="sub-dropdown">
+                        <div class="dropdown-item">
+                          Vagas de Representação <i class="fas fa-angle-right hide-768"></i><i class="fas fa-angle-down show-inline-768"></i>
+                        </div>
+                        <div class="sub-dropdown-menu">
+                          <a href="/balcao-de-oportunidades" class="dropdown-item">Acessar</a>
+                          <a href="/anunciar-vaga" class="dropdown-item bb-0">Anunciar</a>
+                        </div>
+                      </div>
+                      <div class="sub-dropdown">
+                        <div class="dropdown-item">
+                          Vagas de Representantes <i class="fas fa-angle-right hide-768"></i><i class="fas fa-angle-down show-inline-768"></i>
+                        </div>
+                        <div class="sub-dropdown-menu">
+                          <a href="/balcao-de-oportunidades" class="dropdown-item">Acessar</a>
+                          <a href="{{ route('representante.bdo') }}" class="dropdown-item bb-0">Anunciar</a>
+                        </div>
+                      </div>
+                      {{--<a href="#" class="dropdown-item">Modelo de contrato</a>--}}
+                    </div>
                   </li>
                   <li class="nav-item">
-                    <a href="/prestacao-de-contas-do-core-sp" class="nav-link">Prestação de Contas</a>
+                    <a href="/ouvidoria" class="nav-link">Ouvidoria</a>
                   </li>
                   <li class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownFiscal" role="button" data-toggle="dropdown">Fiscalização</a>
@@ -195,18 +217,8 @@
                         </div>
                       </div>
                       <a href="/anuidade-ano-vigente" class="dropdown-item">Anuidade {{ date('Y') }}</a>
-                      <a href="/representante/login" class="dropdown-item">Área Restrita</a>
+                      <a href="/representante/login" class="dropdown-item">Área Exclusiva</a>
                       <a href="/servicos-atendimento-ao-rc" class="dropdown-item">Atendimento</a>
-                      <div class="sub-dropdown">
-                        <div class="dropdown-item">
-                          Balcão de Oportunidades <i class="fas fa-angle-right hide-768"></i><i class="fas fa-angle-down show-inline-768"></i>
-                        </div>
-                        <div class="sub-dropdown-menu">
-                          <a href="/balcao-de-oportunidades" class="dropdown-item">Acessar</a>
-                          <a href="/anunciar-vaga" class="dropdown-item">Anunciar Vagas</a>
-                          <a href="{{ route('representante.bdo') }}" class="dropdown-item bb-0">Anunciar Representante</a>
-                        </div>
-                      </div>
                       <a href="{{ route('carta-servicos') }}" class="dropdown-item">Carta de Serviços ao Usuário</a>
                       <a href="/consulta-de-situacao" class="dropdown-item">Consulta Pública</a>
                       <a href="/cursos" class="dropdown-item">Cursos</a>
@@ -239,7 +251,7 @@
                 <div class="container">
                   <div class="d-flex">
                     <div class="flex-one text-center">
-                      <h5 class="d-inline-block pr-3 cinza-claro"><strong>Dúvidas frequentes</strong></h5>
+                      <h5 class="d-inline-block pr-3 cinza-claro"><strong>Serviços de atendimento ao RC</strong></h5>
                       <p class="d-inline-block cinza-claro">Clique aqui e tenha acesso aos principais serviços realizados <br class="show-768">pelo Setor de Atendimento do Core-SP.</p>
                     </div>
                   </div>
@@ -327,7 +339,7 @@
               </div>
               <p class="branco"><a href="/agendamento">Agendamento</a></p>
               <p class="branco"><a href="/anuidade-ano-vigente">Anuidade {{ date('Y') }}</a></p>
-              <p class="branco"><a href="/representante/login">Área Restrita</a></p>
+              <p class="branco"><a href="/representante/login">Área Exclusiva</a></p>
               <p class="branco"><a href="/servicos-atendimento-ao-rc">Atendimento</a></p>
               <p class="branco"><a href="/balcao-de-oportunidades">Balcão de Oportunidades</a></p>
               <p class="branco"><a href="{{ route('carta-servicos') }}">Carta de Serviços ao Usuário</a></p>
@@ -427,7 +439,7 @@
       </footer>
       @show
 
-      <div class="container">
+      <div class="container" id="box-consentimento">
         <div class="row d-flex justify-content-center">
           <div class="border border-primary rounded box-cookies hide">
             <p class="msg-cookies">

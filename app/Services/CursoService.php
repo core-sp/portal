@@ -7,6 +7,7 @@ use App\Events\CrudEvent;
 use App\Contracts\CursoServiceInterface;
 use Carbon\Carbon;
 use App\Traits\ImagensLazyLoad;
+use App\Repositories\GerentiRepositoryInterface;
 
 class CursoService implements CursoServiceInterface {
 
@@ -234,14 +235,74 @@ class CursoService implements CursoServiceInterface {
         ];
     }
 
-    public function downloadInscricoes($id)
+    private function getRepGerenti($gerenti, $dados = [])
+    {
+        $rep["RC Ativo"] = "";
+        $rep["RC Registro"] = "";
+        $rep["RC Nome / Empresa"] = "";
+        $rep["RC Tipo"] = "";
+        $rep["RC Financeiro"] = "";
+        $rep["RC Homenagem"] = "";
+
+        if(!empty($dados))
+        {
+            foreach($dados as $key => $dado)
+            {
+                $rep["RC Ativo"] .= $dado["ASS_ATIVO"] == "T" ? 'Ativo * ' : 'Não Ativo * ';
+                $rep["RC Registro"] .= $dado["ASS_REGISTRO"] . ' * ';
+                $rep["RC Nome / Empresa"] .= $dado["ASS_NOME"] . ' * ';
+                $rep["RC Tipo"] .= \App\Representante::mapaCodigoTipoPessoa($dado["ASS_TP_ASSOC"]) . ' * ';
+                $rep["RC Financeiro"] .= $dado["ASS_ATIVO"] == "T" ? trim(explode(':', $gerenti->gerentiStatus($dado["ASS_ID"]))[1]) . ' * ' : "----- * ";
+
+                $ano = substr($dado["ASS_REGISTRO"], -4);
+                $homenagem = intval(date("Y")) - intval($ano);
+                $rep["RC Homenagem"] .= $homenagem >= 25 ? $homenagem . " anos * " : "----- * ";
+            }
+            return $rep;
+        }
+
+        $rep["RC Ativo"] = "-----";
+        $rep["RC Registro"] = "-----";
+        $rep["RC Nome / Empresa"] = "-----";
+        $rep["RC Tipo"] = "-----";
+        $rep["RC Financeiro"] = "-----";
+        $rep["RC Homenagem"] = "-----";
+
+        return $rep;
+    }
+
+    private function preencheTabelaCSV($tabela, GerentiRepositoryInterface $gerenti)
+    {
+        foreach($tabela as $key => $valor)
+        {
+            $rep = array();
+            $dados = $gerenti->gerentiBusca(null, null, apenasNumeros($valor["CPF"]));
+            $rep = $this->getRepGerenti($gerenti, $dados);
+
+            if(empty($rep) && (strlen($valor["Registro Core"]) > 1))
+            {
+                $dados = $gerenti->gerentiBusca(apenasNumeros($valor["Registro Core"]), null, null);
+                $rep = $this->getRepGerenti($gerenti, $dados);
+            }
+
+            if(empty($rep))
+                $rep = $this->getRepGerenti($gerenti);
+            
+            $tabela[$key] = array_merge($valor, $rep);
+        }
+
+        return $tabela;
+    }
+
+    public function downloadInscricoes($id, GerentiRepositoryInterface $gerenti)
     {
         $resultado = Curso::findOrFail($id)->cursoinscrito()
         ->selectRaw('email AS "E-mail", cpf AS "CPF", nome AS "Nome", telefone AS "Telefone", registrocore AS "Registro Core", tipo_inscrito AS "Tipo da Inscrição", campo_adicional AS "Campo Adicional", presenca AS "Compareceu", created_at AS "Data da Inscrição"')
         ->orderBy('created_at', 'desc')
         ->get();
-        
-        $lista = $resultado->toArray();
+
+        $lista = $this->preencheTabelaCSV($resultado->toArray(), $gerenti);
+
         array_unshift($lista, array_keys($lista[0]));
         $callback = function() use($lista) {
             $fh = fopen('php://output','w');

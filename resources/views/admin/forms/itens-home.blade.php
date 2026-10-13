@@ -389,7 +389,7 @@
         <!-- cards-laterais -->
         <fieldset class="form-group border border-primary p-3 mt-2">
             <legend class="w-auto">
-                <small>Cards Laterais - Localizados em notícias, páginas, área restrita...</small>
+                <small>Cards Laterais - Localizados em notícias, páginas, área exclusiva...</small>
             </legend>
 
             <div class="form-row">

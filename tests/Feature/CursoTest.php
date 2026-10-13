@@ -2537,7 +2537,7 @@ class CursoTest extends TestCase
         $this->get(route('representante.cursos'))
         ->assertOk()
         ->assertSee('<a href="'. route('cursos.show', $curso->idcurso) .'">')
-        ->assertSee('<h6 class="light cinza-claro">'. $curso->regional->regional .' - '. onlyDate($curso->datarealizacao) .'</h6>')
+        ->assertSee('<h6 class="light cinza-claro">'/*. $curso->regional->regional */.' <!-- - --> '. onlyDate($curso->datarealizacao) .'</h6>')
         ->assertSee('<a href="'. route('cursos.inscricao.website', $curso->idcurso) .'" class="btn btn-sm btn-primary text-white mt-2">Inscrever-se</a>');
     }
 
@@ -2552,7 +2552,7 @@ class CursoTest extends TestCase
         $this->get(route('representante.cursos'))
         ->assertOk()
         ->assertSee('<a href="'. route('cursos.show', $curso->idcurso) .'">')
-        ->assertSee('<h6 class="light cinza-claro">'. $curso->regional->regional .' - '. onlyDate($curso->datarealizacao) .'</h6>')
+        ->assertSee('<h6 class="light cinza-claro">'/*. $curso->regional->regional */.' <!-- - --> '. onlyDate($curso->datarealizacao) .'</h6>')
         ->assertSee('<a href="'. route('cursos.inscricao.website', $curso->idcurso) .'" class="btn btn-sm btn-primary text-white mt-2">Inscrever-se</a>')
         ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="'.asset('img/small-news-generica-thumb.png').'" data-src="'. asset('img/news-generica-thumb.png') .'" />');
     }
@@ -2567,7 +2567,7 @@ class CursoTest extends TestCase
         $this->get(route('representante.cursos'))
         ->assertOk()
         ->assertSee('<a href="'. route('cursos.show', $curso->idcurso) .'">')
-        ->assertSee('<h6 class="light cinza-claro">'. $curso->regional->regional .' - '. onlyDate($curso->datarealizacao) .'</h6>')
+        ->assertSee('<h6 class="light cinza-claro">'/*. $curso->regional->regional */.' <!-- - --> '. onlyDate($curso->datarealizacao) .'</h6>')
         ->assertSee('<a href="'. route('cursos.inscricao.website', $curso->idcurso) .'" class="btn btn-sm btn-primary text-white mt-2">Inscrever-se</a>')
         ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="" data-src="'. asset($curso->img) .'" />');
     }
@@ -2585,7 +2585,7 @@ class CursoTest extends TestCase
         $this->get(route('representante.cursos'))
         ->assertOk()
         ->assertSee('<a href="'. route('cursos.show', $curso->idcurso) .'">')
-        ->assertSee('<h6 class="light cinza-claro">'. $curso->regional->regional .' - '. onlyDate($curso->datarealizacao) .'</h6>')
+        ->assertSee('<h6 class="light cinza-claro">'/*. $curso->regional->regional */.' <!-- - --> '. onlyDate($curso->datarealizacao) .'</h6>')
         ->assertSee('<a href="'. route('cursos.inscricao.website', $curso->idcurso) .'" class="btn btn-sm btn-primary text-white mt-2">Inscrever-se</a>')
         ->assertSee('<img class="lazy-loaded-image lazy bn-img" src="' .$curso->imgBlur(). '" data-src="'. asset($curso->img) .'" />');
     }
@@ -2603,7 +2603,7 @@ class CursoTest extends TestCase
         $this->get(route('representante.cursos'))
         ->assertOk()
         ->assertSee('<a href="'. route('cursos.show', $curso->idcurso) .'">')
-        ->assertSee('<h6 class="light cinza-claro">'. $curso->regional->regional .' - '. onlyDate($curso->datarealizacao) .'</h6>')
+        ->assertSee('<h6 class="light cinza-claro">'/*. $curso->regional->regional */.' <!-- - --> '. onlyDate($curso->datarealizacao) .'</h6>')
         ->assertSee('<span class="'.$curso::TEXTO_BTN_INSCRITO.'">Inscrição realizada</span>');
     }
 }

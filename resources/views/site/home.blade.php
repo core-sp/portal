@@ -6,7 +6,24 @@
 
 @section('content')
 
-@include('site.inc.popup')
+{{-- @include('site.inc.popup') --}}
+
+<!-- POP UP TEMPORÁRIO -->
+
+<div class="modal hide fade" id="popup-campanha">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content d-flex flex-column">
+            <button type="button" class="btn btn-link position-absolute align-self-end" data-dismiss="modal" aria-label="Close">
+              <i class="fas fa-times-circle fa-lg"></i>
+            </button>
+            <a href="/parcerias">
+              <img src="{{ asset('img/pop-up-parcerias.png') }}" />
+            </a>
+        </div>
+    </div>
+</div>
+
+<!--  -->
 
 @if($imagens->isNotEmpty())
 <section>
@@ -75,7 +92,7 @@
             <h2 class="pr-3 ml-1">Espaço do Representante</h2>
           </blockquote>
           <h5 class="float-right cinza-claro-bg hide-576">
-          <a href="{{ route('representante.login') }}"><i class="fas fa-lock icon-title"></i> Área restrita do Representante</a>
+          <a href="{{ route('representante.login') }}"><i class="fas fa-lock icon-title"></i> Área exclusiva do Representante</a>
           </h5>
         </div>
       </div>
@@ -84,27 +101,30 @@
       <div class="col-lg-3 col-sm-6 pb-15">
         <div class="box text-center {{ isset($itens_home['cards_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_1']) ? 'background-color:'.$itens_home['cards_1'] : '' }}">
           <div class="inside-box">
-            <img src="{{ asset('img/padlock.png') }}" class="inside-img" alt="Área restrita do Representante | Core-SP" />
-            <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Área restrita<br class="hide-992" /> do Representante</h3>
-            <a href="/representante/login" class="d-block h-100">
+            <img src="{{ asset('img/appointment.png') }}" class="inside-img" alt="Agendamento | Core-SP" />
+            <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Serviços ao<br class="hide-992" /> Representante Comercial</h3>
+            <a href="/agendamento" class="d-inline h-100">
               <button class="btn-box azul-escuro">Acessar</button>
             </a>
-            <a href="/representante/cadastro" class="d-block h-100">
-              <button class="btn-box btn-box-little azul-escuro">Cadastrar-se</button>
-            </a>
+            <!-- <a href="/agendamento-consulta" class="d-inline h-100">
+              <button class="btn-box btn-box-little azul-escuro">Consultar</button>
+            </a> -->
           </div>
         </div>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <a href="/consulta-de-situacao" class="d-block">
-          <div class="box text-center {{ isset($itens_home['cards_2']) ? '' : 'azul-bg' }}" style="{{ isset($itens_home['cards_2']) ? 'background-color:'.$itens_home['cards_2'] : '' }}">
-            <div class="inside-box">
-              <img src="{{ asset('img/file.png') }}" class="inside-img" alt="Consulta de Ativos | Core-SP">
-              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Consulta<br class="hide-992" /> Pública</h3>
-              <button class="btn-box azul">Consultar</button>
-            </div>
+        <div class="box text-center {{ isset($itens_home['cards_2']) ? '' : 'azul-bg' }}" style="{{ isset($itens_home['cards_2']) ? 'background-color:'.$itens_home['cards_2'] : '' }}">
+          <div class="inside-box">
+            <img src="{{ asset('img/padlock.png') }}" class="inside-img" alt="Área exclusiva do Representante | Core-SP" />
+            <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Área exclusiva<br class="hide-992" /> do Representante</h3>
+            <a href="/representante/login" class="d-block h-100">
+              <button class="btn-box azul">Acessar</button>
+            </a>
+            <a href="/representante/cadastro" class="d-block h-100">
+              <button class="btn-box btn-box-little azul">Cadastrar-se</button>
+            </a>
           </div>
-        </a>
+        </div>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
         <div class="box text-center {{ isset($itens_home['cards_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_1']) ? 'background-color:'.$itens_home['cards_1'] : '' }}">
@@ -143,18 +163,15 @@
         </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <div class="box text-center {{ isset($itens_home['cards_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_1']) ? 'background-color:'.$itens_home['cards_1'] : '' }}">
-          <div class="inside-box">
-            <img src="{{ asset('img/appointment.png') }}" class="inside-img" alt="Agendamento | Core-SP" />
-            <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Agendamento<br class="hide-992" /> de Atendimento</h3>
-            <a href="/agendamento" class="d-inline h-100">
-              <button class="btn-box azul-escuro">Agendar</button>
-            </a>
-            <a href="/agendamento-consulta" class="d-inline h-100">
-              <button class="btn-box btn-box-little azul-escuro">Consultar</button>
-            </a>
+        <a href="/consulta-de-situacao" class="d-block">
+          <div class="box text-center {{ isset($itens_home['cards_1']) ? '' : 'azul-escuro-bg' }}" style="{{ isset($itens_home['cards_1']) ? 'background-color:'.$itens_home['cards_1'] : '' }}">
+            <div class="inside-box">
+              <img src="{{ asset('img/file.png') }}" class="inside-img" alt="Consulta de Ativos | Core-SP">
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Consulta<br class="hide-992" /> Pública</h3>
+              <button class="btn-box azul-escuro">Consultar</button>
+            </div>
           </div>
-        </div>
+        </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="/cartilha-do-representante" class="d-block h-100">

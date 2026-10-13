@@ -115,6 +115,9 @@ class CursoInscritoController extends Controller
     public function inscricaoView($idcurso)
     {
         try{
+            if($idcurso == 109)
+                return redirect()->route('cursos.show', $idcurso);
+
             $curso = $this->service->getService('Curso')->show($idcurso, true);
             $rep = auth()->guard('representante')->check();
             $dados = array();
@@ -143,6 +146,9 @@ class CursoInscritoController extends Controller
     public function inscricao(CursoInscricaoRequest $request, $idcurso)
     {
         try{
+            if($idcurso == 109)
+                return redirect()->route('cursos.show', $idcurso);
+            
             $validated = $request->validated();
             $curso = $this->service->getService('Curso')->show($idcurso, true);
 
@@ -204,7 +210,7 @@ class CursoInscritoController extends Controller
         $this->authorize('viewAny', auth()->user());
         
         try{
-            $callback = $this->service->getService('Curso')->downloadInscricoes($id);
+            $callback = $this->service->getService('Curso')->downloadInscricoes($id, $this->gerentiRepository);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao realizar download dos inscritos no curso com ID ".$id.".");

@@ -21,7 +21,7 @@ class CursoSubService implements CursoSubServiceInterface {
             'continuacao_titulo' => 'em <strong>'.$curso->tipo.': '.$curso->tema.'</strong>',
             'btn_lixeira' => '<a href="'.route('cursos.index').'" class="btn btn-default"><i class="fas fa-list"></i> Lista de Cursos</a>',
             'busca' => 'cursos/inscritos/'.$curso->idcurso,
-            'addonsHome' => '<a href="'.route('inscritos.download', $curso->idcurso).'" class="btn btn-primary mb-2">Baixar CSV</a>',
+            'addonsHome' => '<button type="button" class="btn btn-primary mb-2 downloadCSV" id="' . $curso->idcurso . '">Baixar CSV</button> <script type="module" src="' . asset('/js/interno/modulos/curso.js?'.hashScriptJs()) . '" data-modulo-id="curso" data-modulo-acao="editar"></script>',
             'btn_criar' => '<a href="'.route('inscritos.create', $curso->idcurso).'" class="btn btn-primary mr-1"><i class="fas fa-plus"></i> Adicionar inscrito</a> ',
         ];
     }
@@ -168,7 +168,7 @@ class CursoSubService implements CursoSubServiceInterface {
         $validated['nome'] = mb_convert_case(mb_strtolower($validated['nome']), MB_CASE_TITLE);
 
         if(isset($validated['cpf']))
-            $validated['cpf'] = formataCpfCnpj(apenasNumeros($validated['cpf']));
+            $validated['cpf'] = formataCpfCnpj(apenasNumerosLetras($validated['cpf']));
 
         if($curso->add_campo)
         {
@@ -261,7 +261,7 @@ class CursoSubService implements CursoSubServiceInterface {
         if(!$curso->liberarAcesso($rep, $situacao))
             return $situacao == '' ? [
                 'rota' => 'representante.login',
-                'message' => 'Deve realizar login na área restrita do representante para se inscrever.',
+                'message' => 'Deve realizar login na área exclusiva do representante para se inscrever.',
                 'class' => 'alert-danger'
             ] : [
                 'rota' => 'representante.cursos',
@@ -278,7 +278,7 @@ class CursoSubService implements CursoSubServiceInterface {
             return array();
 
         $validated['nome'] = mb_convert_case(mb_strtolower($validated['nome']), MB_CASE_TITLE);
-        $validated['cpf'] = formataCpfCnpj(apenasNumeros($validated['cpf']));
+        $validated['cpf'] = formataCpfCnpj(apenasNumerosLetras($validated['cpf']));
         $ip = $validated['ip'];
         unset($validated['ip']);
         unset($validated['termo']);

@@ -36,7 +36,7 @@
                 @if(Session::has('message'))
                     <p class="alert {{ Session::get('class') }}">{{ Session::get('message') }}</p>
                 @endif
-                <p>Caso já tenha se cadastrado, preencha as informações abaixo para <strong>acessar a área restrita do Representante Comercial.</strong></p>
+                <p>Caso já tenha se cadastrado, preencha as informações abaixo para <strong>acessar a área exclusiva do Representante Comercial.</strong></p>
                 <p>Ou então, <a href="{{ route('representante.cadastro') }}">realize o cadastro</a> e depois efetue o login.</p>
                 <form action="{{ route('representante.login.submit') }}" method="POST" class="cadastroRepresentante" autocomplete="off">
                     @csrf

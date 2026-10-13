@@ -25,7 +25,7 @@ class Cnpj implements Rule
      */
     public function passes($attribute, $cnpj)
     {
-        $cnpj = apenasNumeros((string) $cnpj);
+        $cnpj = apenasNumerosLetras((string) $cnpj);
         // Valida tamanho
         if (strlen($cnpj) != 14)
             return false;
@@ -35,6 +35,21 @@ class Cnpj implements Rule
                 return false;
         }
             
+        return $this->cnpjAlfaNumerico($cnpj);
+    }
+
+    /**
+     * Get the validation error message.
+     *
+     * @return string
+     */
+    public function message()
+    {
+        return 'CNPJ inválido';
+    }
+
+    private function cnpjNumerico($cnpj)
+    {
         // Valida primeiro dígito verificador
         for ($i = 0, $j = 5, $soma = 0; $i < 12; $i++)
         {
@@ -54,13 +69,28 @@ class Cnpj implements Rule
         return $cnpj[13] == ($resto < 2 ? 0 : 11 - $resto);
     }
 
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
+    private function cnpjAlfaNumerico($cnpj)
     {
-        return 'CNPJ inválido';
+        $cnpj_sem_dv = substr($cnpj, 0, 12);
+        $primeiro_dv = (string) $this->calcularDVAlfaNumerico($cnpj_sem_dv);
+        $segundo_dv = (string) $this->calcularDVAlfaNumerico($cnpj_sem_dv . $primeiro_dv);
+
+        return $cnpj == ($cnpj_sem_dv . $primeiro_dv . $segundo_dv);
+    }
+
+    private function calcularDVAlfaNumerico($cnpj_base)
+    {
+        $pesos = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        $lenght_cnpj = strlen($cnpj_base);
+        $soma = 0;
+
+        for($indice = $lenght_cnpj - 1; $indice >= 0; $indice--)
+        {
+            $valor_digito = ord($cnpj_base[$indice]) - 48;
+            $soma += $valor_digito * $pesos[(count($pesos) - $lenght_cnpj) + $indice];
+        }
+
+        $resto = $soma % 11;
+        return $resto < 2 ? 0 : 11 - $resto;
     }
 }

@@ -30,7 +30,7 @@
           <img src="{{ asset('img/padlock.png') }}" class="inside-img">
         </div>
         <div class="flex-one align-self-center pl-4">
-          <h5 class="text-uppercase normal branco">Área restrita do Representante</h5>
+          <h5 class="text-uppercase normal branco">Área exclusiva do Representante</h5>
         </div>
       </div>
     </div>

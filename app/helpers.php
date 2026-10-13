@@ -139,7 +139,7 @@ function segmentos()
         'Artigos de festa',
         'Atacadista',
         'Audiovisual',
-        'Auto Peças',
+        'Autopeças',
         'Automação Industrial',
         'Automobilística',
         'Bebidas e Congêneres',
@@ -163,8 +163,8 @@ function segmentos()
         'Decoração',
         'Descartáveis',
         'Educação/Cultura/Lazer',
-        'Eletro Domésticos',
-        'Eletro Eletrônicos',
+        'Eletrodomésticos',
+        'Eletroeletrônicos',
         'Eletrônicos',
         'Embalagens',
         'Energia',
@@ -194,17 +194,17 @@ function segmentos()
         'Informática/Telecom.',
         'Instrumentos Musicais',
         'Isolamento Térmico',
-        'Jóias e Acessórios',
+        'Joias e Acessórios',
         'Jornais e Revistas',
         'Laboratorial',
-        'Langerie',
         'Limpeza e Conservação',
+        'Lingerie',
         'Lubrificantes',
         'Madeira',
         'Máquinas e Equip. Industriais',
         'Máquinas e Equipamentos',
         'Máquinas/Ferramentas',
-        'Matéria Prima',
+        'Matéria-Prima',
         'Materiais Elétricos',
         'Materiais Hidráulicos',
         'Mecânica Industrial',
@@ -214,11 +214,11 @@ function segmentos()
         'Metais',
         'Metalurgia/Mecânica',
         'Mobiliário/Móveis',
-        'Moto Peças',
+        'Motopeças',
         'Motos',
         'Nutrição Animal',
         'Odontológicos',
-        'Óticos',
+        'Óptico',
         'Ortodônticos',
         'Papel e Celulose',
         'Papelaria/Livraria/Revistas',
@@ -245,7 +245,7 @@ function segmentos()
         'Segurança Patrimonial',
         'Segurança',
         'Segurança Industrial',
-        'Sensores Óticos',
+        'Sensores Ópticos',
         'Serviço de Proteção ao Consumidor',
         'Siderúrgica',
         'Suplemento Alimentar',
@@ -472,6 +472,8 @@ function secondLine($situacao, $vencimento = null, $link = null, $descricao = nu
             $str = '<strong class="text-info">PROC. ADM.</strong> ⋅ <a href="' . $link . '" class="normal text-info" data-descricao="'. $descricao .'">BAIXAR BOLETO</a>';
         else
             $str = '<strong class="text-info">PROC. ADM.</strong>';
+    } elseif($situacao === 'Prescrito'){
+        $str = '<strong class="text-secondary">PRESCRITO</strong>';
     } else {
         $str = '<strong class="text-primary">VERIFICAR COM FINANCEIRO</strong>';
     }
@@ -495,8 +497,8 @@ function termoDeUso()
 {
     return '
         <p><strong>1. Aceitação dos Termos e Condições de Uso</strong></p>
-        <p>O uso da Área Restrita do Representante Comercial oferecida pela Core-SP está condicionado à aceitação e ao cumprimento dos Termos e Condições de Uso descritos abaixo.</p>
-        <p>Para fazer uso da Área Restrita, é preciso: (i) ler atentamente os termos descritos abaixo; (ii) concordar expressamente com eles, (iii) se cadastrar fornecendo o CPF/CNPJ, número de registro junto ao Core-SP e o e-mail válido cadastrado no ato de registro profissional, para ter acesso à Área Restrita.</p>
+        <p>O uso da Área Exclusiva do Representante Comercial oferecida pela Core-SP está condicionado à aceitação e ao cumprimento dos Termos e Condições de Uso descritos abaixo.</p>
+        <p>Para fazer uso da Área Exclusiva, é preciso: (i) ler atentamente os termos descritos abaixo; (ii) concordar expressamente com eles, (iii) se cadastrar fornecendo o CPF/CNPJ, número de registro junto ao Core-SP e o e-mail válido cadastrado no ato de registro profissional, para ter acesso à Área Exclusiva.</p>
     ';
 }
 
@@ -528,16 +530,16 @@ function formataRegistro($registro)
 
 function formataCpfCnpj($value)
 {
-    $cnpj_cpf = preg_replace("/\D/", '', $value);
+    $cnpj_cpf = apenasNumerosLetras($value);
     if (strlen($cnpj_cpf) === 11) {
         return preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "\$1.\$2.\$3-\$4", $cnpj_cpf);
     }
-    return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf);
+    return strtoupper(preg_replace("/([A-Za-z0-9]{2})([A-Za-z0-9]{3})([A-Za-z0-9]{3})([A-Za-z0-9]{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf));
 }
 
 function tipoPessoaCpfCnpj($cpf_cpnj)
 {
-    $cpf_cnpj_numero = apenasNumeros($cpf_cpnj);
+    $cpf_cnpj_numero = apenasNumerosLetras($cpf_cpnj);
 
     return strlen($cpf_cnpj_numero) === 11 ? Representante::PESSOA_FISICA : Representante::PESSOA_JURIDICA;
 }
@@ -691,7 +693,7 @@ function concursoSituacoes()
 
 function mostraChatScript()
 {
-    if(config('app.env') !== 'local') {
+    if((config('app.env') !== 'local') && !\Route::is('site.carousel')){
         $hour = date('H');
         $day = date('w');
         if($hour >= 9 && $hour < 18 && $day !== '6' && $day !== '0') {
@@ -826,7 +828,7 @@ function ambiente()
 
 function versaoScriptJs()
 {
-    return '1.4.5';
+    return '1.4.8';
 }
 
 function hashScriptJs()
@@ -839,7 +841,7 @@ function hashScriptJs()
 
 function versaoScriptCss()
 {
-    return '1.0.1';
+    return '1.1.2';
 }
 
 function hashScriptCss()

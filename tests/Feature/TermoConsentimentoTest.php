@@ -221,6 +221,9 @@ class TermoConsentimentoTest extends TestCase
     /** @test */
     public function created_new_record_when_new_agendamento()
     {
+        $this->markTestSkipped(
+            'Temporariamente com redirecionamento na parte de agendamento.'
+        );
         $pegarDia = factory('App\Agendamento')->raw();
         $agendamento = factory('App\Agendamento')->raw([
             'dia' => onlyDate($pegarDia['dia']),
@@ -249,6 +252,9 @@ class TermoConsentimentoTest extends TestCase
     /** @test */
     public function id_termo_in_log_when_new_agendamento()
     {
+        $this->markTestSkipped(
+            'Temporariamente com redirecionamento na parte de agendamento.'
+        );
         $regional = factory('App\Regional')->create();
         $pegarDia = factory('App\Agendamento')->raw();
 

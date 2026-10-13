@@ -42,7 +42,7 @@
                 @endif
                 
                 <p>Informe o CPF ou CNPJ abaixo para verificar a disponibilidade do boleto de anuidade do ano vigente, e então baixe-o clicando no link.</p>
-                <p>Ou, se preferir, acesse a <a href="/representante/login">Área Restrita do Representante,</a> e confira também outras informações relativas ao seu cadastro junto ao Core-SP, incluindo seu extrato financeiro detalhado.</p>
+                <p>Ou, se preferir, acesse a <a href="/representante/login">Área Exclusiva do Representante,</a> e confira também outras informações relativas ao seu cadastro junto ao Core-SP, incluindo seu extrato financeiro detalhado.</p>
                 <p class="text-danger"><strong>
                     IMPORTANTE: para ter acesso ao boleto que unifica as cobranças de anuidade de responsável técnico e pessoa jurídica, digite o <u>CNPJ</u> no campo indicado.
                 </strong></p>    

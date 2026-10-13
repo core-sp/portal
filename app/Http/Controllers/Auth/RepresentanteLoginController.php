@@ -71,13 +71,13 @@ class RepresentanteLoginController extends Controller
     {
         if($request->filled('email_system')){
             $ip = "[IP: " . request()->ip() . "] - ";
-            \Log::channel('externo')->info($ip . 'Possível bot tentou login com cpf/cnpj "' . apenasNumeros($request->cpf_cnpj) . '", mas impedido de verificar o usuário no banco de dados.');
+            \Log::channel('externo')->info($ip . 'Possível bot tentou login com cpf/cnpj "' . apenasNumerosLetras($request->cpf_cnpj) . '", mas impedido de verificar o usuário no banco de dados.');
             throw ValidationException::withMessages([
                 'email_system' => 'error',
             ]);
         }
 
-        $cpfCnpj = apenasNumeros($request->cpf_cnpj);
+        $cpfCnpj = apenasNumerosLetras($request->cpf_cnpj);
         $request->request->set('cpf_cnpj', $cpfCnpj);
         $request->offsetUnset('remember');
         $this->validate($request, [
@@ -96,7 +96,7 @@ class RepresentanteLoginController extends Controller
     protected function attemptLogin(Request $request)
     {
         return $this->guard()->attempt([
-            'cpf_cnpj' => apenasNumeros($request->cpf_cnpj),
+            'cpf_cnpj' => apenasNumerosLetras($request->cpf_cnpj),
             'password' => $request->password,
             'ativo' => 1
         ], $request->remember);
@@ -120,7 +120,7 @@ class RepresentanteLoginController extends Controller
         return redirect()->back()->with([
             'message' => 'Login inválido.',
             'class' => 'alert-danger',
-            'cpf_cnpj' => apenasNumeros($request->cpf_cnpj)
+            'cpf_cnpj' => apenasNumerosLetras($request->cpf_cnpj)
         ]);
     }
 

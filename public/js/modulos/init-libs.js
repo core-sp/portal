@@ -145,6 +145,20 @@ function galeria(){
     });
 }
 
+function animacao(){
+
+    if($('.lib-animacao').length > 0){
+        const _lib = document.createElement('link');
+
+        _lib.setAttribute("rel", 'stylesheet');
+        _lib.setAttribute("href", 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
+        _lib.setAttribute("integrity", 'sha512-c42qTSw/wPZ3/5LBzD+Bw5f7bSF2oxou6wEb+I/lqeaKV5FDIfMvvRp772y4jcJLKuGUOpbJMdg/BTl50fJYAw==');
+        _lib.setAttribute("crossorigin", 'anonymous');
+        _lib.setAttribute("referrerpolicy", 'no-referrer');
+        document.head.appendChild(_lib);
+    }
+}
+
 export function executar(link, hash){
     
     galeria();
@@ -152,4 +166,5 @@ export function executar(link, hash){
     recaptcha();
     tinyInit(link, hash);
 	securityInit(link);
+    animacao();
 }

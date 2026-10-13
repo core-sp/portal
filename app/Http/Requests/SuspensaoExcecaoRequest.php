@@ -24,7 +24,7 @@ class SuspensaoExcecaoRequest extends FormRequest
     {
         if(!isset($this->situacao))
         {
-            $this->merge(['cpf_cnpj' => apenasNumeros($this->cpf_cnpj)]);
+            $this->merge(['cpf_cnpj' => apenasNumerosLetras($this->cpf_cnpj)]);
             if($this->filled('cpf_cnpj'))
             {
                 $suspenso = $this->service->getService('SalaReuniao')->suspensaoExcecao()->verificaSuspenso($this->cpf_cnpj);
