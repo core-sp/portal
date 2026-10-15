@@ -27,7 +27,7 @@ class AgendamentoSalaVerificaRequest extends FormRequest
         $campos = ["NOME" => 'nomeGerenti', "REGISTRONUM" => 'registroGerenti', "EMAILS" => 'emailGerenti', "SITUACAO" => 'situacaoGerenti'];
 
         if($this->filled('cpf_cnpj') && ((strlen($this->cpf_cnpj) == 14) || (strlen($this->cpf_cnpj) == 18))){
-            $dados = utf8_converter($this->gerentiRepository->gerentiAtivo(apenasNumeros($this->cpf_cnpj)));
+            $dados = utf8_converter($this->gerentiRepository->gerentiAtivo(apenasNumerosLetras($this->cpf_cnpj)));
 
             foreach($campos as $key => $value){
                 if(!isset($dados[0][$key]))
@@ -74,7 +74,7 @@ class AgendamentoSalaVerificaRequest extends FormRequest
         if(!\Route::is('sala.reuniao.agendados.verifica.criar'))
         {
             $this->merge(['total_participantes' => isset($this->total_participantes) ? $this->total_participantes : 0]);
-            $this->merge(['cpf_cnpj' => apenasNumeros($this->cpf_cnpj)]);
+            $this->merge(['cpf_cnpj' => apenasNumerosLetras($this->cpf_cnpj)]);
             $campos = ["NOME" => 'nome', "REGISTRONUM" => 'registro_core', "EMAILS" => 'email', "ASS_ID" => 'ass_id'];
             $dados[0]["EMAILS"] = isset($dados[0]["EMAILS"]) ? explode(';', $dados[0]["EMAILS"])[0] : null;
             foreach($campos as $key => $value)

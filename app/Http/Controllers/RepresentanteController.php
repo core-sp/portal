@@ -203,7 +203,7 @@ class RepresentanteController extends Controller
     {
         $request->merge([
             'registro' => apenasNumeros($request->registro),
-            'cpf_cnpj' => apenasNumeros($request->cpf_cnpj),
+            'cpf_cnpj' => apenasNumerosLetras($request->cpf_cnpj),
             'anoCadastro' => apenasNumeros($request->anoCadastro),
             'regional' => is_null($request->regional) ? "" : $request->regional,
             'nome' => is_null($request->nome) ? "" : $request->nome,

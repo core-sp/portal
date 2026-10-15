@@ -28,7 +28,7 @@ function getInfoEmpresa(value){
 
 	$.ajax({
 		type: 'GET',
-		url: '/info-empresa/' + encodeURIComponent(value.replace(/[^\d]+/g,'')),
+		url: '/info-empresa/' + encodeURIComponent(value.replace(/[^A-Za-z0-9]+/g,'')),
 		beforeSend: function(){
             document.dispatchEvent(new CustomEvent("MSG_GERAL_CARREGAR"));
 		},

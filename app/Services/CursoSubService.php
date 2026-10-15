@@ -168,7 +168,7 @@ class CursoSubService implements CursoSubServiceInterface {
         $validated['nome'] = mb_convert_case(mb_strtolower($validated['nome']), MB_CASE_TITLE);
 
         if(isset($validated['cpf']))
-            $validated['cpf'] = formataCpfCnpj(apenasNumeros($validated['cpf']));
+            $validated['cpf'] = formataCpfCnpj(apenasNumerosLetras($validated['cpf']));
 
         if($curso->add_campo)
         {
@@ -278,7 +278,7 @@ class CursoSubService implements CursoSubServiceInterface {
             return array();
 
         $validated['nome'] = mb_convert_case(mb_strtolower($validated['nome']), MB_CASE_TITLE);
-        $validated['cpf'] = formataCpfCnpj(apenasNumeros($validated['cpf']));
+        $validated['cpf'] = formataCpfCnpj(apenasNumerosLetras($validated['cpf']));
         $ip = $validated['ip'];
         unset($validated['ip']);
         unset($validated['termo']);

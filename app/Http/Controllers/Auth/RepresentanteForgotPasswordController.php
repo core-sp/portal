@@ -49,7 +49,7 @@ class RepresentanteForgotPasswordController extends Controller
     {
         $this->validateEmail($request);
         
-        $cpf_cnpj = apenasNumeros($request->only('cpf_cnpj'));
+        $cpf_cnpj = apenasNumerosLetras($request->only('cpf_cnpj'));
         $arrayCC = [
             'cpf_cnpj' => $cpf_cnpj
         ];

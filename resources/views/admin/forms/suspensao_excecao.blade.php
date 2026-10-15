@@ -113,7 +113,7 @@
                     class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
                     id="cpf_cnpj"
                     placeholder="CPF / CNPJ"
-                    value="{{ apenasNumeros(old('cpf_cnpj')) }}"
+                    value="{{ apenasNumerosLetras(old('cpf_cnpj')) }}"
                     required
                 >
                 @if($errors->has('cpf_cnpj'))

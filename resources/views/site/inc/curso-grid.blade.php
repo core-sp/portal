@@ -17,7 +17,11 @@
           <span class="{{ $curso::TEXTO_BTN_INSCRITO }} btn-inscrito-grid"><b>Inscrição realizada</b></span>
         </div>
         @elseif($curso->podeInscreverExterno())
+
+          @if($curso->idcurso != 109)
           <a href="{{ route('cursos.inscricao.website', $curso->idcurso) }}" class="btn-curso-grid mt-3">Inscrever-se</a>
+          @endif
+          
         @elseif(!$curso->aguardandoAbrirInscricao())
           <button class="btn-esgotado mt-3">Vagas esgotadas</button>
         @else

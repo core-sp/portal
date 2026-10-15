@@ -167,7 +167,7 @@ class BdoEmpresaController extends Controller
                 'class' => 'alert-warning'
             ];
 
-        request()->request->set('cnpj', apenasNumeros($cnpj));
+        request()->request->set('cnpj', apenasNumerosLetras($cnpj));
         $this->validate(request(), [
             'cnpj' => ['required', new Cnpj],
         ], [
