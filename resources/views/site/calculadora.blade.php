@@ -37,9 +37,9 @@
     <div class="row mt-2" id="conteudo-principal">
       
       <iframe
-        src="https://www.core-rj.org.br/calculadora-iframe.php"
+        src="https://www.core-rj.org.br/calculadora-iframe.php?core=sp"
         width="100%"
-        height="1300"
+        height="950px"
         style="border: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
         allow="local-storage"
         scrolling="auto"
