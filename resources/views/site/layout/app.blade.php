@@ -176,7 +176,7 @@
                           <a href="/anunciar-vaga" class="dropdown-item bb-0">Anunciar</a>
                         </div>
                       </div>
-                      {{--<a href="#" class="dropdown-item">Modelo de contrato</a>--}}
+                      <a href="/arquivos/2026-10/80/Modelo_Contrato_Representacao_Comercial_CORE_SP.pdf" class="dropdown-item">Modelo de contrato</a>
                     </div>
                   </li>
                   <li class="nav-item">
